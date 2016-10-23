@@ -1,0 +1,94 @@
+\section{Research Vision}
+At a very high level, this research tackles the same problems tackled by many
+existing research projects like BOOM Analytics \cite{alvaro2010boom}, Bloom
+\cite{alvaro2011consistency}, Bloom$^L$ \cite{conway2012logic}, TARDiS
+\cite{crookstardis}, and IPA \cite{holt2016disciplined}:
+
+\begin{quotation}
+  \emph{How can we make writing weakly consistent programs more principled?}
+\end{quotation}
+
+BOOM Analytics, Bloom, and Bloom$^L$ use data-centric declarative programming
+and program analysis based on the CALM theorem. TARDiS exposes the entire
+history of divergent computations to users in a git-like system to empower them
+to programmatically resolve conflicts. IPA uses a type system to ensure weakly
+consistent data doesn't leak into strongly consistent data.
+
+This system builds off existing research on CRDTs and \iconfluence{} to provide
+a library of CRDTs, a language to express invariants over those CRDTs, the
+ability to transactionally update the replicated CRDTs, and a decision
+procedure to algorithmically determine whether the transactions are
+\iconfluent{} with respect to the invariants, ensuring coordination free
+execution if they are and potentially giving illustrative counterexamples when
+they are not. A simple example of psuedocode written with this system may look
+something like this:
+
+\begin{Python}
+# Create an increment/decrement counter CRDT.
+x = PNCounter(0)
+
+# Set the invariant that the counter must always be non-negative.
+set_invariant(x >= 0)
+
+# This transaction is invariant confluent and would be accepted by the system.
+@transaction
+def foo():
+  x.increment(42)
+
+# This transaction is not invariant confluent and would be rejected by the
+# system.
+@transaction
+def bar():
+  x.decrement(1)
+\end{Python}
+
+A more complex example of psuedocode may look something like this:
+
+\begin{Python}
+# A map from employee id to employee name.
+employees = Map[Int, String]()
+# The number of employees.
+num_employees = PN-Counter(0)
+# Employee ids partitioned into teams.
+teams = Set[Set[Int]]
+
+# The number of employees has to equal the size of employees.
+set_invariant(num_employees = employees.size())
+# All ids in teams must appear in employees.
+set_invariant(forall team in teams. team subset employees.keys())
+# All teams must be disjoint.
+set_invariant(forall a, b in teams. a != b => a intersect b = {})
+# Every employee must be on a team
+set_invariant(union(teams) = employees.keys())
+
+# This transaction which adds a new employee would be checked for
+# invariant-confluence by the system.
+@transaction
+def add_employee(name):
+  id = employees.unique_id()
+  employees.put(name, id)
+  num_employees.increment(1)
+  teams[0].add(id)
+\end{Python}
+
+This pseudocode brings up a lot of \emph{theoretical questions}...
+\begin{inparaitem}
+  \item What CRDTs and what operations can we support?
+  \item What invariant languages can we support?
+  \item Given the set of CRDTs and invariants, is determining invariant
+    confluence even decidable?
+  \item If so, can it be determined efficiently?
+  \item If not, how can we limit the CRDTs, operations, or invariants to make
+    it decidable?
+\end{inparaitem}
+...and a lot of \emph{systems questions}:
+\begin{inparaitem}
+  \item Is the system expressive enough to write real-world programs?
+  \item Can the system be implemented as a library in an existing programming
+    language?
+  \item How do we architect and build an actual system out of this?
+\end{inparaitem}
+
+This research aims to answer these questions and develop a first-of-its-kind
+system that allows programmers to write coordination free distributed systems
+with more discipline than ever before.
