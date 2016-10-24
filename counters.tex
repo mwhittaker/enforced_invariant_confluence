@@ -109,16 +109,20 @@ t$, produces a new database state defined as follows:
     D(x)        & otherwise
   \end{cases*}
 \]
+Note that transaction application is commutative. That is for all database
+states $D$ and transactions $t_1$ and $t_2$, $D \circ t_1 \circ t_2 = D \circ
+t_2 \circ t_1$.
 
 A transaction chain $C$ created from a set of transactions $T$ is a sequence of
 transactions $t_1, \ldots, t_n$ where $t_j \in T$ for $1 \leq j \leq n$. Let $D
 \circ C$ be syntactic sugar for $D \circ t_1 \circ \cdots \circ t_n$. We say
-$C$ \emph{satisfies invariant} $I$ if for every database state $D$ and prefix
-$C'$ of $C$, $D \circ C'$ satisfies invariant $I$.
+$C$ \emph{satisfies invariant} $I$ starting at $D$ if for every prefix $C'$ of
+$C$, $D \circ C'$ satisfies invariant $I$.
 
 A set of transactions $T$ is \iconfluent{} with respect to invariant $I$ if for
-all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$,
-$C_1$, and $C_2$ satisfy $I$, then so does $D \circ C_1 \circ C_2$.
+all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$
+satisfies $I$, $C_1$ satisfies $I$ starting at $D$, and $C_2$ satisfies $I$
+starting at $D$, then so does $D \circ C_1 \circ C_2$.
 
 \subsection{A Geometric Interpretation}
 \newcommand{\inva}{x + y \geq 0}
@@ -140,7 +144,7 @@ the set of points in $\ints^n$ that satisfy $I$. In fact, if we canonicalize
 $I$ by eliminating negations and converting to conjunctive normal form, then
 the set of points satisfying $I$ is the intersection (for $\land)$ and union
 (for $\lor$) of the solutions to a set of linear equations and inequalities,
-which is always straightforward to draw.  For example, the set of points
+which is always straightforward to draw. For example, the set of points
 satisfying $\inv$ is shown in \figref{geometric-example}.
 
 \begin{figure}
@@ -216,3 +220,55 @@ Turning again to our example in \figref{geometric-example}, it is now clear
 that any transaction $(k_x, k_y)$ where $y \geq 0$ and $|x| \leq y$ is
 \iconfluent{} with respect to $\inv$. These are the vectors that point up and
 not too far left or right.
+
+\subsection{One is Enough}
+Define a set of transactions $T$ to be $k$-\iconfluent{} with respect to
+invariant $I$ if for all database states $D$ and chains $C_1$ and $C_2$ created
+from $T$ of length at most $k$, if $D$ satisfies $I$, $C_1$ satisfies $I$
+starting at $D$, and $C_2$ satisfies $I$ starting at $D$, then so does $D \circ
+C_1 \circ C_2$.
+%
+A set of transactions $T$ is \iconfluent{} with respect to an invariant $I$ if
+it is $k$-\iconfluent{} for all $k$. Thus, when reasoning about \iconfluent{}
+transactions, we have to consider potentially large transaction chains which
+can be a bit brain boggling. Reasoning about 1-\iconfluence{} is much easier
+because we only have to consider a pair of transactions at a time. This
+subsection proves a convenient lemma that 1-\iconfluence{} and \iconfluence{}
+are equivalent.
+
+\begin{theorem}
+  For all sets of transactions $T$ and invariants $I$, T is 1-\iconfluent{} if
+  and only if it is \iconfluent{}.
+\end{theorem}
+\begin{proof}
+  The reverse direction is immediate from the definition of \iconfluence{}. For
+  the forward direction, consider a set of transactions $T$ that is
+  1-\iconfluent{} with respect to an invariant $I$, but assume for
+  contradiction that $T$ is not \iconfluent{} with respect to $I$. That is,
+  there exists a database state $D$ and two chains $C^1 = t^1_1, t^1_2, \ldots,
+  t^1_m$ and $C^2 = t^2_1, t^2_2, \ldots, t^2_n$ such that $D$ satisfies $I$,
+  $C^1$ satisfies $I$ starting at $D$, and $C^2$ satisfies $I$ starting at $D$
+  but $D \circ C^1 \circ C^2$ does not.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $i$, that $D \circ C^1_j \circ C^2_k$ satisfies $I$
+  for all $0 \leq j \leq m$, $0 \leq k \leq n$, and $0 \leq i = j + k \leq n +
+  m$.
+  %
+  The base case, when $i = 0$, is trivial. $j = k = 0$, and $D \circ C^1_0
+  \circ C^2_0 = D$ which satisfies $I$ by assumption.
+  %
+  For the inductive step, we wish to show for arbitrary $0 \leq j \leq m$, $0
+  \leq k \leq n$, and $0 < i = j + k$ that $D \circ C^1_j \circ C^2_k$
+  satisfies $I$. If $j = 0$, then $D \circ C^1_0 \circ C^2_k = D \circ C^2_k$
+  satisfies $I$ by the assumption that $C^2$ satisfies $I$ starting at $D$, and
+  likewise for when $k = 0$. Now consider $j, k > 0$. By the inductive
+  hypothesis, we know
+    (1) $D \circ C^1_{j-1} \circ C^2_{k-1}$,
+    (2) $D \circ C^1_{j-1} \circ C^2_{k}$, and
+    (3) $D \circ C^1_{j}   \circ C^2_{k-1}$
+  all satisfy $I$. If we let (1) be our initial database state, $t^1_j$ be one
+  chain, and $t^2_k$ be the other chain, then the 1-\iconfluence{} of $T$ tells
+  us that $(1) \circ t^1_j \circ t^2_k = D \circ C^1_j \circ C^2_k$ satisfies
+  $I$.
+\end{proof}
