@@ -119,3 +119,100 @@ $C'$ of $C$, $D \circ C'$ satisfies invariant $I$.
 A set of transactions $T$ is \iconfluent{} with respect to invariant $I$ if for
 all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$,
 $C_1$, and $C_2$ satisfy $I$, then so does $D \circ C_1 \circ C_2$.
+
+\subsection{A Geometric Interpretation}
+\newcommand{\inva}{x + y \geq 0}
+\newcommand{\invb}{x - y \geq 0}
+\newcommand{\invc}{x \geq 1}
+\newcommand{\invd}{x \geq 3}
+\newcommand{\inv}{(\inva \land \invb \land \invc) \lor (\invd)}
+
+Sometimes, we can eyeball whether a transaction is \iconfluent{} with respect
+to an invariant. Other times, not so much. For example, which transactions are
+invariant confluent with respect to the invariant $\inv$? It's not immediately
+clear.  Surprisingly, we can interpret the question ``Is $T$ \iconfluent{} with
+respect to $I$?'' geometrically, and doing so will make answering the question
+much easier!
+
+Consider an invariant $I$ over $n$ variables $x_1, \ldots, x_n$. If we imagine
+the values of the $n$ variables as an $n$-dimensional point, then we can draw
+the set of points in $\ints^n$ that satisfy $I$. In fact, if we canonicalize
+$I$ by eliminating negations and converting to conjunctive normal form, then
+the set of points satisfying $I$ is the intersection (for $\land)$ and union
+(for $\lor$) of the solutions to a set of linear equations and inequalities,
+which is always straightforward to draw.  For example, the set of points
+satisfying $\inv$ is shown in \figref{geometric-example}.
+
+\begin{figure}
+  \newenvironment{griddedpic}{
+    \begin{tikzpicture}
+      \clip (-4, -1) rectangle (4, 4);
+  }{
+      \draw (-4, -1) grid (4, 4);
+      \draw[ultra thick] (-4, 0) -- (4, 0);
+      \draw[ultra thick] (0, -1) -- (0, 4);
+    \end{tikzpicture}
+  }
+
+  \begin{subfigure}[c]{0.5\textwidth}
+    \begin{griddedpic}
+      \fill[red, opacity=0.4]
+        (-10, 10) -- (10, -10) -- (10, 10) -- cycle;
+    \end{griddedpic}
+    \caption{$\inva$}
+  \end{subfigure}
+  \begin{subfigure}[c]{0.5\textwidth}
+    \begin{griddedpic}
+      \fill[blue, opacity=0.4]
+        (-10, -10) -- (10, 10) -- (-10, 10) -- cycle;
+    \end{griddedpic}
+    \caption{$\invb$}
+  \end{subfigure}
+
+  \vspace{0.5cm}
+
+  \begin{subfigure}[c]{0.5\textwidth}
+    \begin{griddedpic}
+      \fill[green, opacity=0.4]
+        (-10, 1) -- (10, 1) -- (10, 10) -- (-10, 10) -- cycle;
+    \end{griddedpic}
+    \caption{$\invc$}
+  \end{subfigure}
+  \begin{subfigure}[c]{0.5\textwidth}
+    \begin{griddedpic}
+      \fill[orange, opacity=0.4]
+        (-10, 3) -- (10, 3) -- (10, 10) -- (-10, 10) -- cycle;
+    \end{griddedpic}
+  \caption{$\invd$}
+  \end{subfigure}
+
+  \vspace{0.5cm}
+
+  \begin{subfigure}[c]{\textwidth}
+    \centering
+    \begin{griddedpic}
+      \fill[purple, opacity=0.4]
+        (-1, 1) -- (-3, 3) -- (-10, 3) -- (-10, 10) -- (10, 10) -- (10, 3) --
+        (3, 3) -- (1, 1) -- cycle;
+    \end{griddedpic}
+    \caption{$\inv$}
+  \end{subfigure}
+
+  \caption{An illustration of the solution to $\inv$.}
+  \label{fig:geometric-example}
+\end{figure}
+
+Next, we can imagine a transaction $t$ as an $n$-dimensional vector $(k_{x_1},
+\ldots, k_{x_n})$ where $t$ adds constant $k_{x_i}$ to variable $x_i$. Now, the
+question of whether a set of transactions $T$ is \iconfluent{} with respect to
+invariant $I$ has been reduced to the following question. Starting at an
+arbitrary point $D$ in the solution space of $I$, if we can add vectors $t^1_1,
+t^1_2, \ldots, t^1_m$ to $D$ and vectors $t^2_1, t^2_2, \ldots, t^2_n$ to $D$
+all while staying in the solution space of $I$, then are we guaranteed that $D
++ t^1_1 + t^1_2 + \ldots + t^1_m + t^2_1 + t^2_2 + \ldots + t^2_n$ is in the
+solution space of $I$?
+
+Turning again to our example in \figref{geometric-example}, it is now clear
+that any transaction $(k_x, k_y)$ where $y \geq 0$ and $|x| \leq y$ is
+\iconfluent{} with respect to $\inv$. These are the vectors that point up and
+not too far left or right.
