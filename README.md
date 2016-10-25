@@ -17,3 +17,9 @@ invariants, and a language of transactions that facilitates the ability for
 I-confluence to be determined algorithmically. An I-confluence decision
 procedure would allow programmers to guarantee that their programs can execute
 without coordination.
+
+This repository contains some [theoretical pencil-and-paper work](doc) to
+characterize with which CRDTs and invariant languages can I-confluence be
+enforced. It also contains some [fully implemented prototypes](src) which
+implement the decision procedures which have been outlined with
+pencil-and-paper.
