@@ -1,7 +1,7 @@
 \section{Counters}
 As a first step towards accomplishing our research vision, let's begin with a
 \emph{simple} CRDT with \emph{simple} operations and a \emph{simple} invariant
-language: PN-counters and linear equations and inequalities.
+language: PN-Counters and linear equations and inequalities.
 
 \subsection{Overview}\label{sec:counter-overview}
 Recall that a \emph{G-Counter} CRDT is an increment-only counter
@@ -30,9 +30,9 @@ decrement $y$ by 42, and increment $z$ by 100.
 
 Given a set of transactions and an invariant, we want to determine whether the
 transactions are \iconfluent{} with respect to the invariant. For example, the
-transaction that \emph{increments} $x$ by 1 is invariant confluent with respect
-to the invariant $x > 0$, but the transaction that \emph{decrements} $x$ by 1
-is not, as shown in \figref{decrement}.
+transaction that \emph{increments} $x$ by 1 is \iconfluent{} with respect to
+the invariant $x > 0$, but the transaction that \emph{decrements} $x$ by 1 is
+not, as shown in \figref{decrement}.
 
 \begin{figure}[h]
   \centering
@@ -114,7 +114,7 @@ states $D$ and transactions $t_1$ and $t_2$, $D \circ t_1 \circ t_2 = D \circ
 t_2 \circ t_1$.
 
 A transaction chain $C$ created from a set of transactions $T$ is a sequence of
-transactions $t_1, \ldots, t_n$ where $t_j \in T$ for $1 \leq j \leq n$. Let $D
+transactions $t_1, \ldots, t_n$ where $t_i \in T$ for $1 \leq i \leq n$. Let $D
 \circ C$ be syntactic sugar for $D \circ t_1 \circ \cdots \circ t_n$. We say
 $C$ \emph{satisfies invariant} $I$ starting at $D$ if for every prefix $C'$ of
 $C$, $D \circ C'$ satisfies invariant $I$.
@@ -122,7 +122,7 @@ $C$, $D \circ C'$ satisfies invariant $I$.
 A set of transactions $T$ is \iconfluent{} with respect to invariant $I$ if for
 all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$
 satisfies $I$, $C_1$ satisfies $I$ starting at $D$, and $C_2$ satisfies $I$
-starting at $D$, then so does $D \circ C_1 \circ C_2$.
+starting at $D$, then $D \circ C_1 \circ C_2$ satisfies $I$.
 
 \subsection{A Geometric Interpretation}\label{sec:counter-geometry}
 \newcommand{\inva}{x + y \geq 0}
@@ -133,7 +133,7 @@ starting at $D$, then so does $D \circ C_1 \circ C_2$.
 
 Sometimes, we can eyeball whether a transaction is \iconfluent{} with respect
 to an invariant. Other times, not so much. For example, which transactions are
-invariant confluent with respect to the invariant $\inv$? It's not immediately
+\iconfluent{} with respect to the invariant $\inv$? It's not immediately
 clear.  Surprisingly, we can interpret the question ``Is $T$ \iconfluent{} with
 respect to $I$?'' geometrically, and doing so will make answering the question
 much easier!
@@ -225,8 +225,8 @@ not too far left or right.
 Define a set of transactions $T$ to be $k$-\iconfluent{} with respect to
 invariant $I$ if for all database states $D$ and chains $C_1$ and $C_2$ created
 from $T$ of length at most $k$, if $D$ satisfies $I$, $C_1$ satisfies $I$
-starting at $D$, and $C_2$ satisfies $I$ starting at $D$, then so does $D \circ
-C_1 \circ C_2$.
+starting at $D$, and $C_2$ satisfies $I$ starting at $D$, then $D \circ
+C_1 \circ C_2$ satisfies $I$.
 %
 A set of transactions $T$ is \iconfluent{} with respect to an invariant $I$ if
 it is $k$-\iconfluent{} for all $k$. Thus, when reasoning about \iconfluent{}
@@ -247,8 +247,8 @@ are equivalent.
   contradiction that $T$ is not \iconfluent{} with respect to $I$. That is,
   there exists a database state $D$ and two chains $C^1 = t^1_1, t^1_2, \ldots,
   t^1_m$ and $C^2 = t^2_1, t^2_2, \ldots, t^2_n$ such that $D$ satisfies $I$,
-  $C^1$ satisfies $I$ starting at $D$, and $C^2$ satisfies $I$ starting at $D$
-  but $D \circ C^1 \circ C^2$ does not.
+  $C^1$ satisfies $I$ starting at $D$, and $C^2$ satisfies $I$ starting at $D$,
+  but $D \circ C^1 \circ C^2$ does not satisfy $I$.
 
   Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
   mathematical induction on $i$, that $D \circ C^1_j \circ C^2_k$ satisfies $I$
@@ -259,11 +259,11 @@ are equivalent.
   \circ C^2_0 = D$ which satisfies $I$ by assumption.
   %
   For the inductive step, we wish to show for arbitrary $0 \leq j \leq m$, $0
-  \leq k \leq n$, and $0 < i = j + k$ that $D \circ C^1_j \circ C^2_k$
-  satisfies $I$. If $j = 0$, then $D \circ C^1_0 \circ C^2_k = D \circ C^2_k$
-  satisfies $I$ by the assumption that $C^2$ satisfies $I$ starting at $D$, and
-  likewise for when $k = 0$. Now consider $j, k > 0$. By the inductive
-  hypothesis, we know
+  \leq k \leq n$, and $i = j + k$ that $D \circ C^1_j \circ C^2_k$ satisfies
+  $I$. If $j = 0$, then $D \circ C^1_0 \circ C^2_k = D \circ C^2_k$ satisfies
+  $I$ by the assumption that $C^2$ satisfies $I$ starting at $D$, and likewise
+  for when $k = 0$. Now consider $j, k > 0$. By the inductive hypothesis, we
+  know
     (1) $D \circ C^1_{j-1} \circ C^2_{k-1}$,
     (2) $D \circ C^1_{j-1} \circ C^2_{k}$, and
     (3) $D \circ C^1_{j}   \circ C^2_{k-1}$
@@ -275,7 +275,7 @@ are equivalent.
 
 \subsection{A Solution}
 This section posed the question: how do we write an algorithm to decide whether
-a set of PN-counter increment/decrement transactions are \iconfluent{} with
+a set of PN-Counter increment/decrement transactions are \iconfluent{} with
 respect to an invariant expressed as a formula of linear equations and
 inequalities?  Now that we're armed with an intuitive
 (\secref{counter-overview}) and formal (\secref{counter-question})
@@ -287,8 +287,8 @@ In a nutshell, our algorithm translates a set of transactions $T$ and invariant
 $I$ into a universally quantified invariant $F$ in prenex normal form where $F$
 is a tautology if and only if $T$ is 1-\iconfluent{} with respect to $I$. Thus,
 by \thmref{one-is-enough}, $F$ is a tautology if and only if $T$ is
-\iconfluent{} with respect to $I$. It then uses Z3 \cite{de2008z3} to check if
-$F$ is a tautology.
+\iconfluent{} with respect to $I$. Our algorithm then uses Z3 \cite{de2008z3}
+to check if $F$ is a tautology.
 
 The algorithm for constructing $F$ is best explained by way of example.
 Consider a simple case where $I = x + y \geq 0$, and $T$ consists of a single
