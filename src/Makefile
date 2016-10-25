@@ -1,7 +1,7 @@
 default: example.byte
 
-%.byte: %.ml
-	ocamlbuild $@
+example.byte: common.ml invariant.ml formula.ml example.ml
+	ocamlbuild example.byte
 
 clean:
 	rm -f *.byte

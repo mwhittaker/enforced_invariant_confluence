@@ -22,7 +22,7 @@ let main () : unit =
   let inv = IA.((inva && invb && invc) || invd) in
 
   Iconfluence.iconfluent_formula txns inv
-  |> Formula.to_z3_validity_check
+  |> Formula.to_z3_script
   |> print_endline
 
 let () = main ()
