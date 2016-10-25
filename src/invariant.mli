@@ -29,11 +29,7 @@ type bexp =
   | Or   of bexp * bexp (* or  *)
   | Impl of bexp * bexp (* implication *)
 
-val atom_to_string : atom -> string
-val aexp_to_string : aexp -> string
-val bexp_to_string : bexp -> string
-
-module Abbreviations: sig
+module Abbreviations : sig
   val x : aexp
   val y : aexp
   val z : aexp
@@ -59,3 +55,13 @@ module Abbreviations: sig
   val (||) : bexp -> bexp -> bexp
   val (=>) : bexp -> bexp -> bexp
 end
+
+(* Converts an atom, aexp, or bexp to a human readable string. *)
+val atom_to_string : atom -> string
+val aexp_to_string : aexp -> string
+val bexp_to_string : bexp -> string
+
+(* Converts an atom, aexp, or bexp to a Z3 sexp. *)
+val atom_to_z3 : atom -> string
+val aexp_to_z3 : aexp -> string
+val bexp_to_z3 : bexp -> string
