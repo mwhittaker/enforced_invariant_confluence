@@ -33,11 +33,13 @@ module Abbreviations : sig
   val x : aexp
   val y : aexp
   val z : aexp
+  val var : string -> aexp
 
   val zero  : aexp
   val one   : aexp
   val two   : aexp
   val three : aexp
+  val four  : aexp
 
   val (~-) : aexp -> aexp
   val (+)  : aexp -> aexp -> aexp
@@ -65,3 +67,12 @@ val bexp_to_string : bexp -> string
 val atom_to_z3 : atom -> string
 val aexp_to_z3 : aexp -> string
 val bexp_to_z3 : bexp -> string
+
+(* Returns the set of variables appearing in an atom, aexp, or bexp. *)
+val vars_of_atom : atom -> Common.StringSet.t
+val vars_of_aexp : aexp -> Common.StringSet.t
+val vars_of_bexp : bexp -> Common.StringSet.t
+
+(* [var_map f a] returns a boolean expression [a'] where all variables [x] in
+ * [a] have been replaced with [f x]. *)
+val var_map : (string -> aexp) -> bexp -> bexp

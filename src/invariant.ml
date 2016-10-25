@@ -24,11 +24,13 @@ module Abbreviations = struct
   let x  = Atom (Var "x")
   let y  = Atom (Var "y")
   let z  = Atom (Var "z")
+  let var x = Atom (Var x)
 
   let zero  = Atom (Const 0)
   let one   = Atom (Const 1)
   let two   = Atom (Const 2)
   let three = Atom (Const 3)
+  let four  = Atom (Const 4)
 
   let (~-) x   = Neg x
   let (+)  x y = Add (x, y)
@@ -98,3 +100,50 @@ let rec bexp_to_z3 a =
   | And  (a, b) -> sprintf "(and %s %s)" (bexp_to_z3 a) (bexp_to_z3 b)
   | Or   (a, b) -> sprintf "(or %s %s)"  (bexp_to_z3 a) (bexp_to_z3 b)
   | Impl (a, b) -> sprintf "(=> %s %s)"  (bexp_to_z3 a) (bexp_to_z3 b)
+
+let vars_of_atom (atom: atom) =
+  match atom with
+  | Var x -> Common.StringSet.singleton x
+  | Const _ -> Common.StringSet.empty
+
+let rec vars_of_aexp x =
+  match x with
+  | Atom atom  -> vars_of_atom atom
+  | Neg x      -> vars_of_aexp x
+  | Add (x, y)
+  | Sub (x, y) -> Common.StringSet.union (vars_of_aexp x) (vars_of_aexp y)
+
+let rec vars_of_bexp a =
+  match a with
+  | Eq  (x, y)
+  | Neq (x, y)
+  | Lt  (x, y)
+  | Leq (x, y)
+  | Gt  (x, y)
+  | Geq (x, y)  -> Common.StringSet.union (vars_of_aexp x) (vars_of_aexp y)
+  | Not  a      -> vars_of_bexp a
+  | And  (a, b)
+  | Or   (a, b)
+  | Impl (a, b) -> Common.StringSet.union (vars_of_bexp a) (vars_of_bexp b)
+
+(* [aexp_var_map] is like [var_map] but for arithmetic expressions. *)
+let rec aexp_var_map (f: string -> aexp) (x: aexp) : aexp =
+  match x with
+  | Atom (Const k) as x -> x
+  | Atom (Var x) -> f x
+  | Neg x -> Neg (aexp_var_map f x)
+  | Add (x, y) -> Add (aexp_var_map f x, aexp_var_map f y)
+  | Sub (x, y) -> Sub (aexp_var_map f x, aexp_var_map f y)
+
+let rec var_map f a =
+  match a with
+  | Eq  (x, y)  -> Eq   (aexp_var_map f x, aexp_var_map f y)
+  | Neq (x, y)  -> Neq  (aexp_var_map f x, aexp_var_map f y)
+  | Lt  (x, y)  -> Lt   (aexp_var_map f x, aexp_var_map f y)
+  | Leq (x, y)  -> Leq  (aexp_var_map f x, aexp_var_map f y)
+  | Gt  (x, y)  -> Gt   (aexp_var_map f x, aexp_var_map f y)
+  | Geq (x, y)  -> Geq  (aexp_var_map f x, aexp_var_map f y)
+  | Not  a      -> Not  (var_map f a)
+  | And  (a, b) -> And  (var_map f a, var_map f b)
+  | Or   (a, b) -> Or   (var_map f a, var_map f b)
+  | Impl (a, b) -> Impl (var_map f a, var_map f b)
