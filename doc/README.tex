@@ -2,26 +2,33 @@
 \title{Enforced Invariant Confluence}
 \author{Michael Whittaker}
 
+\usepackage[hidelinks]{hyperref}
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{centernot}
 \usepackage{mathtools}
 \usepackage{paralist}
-\usepackage{subcaption}
 \usepackage{python}
+\usepackage{stmaryrd}
+\usepackage{subcaption}
 \usepackage{tikz}
 
 \newtheorem{theorem}{Theorem}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+\newtheorem{claim}{Claim}
 \renewcommand{\qedsymbol}{$\blacksquare$}
 
 \newcommand{\figref}[1]{Figure \ref{fig:#1}}
 \newcommand{\secref}[1]{Section \ref{sec:#1}}
 \newcommand{\thmref}[1]{Theorem \ref{thm:#1}}
+\newcommand{\clmref}[1]{Claim \ref{clm:#1}}
 
 \newcommand{\defeq}{\stackrel{\mathclap{\normalfont\mbox{\scriptsize def}}}{=}}
 \newcommand{\dom}[1]{\text{dom}}
 \newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
 
 \newcommand{\iinvariant}{\mathcal{I}}
 \newcommand{\iconfluent}{$\iinvariant$-confluent}
@@ -36,6 +43,7 @@
 \input{vision.tex}
 \input{counters.tex}
 
+\pagebreak{}
 \bibliography{bib}
 \bibliographystyle{plain}
 \end{document}
