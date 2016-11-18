@@ -732,3 +732,85 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   }
   \label{fig:wimp-icviz}
 \end{figure}
+
+\subsection{\iconfluence{} Alternatives}
+\todo{Clarify these rambling thoughts.}
+\iconfluent{}, 1-\iconfluent{}, $\iinvariant$-invariant, $\iinvariant$-safe,
+reachable-$\iinvariant$-safe.
+
+\tikzstyle{txn}=[ultra thick, ->]
+\tikzstyle{dtxn}=[ultra thick, ->, dashed]
+
+\newcommand{\inode}[3][]{
+  \node[draw, shape=circle, minimum width=0.5cm, #1] (#2) at (#3) {};
+  \node[fill, shape=circle] () at (#3) {};
+}
+\newcommand{\nnode}[3][]{
+  \node[fill, shape=circle, #1] (#2) at (#3) {};
+}
+
+\fbox{
+\begin{tikzpicture}[scale=2]
+  \inode[label=above:$D$]{a}{0, 0}
+  \inode[label=left:$D_{t_1}$]{l1}{$(a) + (225:1)$}
+  \inode[label=left:$D_{t_n}$]{l2}{$(l1) + (0, -1)$}
+  \inode[label=right:$D_{u_1}$]{r1}{$(a) + (315:1)$}
+  \inode[label=right:$D_{u_m}$]{r2}{$(r1) + (0, -1)$}
+  \nnode{b}{$(l2) + (315:1)$}
+  \node (le) at ($(l1) + (0, -0.4)$) {\huge $\vdots$};
+  \node (re) at ($(r1) + (0, -0.4)$) {\huge $\vdots$};
+
+  \draw[txn] (a) -- (l1) node[pos=0.3, left] {$t_1(D)$};
+  \draw[txn] (a) -- (r1) node[pos=0.3, right] {$u_1(D)$};
+  \draw[txn] (l2) -- (b);
+  \draw[txn] (r2) -- (b);
+\end{tikzpicture}
+}
+%
+\fbox{
+\begin{tikzpicture}[scale=2]
+  \inode[label=above:$D$]{a}{0, 0}
+  \inode[label=left:$D_{t}$]{l1}{$(a) + (225:1)$}
+  \inode[label=right:$D_{u}$]{r1}{$(a) + (315:1)$}
+  \nnode{b}{$(l1) + (315:1)$}
+
+  \draw[txn] (a) -- (l1) node[pos=0.3, left] {$t(D)$};
+  \draw[txn] (a) -- (r1) node[pos=0.3, right] {$u(D)$};
+  \draw[txn] (l1) -- (b);
+  \draw[txn] (r1) -- (b);
+\end{tikzpicture}
+}
+%
+\fbox{
+\begin{tikzpicture}[scale=2]
+  \inode[label=above:$D$]{a}{0, 0}
+  \nnode{b}{0, -1}
+  \draw[txn] (a) -- (b) node[midway, left]{$t(D)$};
+\end{tikzpicture}
+}
+
+\fbox{
+\begin{tikzpicture}[scale=2]
+  \inode[label=above:$D_1$]{d1}{0, 0}
+  \inode[label=above:$D_2$]{d2}{1, 0}
+  \nnode{b1}{0, -1}
+  \nnode{b2}{1, -1}
+  \draw[txn] (d2) -- (b2) node[midway, right]{$t(D_2)$};
+  \draw[dtxn] (d1) -- (b1) node[midway, left]{$t(D_2)$};
+\end{tikzpicture}
+}
+%
+\fbox{
+\begin{tikzpicture}[scale=2]
+  \inode[label=above:$D_1$]{a1}{0, 1}
+  \inode[label=above:$D_2$]{a2}{1, 1}
+  \inode[label=left:$D_1'$]{d1}{0, 0}
+  \inode[label=right:$D_2'$]{d2}{1, 0}
+  \nnode{b1}{0, -1}
+  \nnode{b2}{1, -1}
+  \draw[txn] (a1) -- (d1);
+  \draw[txn] (a2) -- (d2);
+  \draw[txn] (d2) -- (b2) node[midway, right]{$t(D_2')$};
+  \draw[dtxn] (d1) -- (b1) node[midway, left]{$t(D_2')$};
+\end{tikzpicture}
+}
