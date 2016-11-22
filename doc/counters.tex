@@ -97,8 +97,9 @@ $\var$ and integer constants in $\ints$.
 \end{figure}
 
 A \emph{database state} is a total function $D: \var \to \ints$.  We say a
-database state $D$ \emph{satisfies invariant} $I$ if $I$ evaluates to true
-after all variables in $I$ have been replaced by their mapping in $D$.
+database state $D$ \emph{satisfies invariant} $I$, denoted $I(D)$, if $I$
+evaluates to true after all variables in $I$ have been replaced by their
+mapping in $D$.
 
 A \emph{transaction} is a partial function $t: \var \rightharpoonup \ints$.
 \emph{Applying a transaction} $t$ to database state $D$, denoted by $D \circ
@@ -116,8 +117,8 @@ t_2 \circ t_1$.
 A transaction chain $C$ created from a set of transactions $T$ is a sequence of
 transactions $t_1, \ldots, t_n$ where $t_i \in T$ for $1 \leq i \leq n$. Let $D
 \circ C$ be syntactic sugar for $D \circ t_1 \circ \cdots \circ t_n$. We say
-$C$ \emph{satisfies invariant} $I$ starting at $D$ if for every prefix $C'$ of
-$C$, $D \circ C'$ satisfies invariant $I$.
+$C$ \emph{satisfies invariant} $I$ starting at $D$, denoted $I(C @ D)$, if for
+every prefix $C'$ of $C$, $D \circ C'$ satisfies invariant $I$.
 
 A set of transactions $T$ is \iconfluent{} with respect to invariant $I$ if for
 all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$
@@ -436,12 +437,13 @@ unlike fixed transaction application, \imp{} transaction application is
 \]
 
 An \imp{} transaction chain $B$ created from a set of \imp{} transactions $T$
-is a sequence of transactions $c_1, \ldots, c_n$ where $c_i \in T$ for $1 \leq
-i \leq n$. Each \imp{} transaction chain $B$ starting with database state $D$
-has a corresponding fixed transaction chain $C$. Let $D_i = D \circ c_1 \circ
-\cdots \circ c_i$. Then, the corresponding fixed transaction chain is
-$\denote{c_1}(D_0), \ldots, \denote{c_n}(D_{n-1})$. We say $B$ \emph{satisfies
-invariant} $I$ starting at $D$ if the corresponding fixed transaction chain $C$
+is a sequence of \imp{} transactions $c_1, \ldots, c_n$ where $c_i \in T$ for
+$1 \leq i \leq n$. Each \imp{} transaction chain $B$ starting with database
+state $D$ has a corresponding fixed transaction chain $C$ denoted
+$\denote{B}(D)$. Let $D_i = D \circ c_1 \circ \cdots \circ c_i$. Then, the
+corresponding fixed transaction chain is $\denote{c_1}(D_0), \ldots,
+\denote{c_n}(D_{n-1})$. We say $B$ \emph{satisfies invariant} $I$ starting at
+$D$, denoted $I(B@D)$, if the corresponding fixed transaction chain $C$
 satisfies invariant $I$ starting at $D$.
 
 We say a set of \imp{} transactions $T$ is \iconfluent{} with respect to
@@ -734,13 +736,111 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 \end{figure}
 
 \subsection{\iconfluence{} Alternatives}
-\todo{Clarify these rambling thoughts.}
-\iconfluent{}, 1-\iconfluent{}, $\iinvariant$-invariant, $\iinvariant$-safe,
-reachable-$\iinvariant$-safe.
+\newcommand{\ipreservation}{$\iinvariant$-preservation}
+\newcommand{\ipreserving}{$\iinvariant$-preserving}
+\newcommand{\isafety}{$\iinvariant$-safety}
+\newcommand{\isafe}{$\iinvariant$-safe}
+
+\begin{itemize}
+  \item \todo{Clarify these rambling thoughts.}
+  \item \todo{Add $k$-\isafety to the figure.}
+  \item \todo{Find something between \isafety{} and \iconfluence.}
+\end{itemize}
+
+\begin{itemize}
+  \item \textbf{1-\isafety.}
+    $\forall D, D', c.\>
+      I(D) \land
+      I(D') \implies
+      I(D \circ \denote{c}(D'))$
+
+  \item \textbf{k-\isafety.}
+    $\forall D, D', B, C, c.\>
+        C = \denote{B}(D) \land
+       |B| \leq k-1 \land
+       I(C @ D) \land
+       I(B @ D') \implies
+       I(D \circ C \circ \denote{c}(D' \circ C))$
+
+  \item \textbf{\isafety.}
+    $\forall D, D', B, C, c.\>
+        C = \denote{B}(D) \land
+       I(C @ D) \land
+       I(B @ D') \implies
+       I(D \circ C \circ \denote{c}(D' \circ C))$
+
+  \item \textbf{\ipreservation.}
+    $\forall D, c.\>
+       I(D) \implies
+       I(D \circ \denote{c}(D)$
+
+  \item \textbf{\iconfluence.}
+    $\forall D, B_1, B_2, C_1, C_2. \>
+       C_1 = \denote{B_1}(D) \land
+       C_2 = \denote{B_2}(D) \land
+       I(B_1 @ D) \land
+       I(B_2 @ D) \implies
+       I(D \circ C_1 \circ C_2)$
+
+  \item \textbf{k-\iconfluence.}
+    $\forall D, B_1, B_2, C_1, C_2. \>
+       C_1 = \denote{B_1}(D) \land
+       C_2 = \denote{B_2}(D) \land
+       |B_1|, |B_2| \leq k \land
+       I(B_1 @ D) \land
+       I(B_2 @ D) \implies
+       I(D \circ C_1 \circ C_2)$
+
+  \item \textbf{1-\iconfluence.}
+    $\forall D, c_1, c_2.\>
+       I(D) \land
+       I(D \circ \denote{c_1}(D)) \land
+       I(D \circ \denote{c_2}(D)) \implies
+       I(D \circ \denote{c_1}(D) \circ \denote{c_2}(D))$
+\end{itemize}
+
+\begin{claim}
+  $\text{\iconfluence} \implies \text{$k$-\iconfluence}$
+\end{claim}
+\begin{proof}
+  \todo{Trivial.}
+\end{proof}
+\begin{claim}
+  $\text{1-\iconfluence} \centernot\implies \text{$k$-\iconfluence}$
+\end{claim}
+\begin{proof}
+  See \clmref{wimp-1-iconfluence}.
+\end{proof}
+
+\begin{claim}
+  $k\text{-\iconfluence} \implies \text{1-\iconfluence}$
+\end{claim}
+\begin{proof}
+  \todo{Trivial.}
+\end{proof}
+\begin{claim}
+  $\text{$k$-\iconfluence} \centernot\implies \text{\iconfluence}$
+\end{claim}
+\begin{proof}
+  See \clmref{wimp-1-iconfluence}.
+\end{proof}
+
+\begin{claim}
+  $\text{\isafety} \centernot\implies \text{\ipreservation}$
+\end{claim}
+\begin{proof}
+  \todo{Trivial.}
+\end{proof}
+\begin{claim}
+  $\text{\ipreservation} \centernot\implies \text{\isafety}$
+\end{claim}
+\begin{proof}
+  \todo{Not sure.}
+\end{proof}
 
 \tikzstyle{txn}=[ultra thick, ->]
 \tikzstyle{dtxn}=[ultra thick, ->, dashed]
-
+\tikzstyle{impl}=[-implies, double distance=3pt]
 \newcommand{\inode}[3][]{
   \node[draw, shape=circle, minimum width=0.5cm, #1] (#2) at (#3) {};
   \node[fill, shape=circle] () at (#3) {};
@@ -749,68 +849,155 @@ reachable-$\iinvariant$-safe.
   \node[fill, shape=circle, #1] (#2) at (#3) {};
 }
 
-\fbox{
-\begin{tikzpicture}[scale=2]
-  \inode[label=above:$D$]{a}{0, 0}
-  \inode[label=left:$D_{t_1}$]{l1}{$(a) + (225:1)$}
-  \inode[label=left:$D_{t_n}$]{l2}{$(l1) + (0, -1)$}
-  \inode[label=right:$D_{u_1}$]{r1}{$(a) + (315:1)$}
-  \inode[label=right:$D_{u_m}$]{r2}{$(r1) + (0, -1)$}
-  \nnode{b}{$(l2) + (315:1)$}
-  \node (le) at ($(l1) + (0, -0.4)$) {\huge $\vdots$};
-  \node (re) at ($(r1) + (0, -0.4)$) {\huge $\vdots$};
+\begin{figure}[h]
+  \centering
 
-  \draw[txn] (a) -- (l1) node[pos=0.3, left] {$t_1(D)$};
-  \draw[txn] (a) -- (r1) node[pos=0.3, right] {$u_1(D)$};
-  \draw[txn] (l2) -- (b);
-  \draw[txn] (r2) -- (b);
-\end{tikzpicture}
-}
-%
-\fbox{
-\begin{tikzpicture}[scale=2]
-  \inode[label=above:$D$]{a}{0, 0}
-  \inode[label=left:$D_{t}$]{l1}{$(a) + (225:1)$}
-  \inode[label=right:$D_{u}$]{r1}{$(a) + (315:1)$}
-  \nnode{b}{$(l1) + (315:1)$}
+  \begin{tikzpicture}
+    \node[] (isafety) at (0, 0) {\isafety};
+    \node[] (ipreservation) at ($(isafety) + (30:3)$) {\ipreservation};
+    \node[] (iconfluence) at ($(isafety) + (-30:3)$) {\iconfluence};
+    \node[] (k-iconfluence) at ($(iconfluence) + (4, 0)$) {$k$-\iconfluence};
+    \node[] (1-iconfluence) at ($(k-iconfluence) + (4, 0)$) {1-\iconfluence};
 
-  \draw[txn] (a) -- (l1) node[pos=0.3, left] {$t(D)$};
-  \draw[txn] (a) -- (r1) node[pos=0.3, right] {$u(D)$};
-  \draw[txn] (l1) -- (b);
-  \draw[txn] (r1) -- (b);
-\end{tikzpicture}
-}
-%
-\fbox{
-\begin{tikzpicture}[scale=2]
-  \inode[label=above:$D$]{a}{0, 0}
-  \nnode{b}{0, -1}
-  \draw[txn] (a) -- (b) node[midway, left]{$t(D)$};
-\end{tikzpicture}
-}
+    \draw[impl] (isafety) -> (ipreservation);
+    \draw[impl] (isafety) -> (iconfluence);
+    \draw[impl] (iconfluence) -> (k-iconfluence);
+    \draw[impl] (k-iconfluence) -> (1-iconfluence);
+  \end{tikzpicture}
 
-\fbox{
-\begin{tikzpicture}[scale=2]
-  \inode[label=above:$D_1$]{d1}{0, 0}
-  \inode[label=above:$D_2$]{d2}{1, 0}
-  \nnode{b1}{0, -1}
-  \nnode{b2}{1, -1}
-  \draw[txn] (d2) -- (b2) node[midway, right]{$t(D_2)$};
-  \draw[dtxn] (d1) -- (b1) node[midway, left]{$t(D_2)$};
-\end{tikzpicture}
-}
-%
-\fbox{
-\begin{tikzpicture}[scale=2]
-  \inode[label=above:$D_1$]{a1}{0, 1}
-  \inode[label=above:$D_2$]{a2}{1, 1}
-  \inode[label=left:$D_1'$]{d1}{0, 0}
-  \inode[label=right:$D_2'$]{d2}{1, 0}
-  \nnode{b1}{0, -1}
-  \nnode{b2}{1, -1}
-  \draw[txn] (a1) -- (d1);
-  \draw[txn] (a2) -- (d2);
-  \draw[txn] (d2) -- (b2) node[midway, right]{$t(D_2')$};
-  \draw[dtxn] (d1) -- (b1) node[midway, left]{$t(D_2')$};
-\end{tikzpicture}
-}
+  \caption{}
+  \label{}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{d1}{0, 0}
+      \inode[label=above:$D'$]{d2}{1, 0}
+      \nnode{b1}{0, -1}
+      \nnode{b2}{1, -1}
+      \draw[txn] (d2) -- (b2) node[midway, right]{$t(D')$};
+      \draw[dtxn] (d1) -- (b1) node[midway, left]{$t(D')$};
+    \end{tikzpicture}
+    \caption{1-\isafety}
+    \label{fig:1-isafety}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{a}{0, 0}
+      \nnode{b}{0, -1}
+      \draw[txn] (a) -- (b) node[midway, left]{$t(D)$};
+    \end{tikzpicture}
+    \caption{1-\ipreservation}
+    \label{fig:1-ipreservation}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[label=left:$D_{t}$]{l1}{$(a) + (240:1)$}
+      \inode[label=right:$D_{u}$]{r1}{$(a) + (300:1)$}
+      \nnode{b}{$(l1) + (300:1)$}
+      \draw[txn] (a) -- (l1) node[midway, left] {$t(D)$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$u(D)$};
+      \draw[dtxn] (l1) -- (b) node[midway, left] {$u(D)$};
+      \draw[dtxn] (r1) -- (b) node[midway, right] {$t(D)$};
+    \end{tikzpicture}
+    \caption{1-\iconfluence}
+    \label{fig:1-iconfluence}
+  \end{subfigure}
+
+  \vspace{1cm}
+
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D_0$]{l1}{0, 4}
+      \inode[label=left:$D_1$]{l2}{0, 3}
+      \inode[label=left:$D_{n-1}$]{l3}{0, 1}
+      \nnode{l4}{0, 0}
+
+      \inode[label=above:$D_0'$]{r1}{1, 4}
+      \inode[label=right:$D_1'$]{r2}{1, 3}
+      \inode[label=right:$D_{n-1}'$]{r3}{1, 1}
+      \nnode{r4}{1, 0}
+
+      \draw[txn] (r1) -- (r2) node[midway, right]{$\denote{c_1}(D_0')$};
+      \draw[txn] (r2) -- (r3) node[midway, right]{
+        $\begin{array}{l}
+          \denote{c_2}(D_1'), \\
+          \ldots, \\
+          \denote{c_{n-1}}(D_{n-2}'), \\
+        \end{array}$
+      };
+      \draw[txn] (r3) -- (r4) node[midway, right]{$\denote{c_n}(D_{n-1}')$};
+
+      \draw[dtxn] (l1) -- (l2) node[midway, left]{$\denote{c_1}(D_0')$};
+      \draw[dtxn] (l2) -- (l3) node[midway, left]{
+        $\begin{array}{l}
+          \denote{c_2}(D_1'), \\
+          \ldots, \\
+          \denote{c_{n-1}}(D_{n-2}'), \\
+        \end{array}$
+      };
+      \draw[dtxn] (l3) -- (l4) node[midway, left]{$\denote{c_n}(D_{n-1}')$};
+    \end{tikzpicture}
+
+    \caption{\isafety}
+    \label{fig:isafety}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:{$D = D_{t_0} = D_{u_0}$}]{a}{0, 0}
+      \inode[label=left:$D_{t_1}$]{l1}{$(a) + (240:1.5)$}
+      \inode[label=left:$D_{t_n}$]{l2}{$(l1) + (0, -2)$}
+      \inode[label=right:$D_{u_1}$]{r1}{$(a) + (300:1.5)$}
+      \inode[label=right:$D_{u_m}$]{r2}{$(r1) + (0, -2)$}
+      \nnode{b}{$(l2) + (300:1.5)$}
+
+      \draw[txn] (a) -- (l1) node[midway, left] {$t_1(D_{t_0})$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$u_1(D_{u_0})$};
+      \draw[txn] (l1) -- (l2) node[midway, left] {
+        $\begin{array}{l}
+          t_2(D_{t_1}), \\
+          \ldots, \\
+          t_n(D_{t_{n-1}})
+        \end{array}$
+      };
+      \draw[txn] (r1) -- (r2) node[midway, right] {
+        $\begin{array}{l}
+          u_2(D_{u_1}), \\
+          \ldots, \\
+          u_m(D_{u_{m-1}})
+        \end{array}$
+      };
+      \draw[dtxn] (l2) -- (b) node[midway, left] {
+        $\begin{array}{l}
+          u_i(D_{u_{i-1}}), \\
+          1 \leq i \leq m
+        \end{array}$
+      };
+      \draw[dtxn] (r2) -- (b) node[midway, right] {
+        $\begin{array}{l}
+          t_i(D_{t_{i-1}}), \\
+          1 \leq i \leq n
+        \end{array}$
+      };
+    \end{tikzpicture}
+
+    \caption{\iconfluence}
+    \label{fig:iconfluence}
+  \end{subfigure}
+
+  \caption{}
+  \label{}
+\end{figure}
+
+
