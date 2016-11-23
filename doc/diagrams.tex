@@ -1,0 +1,20 @@
+% Implication.
+\tikzstyle{impl}=[-implies, double distance=3pt]
+
+% Transaction.
+\tikzstyle{txn}=[ultra thick, ->]
+
+% Derived transaction.
+\tikzstyle{dtxn}=[ultra thick, ->, dashed]
+
+% Invariant node.
+\newcommand{\inode}[3][]{
+  \node[draw, shape=circle, minimum width=0.5cm, #1] (#2) at (#3) {};
+  \node[fill, shape=circle, #1] () at (#3) {};
+}
+
+% Normal node.
+\newcommand{\nnode}[3][]{
+  \node[fill, shape=circle, #1] (#2) at (#3) {};
+}
+

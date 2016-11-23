@@ -150,7 +150,7 @@ satisfying $\inv$ is shown in \figref{geometric-example}.
 
 \begin{figure}
   \newenvironment{griddedpic}{
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.4]
       \clip (-4, -1) rectangle (4, 4);
   }{
       \draw (-4, -1) grid (4, 4);
@@ -159,41 +159,40 @@ satisfying $\inv$ is shown in \figref{geometric-example}.
     \end{tikzpicture}
   }
 
-  \begin{subfigure}[c]{0.5\textwidth}
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
     \begin{griddedpic}
       \fill[red, opacity=0.4]
         (-10, 10) -- (10, -10) -- (10, 10) -- cycle;
     \end{griddedpic}
     \caption{$\inva$}
   \end{subfigure}
-  \begin{subfigure}[c]{0.5\textwidth}
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
     \begin{griddedpic}
       \fill[blue, opacity=0.4]
         (-10, -10) -- (10, 10) -- (-10, 10) -- cycle;
     \end{griddedpic}
     \caption{$\invb$}
   \end{subfigure}
-
-  \vspace{0.5cm}
-
-  \begin{subfigure}[c]{0.5\textwidth}
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
     \begin{griddedpic}
       \fill[green, opacity=0.4]
         (-10, 1) -- (10, 1) -- (10, 10) -- (-10, 10) -- cycle;
     \end{griddedpic}
     \caption{$\invc$}
   \end{subfigure}
-  \begin{subfigure}[c]{0.5\textwidth}
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
     \begin{griddedpic}
       \fill[orange, opacity=0.4]
         (-10, 3) -- (10, 3) -- (10, 10) -- (-10, 10) -- cycle;
     \end{griddedpic}
   \caption{$\invd$}
+
   \end{subfigure}
-
-  \vspace{0.5cm}
-
-  \begin{subfigure}[c]{\textwidth}
+  \begin{subfigure}[b]{\textwidth}
     \centering
     \begin{griddedpic}
       \fill[purple, opacity=0.4]
@@ -246,33 +245,265 @@ are equivalent.
   the forward direction, consider a set of transactions $T$ that is
   1-\iconfluent{} with respect to an invariant $I$, but assume for
   contradiction that $T$ is not \iconfluent{} with respect to $I$. That is,
-  there exists a database state $D$ and two chains $C^1 = t^1_1, t^1_2, \ldots,
-  t^1_m$ and $C^2 = t^2_1, t^2_2, \ldots, t^2_n$ such that $D$ satisfies $I$,
-  $C^1$ satisfies $I$ starting at $D$, and $C^2$ satisfies $I$ starting at $D$,
-  but $D \circ C^1 \circ C^2$ does not satisfy $I$.
+  there exists a database state $D$ and two chains $C^t = t_1, t_2, \ldots,
+  t_m$ and $C^u = u_1, u_2, \ldots, u_n$ such that $D$ satisfies $I$,
+  $C^t$ satisfies $I$ starting at $D$, and $C^u$ satisfies $I$ starting at $D$,
+  but $D \circ C^t \circ C^u$ does not satisfy $I$.
 
   Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
-  mathematical induction on $i$, that $D \circ C^1_j \circ C^2_k$ satisfies $I$
+  mathematical induction on $i$, that $D \circ C^t_j \circ C^u_k$ satisfies $I$
   for all $0 \leq j \leq m$, $0 \leq k \leq n$, and $0 \leq i = j + k \leq n +
   m$.
   %
-  The base case, when $i = 0$, is trivial. $j = k = 0$, and $D \circ C^1_0
-  \circ C^2_0 = D$ which satisfies $I$ by assumption.
+  The base case, when $i = 0$, is trivial. $j = k = 0$, and $D \circ C^t_0
+  \circ C^u_0 = D$ which satisfies $I$ by assumption.
   %
   For the inductive step, we wish to show for arbitrary $0 \leq j \leq m$, $0
-  \leq k \leq n$, and $i = j + k$ that $D \circ C^1_j \circ C^2_k$ satisfies
-  $I$. If $j = 0$, then $D \circ C^1_0 \circ C^2_k = D \circ C^2_k$ satisfies
-  $I$ by the assumption that $C^2$ satisfies $I$ starting at $D$, and likewise
+  \leq k \leq n$, and $i = j + k$ that $D \circ C^t_j \circ C^u_k$ satisfies
+  $I$. If $j = 0$, then $D \circ C^t_0 \circ C^u_k = D \circ C^u_k$ satisfies
+  $I$ by the assumption that $C^u$ satisfies $I$ starting at $D$, and likewise
   for when $k = 0$. Now consider $j, k > 0$. By the inductive hypothesis, we
   know
-    (1) $D \circ C^1_{j-1} \circ C^2_{k-1}$,
-    (2) $D \circ C^1_{j-1} \circ C^2_{k}$, and
-    (3) $D \circ C^1_{j}   \circ C^2_{k-1}$
-  all satisfy $I$. If we let (1) be our initial database state, $t^1_j$ be one
-  chain, and $t^2_k$ be the other chain, then the 1-\iconfluence{} of $T$ tells
-  us that $(1) \circ t^1_j \circ t^2_k = D \circ C^1_j \circ C^2_k$ satisfies
+    (1) $D \circ C^t_{j-1} \circ C^u_{k-1}$,
+    (2) $D \circ C^t_{j-1} \circ C^u_{k}$, and
+    (3) $D \circ C^t_{j}   \circ C^u_{k-1}$
+  all satisfy $I$. If we let (1) be our initial database state, $t_j$ be one
+  chain, and $u_k$ be the other chain, then the 1-\iconfluence{} of $T$ tells
+  us that $(1) \circ t_j \circ u_k = D \circ C^t_j \circ C^u_k$ satisfies
   $I$.
 \end{proof}
+
+\newcommand{\baseedges}{
+  \begin{scope}[on background layer]
+    \draw[txn] (03) -- (13) node[midway, above]{$u_1$};
+    \draw[txn] (13) -- (23) node[midway, above]{$u_2$};
+    \draw[txn] (23) -- (33) node[midway, above]{$u_3$};
+    \draw[txn] (03) -- (02) node[midway, left]{$t_1$};
+    \draw[txn] (02) -- (01) node[midway, left]{$t_2$};
+    \draw[txn] (01) -- (00) node[midway, left]{$t_3$};
+    \draw[dtxn] (00) -- (30);
+    \draw[dtxn] (33) -- (30);
+  \end{scope}
+}
+
+\begin{figure}[h]
+  \centering
+  \newcommand{\onescale}{1.1}
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3, 3/3,
+        0/2,
+        0/1,
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+             1/3, 2/3, 3/3,
+        0/2,
+        0/1,
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3,      2/3, 3/3,
+        %
+        0/1,
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/2, 1/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3,      3/3,
+        0/2,
+        %
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/1, 1/2, 2/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3,
+        0/2, 1/2,
+        0/1%
+        %
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/0, 1/1, 2/2, 3/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3, 3/3,
+        0/2, 1/2, 2/2,
+        0/1, 1/1,
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {1/0, 2/1, 3/2} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+      \draw[txn] (00) -- (10) node[midway, above] {$u_1$};
+      \draw[txn] (11) -- (10) node[midway, left]  {$t_3$};
+      \draw[txn] (11) -- (21) node[midway, above] {$u_2$};
+      \draw[txn] (22) -- (21) node[midway, left]  {$t_2$};
+      \draw[txn] (22) -- (32) node[midway, above] {$u_3$};
+      \draw[txn] (33) -- (32) node[midway, left]  {$t_1$};
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3, 3/3,
+        0/2, 1/2, 2/2, 3/2,
+        0/1, 1/1, 2/1,
+        0/0, 1/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {2/0, 3/1} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+      \draw[txn] (00) -- (10) node[midway, above] {$u_1$};
+      \draw[txn] (11) -- (10) node[midway, left]  {$t_3$};
+      \draw[txn] (11) -- (21) node[midway, above] {$u_2$};
+      \draw[txn] (22) -- (21) node[midway, left]  {$t_2$};
+      \draw[txn] (22) -- (32) node[midway, above] {$u_3$};
+      \draw[txn] (33) -- (32) node[midway, left]  {$t_1$};
+      \draw[txn] (10) -- (20) node[midway, above] {$u_2$};
+      \draw[txn] (21) -- (20) node[midway, left]  {$t_3$};
+      \draw[txn] (21) -- (31) node[midway, above] {$u_3$};
+      \draw[txn] (32) -- (31) node[midway, left]  {$t_2$};
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3, 3/3,
+        0/2, 1/2, 2/2, 3/2,
+        0/1, 1/1, 2/1, 3/1,
+        0/0, 1/0, 2/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \inode[red]{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+      \draw[txn] (00) -- (10) node[midway, above] {$u_1$};
+      \draw[txn] (11) -- (10) node[midway, left]  {$t_3$};
+      \draw[txn] (11) -- (21) node[midway, above] {$u_2$};
+      \draw[txn] (22) -- (21) node[midway, left]  {$t_2$};
+      \draw[txn] (22) -- (32) node[midway, above] {$u_3$};
+      \draw[txn] (33) -- (32) node[midway, left]  {$t_1$};
+      \draw[txn] (10) -- (20) node[midway, above] {$u_2$};
+      \draw[txn] (21) -- (20) node[midway, left]  {$t_3$};
+      \draw[txn] (21) -- (31) node[midway, above] {$u_3$};
+      \draw[txn] (32) -- (31) node[midway, left]  {$t_2$};
+      \draw[txn] (20) -- (30) node[midway, above] {$u_3$};
+      \draw[txn] (31) -- (30) node[midway, left]  {$t_3$};
+    \end{tikzpicture}
+    \caption{}
+    \label{}
+  \end{subfigure}
+
+  \caption{TODO}
+  \label{fig:one-is-enough}
+\end{figure}
 
 \subsection{A Solution}\label{sec:solution}
 This section posed the question: how do we write an algorithm to decide whether
@@ -686,19 +917,18 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 \begin{figure}[h]
   \centering
 
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.49\textwidth}
     \centering
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.8]
       \gridxy{}
       \forxy{\node[point] (\x-\y) at (\x, \y) {};}
     \end{tikzpicture}
     \caption{Visualization of $I$.}
     \label{fig:wimp-iviz}
   \end{subfigure}
-
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.49\textwidth}
     \centering
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.8]
       \gridxy{}
       \forxy{\node[point] (\x-\y) at (\x, \y) {};}
       \forxy{\draw[vec] (\x, \y) -- (\x, \y + 1);}
@@ -706,9 +936,10 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
     \caption{Visualization of $c_1$.}
     \label{fig:wimp-c1viz}
   \end{subfigure}
-  \begin{subfigure}[b]{0.32\textwidth}
+
+  \begin{subfigure}[b]{0.49\textwidth}
     \centering
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.8]
       \gridxy{}
       \forxy{\node[point] (\x-\y) at (\x, \y) {};}
       \forxysmall{\draw[vec] (\x, \y) -- (\x + \x + 1, \y);}
@@ -716,9 +947,9 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
     \caption{Visualization of $c_2$.}
     \label{fig:wimp-c2viz}
   \end{subfigure}
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.49\textwidth}
     \centering
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.8]
       \gridxy{}
       \forxy{\node[point] (\x-\y) at (\x, \y) {};}
       \forxysmall{\draw[vec] (\x, \y) -- (\x + \x - 1, \y);}
@@ -745,10 +976,15 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \item \todo{Clarify these rambling thoughts.}
   \item \todo{Add $k$-\isafety to the figure.}
   \item \todo{Find something between \isafety{} and \iconfluence.}
+  \item \todo{Add two state-based proof rules from strong enough paper limited
+              to causal consistency.}
+  \item \todo{Prove state-based proof rules imply iconfluence.}
+  \item \todo{Figure out relationship of proof rules to this stuff.}
+  \item \todo{1-iconfluence with derived txns to start}
 \end{itemize}
 
 \begin{itemize}
-  \item \textbf{1-\isafety.}
+  \item \textbf{0-\isafety.}
     $\forall D, D', c.\>
       I(D) \land
       I(D') \implies
@@ -756,21 +992,18 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
   \item \textbf{k-\isafety.}
     $\forall D, D', B, C, c.\>
-        C = \denote{B}(D) \land
-       |B| \leq k-1 \land
-       I(C @ D) \land
+       C = \denote{B}(D) \land
+       |B| \geq k \land
        I(B @ D') \implies
        I(D \circ C \circ \denote{c}(D' \circ C))$
 
   \item \textbf{\isafety.}
     $\forall D, D', B, C, c.\>
-        C = \denote{B}(D) \land
-       I(C @ D) \land
+       C = \denote{B}(D) \land
        I(B @ D') \implies
        I(D \circ C \circ \denote{c}(D' \circ C))$
 
-  \item \textbf{\ipreservation.}
-    $\forall D, c.\>
+  \item \textbf{\ipreservation.} $\forall D, c.\>
        I(D) \implies
        I(D \circ \denote{c}(D)$
 
@@ -838,29 +1071,18 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \todo{Not sure.}
 \end{proof}
 
-\tikzstyle{txn}=[ultra thick, ->]
-\tikzstyle{dtxn}=[ultra thick, ->, dashed]
-\tikzstyle{impl}=[-implies, double distance=3pt]
-\newcommand{\inode}[3][]{
-  \node[draw, shape=circle, minimum width=0.5cm, #1] (#2) at (#3) {};
-  \node[fill, shape=circle] () at (#3) {};
-}
-\newcommand{\nnode}[3][]{
-  \node[fill, shape=circle, #1] (#2) at (#3) {};
-}
-
 \begin{figure}[h]
   \centering
 
   \begin{tikzpicture}
-    \node[] (isafety) at (0, 0) {\isafety};
-    \node[] (ipreservation) at ($(isafety) + (30:3)$) {\ipreservation};
-    \node[] (iconfluence) at ($(isafety) + (-30:3)$) {\iconfluence};
+    \node[] (0-isafety) at (0, 0) {0-\isafety};
+    \node[] (ipreservation) at ($(0-isafety) + (30:3)$) {\ipreservation};
+    \node[] (iconfluence) at ($(0-isafety) + (-30:3)$) {\iconfluence};
     \node[] (k-iconfluence) at ($(iconfluence) + (4, 0)$) {$k$-\iconfluence};
     \node[] (1-iconfluence) at ($(k-iconfluence) + (4, 0)$) {1-\iconfluence};
 
-    \draw[impl] (isafety) -> (ipreservation);
-    \draw[impl] (isafety) -> (iconfluence);
+    \draw[impl] (0-isafety) -> (ipreservation);
+    \draw[impl] (0-isafety) -> (iconfluence);
     \draw[impl] (iconfluence) -> (k-iconfluence);
     \draw[impl] (k-iconfluence) -> (1-iconfluence);
   \end{tikzpicture}
@@ -918,8 +1140,6 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
     \begin{tikzpicture}[scale=2]
       \inode[label=above:$D_0$]{l1}{0, 4}
-      \inode[label=left:$D_1$]{l2}{0, 3}
-      \inode[label=left:$D_{n-1}$]{l3}{0, 1}
       \nnode{l4}{0, 0}
 
       \inode[label=above:$D_0'$]{r1}{1, 4}
@@ -937,15 +1157,14 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
       };
       \draw[txn] (r3) -- (r4) node[midway, right]{$\denote{c_n}(D_{n-1}')$};
 
-      \draw[dtxn] (l1) -- (l2) node[midway, left]{$\denote{c_1}(D_0')$};
-      \draw[dtxn] (l2) -- (l3) node[midway, left]{
+      \draw[dtxn] (l1) -- (l4) node[midway, left]{
         $\begin{array}{l}
-          \denote{c_2}(D_1'), \\
-          \ldots, \\
-          \denote{c_{n-1}}(D_{n-2}'), \\
+          \denote{c_1}(D_0') \circ {} \\
+          \denote{c_2}(D_1') \circ {} \\
+          \cdots \circ {} \\
+          \denote{c_n}(D_{n-1}')
         \end{array}$
       };
-      \draw[dtxn] (l3) -- (l4) node[midway, left]{$\denote{c_n}(D_{n-1}')$};
     \end{tikzpicture}
 
     \caption{\isafety}
@@ -956,11 +1175,11 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
     \begin{tikzpicture}[scale=2]
       \inode[label=above:{$D = D_{t_0} = D_{u_0}$}]{a}{0, 0}
-      \inode[label=left:$D_{t_1}$]{l1}{$(a) + (240:1.5)$}
-      \inode[label=left:$D_{t_n}$]{l2}{$(l1) + (0, -2)$}
-      \inode[label=right:$D_{u_1}$]{r1}{$(a) + (300:1.5)$}
-      \inode[label=right:$D_{u_m}$]{r2}{$(r1) + (0, -2)$}
-      \nnode{b}{$(l2) + (300:1.5)$}
+      \inode[label=left:$D_{t_1}$]{l1}{$(a) + (240:1)$}
+      \inode[label=left:$D_{t_n}$]{l2}{$(l1) + (240:2)$}
+      \inode[label=right:$D_{u_1}$]{r1}{$(a) + (300:1)$}
+      \inode[label=right:$D_{u_m}$]{r2}{$(r1) + (300:2)$}
+      \nnode{b}{$(l2) + (300:3)$}
 
       \draw[txn] (a) -- (l1) node[midway, left] {$t_1(D_{t_0})$};
       \draw[txn] (a) -- (r1) node[midway, right] {$u_1(D_{u_0})$};
