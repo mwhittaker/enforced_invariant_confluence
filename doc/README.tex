@@ -3,8 +3,8 @@
 \author{Michael Whittaker}
 
 \usepackage[hidelinks]{hyperref}
-\usepackage{amsfonts}
 \usepackage[leqno]{amsmath}
+\usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{centernot}
@@ -20,46 +20,18 @@
 \usetikzlibrary{calc}
 \usetikzlibrary{decorations.pathmorphing}
 
+\input{pervasives.tex}
+\input{notation.tex}
 \input{diagrams.tex}
-
-\makeatletter
-\newcommand{\leqnomode}{\tagsleft@true}
-\newcommand{\reqnomode}{\tagsleft@false}
-\makeatother
-
-\newtheorem{theorem}{Theorem}
-\renewcommand{\qedsymbol}{$\blacksquare$}
-\newtheorem{claim}{Claim}
-\renewcommand{\qedsymbol}{$\blacksquare$}
-
-\newcommand{\figref}[1]{Figure \ref{fig:#1}}
-\newcommand{\secref}[1]{Section \ref{sec:#1}}
-\newcommand{\thmref}[1]{Theorem \ref{thm:#1}}
-\newcommand{\clmref}[1]{Claim \ref{clm:#1}}
-
-\newcommand{\defeq}{\stackrel{\mathclap{\normalfont\mbox{\scriptsize def}}}{=}}
-\newcommand{\dom}[1]{\text{dom}}
-\newcommand{\set}[1]{\left\{#1\right\}}
-\newcommand{\setst}[2]{\left\{#1 \,\middle|\, #2\right\}}
-\newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
-
-\newcommand{\iinvariant}{\mathcal{I}}
-\newcommand{\iconfluent}{$\iinvariant$-confluent}
-\newcommand{\iconfluence}{$\iinvariant$-confluence}
-
-\newcommand{\dbs}{\mathcal{D}}
-
-\newcommand{\todo}[2][mwhittaker]{\textcolor{red}{TODO(#1): #2}}
 
 \begin{document}
 \maketitle
-
 \reqnomode
+
 \input{abstract.tex}
 \input{vision.tex}
 \input{counters.tex}
 
-\pagebreak{}
 \bibliography{bib}
 \bibliographystyle{plain}
 \end{document}

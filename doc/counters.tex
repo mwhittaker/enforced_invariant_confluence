@@ -37,7 +37,6 @@ not, as shown in \figref{decrement}.
 \begin{figure}[h]
   \centering
   \begin{tikzpicture}
-    % \draw (0, 0) grid (4, 4);
     \node[draw] (start)  at (2, 4) {$x=2$};
     \node[draw] (left)   at (0, 2) {$x=1$};
     \node[draw] (right)  at (4, 2) {$x=1$};
@@ -57,9 +56,6 @@ not, as shown in \figref{decrement}.
 \end{figure}
 
 \subsection{Formalizing the Question}\label{sec:counter-question}
-\newcommand{\var}{\textsf{Var}}
-\newcommand{\ints}{\mathbb{Z}}
-
 Our invariant language is defined by the grammar in \figref{invariant-grammar}
 which includes linear equations and inequalities over variables in a finite set
 $\var$ and integer constants in $\ints$.
@@ -580,7 +576,6 @@ and $(x + dx_2, y + dy_2)$ satisfy the invariant, then so does $(x + dx_1 +
 dx_2, y + dy_1 + dy_2)$. In other words, the formula is nothing more than a
 restatement of the definition of 1-\iconfluence!
 
-\newcommand{\imp}{$\iinvariant$MP}
 \subsection{\imp{} Transactions}\label{sec:imptxns}
 So far, we've modelled a transaction $t: \var \rightharpoonup \ints$ as a
 partial function from variables to integers. Intuitively, a transaction chooses
@@ -599,34 +594,32 @@ transactions---transactions written in \imp{}---and ask ourselves the question
 of how do determine whether a set of \imp{} transactions is \iconfluent{} with
 respect to some invariant.
 
-\newcommand{\aexp}{\textsf{Aexp}}
-\newcommand{\bexp}{\textsf{Bexp}}
-\newcommand{\com}{\textsf{Com}}
-\newcommand{\impskip}{\textsf{skip}}
-\newcommand{\impif}[3]{\textsf{if}(#1)\set{#2}\textsf{else}\set{#3}}
 \begin{figure}[h]
   \centering
   \begin{gather*}
     \begin{array}{rrll}
-      \aexp\; a & ::= & k       & \text{\emph{constant}} \\
-                & |   & x       & \text{\emph{variable}} \\
-                & |   & read(x) & \text{\emph{database read}} \\
-                & |   & a + a   & \text{\emph{addition}} \\
-                & |   & a - a   & \text{\emph{subtraction}} \\
-                & |   & - a     & \text{\emph{negation}} \\
+      \impaexp\;
+        a & ::= & k       & \text{\emph{constant}} \\
+          & |   & x       & \text{\emph{variable}} \\
+          & |   & read(x) & \text{\emph{database read}} \\
+          & |   & a + a   & \text{\emph{addition}} \\
+          & |   & a - a   & \text{\emph{subtraction}} \\
+          & |   & - a     & \text{\emph{negation}} \\
       &&& \\
-      \bexp\; b & ::= & \textsf{true}  & \text{\emph{true}} \\
-                & |   & \textsf{false} & \text{\emph{false}} \\
-                & |   & a \odot a      & \text{\emph{linear constraint}} \\
-                & |   & \lnot b        & \text{\emph{negation}} \\
-                & |   & b \lor b       & \text{\emph{disjunction}} \\
-                & |   & b \land b      & \text{\emph{conjunction}} \\
+      \impbexp\;
+        b & ::= & \textsf{true}  & \text{\emph{true}} \\
+          & |   & \textsf{false} & \text{\emph{false}} \\
+          & |   & a \odot a      & \text{\emph{linear constraint}} \\
+          & |   & \lnot b        & \text{\emph{negation}} \\
+          & |   & b \lor b       & \text{\emph{disjunction}} \\
+          & |   & b \land b      & \text{\emph{conjunction}} \\
       &&& \\
-      \com\; c  & ::= & \impskip        & \text{\emph{skip}} \\
-                & |   & x := a          & \text{\emph{assignment}} \\
-                & |   & add(x, a)       & \text{\emph{database adds}} \\
-                & |   & c; c            & \text{\emph{sequence}} \\
-                & |   & \impif{b}{c}{c} & \text{\emph{conditional}} \\
+      \impcom\;
+        c  & ::= & \impskip        & \text{\emph{skip}} \\
+           & |   & x := a          & \text{\emph{assignment}} \\
+           & |   & add(x, a)       & \text{\emph{database adds}} \\
+           & |   & c; c            & \text{\emph{sequence}} \\
+           & |   & \impif{b}{c}{c} & \text{\emph{conditional}} \\
       &&& \\
       \odot & ::= & =    \vert
                     \neq \vert
@@ -640,8 +633,8 @@ respect to some invariant.
   \caption{
     A grammar for \imp{}: a simple imperative transaction language inspired by
     IMP \cite{winskel1993formal} and $\mathcal{L}$ \cite{roy2015homeostasis}.
-    The language consists of arithmetic expressions $\aexp{}$, boolean
-    expressions $\bexp{}$, and commands $\com{}$.
+    The language consists of arithmetic expressions $\impaexp{}$, boolean
+    expressions $\impbexp{}$, and commands $\impcom{}$.
   }
   \label{fig:imp-grammar}
 \end{figure}
@@ -806,7 +799,6 @@ technique from \secref{solution} with slight modification. Unfortunately,
   \label{fig:icviz}
 \end{figure}
 
-\newcommand{\wimp}{W$\iinvariant$MP}
 \subsection{\wimp{} Transactions}\label{sec:datatxns}
 We began this section by looking at fixed transactions and concluded in
 \thmref{one-is-enough} that if a set of fixed transactions is 1-\iconfluent{}
@@ -968,19 +960,6 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 \end{figure}
 
 \subsection{\iconfluence{} Alternatives}
-
-\newcommand{\ipreservation}{$\iinvariant$-preservation}
-\newcommand{\ipreserving}{$\iinvariant$-preserving}
-
-\newcommand{\isafety}{$\iinvariant$-safety}
-\newcommand{\isafe}{$\iinvariant$-safe}
-
-\newcommand{\istrength}{$\iinvariant$-strength}
-\newcommand{\istrong}{$\iinvariant$-strong}
-
-\newcommand{\istrengthstar}{\istrength$^\ast$}
-\newcommand{\istrongstar}{\istrong$^\ast$}
-
 \begin{itemize}
   \item \todo{\istrengthstar $\centernot \implies$ \iconfluence?}
   \item \todo{\iconfluence $\implies$ \istrengthstar?}
