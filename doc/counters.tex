@@ -99,7 +99,7 @@ $\var$ and integer constants in $\ints$.
 A \emph{database state} is a total function $D: \var \to \ints$.  We say a
 database state $D$ \emph{satisfies invariant} $I$, denoted $I(D)$, if $I$
 evaluates to true after all variables in $I$ have been replaced by their
-mapping in $D$.
+mapping in $D$. Let $\dbs$ denote the set of all database states.
 
 A \emph{transaction} is a partial function $t: \var \rightharpoonup \ints$.
 \emph{Applying a transaction} $t$ to database state $D$, denoted by $D \circ
@@ -982,13 +982,9 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 \newcommand{\istrongstar}{\istrong$^\ast$}
 
 \begin{itemize}
-  \item \todo{Clarify these rambling thoughts.}
-  \item \todo{Add $k$-\isafety to the figure.}
+  \item \todo{\istrengthstar $\centernot \implies$ \iconfluence?}
+  \item \todo{\iconfluence $\implies$ \istrengthstar?}
   \item \todo{Find something between \isafety{} and \iconfluence.}
-  \item \todo{Add two state-based proof rules from strong enough paper limited
-              to causal consistency.}
-  \item \todo{Prove state-based proof rules imply iconfluence.}
-  \item \todo{Figure out relationship of proof rules to this stuff.}
   \item \todo{1-iconfluence with derived txns to start}
 \end{itemize}
 
@@ -1073,64 +1069,51 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 \end{itemize}
 
 \begin{claim}
-  $\text{\iconfluence} \implies \text{$k$-\iconfluence}$
+  0-\isafety $\implies$ \istrengthstar.
 \end{claim}
 \begin{proof}
-  \todo{Trivial.}
-\end{proof}
-\begin{claim}
-  $\text{1-\iconfluence} \centernot\implies \text{$k$-\iconfluence}$
-\end{claim}
-\begin{proof}
-  See \clmref{wimp-1-iconfluence}.
-\end{proof}
-
-\begin{claim}
-  $k\text{-\iconfluence} \implies \text{1-\iconfluence}$
-\end{claim}
-\begin{proof}
-  \todo{Trivial.}
-\end{proof}
-\begin{claim}
-  $\text{$k$-\iconfluence} \centernot\implies \text{\iconfluence}$
-\end{claim}
-\begin{proof}
-  See \clmref{wimp-1-iconfluence}.
+  Consider an abitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
+  respect to invariant $I$. We show $T$ is \istrongstar{} with respect to $I$.
+  Let $G_0 = I \times I$. S2 holds trivially: $G_0(I) = I
+  \subseteq I$. Consider an arbitrary $c$, $D$, and $D'$ where $D \in I$ and
+  $(D, D') \in G_0^*$.
+  \begin{align*}
+    & D \in I \land (D, D') \in G_0^*  \\
+    &\implies D \in I \land D' \in I \tag{Definition of $G_0$} \\
+    &\implies D' \in I \land D' \circ \denote{c}(D) \in I \tag{0-\isafety} \\
+    &\implies (D', D' \circ \denote{c}(D)) \in G_0 \tag{Definition of $G_0$}
+  \end{align*}
 \end{proof}
 
 \begin{claim}
-  $\text{\isafety} \centernot\implies \text{\ipreservation}$
+  \istrengthstar $\centernot\implies$ 0-\isafety
 \end{claim}
 \begin{proof}
-  \todo{Trivial.}
-\end{proof}
-\begin{claim}
-  $\text{\ipreservation} \centernot\implies \text{\isafety}$
-\end{claim}
-\begin{proof}
-  \todo{Not sure.}
-\end{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let
+  \begin{itemize}
+    \item
+      $G \defeq \set{(0, 0), (0, 2)} \cup \setst{(a, b)}{a \geq 2, b \geq a}$
+    \item
+      $I \defeq x = 0 \lor x \geq 2$, and
+    \item
+      the single \imp{} transaction $c \defeq
+      \impif{read(x)=0}{add(x, 0)}{add(x, 1)}$.
+  \end{itemize}
 
-\begin{claim}
-  $\text{$k$-\isafety} \land \text{$k$-\iconfluence}
-   \implies \text{\iconfluence}$
-\end{claim}
-\begin{proof}
-  \todo{Not super hard.}
-\end{proof}
+  First note that $c$ is \istrengthstar{} with respect to $I$. S2 holds
+  trivially. To show S3 holds, consider an arbitrary pair $a, b \in G_0^*$.
+  \begin{itemize}
+    \item \textbf{Case $a = 0, b = 0$.}
+      $0 \circ \denote{c}(0) = 0 + 0 = 0$ and $(0, 0) \in G_0$.
+    \item \textbf{Case $a = 0, b >= 2$.}
+      $b \circ \denote{c}(0) = b + 0 = b$ and $(b, b) \in G_0$.
+    \item \textbf{Case $a \geq 2, b >= a$.}
+      $b \circ \denote{c}(a) = b + a$ and $(b, b + a) \in G_0$.
+  \end{itemize}
 
-\begin{claim}
-  State-based proof rule $\implies$ \iconfluence{}.
-\end{claim}
-\begin{proof}
-  \todo{Pretty tough.}
-\end{proof}
-
-\begin{claim}
-  State-based tool proof rule $\implies$ \iconfluence{}.
-\end{claim}
-\begin{proof}
-  \todo{Hard, but similar to the visualized one-is-enough proof.}
+  Now note that $c$ is not 0-\isafe{} with respect to $I$. Notably, $I(0)$ and
+  $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ and $\lnot I(1)$.
 \end{proof}
 
 \begin{figure}[h]
