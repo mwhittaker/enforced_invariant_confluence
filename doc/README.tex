@@ -4,7 +4,7 @@
 
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsfonts}
-\usepackage{amsmath}
+\usepackage[leqno]{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{centernot}
@@ -18,8 +18,14 @@
 \usetikzlibrary{arrows}
 \usetikzlibrary{backgrounds}
 \usetikzlibrary{calc}
+\usetikzlibrary{decorations.pathmorphing}
 
 \input{diagrams.tex}
+
+\makeatletter
+\newcommand{\leqnomode}{\tagsleft@true}
+\newcommand{\reqnomode}{\tagsleft@false}
+\makeatother
 
 \newtheorem{theorem}{Theorem}
 \renewcommand{\qedsymbol}{$\blacksquare$}
@@ -45,6 +51,7 @@
 \begin{document}
 \maketitle
 
+\reqnomode
 \input{abstract.tex}
 \input{vision.tex}
 \input{counters.tex}

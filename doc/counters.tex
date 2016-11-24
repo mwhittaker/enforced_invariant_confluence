@@ -968,10 +968,18 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 \end{figure}
 
 \subsection{\iconfluence{} Alternatives}
+
 \newcommand{\ipreservation}{$\iinvariant$-preservation}
 \newcommand{\ipreserving}{$\iinvariant$-preserving}
+
 \newcommand{\isafety}{$\iinvariant$-safety}
 \newcommand{\isafe}{$\iinvariant$-safe}
+
+\newcommand{\istrength}{$\iinvariant$-strength}
+\newcommand{\istrong}{$\iinvariant$-strong}
+
+\newcommand{\istrengthstar}{\istrength$^\ast$}
+\newcommand{\istrongstar}{\istrong$^\ast$}
 
 \begin{itemize}
   \item \todo{Clarify these rambling thoughts.}
@@ -996,7 +1004,8 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
        C = \denote{B}(D) \land
        |B| \geq k \land
        I(B @ D') \implies
-       I(D \circ C \circ \denote{c}(D' \circ C))$
+       I(C @ D) \land
+       I(D \circ C \circ \denote{c}{D' \circ C})$
 
   \item \textbf{\isafety.}
     $\forall D, D', B, C, c.\>
@@ -1031,6 +1040,36 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
        I(D \circ \denote{c_1}(D)) \land
        I(D \circ \denote{c_2}(D)) \implies
        I(D \circ \denote{c_1}(D) \circ \denote{c_2}(D))$
+
+  \item \textbf{\istrengthstar{} \cite{gotsman2016cause}.}
+    \leqnomode
+    \begin{flalign*}
+      & \exists G_0 \subseteq (\var \to \ints) \times (\var \to \ints).& \\
+      & G_0(I) \subseteq I \land{} & \tag*{S2.} \\
+      & \forall c, D, D'.\>
+          D \in I \land
+          (D, D') \in G_0^* \implies
+          (D', \denote{c}(D)(D')) \in G_0 & \tag*{S3.}
+    \end{flalign*}
+    \reqnomode
+    where $I$ is viewed as a set of database states.
+
+  \item \textbf{\istrength{} \cite{gotsman2016cause}.}
+    \leqnomode
+    \begin{flalign*}
+      & \exists G_0 \subseteq (\var \to \ints) \times (\var \to \ints). & \\
+      & G_0(I) \subseteq I \land{} & \tag*{T2.} \\
+      & \forall c.\> & \tag*{T3.} \\
+      & \exists P_1, \ldots, P_n \subseteq (\var \to \ints).\> & \\
+      & \exists Q_1, \ldots, Q_n \subseteq (\var \to \ints).\> & \\
+      & \quad I \subseteq \cup_{i=1}^n P_i \land {} & \tag*{T3b.} \\
+      & \quad \forall i \in \set{1, \ldots, n}.\> & \\
+      & \quad \quad P_i \subseteq Q_i \land {} & \tag*{T3c.} \\
+      & \quad \quad G_0(Q_i) \subseteq Q_i \land {} & \tag*{T3d.} \\
+      & \quad \quad Q_i \times \denote{c}(P_i)(Q_i) \subseteq G_0 & \tag*{T3e.}
+    \end{flalign*}
+    \reqnomode
+    where $I$ is viewed as a set of database states.
 \end{itemize}
 
 \begin{claim}
@@ -1122,35 +1161,35 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
     \begin{tikzpicture}[scale=2]
       \inode[label=above:$D$]{d1}{0, 0}
       \inode[label=above:$D'$]{d2}{1, 0}
-      \nnode{b1}{0, -1}
+      \dnode{b1}{0, -1}
       \nnode{b2}{1, -1}
-      \draw[txn] (d2) -- (b2) node[midway, right]{$t(D')$};
-      \draw[dtxn] (d1) -- (b1) node[midway, left]{$t(D')$};
+      \draw[txn] (d2) -- (b2) node[midway, right]{$\denote{c}(D')$};
+      \draw[dtxn] (d1) -- (b1) node[midway, left]{$\denote{c}(D')$};
     \end{tikzpicture}
-    \caption{1-\isafety}
-    \label{fig:1-isafety}
+    \caption{0-\isafety}
+    \label{fig:0-isafety}
   \end{subfigure}%
   \begin{subfigure}[b]{0.3\textwidth}
     \centering
     \begin{tikzpicture}[scale=2]
       \inode[label=above:$D$]{a}{0, 0}
-      \nnode{b}{0, -1}
-      \draw[txn] (a) -- (b) node[midway, left]{$t(D)$};
+      \dnode{b}{0, -1}
+      \draw[txn] (a) -- (b) node[midway, left]{$\denote{c}(D)$};
     \end{tikzpicture}
-    \caption{1-\ipreservation}
-    \label{fig:1-ipreservation}
+    \caption{\ipreservation}
+    \label{fig:ipreservation}
   \end{subfigure}%
   \begin{subfigure}[b]{0.3\textwidth}
     \centering
     \begin{tikzpicture}[scale=2]
       \inode[label=above:$D$]{a}{0, 0}
-      \inode[label=left:$D_{t}$]{l1}{$(a) + (240:1)$}
-      \inode[label=right:$D_{u}$]{r1}{$(a) + (300:1)$}
-      \nnode{b}{$(l1) + (300:1)$}
-      \draw[txn] (a) -- (l1) node[midway, left] {$t(D)$};
-      \draw[txn] (a) -- (r1) node[midway, right] {$u(D)$};
-      \draw[dtxn] (l1) -- (b) node[midway, left] {$u(D)$};
-      \draw[dtxn] (r1) -- (b) node[midway, right] {$t(D)$};
+      \inode[label=left:$D_{c}$]{l1}{$(a) + (240:1)$}
+      \inode[label=right:$D_{d}$]{r1}{$(a) + (300:1)$}
+      \dnode{b}{$(l1) + (300:1)$}
+      \draw[txn] (a) -- (l1) node[midway, left] {$\denote{c}(D)$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$\denote{d}(D)$};
+      \draw[txn] (l1) -- (b) node[midway, left] {$\denote{d}(D)$};
+      \draw[txn] (r1) -- (b) node[midway, right] {$\denote{c}(D)$};
     \end{tikzpicture}
     \caption{1-\iconfluence}
     \label{fig:1-iconfluence}
@@ -1161,9 +1200,11 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \begin{subfigure}[b]{0.5\textwidth}
     \centering
 
-    \begin{tikzpicture}[scale=2]
+    \begin{tikzpicture}[scale=1.5]
       \inode[label=above:$D_0$]{l1}{0, 4}
-      \nnode{l4}{0, 0}
+      \dnode[label=left:$D_1$]{l2}{0, 3}
+      \dnode[label=left:$D_{n-1}$]{l3}{0, 1}
+      \dnode{l4}{0, 0}
 
       \inode[label=above:$D_0'$]{r1}{1, 4}
       \inode[label=right:$D_1'$]{r2}{1, 3}
@@ -1175,67 +1216,81 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
         $\begin{array}{l}
           \denote{c_2}(D_1'), \\
           \ldots, \\
-          \denote{c_{n-1}}(D_{n-2}'), \\
+          \denote{c_k}(D_{k-1}'), \\
         \end{array}$
       };
-      \draw[txn] (r3) -- (r4) node[midway, right]{$\denote{c_n}(D_{n-1}')$};
+      \draw[txn] (r3) -- (r4) node[midway, right]{$\denote{c_{k+1}}(D_{k}')$};
 
-      \draw[dtxn] (l1) -- (l4) node[midway, left]{
+      \draw[txn] (l1) -- (l2) node[midway, left]{$\denote{c_1}(D_0')$};
+      \draw[txn] (l2) -- (l3) node[midway, left]{
         $\begin{array}{l}
-          \denote{c_1}(D_0') \circ {} \\
-          \denote{c_2}(D_1') \circ {} \\
-          \cdots \circ {} \\
-          \denote{c_n}(D_{n-1}')
+          \denote{c_2}(D_1'), \\
+          \ldots, \\
+          \denote{c_k}(D_{k-1}'), \\
         \end{array}$
       };
+      \draw[txn] (l3) -- (l4) node[midway, left]{$\denote{c_{k+1}}(D_{k}')$};
     \end{tikzpicture}
 
-    \caption{\isafety}
-    \label{fig:isafety}
+    \caption{$k$-\isafety}
+    \label{fig:k-isafety}
   \end{subfigure}%
   \begin{subfigure}[b]{0.5\textwidth}
     \centering
 
-    \begin{tikzpicture}[scale=2]
-      \inode[label=above:{$D = D_{t_0} = D_{u_0}$}]{a}{0, 0}
-      \inode[label=left:$D_{t_1}$]{l1}{$(a) + (240:1)$}
-      \inode[label=left:$D_{t_n}$]{l2}{$(l1) + (240:2)$}
-      \inode[label=right:$D_{u_1}$]{r1}{$(a) + (300:1)$}
-      \inode[label=right:$D_{u_m}$]{r2}{$(r1) + (300:2)$}
-      \nnode{b}{$(l2) + (300:3)$}
+    \begin{tikzpicture}[scale=1.5]
+      \inode[label=above:{$D = D_{c_0} = D_{d_0}$}]{a}{0, 0}
+      \inode[label=left:$D_{c_1}$]{l1}{$(a) + (240:1)$}
+      \inode[label=left:$D_{c_n}$]{l2}{$(l1) + (240:2)$}
+      \inode[label=right:$D_{d_1}$]{r1}{$(a) + (300:1)$}
+      \inode[label=right:$D_{d_m}$]{r2}{$(r1) + (300:2)$}
+      \dnode{b}{$(l2) + (300:3)$}
 
-      \draw[txn] (a) -- (l1) node[midway, left] {$t_1(D_{t_0})$};
-      \draw[txn] (a) -- (r1) node[midway, right] {$u_1(D_{u_0})$};
+      \draw[txn] (a) -- (l1) node[midway, left] {$\denote{c_1}(D_{c_0})$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$\denote{d_1}(D_{d_0})$};
       \draw[txn] (l1) -- (l2) node[midway, left] {
         $\begin{array}{l}
-          t_2(D_{t_1}), \\
+          \denote{c_2}(D_{c_1}), \\
           \ldots, \\
-          t_n(D_{t_{n-1}})
+          \denote{c_n}(D_{c_{n-1}})
         \end{array}$
       };
       \draw[txn] (r1) -- (r2) node[midway, right] {
         $\begin{array}{l}
-          u_2(D_{u_1}), \\
+          \denote{d_2}(D_{d_1}), \\
           \ldots, \\
-          u_m(D_{u_{m-1}})
+          \denote{d_m}(D_{d_{m-1}})
         \end{array}$
       };
-      \draw[dtxn] (l2) -- (b) node[midway, left] {
-        $\begin{array}{l}
-          u_i(D_{u_{i-1}}), \\
-          1 \leq i \leq m
-        \end{array}$
+      \draw[txn] (l2) -- (b) node[midway, left] {
+          $\displaystyle \bigcirc_{i=1}^m \denote{d_i} (D_{d_{i-1}})$
       };
-      \draw[dtxn] (r2) -- (b) node[midway, right] {
-        $\begin{array}{l}
-          t_i(D_{t_{i-1}}), \\
-          1 \leq i \leq n
-        \end{array}$
+      \draw[txn] (r2) -- (b) node[midway, right] {
+        $\displaystyle \bigcirc_{i=1}^n \denote{c_i} (D_{c_{i-1}})$
       };
     \end{tikzpicture}
 
     \caption{\iconfluence}
     \label{fig:iconfluence}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{s2a}{0, 1}
+      \dnode{s2b}{0, 0}
+      \draw[gtxn] (s2a) -- (s2b) node[midway, left]{$\denote{c}(D)$};
+
+      \inode[label=above:$D$]{s3a}{2, 1}
+      \nnode[]{s3b}{2, 0}
+      \inode[label=above:$D'$]{s3c}{3, 1}
+      \nnode[]{s3d}{3, 0}
+      \draw[txn] (s3a) -- (s3b) node[midway, left] {$\denote{c}(D)$};
+      \draw[dgtxn] (s3c) -- (s3d) node[midway, right] {$\denote{c}(D)$};
+      \draw[gtxn] (s3a) -- (s3c) node[midway, above] {$G_0^*$};
+    \end{tikzpicture}
+    \caption{\istrengthstar}
+    \label{fig:istrengthstar}
   \end{subfigure}
 
   \caption{}

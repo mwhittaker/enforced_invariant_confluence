@@ -4,12 +4,24 @@
 % Transaction.
 \tikzstyle{txn}=[ultra thick, ->]
 
-% Derived transaction.
+% Dashed transaction.
 \tikzstyle{dtxn}=[ultra thick, ->, dashed]
+
+% G transaction.
+\tikzstyle{gtxn}=[ultra thick, ->, decorate, decoration={zigzag}]
+
+% Dashed G transaction.
+\tikzstyle{dgtxn}=[ultra thick, ->, densely dashed, decorate, decoration={zigzag}]
 
 % Invariant node.
 \newcommand{\inode}[3][]{
-  \node[draw, shape=circle, minimum width=0.5cm] (#2) at (#3) {};
+  \node[draw, shape=circle, minimum width=0.6cm] (#2) at (#3) {};
+  \node[fill, shape=circle, #1] () at (#3) {};
+}
+
+% Dashed node.
+\newcommand{\dnode}[3][]{
+  \node[draw, dashed, shape=circle, minimum width=0.6cm] (#2) at (#3) {};
   \node[fill, shape=circle, #1] () at (#3) {};
 }
 
