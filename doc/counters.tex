@@ -1203,6 +1203,52 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \istrongstar{} with respect to $I$.
 \end{proof}
 
+\begin{claim}\label{clm:0-isafety-implies-istrength}
+  0-\isafety{} $\implies$ \istrength{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
+  respect to invariant $I$; we show $T$ is \istrong{} with respect to $I$. Let
+  $G_0 = I \times I$. $T2$ holds trivially. For all $c \in T$, let $n = 1$ and
+  $P_n = Q_n = I$. T3b, T3c, and T3d reduce to $I \subseteq I$, $I \subseteq
+  I$, and $G_0(I) \subseteq I$ which all hold trivially. T3e reduces to $I
+  \times \denote{c}(I)(I) \subseteq G_0$. To prove this, it is sufficient to
+  prove $\denote{c}(I)(I) \subseteq I$ which holds directly from 0-\isafety{}.
+\end{proof}
+
+\begin{claim}\label{clm:0-istrength-not-implies-0-isafety}
+  \istrength{} $\centernot\implies$ 0-\isafety.
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let
+  \begin{itemize}
+    \item
+      $G_0 \defeq \set{(0, 0)} \cup \setst{(a, b)}{a \geq 2, b \geq 2}$;
+    \item
+      $I \defeq x = 0 \lor x \geq 2$;
+    \item
+      the single \imp{} transaction $c \defeq
+      \impif{read(x)=0}{add(x, 0)}{add(x, 1)}$;
+    \item
+      $n \defeq 2$;
+    \item
+      $P_1 \defeq Q_1 \defeq \set{0}$; and
+    \item
+      $P_2 \defeq Q_2 \defeq \setst{x}{x \geq 2}$.
+  \end{itemize}
+
+ First note that $c$ is \istrong{} with respect to $I$.  T2, T3b, T3c, and T3d
+ hold trivially. For $i = 1$, T3e reduces to $\set{0} \times
+ \denote{c}(\set{0})(\set{0}) \subseteq G_0$ which holds because $\set{(0, 0
+ \circ \denote{c}(0)} = \set{(0, 0)} \subseteq G_0$. For $i = 2$, consider
+ arbitrary databse states $x,y,z \in P_2 = G_2$. $(x, y \circ \denote{c}(z)) =
+ (x, y + 1) \in G_0$. Thus T3e holds for $i = 2$.
+
+  Now note that $c$ is not 0-\isafe{} with respect to $I$. Notably, $I(0)$ and
+  $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ does not satisfy $I$.
+\end{proof}
+
 \begin{figure}[h]
   \centering
 
@@ -1215,9 +1261,11 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
     \node[right=of istrengthstar] (iconfluence)   {\iconfluence};
     \node[below=of iconfluence]   (k-iconfluence) {$k$-\iconfluence};
     \node[below=of k-iconfluence] (1-iconfluence) {1-\iconfluence};
+    \node[below=of istrengthstar] (istrength)     {\istrength};
 
     \draw[ultra thick, impl] (0-isafety) -> (istrengthstar);
     \draw[ultra thick, impl] (istrengthstar) -> (iconfluence);
+    \draw[ultra thick, impl] (0-isafety) -> (istrength);
     \draw[impl] (iconfluence) -> (k-iconfluence);
     \draw[impl] (k-iconfluence) -> (1-iconfluence);
     \draw[impl] (istrengthstar) -> (ipreservation);
