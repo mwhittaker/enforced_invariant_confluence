@@ -960,12 +960,8 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
 \subsection{\iconfluence{} Alternatives}
 \begin{todoitemize}
-  \item \todo{\istrength $\centernot \implies$ \isafety?}
-  \item \todo{\isafety $\implies$ \istrength?}
-  \item \todo{\istrength $\centernot \implies$ \iconfluence?}
-  \item \todo{\iconfluence $\implies$ \istrength?}
-  \item \todo{\istrengthstar $\implies$ \istrength?}
   \item \todo{\istrength $\implies$ \istrengthstar?}
+  \item \todo{\iconfluence $\implies$ 1-\iconvergence?}
   \item \todo{Find something between \isafety{} and \iconfluence.}
   \item \todo{1-iconfluence with derived txns to start}
 \end{todoitemize}
@@ -1269,6 +1265,79 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   database states $D$ and $D'$ where $I(D)$ and $(D, D') \in G_0^*$. By T3b, $D
   \in P_i^c$ for some $i$, and by T3c, $D \in Q_i^c$. By T3d, $D' \in Q_i^c$.
   Finally by T3e, $(D', D' \circ \denote{c}(D)) \in G_0$.
+\end{proof}
+
+\begin{claim}\label{clm:0-isafety-implies-1-iconvergence}
+  0-\isafety{} $\implies$ 1-\iconvergence{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is \iconfluent{}
+  with respect to invariant $I$. We show that $T$ is 1-\iconvergent{} with
+  respect to $I$.
+
+  Consider arbitrary database states $D$, $D'$, $D''$ and arbitrary
+  transactions $c'$, $c''$ where $I(D)$, $I(D')$, $I(D'')$, $I(D \circ
+  \denote{c'}(D'))$, and $I(D \circ \denote{c''}(D''))$. Applying 0-\isafety{}
+  to $D \circ \denote{c'}(D')$, $D''$, and $c''$, we have $I(D \circ
+  \denote{c'}(D') \circ \denote{c''}(D''))$.
+\end{proof}
+
+\begin{claim}\label{clm:1-iconvergence-implies-iconfluence}
+  1-\iconvergence{} $\implies$ \iconfluence{}.
+\end{claim}
+\begin{proof}
+  Consider a set of \imp{} transactions $T$ that is 1-\iconvergent{} with
+  respect to an invariant $I$. Consider an arbitrary database state $D$, two
+  \imp{} chains $B^c = c_1, c_2, \ldots, c_m$ and $B^d = d_1, d_2, \ldots,
+  d_n$, and two fixed transaction chains $C^c$ and $C^D$ such that $D$
+  satisfies $I$, $B^c$ satisfies $I$ starting at $D$, $B^d$ satisfies $I$
+  starting at $D$, $C^c = \denote{B^c}(D)$, and $C^d = \denote{B^d}(D)$. We
+  show $D \circ C^c \circ C^d$ satisfies $I$.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $0 \leq i \leq m + n$, that for all natural numbers
+  $j, k$ if
+    $j \leq m$,
+    $k \leq n$, and
+    $i = j + k$, then
+    $I(D \circ C^c_j \circ C^d_k)$
+  %
+  The base case, when $i = 0$, is trivial. $i = j = k = 0$, and $D \circ C^c_0
+  \circ C^d_0 = D$ satisfies $I$ by assumption.
+  %
+  For the inductive step, consider arbitrary natural numbers $i, j, k$ where
+    $0 < i \leq m + n$,
+    $j \leq m$,
+    $k \leq n$, and
+    $i = j + k$.
+  If $j = 0$, then $D \circ C^c_0 \circ C^d_k = D \circ C^d_k$ satisfies $I$ by
+  assumption. A symmetric argument holds for $k=0$. Otherwise, $j, k > 0$. Let
+  \newcommand{\wh}{\widehat}
+  \begin{align*}
+    \wh{D}   &\defeq D \circ C^c_{j-1} \circ C^d_{k-1}, \\
+    \wh{D'}  &\defeq D \circ C^c_{j-1}, \\
+    \wh{D''} &\defeq D \circ C^d_{k-1}, \\
+    \wh{c'}  &\defeq c_j,\ \text{and} \\
+    \wh{c''} &\defeq d_k.
+  \end{align*}
+  By the inductive hypothesis, we have
+    $I(\wh{D})$,
+    $I(\wh{D'})$,
+    $I(\wh{D''})$,
+    $I(\wh{D} \circ \denote{\wh{c'}}(\wh{D'}))
+      = I(D \circ C^c_{j} \circ C^d_{k-1})$, and
+    $I(\wh{D} \circ \denote{\wh{c''}}(\wh{D''}))
+      = I(D \circ C^c_{j-1} \circ C^d_{k})$.
+  Applying 1-\iconvergence{} to
+    $\wh{D}$,
+    $\wh{D'}$,
+    $\wh{D''}$,
+    $\wh{c'}$, and
+    $\wh{c''}$,
+  we have
+    $I(\wh{D} \circ \denote{\wh{c'}}(\wh{D'})
+              \circ \denote{\wh{c''}}(\wh{D''}))
+      = I(D \circ C^c_j \circ C^d_k)$.
 \end{proof}
 
 \begin{figure}[h]
