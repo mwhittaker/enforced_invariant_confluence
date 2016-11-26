@@ -1022,7 +1022,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \item \textbf{\istrengthstar{} \cite{gotsman2016cause}.}
     \leqnomode
     \begin{flalign*}
-      & \exists G_0 \subseteq (\var \to \ints) \times (\var \to \ints).& \\
+      & \exists G_0 \subseteq \dbs \times \dbs.& \\
       & G_0(I) \subseteq I \land{} & \tag*{S2.} \\
       & \forall c, D, D'.\>
           D \in I \land
@@ -1035,11 +1035,11 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \item \textbf{\istrength{} \cite{gotsman2016cause}.}
     \leqnomode
     \begin{flalign*}
-      & \exists G_0 \subseteq (\var \to \ints) \times (\var \to \ints). & \\
+      & \exists G_0 \subseteq \dbs \times \dbs. & \\
       & G_0(I) \subseteq I \land{} & \tag*{T2.} \\
       & \forall c.\>
-        \exists P_1, \ldots, P_n \subseteq (\var \to \ints).\>
-        \exists Q_1, \ldots, Q_n \subseteq (\var \to \ints).\> & \tag*{T3.} \\
+        \exists P_1, \ldots, P_n \subseteq \dbs.\>
+        \exists Q_1, \ldots, Q_n \subseteq \dbs.\> & \tag*{T3.} \\
       & \quad I \subseteq \cup_{i=1}^n P_i \land {} & \tag*{T3b.} \\
       & \quad \forall i \in \set{1, \ldots, n}.\> & \\
       & \quad \quad P_i \subseteq Q_i \land {} & \tag*{T3c.} \\
@@ -1249,6 +1249,21 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ does not satisfy $I$.
 \end{proof}
 
+\begin{claim}\label{clm:istrength-implies-istrengthstar}
+  \istrength{} $\implies$ \istrengthstar{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is \istrong{} with
+  respect to invariant $I$ with relation $G_0$ and sets $P_1^c, \ldots, P_n^c,
+  Q_1^c, \ldots, Q_n^c$ for every $c \in T$. We show $T$ is \istrongstar{} with
+  respect to $I$ with $G_0$.
+
+  T2 implies S2. To prove S3, consider an arbitrary transaction $c$ and
+  database states $D$ and $D'$ where $I(D)$ and $(D, D') \in G_0^*$. By T3b, $D
+  \in P_i^c$ for some $i$, and by T3c, $D \in Q_i^c$. By T3d, $D' \in Q_i^c$.
+  Finally by T3e, $(D', D' \circ \denote{c}(D)) \in G_0$.
+\end{proof}
+
 \begin{figure}[h]
   \centering
 
@@ -1271,6 +1286,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
     \draw[impl] (istrengthstar) -> (ipreservation);
     \draw[impl] (0-isafety) -> (1-isafety);
     \draw[impl] (1-isafety) -> (k-isafety);
+    \draw[impl] (istrength) -> (istrengthstar);
   \end{tikzpicture}
 
   \caption{
@@ -1394,7 +1410,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
       \inode[label=above:$D$]{s3a}{2, 1}
       \nnode[]{s3b}{2, 0}
-      \inode[label=above:$D'$]{s3c}{3, 1}
+      \nnode[label=above:$D'$]{s3c}{3, 1}
       \nnode[]{s3d}{3, 0}
       \draw[txn] (s3a) -- (s3b) node[midway, left] {$\denote{c}(D)$};
       \draw[dgtxn] (s3c) -- (s3d) node[midway, right] {$\denote{c}(D)$};
