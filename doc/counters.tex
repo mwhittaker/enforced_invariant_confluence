@@ -1340,20 +1340,22 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
       = I(D \circ C^c_j \circ C^d_k)$.
 \end{proof}
 
+\tikzstyle{automatable}=[fill=green!20]
+\tikzstyle{intractable}=[fill=red!20]
 \begin{figure}[h]
   \centering
 
   \begin{tikzpicture}
-    \node[] (0-isafety) at (0, 0) {0-\isafety};
-    \node[below=of 0-isafety]     (1-isafety)      {1-\isafety};
-    \node[below=of 1-isafety]     (k-isafety)      {$k$-\isafety};
-    \node[right=of 0-isafety]     (istrengthstar)  {\istrengthstar};
-    \node[above=of istrengthstar] (ipreservation)  {\ipreservation};
-    \node[right=of istrengthstar] (iconfluence)    {\iconfluence};
-    \node[below=of iconfluence]   (k-iconfluence)  {$k$-\iconfluence};
-    \node[below=of k-iconfluence] (1-iconfluence)  {1-\iconfluence};
-    \node[below=of istrengthstar] (istrength)      {\istrength};
-    \node[below=of istrength]     (1-iconvergence) {1-\iconvergence};
+    \node[automatable] (0-isafety) at (0, 0) {0-\isafety};
+    \node[automatable, below=of 0-isafety]     (1-isafety)      {1-\isafety};
+    \node[automatable, below=of 1-isafety]     (k-isafety)      {$k$-\isafety};
+    \node[intractable, right=of 0-isafety]     (istrengthstar)  {\istrengthstar};
+    \node[automatable, above=of istrengthstar] (ipreservation)  {\ipreservation};
+    \node[intractable, right=of istrengthstar] (iconfluence)    {\iconfluence};
+    \node[automatable, below=of iconfluence]   (k-iconfluence)  {$k$-\iconfluence};
+    \node[automatable, below=of k-iconfluence] (1-iconfluence)  {1-\iconfluence};
+    \node[automatable, below=of istrengthstar] (istrength)      {\istrength};
+    \node[automatable, below=of istrength]     (1-iconvergence) {1-\iconvergence};
 
     \draw[ultra thick, impl] (0-isafety) -> (istrengthstar);
     \draw[ultra thick, impl] (istrengthstar) -> (iconfluence);
@@ -1371,10 +1373,12 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \caption{
     An illustration of the relationship between various \iconfluence{}
     alternatives. We have proven bold implications in both directions. For
-    example, we have proven both \iconfluence $\protect \centernot \implies$
-    \istrengthstar.
+    example, we have proven both \istrengthstar{} $\implies$ \iconfluence{} and
+    \iconfluence{} $\protect \centernot \implies$ \istrengthstar{}. Conditions
+    shaded green can be automatically determined using an SMT solver.
+    Conditions shaded red are not easy to automatically determine.
   }
-  \label{fig:iconfluence-alternatives}
+  \label{fig:iconfluence-alternatives-implications}
 \end{figure}
 
 \begin{figure}[h]
@@ -1528,7 +1532,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \caption{
     An illustration of \iconfluence{} alternatives. \todo{Describe drawings.}
   }
-  \label{fig:iconfluence-alternatives}
+  \label{fig:iconfluence-alternatives-diagrams}
 \end{figure}
 
 
