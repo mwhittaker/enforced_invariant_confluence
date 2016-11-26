@@ -239,12 +239,11 @@ are equivalent.
 \begin{proof}
   The reverse direction is immediate from the definition of \iconfluence{}. For
   the forward direction, consider a set of transactions $T$ that is
-  1-\iconfluent{} with respect to an invariant $I$, but assume for
-  contradiction that $T$ is not \iconfluent{} with respect to $I$. That is,
-  there exists a database state $D$ and two chains $C^t = t_1, t_2, \ldots,
-  t_m$ and $C^u = u_1, u_2, \ldots, u_n$ such that $D$ satisfies $I$,
-  $C^t$ satisfies $I$ starting at $D$, and $C^u$ satisfies $I$ starting at $D$,
-  but $D \circ C^t \circ C^u$ does not satisfy $I$.
+  1-\iconfluent{} with respect to an invariant $I$. Consider an arbitrary
+  database state $D$ and two chains $C^t = t_1, t_2, \ldots, t_m$ and $C^u =
+  u_1, u_2, \ldots, u_n$ such that $D$ satisfies $I$, $C^t$ satisfies $I$
+  starting at $D$, and $C^u$ satisfies $I$ starting at $D$. We show $D \circ
+  C^t \circ C^u$ satisfies $I$.
 
   Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
   mathematical induction on $i$, that $D \circ C^t_j \circ C^u_k$ satisfies $I$
@@ -963,6 +962,10 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 \begin{itemize}
   \item \todo{\istrengthstar $\centernot \implies$ \iconfluence?}
   \item \todo{\iconfluence $\implies$ \istrengthstar?}
+  \item \todo{\istrength $\centernot \implies$ \isafety?}
+  \item \todo{\isafety $\implies$ \istrength?}
+  \item \todo{\istrength $\centernot \implies$ \iconfluence?}
+  \item \todo{\iconfluence $\implies$ \istrength?}
   \item \todo{Find something between \isafety{} and \iconfluence.}
   \item \todo{1-iconfluence with derived txns to start}
 \end{itemize}
@@ -990,7 +993,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
   \item \textbf{\ipreservation.} $\forall D, c.\>
        I(D) \implies
-       I(D \circ \denote{c}(D)$
+       I(D \circ \denote{c}(D))$
 
   \item \textbf{\iconfluence.}
     $\forall D, B_1, B_2, C_1, C_2. \>
@@ -1024,7 +1027,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
       & \forall c, D, D'.\>
           D \in I \land
           (D, D') \in G_0^* \implies
-          (D', \denote{c}(D)(D')) \in G_0 & \tag*{S3.}
+          (D', D' \circ \denote{c}(D)) \in G_0 & \tag*{S3.}
     \end{flalign*}
     \reqnomode
     where $I$ is viewed as a set of database states.
@@ -1034,9 +1037,9 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
     \begin{flalign*}
       & \exists G_0 \subseteq (\var \to \ints) \times (\var \to \ints). & \\
       & G_0(I) \subseteq I \land{} & \tag*{T2.} \\
-      & \forall c.\> & \tag*{T3.} \\
-      & \exists P_1, \ldots, P_n \subseteq (\var \to \ints).\> & \\
-      & \exists Q_1, \ldots, Q_n \subseteq (\var \to \ints).\> & \\
+      & \forall c.\>
+        \exists P_1, \ldots, P_n \subseteq (\var \to \ints).\>
+        \exists Q_1, \ldots, Q_n \subseteq (\var \to \ints).\> & \tag*{T3.} \\
       & \quad I \subseteq \cup_{i=1}^n P_i \land {} & \tag*{T3b.} \\
       & \quad \forall i \in \set{1, \ldots, n}.\> & \\
       & \quad \quad P_i \subseteq Q_i \land {} & \tag*{T3c.} \\
@@ -1047,11 +1050,11 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
     where $I$ is viewed as a set of database states.
 \end{itemize}
 
-\begin{claim}
+\begin{claim}\label{clm:0-isafety-implies-istrengthstar}
   0-\isafety $\implies$ \istrengthstar.
 \end{claim}
 \begin{proof}
-  Consider an abitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
+  Consider an arbitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
   respect to invariant $I$. We show $T$ is \istrongstar{} with respect to $I$.
   Let $G_0 = I \times I$. S2 holds trivially: $G_0(I) = I
   \subseteq I$. Consider an arbitrary $c$, $D$, and $D'$ where $D \in I$ and
@@ -1064,7 +1067,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \end{align*}
 \end{proof}
 
-\begin{claim}
+\begin{claim}\label{clm:istrengthstar-not-implies-0-isafety}
   \istrengthstar $\centernot\implies$ 0-\isafety
 \end{claim}
 \begin{proof}
@@ -1093,6 +1096,111 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
   Now note that $c$ is not 0-\isafe{} with respect to $I$. Notably, $I(0)$ and
   $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ and $\lnot I(1)$.
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-implies-ipreservation}
+  \istrengthstar $\implies$ \ipreservation
+\end{claim}
+\begin{proof}
+  Consider a set of transactions $T$ that is \istrongstar{} with respect to
+  invariant $I$ with relation $G_0$. Consider an arbitrary database $D$ that
+  satisfies $I$ and an arbitrary \imp{} transaction $c$. $(D, D) \in G_0^*$,
+  so by S3, $(D, D \circ \denote{c}(D)) \in G_0$. By S2, $I(D \circ \denote{c}(D))$.
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-implies-iconfluence}
+  \istrengthstar{} $\implies$ \iconfluence{}.
+\end{claim}
+\begin{proof}
+  Consider a set of transactions $T$ that is \istrongstar{} with respect to an
+  invariant $I$ with relation $G_0$. Consider an arbitrary database state $D$,
+  two \imp{} chains $B^c = c_1, c_2, \ldots, c_m$ and $B^d = d_1, d_2, \ldots,
+  d_n$, and two fixed transaction chains $C^c$ and $C^D$ such that $D$
+  satisfies $I$, $B^c$ satisfies $I$ starting at $D$, $B^d$ satisfies $I$
+  starting at $D$, $C^c = \denote{B^c}(D)$, and $C^d = \denote{B^d}(D)$. We
+  show $D \circ C^c \circ C^d$ satisfies $I$.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $0 \leq i \leq m + n$, that for all natural numbers
+  $j, k, j', k'$ if
+    $j \leq m$,
+    $k \leq n$,
+    $i = j + k$,
+    $j' \leq j$, and
+    $k' \leq k$, then
+  $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_j \circ C^d_k) \in G_0^*$.
+
+  This proof is similar to the proof of \thmref{one-is-enough}, and we can
+  visualize it similar to how we visualized \thmref{one-is-enough} in
+  \figref{one-is-enough}. Intuitively, our induction progresses diagonally from
+  the upper left corner $D$ to the bottom right corner $D \circ C^c_j \circ
+  C^d_k$. For each diagonal, our inductive hypothesis says all states on the
+  diagonal are reachable via $G_0^*$ from points above and to the left.
+
+  %
+  The base case, when $i = 0$, is trivial. $i = j = k = j' = k' = 0$, so $(D
+  \circ C^c_0 \circ C^d_0, D \circ C^c_0 \circ C^d_0) = (D, D) \in G_0^*$ by
+  the definition of a reflexive transaction closure.
+  %
+  For the inductive step, consider an arbitrary set of natural numbers
+  $i, j, k, j', k'$ where
+    $0 < i \leq m + n$,
+    $j \leq m$,
+    $k \leq n$,
+    $i = j + k$,
+    $j' \leq j$
+    $k' \leq k$.
+  If $j' = j$ and $k' = k$, then $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ
+  C^c_{j} \circ C^d_{j}) \in G_0^*$ by the definition of a reflexive transitive
+  closure. Otherwise $j' < j$ or $k' < k$. Without loss of generality, assume
+  $j' < j$; the proof is symmetric for $k' < k$. We can deduce the following
+  facts:
+  \begin{gather}
+    (D, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-a} \\
+    (D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-b} \\
+    I(D \circ C^c_{j-1} \circ C^d_{k})
+      \label{strength-confluence-c} \\
+    (D \circ C^c_{j-1} \circ C^d_{k}, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-d} \\
+    (D \circ C^c_{j-1} \circ C^d_{k}, D \circ C^c_{j} \circ C^d_{k}) \in G_0
+      \label{strength-confluence-e}
+  \end{gather}
+  where
+  \begin{itemize}
+    \item
+      \eqref{strength-confluence-a} and \eqref{strength-confluence-b} are
+      deduced from the inductive hypothesis applied to $i - 1$;
+    \item
+      \eqref{strength-confluence-c} is deduced from
+      \eqref{strength-confluence-a}, the assumption $I(D)$, and S2;
+    \item
+      \eqref{strength-confluence-d} is deduced from the definition of a
+      reflexive transitive closure;
+    \item
+      \eqref{strength-confluence-e} is deduced from
+      \eqref{strength-confluence-d} and S3 applied to $C^c_j$, $D \circ
+      C^c_{j-1} \circ C^d_{k}$, and $D \circ C^c_{j-1} \circ C^d_{k}$.
+  \end{itemize}
+  \eqref{strength-confluence-b} and \eqref{strength-confluence-e} imply
+  $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_j \circ C^d_k) \in G_0^*$.
+
+  Finally, $I(D)$, $(D, D \circ D^c_m \circ D^d_n) \in G_0^*$, and S2 imply
+  that $I(D \circ D^c_m \circ D^d_n)$.
+\end{proof}
+
+\begin{claim}\label{clm:iconfluence-not-implies-istrengthstar}
+  \iconfluence{} $\centernot\implies$ \istrengthstar{}.
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let $I \defeq x = 0$ and the single \imp{}
+  transaction $c = add(x, 1)$. Note that $c$ is vacuously \iconfluent{} with
+  respect to $I$. Also note that $c$ is not \ipreserving{} with respect to $I$:
+  $0$ satisfies $I$ but $0 \circ \denote{c}(0) = 1$ does not. By the
+  contrapositive of \clmref{istrengthstar-implies-ipreservation}, $c$ is not
+  \istrongstar{} with respect to $I$.
 \end{proof}
 
 \begin{figure}[h]
