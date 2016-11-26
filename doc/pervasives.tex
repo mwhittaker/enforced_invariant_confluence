@@ -1,4 +1,15 @@
-\newcommand{\todo}[2][mwhittaker]{\textcolor{red}{TODO(#1): #2}}
+\newtoggle{showtodos}
+\toggletrue{showtodos}
+\newcommand{\todo}[2][mwhittaker]{
+  \iftoggle{showtodos}{\textcolor{red}{TODO(#1): #2}}{}
+}
+\NewEnviron{todoitemize}{
+  \iftoggle{showtodos}{
+    \begin{itemize}
+      \BODY
+    \end{itemize}
+  }{}
+}
 
 \makeatletter
 \newcommand{\leqnomode}{\tagsleft@true}
