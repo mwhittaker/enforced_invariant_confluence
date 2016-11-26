@@ -964,6 +964,8 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
   \item \todo{\isafety $\implies$ \istrength?}
   \item \todo{\istrength $\centernot \implies$ \iconfluence?}
   \item \todo{\iconfluence $\implies$ \istrength?}
+  \item \todo{\istrengthstar $\implies$ \istrength?}
+  \item \todo{\istrength $\implies$ \istrengthstar?}
   \item \todo{Find something between \isafety{} and \iconfluence.}
   \item \todo{1-iconfluence with derived txns to start}
 \end{itemize}
@@ -1206,27 +1208,30 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
   \begin{tikzpicture}
     \node[] (0-isafety) at (0, 0) {0-\isafety};
-    \node[] (1-isafety) at (0, -2) {1-\isafety};
-    \node[] (k-isafety) at (0, -4) {$k$-\isafety};
-    \node[] (istrengthstar) at (6, 0) {\istrengthstar};
-    \node[] (ipreservation) at ($(0-isafety) + (30:3)$) {\ipreservation};
-    \node[] (iconfluence) at ($(0-isafety) + (-30:3)$) {\iconfluence};
-    \node[] (k-iconfluence) at ($(iconfluence) + (4, 0)$) {$k$-\iconfluence};
-    \node[] (1-iconfluence) at ($(k-iconfluence) + (4, 0)$) {1-\iconfluence};
+    \node[below=of 0-isafety]     (1-isafety)     {1-\isafety};
+    \node[below=of 1-isafety]     (k-isafety)     {$k$-\isafety};
+    \node[right=of 0-isafety]     (istrengthstar) {\istrengthstar};
+    \node[above=of istrengthstar] (ipreservation) {\ipreservation};
+    \node[right=of istrengthstar] (iconfluence)   {\iconfluence};
+    \node[below=of iconfluence]   (k-iconfluence) {$k$-\iconfluence};
+    \node[below=of k-iconfluence] (1-iconfluence) {1-\iconfluence};
 
-    \draw[impl] (0-isafety) -> (ipreservation);
-    \draw[impl] (0-isafety) -> (iconfluence);
+    \draw[ultra thick, impl] (0-isafety) -> (istrengthstar);
+    \draw[ultra thick, impl] (istrengthstar) -> (iconfluence);
     \draw[impl] (iconfluence) -> (k-iconfluence);
     \draw[impl] (k-iconfluence) -> (1-iconfluence);
-    \draw[impl] (0-isafety) -> (istrengthstar);
-    \draw[impl] (istrengthstar) -> (iconfluence);
     \draw[impl] (istrengthstar) -> (ipreservation);
     \draw[impl] (0-isafety) -> (1-isafety);
     \draw[impl] (1-isafety) -> (k-isafety);
   \end{tikzpicture}
 
-  \caption{}
-  \label{}
+  \caption{
+    An illustration of the relationship between various \iconfluence{}
+    alternatives. We have proven bold implications in both directions. For
+    example, we have proven both \iconfluence $\protect \centernot \implies$
+    \istrengthstar.
+  }
+  \label{fig:iconfluence-alternatives}
 \end{figure}
 
 \begin{figure}[h]
