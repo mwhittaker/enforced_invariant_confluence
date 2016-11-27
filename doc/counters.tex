@@ -120,6 +120,10 @@ A set of transactions $T$ is \iconfluent{} with respect to invariant $I$ if for
 all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$
 satisfies $I$, $C_1$ satisfies $I$ starting at $D$, and $C_2$ satisfies $I$
 starting at $D$, then $D \circ C_1 \circ C_2$ satisfies $I$.
+\todo{
+  This isn't quite the definition of \iconfluence{} Bailis uses. Ponder whether
+  this simpler definition is okay.
+}
 
 \subsection{A Geometric Interpretation}\label{sec:counter-geometry}
 \newcommand{\inva}{x + y \geq 0}
