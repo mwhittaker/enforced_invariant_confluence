@@ -1,0 +1,205 @@
+\documentclass[xcolor={dvipsnames,svgnames,table}]{beamer}
+
+\usepackage{slides}
+\usepackage{tikz}
+\usepackage{python}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+
+\input{banks.tex}
+\input{notation.tex}
+
+\title{Enforced \iconfluence{}}
+\author{Michael Whittaker}
+\date{December 12, 2016}
+
+\begin{document}
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\begin{frame}{Coordinating}
+  \begin{center}
+    \begin{tikzpicture}
+      \drawbanks{\$50}{\$50}
+                {\$60}{\$60}
+                {\$80}{\$80}
+
+      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$+\$10$};
+      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$+\$20$};
+      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
+      \draw[op] (b3) -- ($(b3) + (+2, 0)$) node[midway, above] {OK};
+
+      \zigzag{a1}{b1}
+      \zigzag{a2}{b2}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Coordinating}
+  \begin{center}
+    \begin{tikzpicture}
+      \drawbanks{\$50}{\$50}
+                {\$20}{\$20}
+                {\$20}{\$20}
+
+      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$-\$30$};
+      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$-\$40$};
+      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
+      \draw[op] (b3) -- ($(b3) + (+2, 0)$) node[midway, above] {NO};
+
+      \zigzag{a1}{b1}
+      \zigzag{a2}{b2}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Avoiding Coordination}
+  \begin{center}
+    \begin{tikzpicture}
+      \drawbanks{\$50}{\$50}
+                {\$60}{\$70}
+                {\$80}{\$80}
+
+      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$+\$10$};
+      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$+\$20$};
+      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
+      \draw[op] (b2) -- ($(b2) + (+2, 0)$) node[midway, above] {OK};
+
+      \draw[dashed, op] (a2) -- (b3) node[near start, sloped, above] {$+\$10$};
+      \draw[dashed, op] (b2) -- (a3) node[near start, sloped, above] {$+\$20$};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Avoiding Coordination}
+  \begin{center}
+    \begin{tikzpicture}
+      \drawbanks{\$50}{\$50}
+                {\$20}{\$10}
+                {-\$20}{-\$20}
+
+      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$-\$30$};
+      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$-\$40$};
+      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
+      \draw[op] (b2) -- ($(b2) + (+2, 0)$) node[midway, above] {OK};
+
+      \draw[dashed, op] (a2) -- (b3) node[near start, sloped, above] {$-\$30$};
+      \draw[dashed, op] (b2) -- (a3) node[near start, sloped, above] {$-\$40$};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \frame{
+        \includegraphics[width=\textwidth]{figs/bailis-iconfluence-page1.pdf}
+      }
+    \end{column}
+    \begin{column}{0.5\textwidth}  %%<--- here
+      \begin{center}
+        A set of of transactions $T$ is \emph{invariant-confluent}
+        (\iconfluent) with respect to $I$ if and only if $T$ can execute
+        without coordination while preserving $I$.
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{\iconfluence{}}
+  \begin{center}
+    \begin{tikzpicture}
+      \newcommand{\proofa}{proof17}
+      \newcommand{\proofb}{proof12}
+      \newcommand{\proofc}{proof16}
+      \newcommand{\proofwidth}{5cm}
+
+      \node[draw, fill=white] (\proofa) at (0, 0) {
+        \includegraphics[width=\proofwidth]{figs/\proofa.pdf}
+      };
+      \node[draw, fill=white] (\proofb) at (\proofa.south east) {
+        \includegraphics[width=\proofwidth]{figs/\proofb.pdf}
+      };
+      \node[draw, fill=white] (\proofc) at (\proofb.south east) {
+        \includegraphics[width=\proofwidth]{figs/\proofc.pdf}
+      };
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Vision}
+  \begin{center}
+    \begin{Python}[gobble=6]
+      x = PNCounter(0)
+
+      set_invariant(x >= 0)
+
+      # Good!
+      @transaction
+      def foo():
+        x.increment(42)
+
+      # Bad!
+      @transaction
+      def bar():
+        x.decrement(1)
+    \end{Python}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Vision}
+  \begin{center}
+    \begin{Python}[gobble=6]
+      employees = Map[Int, String]()
+      teams = Set[Set[Int]]
+
+      # All ids in teams must appear in employees.
+      set_invariant(forall team in teams.
+        team subset employees.keys())
+      # All teams must be disjoint.
+      set_invariant(forall a, b in teams.
+        a != b => a intersect b = {})
+      # Every employee must be on a team
+      set_invariant(union(teams) = employees.keys())
+
+      @transaction
+      def add_employee(name):
+        id = employees.unique_id()
+        employees.put(name, id)
+        teams[0].add(id)
+    \end{Python}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  - formalism accompanied with informal explanaation
+  - formalize question
+\end{frame}
+
+\begin{frame}
+  - geometric interpretation with pictures
+\end{frame}
+
+\begin{frame}
+  - examples
+  - increment
+  - decrement
+  - x = y with incremenet/decrement
+  - cross with +x
+  - cross with +y
+  - cross with +x, +y
+  - single point
+\end{frame}
+
+\begin{frame}
+  - one is enough with picture
+\end{frame}
+
+\begin{frame}
+  - solution
+  - say its implemented
+\end{frame}
+
+\end{document}
