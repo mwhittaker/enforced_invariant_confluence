@@ -1,6 +1,7 @@
 \documentclass[xcolor={dvipsnames,svgnames,table}]{beamer}
 
 \usepackage{amsmath}
+\usepackage{centernot}
 \usepackage{etoolbox}
 \usepackage{mathtools}
 \usepackage{python}
@@ -314,17 +315,6 @@
        \end{pmatrix} \lor \invd$ & ???  & ??? \\
     \end{tabular}
   \end{center}
-\end{frame}
-
-\begin{frame}
-  - examples
-  - increment
-  - decrement
-  - x = y with incremenet/decrement
-  - cross with +x
-  - cross with +y
-  - cross with +x, +y
-  - single point
 \end{frame}
 
 \begin{frame}{\iconfluence{}, Goemetrically}
@@ -810,6 +800,131 @@
       \onslide<8->{& x + dx_1 + dx_2 + y + dy_1 + dy_2 \geq 0}
     \end{align*}
   \end{center}
+\end{frame}
+
+\begin{frame}{Fixed Transactions}
+  \begin{itemize}
+    \item
+      We've modelled a transaction $t: \var \rightharpoonup \ints$ as a partial
+      function which increments and decrements variables by a fixed number.
+      We'll call these \emph{fixed transactions}.
+
+    \item
+      Fixed transactions are inepressive.
+
+    \item
+      e.g. Increment $x$ by $y$.
+
+    \item
+      e.g. Increment $y$ by $1$ when $x$ is positive, otherwise increment $y$
+      by 2.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\imp{} Syntax}
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \footnotesize
+      \[
+        \begin{array}{rrl}
+          \impaexp\;
+            a & ::= & k       \\
+              & |   & x       \\
+              & |   & read(x) \\
+              & |   & a + a   \\
+              & |   & a - a   \\
+          \impbexp\;
+            b & ::= & \textsf{true}  \\
+              & |   & \textsf{false} \\
+              & |   & a \odot a      \\
+              & |   & \lnot b        \\
+              & |   & b \lor b       \\
+              & |   & b \land b      \\
+          \impcom\;
+            c  & ::= & \impskip        \\
+               & |   & x := a          \\
+               & |   & add(x, a)       \\
+               & |   & c; c            \\
+               & |   & \impif{b}{c}{c} \\
+        \end{array}
+      \]
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{align*}
+        & x := read(x); \\
+        & y := read(y); \\
+        & z = x + x + y; \\
+        & \textsf{if}(x = 0 \lor y = 0)\ \{ \\
+        & \quad add(x, y); \\
+        & \quad add(y, z) \\
+        & \textsf{else}\ \{ \\
+        & \quad add(x, read(a) + z); \\
+        & \quad add(y, 42) \\
+        & \}
+      \end{align*}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{\imp{} Semantics}
+  \begin{itemize}
+    \item Denotational semantics $\denote{\cdot}$.
+    \item $\denote{c}: \dbs \to (\var \rightharpoonup \ints)$.
+    \item $\denote{add(x, 1)}(\set{(x, 0), (y, 0)}) = \set{(x, 1)}$
+    \item $\denote{add(x, 1)}(\set{(x, 42), (y, 42)}) = \set{(x, 1)}$
+    \item $\denote{add(x, read(x))}(\set{(x, 0)}) = \set{(x, 0)}$
+    \item $\denote{add(x, read(x))}(\set{(x, 42)}) = \set{(x, 42)}$
+    \item $c \defeq \impif{read(x)=0}{add(y, x)}{add(z, x + x)}$
+    \item $\denote{c}(\set{(x, 0), (y, 0), (z, 0)}) = \set{(y, 0)}$
+    \item $\denote{c}(\set{(x, 1), (y, 0), (z, 0)}) = \set{(z, 2)}$
+    \item $\denote{c}(\set{(x, 2), (y, 0), (z, 0)}) = \set{(z, 4)}$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\imp{} Transactions.}
+  \begin{itemize}
+    \item $D \circ c \defeq D \circ \denote{c}(D)$
+    \item An \imp{} transaction chain is a sequence $B = c_1, \ldots, c_n$
+    \item TODO: Redefine stuff.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \huge
+    1-\iconfluence{} $\centernot\implies$ \iconfluence
+  \end{center}
+\end{frame}
+
+\begin{frame}{1-\iconfluence{} $\centernot\implies$ \iconfluence}
+  TODO: give counterexample.
+\end{frame}
+
+\begin{frame}{\wimp{}}
+  \[
+    \begin{array}{rrl}
+      \impaexp\;
+        a & ::= & k       \\
+          & |   & x       \\
+          & |   & read(x) \\
+          & |   & a + a   \\
+          & |   & a - a   \\
+      \impcom\;
+        c  & ::= & x := a    \\
+           & |   & add(x, a) \\
+           & |   & c; c      \\
+    \end{array}
+  \]
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \huge
+    1-\iconfluence{} $\centernot\implies$ \iconfluence
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{} Alternatives}
 \end{frame}
 
 \end{document}
