@@ -1,14 +1,23 @@
 \documentclass[xcolor={dvipsnames,svgnames,table}]{beamer}
 
-\usepackage{slides}
-\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{etoolbox}
+\usepackage{mathtools}
 \usepackage{python}
+\usepackage{slides}
+\usepackage{stmaryrd}
+\usepackage{tikz}
 
 \usetikzlibrary{calc}
 \usetikzlibrary{positioning}
 
 \input{banks.tex}
+\input{diagrams.tex}
 \input{notation.tex}
+
+\newcommand{\defeq}{\stackrel{\mathclap{\normalfont\mbox{\scriptsize def}}}{=}}
+\newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
+\newcommand{\set}[1]{\left\{#1\right\}}
 
 \title{Enforced \iconfluence{}}
 \author{Michael Whittaker}
@@ -173,13 +182,137 @@
   \end{center}
 \end{frame}
 
-\begin{frame}
-  - formalism accompanied with informal explanaation
-  - formalize question
+\begin{frame}{\iconfluence{}, Intuitively}
+  \begin{center}
+    \begin{tikzpicture}[scale=1.5]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[]{l1}{$(a) + (225:1)$}
+      \inode[]{l2}{$(l1) + (225:1)$}
+      \inode[]{l3}{$(l2) + (225:1)$}
+
+      \inode[]{r1}{$(a) + (315:1)$}
+      \inode[]{r2}{$(r1) + (315:1)$}
+      \inode[]{r3}{$(r2) + (315:1)$}
+
+      \dnode{b}{$(l3) + (315:3)$}
+
+      \draw[txn] (a)  -- (l1) node[pos=0.3, left]  {$t_1$};
+      \draw[txn] (l1) -- (l2) node[pos=0.3, left]  {$t_2$};
+      \draw[txn] (l2) -- (l3) node[pos=0.3, left]  {$t_3$};
+      \draw[txn] (a)  -- (r1) node[pos=0.3, right] {$u_1$};
+      \draw[txn] (r1) -- (r2) node[pos=0.3, right] {$u_2$};
+      \draw[txn] (r2) -- (r3) node[pos=0.3, right] {$u_3$};
+      \draw[txn] (l3) -- (b)  node[midway, left]  {$t_1, t_2, t_3$};
+      \draw[txn] (r3) -- (b)  node[midway, right] {$u_1, u_2, u_3$};
+    \end{tikzpicture}
+  \end{center}
 \end{frame}
 
-\begin{frame}
-  - geometric interpretation with pictures
+\begin{frame}{\iconfluence{}, Formally}
+  \begin{center}
+    \huge
+    A \emph{database state} $D: \var \to \ints$ is a total function mapping
+    variables to integers.
+  \end{center}
+  \begin{itemize}
+    \item e.g. $\var = \set{x}, D = \set{(x, 1)}$
+    \item e.g. $\var = \set{x, y}, D = \set{(x, 42), (y, 100)}$
+    \item e.g. $\var = \set{x, y, z}, D = \set{(x, 42), (y, 0), (z, 0)}$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Formally}
+  \begin{center}
+    \huge
+    An \emph{invariant} $I$ is an integer linear constraint over $\var$.
+  \end{center}
+  \begin{itemize}
+    \item e.g. $\var = \set{x}, x \geq 0$
+    \item e.g. $\var = \set{x}, x < 0 \lor x = 42$
+    \item e.g. $\var = \set{x, y, z},
+                \lnot(3x - 4y < z \lor (z = 42 \land y > z))$
+    \item We denote that $D$ satisfies $I$ with $I(D)$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Formally}
+  \begin{center}
+    \huge
+    A \emph{transaction} $t: \var \rightharpoonup \ints$ is a partial function
+    mapping variables to integers.
+  \end{center}
+  We denote the application of transaction $t$ to database $D$ as $D \circ t$
+  where
+  \[
+    (D \circ t)(x) \defeq \begin{cases*}
+      D(x) + t(x) & $x \in dom(t)$ \\
+      D(x)        & otherwise
+    \end{cases*}
+  \]
+  \begin{itemize}
+    \item $D \defeq \set{(x, 11), (y, 100)}$,
+    \item $t \defeq \set{(x, 31), (y, -200)}$,
+    \item $D \circ t = \set{(x, 42), (y, -100)}$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Formally}
+  \begin{center}
+    \huge
+    A \emph{transaction chain} $C$ over transactions $T$ is a sequence of
+    transactions $t_1, \ldots, t_n$.
+  \end{center}
+  \begin{itemize}
+    \item Let $D \circ C \defeq D \circ t_1 \circ \cdots \circ t_n$.
+    \item
+      $C$ satisfies $I$ starting at $D$, denoted $I(C @ D)$, if for every
+      prefix $C'$ of $C$, $I(D \circ C')$.
+    \item
+      Note $I(C@D) \implies I(D)$.
+    \item
+      Note $I(C@D) \implies I(D \circ C)$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Formally}
+  \begin{center}
+    \huge
+    A set of transactions $T$ is \emph{\iconfluent{}} with respect to $I$ if
+    for every database state $D$ and chains $C$, $C'$, if $I(D)$, $I(C@D)$, and
+    $I(C'@D)$, then $I(D \circ C \circ C')$.
+  \end{center}
+\end{frame}
+
+\newcommand{\inva}{x + y \geq 0}
+\newcommand{\invb}{x - y \leq 0}
+\newcommand{\invc}{y \geq 1}
+\newcommand{\invd}{y \geq 3}
+\newcommand{\inv}{(\inva \land \invb \land \invc) \lor (\invd)}
+
+\begin{frame}{\iconfluence{}, Socratically}
+  \begin{center}
+    \begin{tabular}{c|c|c}
+      $I$                 & $T$                    & \iconfluent{}? \\\hline\hline
+      $x \geq 0$          & $add(x, 1)$            & \pause yes \pause \\\hline
+      $x \geq 0$          & $add(x, -1)$           & \pause no  \pause \\\hline
+      $x = 0$             & $add(x, 1)$            & \pause yes \pause \\\hline
+      $-x + y \geq 0$     & $add(x, 1)$            & \pause no  \pause \\\hline
+      $-x + y \geq 0$     & $add(x, -1)$           & \pause yes \pause \\\hline
+      $-x + y \geq 0$     & $add(y, 1)$            & \pause yes \pause \\\hline
+      $-x + y \geq 0$     & $add(y, -1)$           & \pause no  \pause \\\hline
+      $-x + y \geq 0$     & $add(x, 1); add(y, 1)$ & \pause yes \pause \\\hline
+      $x = 0 \lor y = 0$  & $add(x, 1)$            & \pause yes \pause \\\hline
+      $x = 0 \lor y = 0$  & $add(y, 1)$            & \pause yes \pause \\\hline
+      $x = 0 \lor y = 0$  & $add(x, 1), add(y, 1)$ & \pause no  \pause \\\hline
+      $x = 0 \land y = 0$ & $add(x, 1), add(y, 1)$ & \pause yes \pause \\\hline
+      %
+      $\begin{pmatrix}
+        \inva \land {} \\
+        \invb \land {} \\
+        \invc
+       \end{pmatrix} \lor \invd$ & ???  & ??? \\
+    \end{tabular}
+  \end{center}
 \end{frame}
 
 \begin{frame}
@@ -191,6 +324,181 @@
   - cross with +y
   - cross with +x, +y
   - single point
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{itemize}
+    \item
+      If $|\var| = n$, we can imagine databases as points in $\ints^n$.
+    \item
+      We can imagine invariants as a subset of $\ints^n$.
+    \item
+      We can imagine transactions as $n$-vectors over $\ints$.
+  \end{itemize}
+\end{frame}
+
+\newcommand{\ymin}{-1}
+\newcommand{\ymax}{4}
+\newcommand{\xmin}{-4}
+\newcommand{\xmax}{4}
+\newcommand{\drawgrid}{
+  \draw[opacity=0.5] (\xmin, \ymin) grid (\xmax, \ymax);
+  \draw[ultra thick] (\xmin, 0) -- (\xmax, 0);
+  \draw[ultra thick] (0, \ymin) -- (0, \ymax);
+}
+\newcommand{\drawpoints}[1]{
+  \foreach \x in {\xmin, ..., \xmax} {
+    \foreach \y in {\ymin, ..., \ymax} {
+      \ifboolexpr{#1}{
+        \node[shape=circle, fill, opacity=0.75, inner sep=3pt] (\x-\y) at (\x, \y) {};
+      }{}
+    }
+  }
+}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{bool{true}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $y \geq 1$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{>}{1}} or
+                  test{\ifnumcomp{\y}{=}{1}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $y \geq 3$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{>}{3}} or test{\ifnumcomp{\y}{=}{3}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $x + y \geq 0$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\x+\y}{>}{0}} or test{\ifnumcomp{\x+\y}{=}{0}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $x - y \leq 0$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\x-\y}{<}{0}} or test{\ifnumcomp{\x-\y}{=}{0}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $t_a \defeq add(x, 1); add(y, 1)$ \quad
+    $t_b \defeq add(x, -1); add(y, 1)$ \quad
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{>}{1}} or test{\ifnumcomp{\y}{=}{1}}}
+      \draw[txn, red]   (0-1) -- (1-2)  node[black, midway, below] {\large $t_a$};
+      \draw[txn, green] (0-1) -- (-1-2) node[black, midway, left]  {\large $t_b$};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $t_a \defeq add(x, 1); add(y, 1)$ \quad
+    $t_b \defeq add(x, -1); add(y, 1)$ \quad
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{>}{1}} or test{\ifnumcomp{\y}{=}{1}}}
+      \draw[txn, red]   (0-1)  -- (1-2)  node[black, midway, below] {\large $t_1$};
+      \draw[txn, red]   (1-2)  -- (2-3)  node[black, midway, below] {\large $t_2$};
+      \draw[txn, green] (0-1)  -- (-1-2) node[black, midway, left]  {\large $u_1$};
+
+      \pause
+
+      \draw[txn, dashed, green]
+        (2-3) -- (1-4)  node[black, midway, below] {\large $u_1$};
+      \draw[txn, dashed, red]
+        (-1-2) -- (0-3)  node[black, midway, left] {\large $t_1$};
+      \draw[txn, dashed, red]
+        (0-3) -- (1-4) node[black, midway, left]  {\large $t_2$};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $I \defeq x = y$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\x}{=}{\y}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $I \defeq x = 0 \lor y = 0$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\x}{=}{0}} or test{\ifnumcomp{\y}{=}{0}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $I \defeq x = 0 \land y = 0$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\x}{=}{0}} and test{\ifnumcomp{\y}{=}{0}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\iconfluence{}, Goemetrically}
+  \begin{center}
+    $\begin{pmatrix}
+      \inva \land {} \\
+      \invb \land {} \\
+      \invc
+     \end{pmatrix} \lor \invd$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{
+        ((test{\ifnumcomp{\x+\y}{>}{0}} or test{\ifnumcomp{\x+\y}{=}{0}}) and
+         (test{\ifnumcomp{\x-\y}{<}{0}} or test{\ifnumcomp{\x-\y}{=}{0}}) and
+         (test{\ifnumcomp{\y}{>}{1}} or test{\ifnumcomp{\y}{=}{1}})) or
+        (test{\ifnumcomp{\y}{>}{3}} or test{\ifnumcomp{\y}{=}{3}})
+      }
+    \end{tikzpicture}
+  \end{center}
 \end{frame}
 
 \begin{frame}
