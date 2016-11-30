@@ -9,6 +9,7 @@
 \usepackage{stmaryrd}
 \usepackage{tikz}
 
+\usetikzlibrary{arrows}
 \usetikzlibrary{backgrounds}
 \usetikzlibrary{calc}
 \usetikzlibrary{positioning}
@@ -1060,7 +1061,61 @@
   \end{center}
 \end{frame}
 
+\tikzstyle{automatable}=[fill=green!20]
+\tikzstyle{intractable}=[fill=red!20]
 \begin{frame}{\iconfluence{} Alternatives}
+  \begin{center}
+    \begin{tikzpicture}
+      \node[automatable] (0-isafety) at (0, 0) {0-\isafety};
+      \node[automatable, below=of 0-isafety]     (1-isafety)      {1-\isafety};
+      \node[automatable, below=of 1-isafety]     (k-isafety)      {$k$-\isafety};
+      \node[intractable, right=of 0-isafety]     (istrengthstar)  {\istrengthstar};
+      \node[automatable, above=of istrengthstar] (ipreservation)  {\ipreservation};
+      \node[intractable, right=of istrengthstar] (iconfluence)    {\iconfluence};
+      \node[automatable, below=of iconfluence]   (k-iconfluence)  {$k$-\iconfluence};
+      \node[automatable, below=of k-iconfluence] (1-iconfluence)  {1-\iconfluence};
+      \node[automatable, below=of istrengthstar] (istrength)      {\istrength};
+      \node[automatable, below=of istrength]     (1-iconvergence) {1-\iconvergence};
+
+      \draw[ultra thick, impl] (0-isafety) -> (istrengthstar);
+      \draw[ultra thick, impl] (istrengthstar) -> (iconfluence);
+      \draw[ultra thick, impl] (0-isafety) -> (istrength);
+      \draw[impl] (iconfluence) -> (k-iconfluence);
+      \draw[impl] (k-iconfluence) -> (1-iconfluence);
+      \draw[impl] (istrengthstar) -> (ipreservation);
+      \draw[impl] (0-isafety) -> (1-isafety);
+      \draw[impl] (1-isafety) -> (k-isafety);
+      \draw[impl] (istrength) -> (istrengthstar);
+      \draw[impl] (0-isafety) -> (1-iconvergence);
+      \draw[impl] (1-iconvergence) -> (iconfluence);
+    \end{tikzpicture}
+  \end{center}
 \end{frame}
 
+\begin{frame}{0-\isafety{}}
+  \begin{center}
+    \[\forall D, D', c.\>
+      I(D) \land
+      I(D') \implies
+      I(D \circ \denote{c}(D'))\]
+
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{d1}{0, 0}
+      \inode[label=above:$D'$]{d2}{1, 0}
+      \dnode{b1}{0, -1}
+      \nnode{b2}{1, -1}
+      \draw[txn] (d2) -- (b2) node[midway, right]{$\denote{c}(D')$};
+      \draw[dtxn] (d1) -- (b1) node[midway, left]{$\denote{c}(D')$};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Moving Forward}
+  \begin{itemize}
+    \item Finish up \iconfluence{} alternatives.
+    \item Correct \iconfluence{} definition.
+    \item Generalize counters to sets and maps.
+    \item Turn theory to practice.
+  \end{itemize}
+\end{frame}
 \end{document}
