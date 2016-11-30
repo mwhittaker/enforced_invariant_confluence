@@ -881,12 +881,66 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{\imp{} Transactions.}
+\begin{frame}{\imp{} Transactions}
   \begin{itemize}
-    \item $D \circ c \defeq D \circ \denote{c}(D)$
-    \item An \imp{} transaction chain is a sequence $B = c_1, \ldots, c_n$
-    \item TODO: Redefine stuff.
+    \item
+      Applying an \imp{} transaction: $D \circ c \defeq D \circ \denote{c}(D)$.
+    \item
+      An \imp{} transaction chain is a sequence $B = c_1, \ldots, c_n$
+    \item
+      Letting $D_i \defeq D \circ c_1 \circ \cdots \circ c_n$, every \imp{}
+      chain $B$ has a corresponing fixed transaction chain $\denote{B}(D)
+      \defeq \denote{c_1}(D_0), \ldots, \denote{c_n}(D_{n-1})$.
+    \item
+      We say \imp{} chain $B$ satisfies $I$ starting at $D$: $I(B@D) \defeq
+      I(\denote{B}(D) @ D)$.
+    \item
+      A set of \imp{} transactions $T$ is \emph{\iconfluent{}} with respect to
+      $I$ if for every database state $D$ and \imp{} chains $B$, $B'$, if
+      $I(D)$, $I(B@D)$, and $I(B'@D)$, then $I(D \circ \denote{B}(D) \circ
+      \denote{B'}(D))$.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{3-\iconfluence{}}
+  \begin{center}
+    \begin{tikzpicture}[scale=1.5]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[label=right:$D_{c_1}$]{l1}{$(a) + (225:1)$}
+      \inode[label=right:$D_{c_2}$]{l2}{$(l1) + (225:1)$}
+      \inode[label=right:$D_{c_3}$]{l3}{$(l2) + (225:1)$}
+
+      \inode[label=left:$D_{d_1}$]{r1}{$(a) + (315:1)$}
+      \inode[label=left:$D_{d_2}$]{r2}{$(r1) + (315:1)$}
+      \inode[label=left:$D_{d_3}$]{r3}{$(r2) + (315:1)$}
+
+      \dnode{b}{$(l3) + (315:3)$}
+
+      \draw[txn] (a) -- (l1) node[pos=0.2, left] {$\denote{c_1}(D)$};
+      \draw[txn] (l1) -- (l2) node[pos=0.2, left] {$\denote{c_2}(D_{c_1})$};
+      \draw[txn] (l2) -- (l3) node[pos=0.2, left] {$\denote{c_3}(D_{c_2})$};
+      \draw[txn] (a) -- (r1) node[pos=0.2, right] {$\denote{d_1}(D)$};
+      \draw[txn] (r1) -- (r2) node[pos=0.2, right] {$\denote{d_2}(D_{d_1})$};
+      \draw[txn] (r2) -- (r3) node[pos=0.2, right] {$\denote{d_3}(D_{d_2})$};
+      \draw[txn] (l3) -- (b) node[midway, left] {$\denote{c_1, c_2, c_3}(D)$};
+      \draw[txn] (r3) -- (b) node[midway, right] {$\denote{d_1, d_2, d_3}(D)$};
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{1-\iconfluence{}}
+  \begin{center}
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[label=left:$D_{c}$]{l1}{$(a) + (225:1)$}
+      \inode[label=right:$D_{d}$]{r1}{$(a) + (315:1)$}
+      \dnode{b}{$(l1) + (315:1)$}
+      \draw[txn] (a) -- (l1) node[pos=0.3, left] {$\denote{c}(D)$};
+      \draw[txn] (a) -- (r1) node[pos=0.3, right] {$\denote{d}(D)$};
+      \draw[txn] (l1) -- (b) node[pos=0.7, left] {$\denote{d}(D)$};
+      \draw[txn] (r1) -- (b) node[pos=0.7, right] {$\denote{c}(D)$};
+    \end{tikzpicture}
+  \end{center}
 \end{frame}
 
 \begin{frame}
@@ -896,8 +950,90 @@
   \end{center}
 \end{frame}
 
+\renewcommand{\ymin}{0}
+\renewcommand{\ymax}{2}
+\renewcommand{\xmin}{-2}
+\renewcommand{\xmax}{2}
+
 \begin{frame}{1-\iconfluence{} $\centernot\implies$ \iconfluence}
-  TODO: give counterexample.
+  \begin{center}
+    $I$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{=}{0}} or test{\ifnumcomp{\x}{=}{1}}}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{1-\iconfluence{} $\centernot\implies$ \iconfluence}
+  \begin{center}
+    $c_1$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{=}{0}} or test{\ifnumcomp{\x}{=}{1}}}
+      \draw[txn, red] (0, 0) -- (1, 0);
+      \draw[txn, red] (1, 0) -- (1, 1);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{1-\iconfluence{} $\centernot\implies$ \iconfluence}
+  \begin{center}
+    $c_2$
+
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{=}{0}} or test{\ifnumcomp{\x}{=}{1}}}
+      \draw[txn, green] (0, 0) -- (-1, 0);
+      \draw[txn, green] (1, 0) -- (1, 1);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{1-\iconfluence{} $\centernot\implies$ \iconfluence}
+  \begin{center}
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{=}{0}} or test{\ifnumcomp{\x}{=}{1}}}
+      \draw[txn, red] (0, 0) -- (1, 0);
+      \draw[txn, red] (1, 0) -- (1, 1);
+    \end{tikzpicture}\quad
+    \begin{tikzpicture}
+      \drawgrid{}
+      \drawpoints{test{\ifnumcomp{\y}{=}{0}} or test{\ifnumcomp{\x}{=}{1}}}
+      \draw[txn, green] (0, 0) -- (-1, 0);
+      \draw[txn, green] (1, 0) -- (1, 1);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\imp{}}
+  \footnotesize
+  \[
+    \begin{array}{rrl}
+      \impaexp\;
+        a & ::= & k       \\
+          & |   & x       \\
+          & |   & read(x) \\
+          & |   & a + a   \\
+          & |   & a - a   \\
+      \impbexp\;
+        b & ::= & \textsf{true}  \\
+          & |   & \textsf{false} \\
+          & |   & a \odot a      \\
+          & |   & \lnot b        \\
+          & |   & b \lor b       \\
+          & |   & b \land b      \\
+      \impcom\;
+        c  & ::= & \impskip        \\
+           & |   & x := a          \\
+           & |   & add(x, a)       \\
+           & |   & c; c            \\
+           & |   & \impif{b}{c}{c} \\
+    \end{array}
+  \]
 \end{frame}
 
 \begin{frame}{\wimp{}}
