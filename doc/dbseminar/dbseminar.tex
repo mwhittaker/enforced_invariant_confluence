@@ -1,10 +1,10 @@
 \documentclass[xcolor={dvipsnames,svgnames,table}]{beamer}
 
+\usepackage{../common/python}
 \usepackage{amsmath}
 \usepackage{centernot}
 \usepackage{etoolbox}
 \usepackage{mathtools}
-\usepackage{python}
 \usepackage{slides}
 \usepackage{stmaryrd}
 \usepackage{tikz}
@@ -15,8 +15,8 @@
 \usetikzlibrary{positioning}
 
 \input{banks.tex}
-\input{diagrams.tex}
-\input{notation.tex}
+\input{../common/diagrams.tex}
+\input{../common/notation.tex}
 
 \newcommand{\defeq}{\stackrel{\mathclap{\normalfont\mbox{\scriptsize def}}}{=}}
 \newcommand{\denote}[1]{\left\llbracket#1\right\rrbracket}
