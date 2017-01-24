@@ -1,0 +1,578 @@
+\section{\iconfluence{} Alternatives}
+\begin{todoitemize}
+  \item \todo{\istrength $\implies$ \istrengthstar?}
+  \item \todo{\iconfluence $\implies$ 1-\iconvergence?}
+  \item \todo{Find something between \isafety{} and \iconfluence.}
+  \item \todo{1-iconfluence with derived txns to start}
+\end{todoitemize}
+
+\begin{itemize}
+  \item \textbf{0-\isafety.}
+    $\forall D, D', c.\>
+      I(D) \land
+      I(D') \implies
+      I(D \circ \denote{c}(D'))$
+
+  \item \textbf{k-\isafety.}
+    $\forall D, D', B, C, c.\>
+       C = \denote{B}(D) \land
+       |B| \geq k \land
+       I(B @ D') \implies
+       I(C @ D) \land
+       I(D \circ C \circ \denote{c}{D' \circ C})$
+
+  \item \textbf{\isafety.}
+    $\forall D, D', B, C, c.\>
+       C = \denote{B}(D) \land
+       I(B @ D') \implies
+       I(D \circ C \circ \denote{c}(D' \circ C))$
+
+  \item \textbf{\ipreservation.} $\forall D, c.\>
+       I(D) \implies
+       I(D \circ \denote{c}(D))$
+
+  \item \textbf{\iconfluence.}
+    $\forall D, B_1, B_2, C_1, C_2. \>
+       C_1 = \denote{B_1}(D) \land
+       C_2 = \denote{B_2}(D) \land
+       I(B_1 @ D) \land
+       I(B_2 @ D) \implies
+       I(D \circ C_1 \circ C_2)$
+
+  \item \textbf{k-\iconfluence.}
+    $\forall D, B_1, B_2, C_1, C_2. \>
+       C_1 = \denote{B_1}(D) \land
+       C_2 = \denote{B_2}(D) \land
+       |B_1|, |B_2| \leq k \land
+       I(B_1 @ D) \land
+       I(B_2 @ D) \implies
+       I(D \circ C_1 \circ C_2)$
+
+  \item \textbf{1-\iconfluence.}
+    $\forall D, c_1, c_2.\>
+       I(D) \land
+       I(D \circ \denote{c_1}(D)) \land
+       I(D \circ \denote{c_2}(D)) \implies
+       I(D \circ \denote{c_1}(D) \circ \denote{c_2}(D))$
+
+  \item \textbf{\istrengthstar{} \cite{gotsman2016cause}.}
+    \leqnomode
+    \begin{flalign*}
+      & \exists G_0 \subseteq \dbs \times \dbs.& \\
+      & G_0(I) \subseteq I \land{} & \tag*{S2.} \\
+      & \forall c, D, D'.\>
+          D \in I \land
+          (D, D') \in G_0^* \implies
+          (D', D' \circ \denote{c}(D)) \in G_0 & \tag*{S3.}
+    \end{flalign*}
+    \reqnomode
+    where $I$ is viewed as a set of database states.
+
+  \item \textbf{\istrength{} \cite{gotsman2016cause}.}
+    \leqnomode
+    \begin{flalign*}
+      & \exists G_0 \subseteq \dbs \times \dbs. & \\
+      & G_0(I) \subseteq I \land{} & \tag*{T2.} \\
+      & \forall c.\>
+        \exists P_1, \ldots, P_n \subseteq \dbs.\>
+        \exists Q_1, \ldots, Q_n \subseteq \dbs.\> & \tag*{T3.} \\
+      & \quad I \subseteq \cup_{i=1}^n P_i \land {} & \tag*{T3b.} \\
+      & \quad \forall i \in \set{1, \ldots, n}.\> & \\
+      & \quad \quad P_i \subseteq Q_i \land {} & \tag*{T3c.} \\
+      & \quad \quad G_0(Q_i) \subseteq Q_i \land {} & \tag*{T3d.} \\
+      & \quad \quad Q_i \times \denote{c}(P_i)(Q_i) \subseteq G_0 & \tag*{T3e.}
+    \end{flalign*}
+    \reqnomode
+    where $I$ is viewed as a set of database states.
+
+  \item \textbf{1-\iconvergence.}
+    $\forall D, D', D'', c', c''.\>
+      I(D) \land I(D') \land I(D'') \land
+      I(D \circ \denote{c'}(D')) \land
+      I(D \circ \denote{c''}(D'')) \implies
+      I(D \circ \denote{c'}(D') \circ \denote{c''}(D''))$
+\end{itemize}
+
+\begin{claim}\label{clm:0-isafety-implies-istrengthstar}
+  0-\isafety $\implies$ \istrengthstar.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
+  respect to invariant $I$. We show $T$ is \istrongstar{} with respect to $I$.
+  Let $G_0 = I \times I$. S2 holds trivially: $G_0(I) = I
+  \subseteq I$. Consider an arbitrary $c$, $D$, and $D'$ where $D \in I$ and
+  $(D, D') \in G_0^*$.
+  \begin{align*}
+    & D \in I \land (D, D') \in G_0^*  \\
+    &\implies D \in I \land D' \in I \tag{Definition of $G_0$} \\
+    &\implies D' \in I \land D' \circ \denote{c}(D) \in I \tag{0-\isafety} \\
+    &\implies (D', D' \circ \denote{c}(D)) \in G_0 \tag{Definition of $G_0$}
+  \end{align*}
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-not-implies-0-isafety}
+  \istrengthstar $\centernot\implies$ 0-\isafety
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let
+  \begin{itemize}
+    \item
+      $G \defeq \set{(0, 0), (0, 2)} \cup \setst{(a, b)}{a \geq 2, b \geq a}$
+    \item
+      $I \defeq x = 0 \lor x \geq 2$, and
+    \item
+      the single \imp{} transaction $c \defeq
+      \impif{read(x)=0}{add(x, 0)}{add(x, 1)}$.
+  \end{itemize}
+
+  First note that $c$ is \istrengthstar{} with respect to $I$. S2 holds
+  trivially. To show S3 holds, consider an arbitrary pair $a, b \in G_0^*$.
+  \begin{itemize}
+    \item \textbf{Case $a = 0, b = 0$.}
+      $0 \circ \denote{c}(0) = 0 + 0 = 0$ and $(0, 0) \in G_0$.
+    \item \textbf{Case $a = 0, b >= 2$.}
+      $b \circ \denote{c}(0) = b + 0 = b$ and $(b, b) \in G_0$.
+    \item \textbf{Case $a \geq 2, b >= a$.}
+      $b \circ \denote{c}(a) = b + a$ and $(b, b + a) \in G_0$.
+  \end{itemize}
+
+  Now note that $c$ is not 0-\isafe{} with respect to $I$. Notably, $I(0)$ and
+  $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ and $\lnot I(1)$.
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-implies-ipreservation}
+  \istrengthstar $\implies$ \ipreservation
+\end{claim}
+\begin{proof}
+  Consider a set of transactions $T$ that is \istrongstar{} with respect to
+  invariant $I$ with relation $G_0$. Consider an arbitrary database $D$ that
+  satisfies $I$ and an arbitrary \imp{} transaction $c$. $(D, D) \in G_0^*$,
+  so by S3, $(D, D \circ \denote{c}(D)) \in G_0$. By S2, $I(D \circ \denote{c}(D))$.
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-implies-iconfluence}
+  \istrengthstar{} $\implies$ \iconfluence{}.
+\end{claim}
+\begin{proof}
+  Consider a set of transactions $T$ that is \istrongstar{} with respect to an
+  invariant $I$ with relation $G_0$. Consider an arbitrary database state $D$,
+  two \imp{} chains $B^c = c_1, c_2, \ldots, c_m$ and $B^d = d_1, d_2, \ldots,
+  d_n$, and two fixed transaction chains $C^c$ and $C^D$ such that $D$
+  satisfies $I$, $B^c$ satisfies $I$ starting at $D$, $B^d$ satisfies $I$
+  starting at $D$, $C^c = \denote{B^c}(D)$, and $C^d = \denote{B^d}(D)$. We
+  show $D \circ C^c \circ C^d$ satisfies $I$.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $0 \leq i \leq m + n$, that for all natural numbers
+  $j, k, j', k'$ if
+    $j \leq m$,
+    $k \leq n$,
+    $i = j + k$,
+    $j' \leq j$, and
+    $k' \leq k$, then
+  $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_j \circ C^d_k) \in G_0^*$.
+
+  This proof is similar to the proof of \thmref{one-is-enough}, and we can
+  visualize it similar to how we visualized \thmref{one-is-enough} in
+  \figref{one-is-enough}. Intuitively, our induction progresses diagonally from
+  the upper left corner $D$ to the bottom right corner $D \circ C^c_j \circ
+  C^d_k$. For each diagonal, our inductive hypothesis says all states on the
+  diagonal are reachable via $G_0^*$ from points above and to the left.
+
+  %
+  The base case, when $i = 0$, is trivial. $i = j = k = j' = k' = 0$, so $(D
+  \circ C^c_0 \circ C^d_0, D \circ C^c_0 \circ C^d_0) = (D, D) \in G_0^*$ by
+  the definition of a reflexive transaction closure.
+  %
+  For the inductive step, consider an arbitrary set of natural numbers
+  $i, j, k, j', k'$ where
+    $0 < i \leq m + n$,
+    $j \leq m$,
+    $k \leq n$,
+    $i = j + k$,
+    $j' \leq j$
+    $k' \leq k$.
+  If $j' = j$ and $k' = k$, then $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ
+  C^c_{j} \circ C^d_{j}) \in G_0^*$ by the definition of a reflexive transitive
+  closure. Otherwise $j' < j$ or $k' < k$. Without loss of generality, assume
+  $j' < j$; the proof is symmetric for $k' < k$. We can deduce the following
+  facts:
+  \begin{gather}
+    (D, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-a} \\
+    (D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-b} \\
+    I(D \circ C^c_{j-1} \circ C^d_{k})
+      \label{strength-confluence-c} \\
+    (D \circ C^c_{j-1} \circ C^d_{k}, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-d} \\
+    (D \circ C^c_{j-1} \circ C^d_{k}, D \circ C^c_{j} \circ C^d_{k}) \in G_0
+      \label{strength-confluence-e}
+  \end{gather}
+  where
+  \begin{itemize}
+    \item
+      \eqref{strength-confluence-a} and \eqref{strength-confluence-b} are
+      deduced from the inductive hypothesis applied to $i - 1$;
+    \item
+      \eqref{strength-confluence-c} is deduced from
+      \eqref{strength-confluence-a}, the assumption $I(D)$, and S2;
+    \item
+      \eqref{strength-confluence-d} is deduced from the definition of a
+      reflexive transitive closure;
+    \item
+      \eqref{strength-confluence-e} is deduced from
+      \eqref{strength-confluence-d} and S3 applied to $C^c_j$, $D \circ
+      C^c_{j-1} \circ C^d_{k}$, and $D \circ C^c_{j-1} \circ C^d_{k}$.
+  \end{itemize}
+  \eqref{strength-confluence-b} and \eqref{strength-confluence-e} imply
+  $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_j \circ C^d_k) \in G_0^*$.
+
+  Finally, $I(D)$, $(D, D \circ D^c_m \circ D^d_n) \in G_0^*$, and S2 imply
+  that $I(D \circ D^c_m \circ D^d_n)$.
+\end{proof}
+
+\begin{claim}\label{clm:iconfluence-not-implies-istrengthstar}
+  \iconfluence{} $\centernot\implies$ \istrengthstar{}.
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let $I \defeq x = 0$ and the single \imp{}
+  transaction $c = add(x, 1)$. Note that $c$ is vacuously \iconfluent{} with
+  respect to $I$. Also note that $c$ is not \ipreserving{} with respect to $I$:
+  $0$ satisfies $I$ but $0 \circ \denote{c}(0) = 1$ does not. By the
+  contrapositive of \clmref{istrengthstar-implies-ipreservation}, $c$ is not
+  \istrongstar{} with respect to $I$.
+\end{proof}
+
+\begin{claim}\label{clm:0-isafety-implies-istrength}
+  0-\isafety{} $\implies$ \istrength{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
+  respect to invariant $I$; we show $T$ is \istrong{} with respect to $I$. Let
+  $G_0 = I \times I$. $T2$ holds trivially. For all $c \in T$, let $n = 1$ and
+  $P_n = Q_n = I$. T3b, T3c, and T3d reduce to $I \subseteq I$, $I \subseteq
+  I$, and $G_0(I) \subseteq I$ which all hold trivially. T3e reduces to $I
+  \times \denote{c}(I)(I) \subseteq G_0$. To prove this, it is sufficient to
+  prove $\denote{c}(I)(I) \subseteq I$ which holds directly from 0-\isafety{}.
+\end{proof}
+
+\begin{claim}\label{clm:0-istrength-not-implies-0-isafety}
+  \istrength{} $\centernot\implies$ 0-\isafety.
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let
+  \begin{itemize}
+    \item
+      $G_0 \defeq \set{(0, 0)} \cup \setst{(a, b)}{a \geq 2, b \geq 2}$;
+    \item
+      $I \defeq x = 0 \lor x \geq 2$;
+    \item
+      the single \imp{} transaction $c \defeq
+      \impif{read(x)=0}{add(x, 0)}{add(x, 1)}$;
+    \item
+      $n \defeq 2$;
+    \item
+      $P_1 \defeq Q_1 \defeq \set{0}$; and
+    \item
+      $P_2 \defeq Q_2 \defeq \setst{x}{x \geq 2}$.
+  \end{itemize}
+
+ First note that $c$ is \istrong{} with respect to $I$.  T2, T3b, T3c, and T3d
+ hold trivially. For $i = 1$, T3e reduces to $\set{0} \times
+ \denote{c}(\set{0})(\set{0}) \subseteq G_0$ which holds because $\set{(0, 0
+ \circ \denote{c}(0)} = \set{(0, 0)} \subseteq G_0$. For $i = 2$, consider
+ arbitrary databse states $x,y,z \in P_2 = G_2$. $(x, y \circ \denote{c}(z)) =
+ (x, y + 1) \in G_0$. Thus T3e holds for $i = 2$.
+
+  Now note that $c$ is not 0-\isafe{} with respect to $I$. Notably, $I(0)$ and
+  $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ does not satisfy $I$.
+\end{proof}
+
+\begin{claim}\label{clm:istrength-implies-istrengthstar}
+  \istrength{} $\implies$ \istrengthstar{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is \istrong{} with
+  respect to invariant $I$ with relation $G_0$ and sets $P_1^c, \ldots, P_n^c,
+  Q_1^c, \ldots, Q_n^c$ for every $c \in T$. We show $T$ is \istrongstar{} with
+  respect to $I$ with $G_0$.
+
+  T2 implies S2. To prove S3, consider an arbitrary transaction $c$ and
+  database states $D$ and $D'$ where $I(D)$ and $(D, D') \in G_0^*$. By T3b, $D
+  \in P_i^c$ for some $i$, and by T3c, $D \in Q_i^c$. By T3d, $D' \in Q_i^c$.
+  Finally by T3e, $(D', D' \circ \denote{c}(D)) \in G_0$.
+\end{proof}
+
+\begin{claim}\label{clm:0-isafety-implies-1-iconvergence}
+  0-\isafety{} $\implies$ 1-\iconvergence{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is \iconfluent{}
+  with respect to invariant $I$. We show that $T$ is 1-\iconvergent{} with
+  respect to $I$.
+
+  Consider arbitrary database states $D$, $D'$, $D''$ and arbitrary
+  transactions $c'$, $c''$ where $I(D)$, $I(D')$, $I(D'')$, $I(D \circ
+  \denote{c'}(D'))$, and $I(D \circ \denote{c''}(D''))$. Applying 0-\isafety{}
+  to $D \circ \denote{c'}(D')$, $D''$, and $c''$, we have $I(D \circ
+  \denote{c'}(D') \circ \denote{c''}(D''))$.
+\end{proof}
+
+\begin{claim}\label{clm:1-iconvergence-implies-iconfluence}
+  1-\iconvergence{} $\implies$ \iconfluence{}.
+\end{claim}
+\begin{proof}
+  Consider a set of \imp{} transactions $T$ that is 1-\iconvergent{} with
+  respect to an invariant $I$. Consider an arbitrary database state $D$, two
+  \imp{} chains $B^c = c_1, c_2, \ldots, c_m$ and $B^d = d_1, d_2, \ldots,
+  d_n$, and two fixed transaction chains $C^c$ and $C^D$ such that $D$
+  satisfies $I$, $B^c$ satisfies $I$ starting at $D$, $B^d$ satisfies $I$
+  starting at $D$, $C^c = \denote{B^c}(D)$, and $C^d = \denote{B^d}(D)$. We
+  show $D \circ C^c \circ C^d$ satisfies $I$.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $0 \leq i \leq m + n$, that for all natural numbers
+  $j, k$ if
+    $j \leq m$,
+    $k \leq n$, and
+    $i = j + k$, then
+    $I(D \circ C^c_j \circ C^d_k)$
+  %
+  The base case, when $i = 0$, is trivial. $i = j = k = 0$, and $D \circ C^c_0
+  \circ C^d_0 = D$ satisfies $I$ by assumption.
+  %
+  For the inductive step, consider arbitrary natural numbers $i, j, k$ where
+    $0 < i \leq m + n$,
+    $j \leq m$,
+    $k \leq n$, and
+    $i = j + k$.
+  If $j = 0$, then $D \circ C^c_0 \circ C^d_k = D \circ C^d_k$ satisfies $I$ by
+  assumption. A symmetric argument holds for $k=0$. Otherwise, $j, k > 0$. Let
+  \newcommand{\wh}{\widehat}
+  \begin{align*}
+    \wh{D}   &\defeq D \circ C^c_{j-1} \circ C^d_{k-1}, \\
+    \wh{D'}  &\defeq D \circ C^c_{j-1}, \\
+    \wh{D''} &\defeq D \circ C^d_{k-1}, \\
+    \wh{c'}  &\defeq c_j,\ \text{and} \\
+    \wh{c''} &\defeq d_k.
+  \end{align*}
+  By the inductive hypothesis, we have
+    $I(\wh{D})$,
+    $I(\wh{D'})$,
+    $I(\wh{D''})$,
+    $I(\wh{D} \circ \denote{\wh{c'}}(\wh{D'}))
+      = I(D \circ C^c_{j} \circ C^d_{k-1})$, and
+    $I(\wh{D} \circ \denote{\wh{c''}}(\wh{D''}))
+      = I(D \circ C^c_{j-1} \circ C^d_{k})$.
+  Applying 1-\iconvergence{} to
+    $\wh{D}$,
+    $\wh{D'}$,
+    $\wh{D''}$,
+    $\wh{c'}$, and
+    $\wh{c''}$,
+  we have
+    $I(\wh{D} \circ \denote{\wh{c'}}(\wh{D'})
+              \circ \denote{\wh{c''}}(\wh{D''}))
+      = I(D \circ C^c_j \circ C^d_k)$.
+\end{proof}
+
+\tikzstyle{automatable}=[fill=green!20]
+\tikzstyle{intractable}=[fill=red!20]
+\begin{figure}[h]
+  \centering
+
+  \begin{tikzpicture}
+    \node[automatable] (0-isafety) at (0, 0) {0-\isafety};
+    \node[automatable, below=of 0-isafety]     (1-isafety)      {1-\isafety};
+    \node[automatable, below=of 1-isafety]     (k-isafety)      {$k$-\isafety};
+    \node[intractable, right=of 0-isafety]     (istrengthstar)  {\istrengthstar};
+    \node[automatable, above=of istrengthstar] (ipreservation)  {\ipreservation};
+    \node[intractable, right=of istrengthstar] (iconfluence)    {\iconfluence};
+    \node[automatable, below=of iconfluence]   (k-iconfluence)  {$k$-\iconfluence};
+    \node[automatable, below=of k-iconfluence] (1-iconfluence)  {1-\iconfluence};
+    \node[automatable, below=of istrengthstar] (istrength)      {\istrength};
+    \node[automatable, below=of istrength]     (1-iconvergence) {1-\iconvergence};
+
+    \draw[ultra thick, impl] (0-isafety) -> (istrengthstar);
+    \draw[ultra thick, impl] (istrengthstar) -> (iconfluence);
+    \draw[ultra thick, impl] (0-isafety) -> (istrength);
+    \draw[impl] (iconfluence) -> (k-iconfluence);
+    \draw[impl] (k-iconfluence) -> (1-iconfluence);
+    \draw[impl] (istrengthstar) -> (ipreservation);
+    \draw[impl] (0-isafety) -> (1-isafety);
+    \draw[impl] (1-isafety) -> (k-isafety);
+    \draw[impl] (istrength) -> (istrengthstar);
+    \draw[impl] (0-isafety) -> (1-iconvergence);
+    \draw[impl] (1-iconvergence) -> (iconfluence);
+  \end{tikzpicture}
+
+  \caption{
+    An illustration of the relationship between various \iconfluence{}
+    alternatives. We have proven bold implications in both directions. For
+    example, we have proven both \istrengthstar{} $\implies$ \iconfluence{} and
+    \iconfluence{} $\protect \centernot \implies$ \istrengthstar{}. Conditions
+    shaded green can be automatically determined using an SMT solver.
+    Conditions shaded red are not easy to automatically determine.
+  }
+  \label{fig:iconfluence-alternatives-implications}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{d1}{0, 0}
+      \inode[label=above:$D'$]{d2}{1, 0}
+      \dnode{b1}{0, -1}
+      \nnode{b2}{1, -1}
+      \draw[txn] (d2) -- (b2) node[midway, right]{$\denote{c}(D')$};
+      \draw[dtxn] (d1) -- (b1) node[midway, left]{$\denote{c}(D')$};
+    \end{tikzpicture}
+    \caption{0-\isafety}
+    \label{fig:0-isafety}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{a}{0, 0}
+      \dnode{b}{0, -1}
+      \draw[txn] (a) -- (b) node[midway, left]{$\denote{c}(D)$};
+    \end{tikzpicture}
+    \caption{\ipreservation}
+    \label{fig:ipreservation}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[label=left:$D_{c}$]{l1}{$(a) + (240:1)$}
+      \inode[label=right:$D_{d}$]{r1}{$(a) + (300:1)$}
+      \dnode{b}{$(l1) + (300:1)$}
+      \draw[txn] (a) -- (l1) node[midway, left] {$\denote{c}(D)$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$\denote{d}(D)$};
+      \draw[txn] (l1) -- (b) node[midway, left] {$\denote{d}(D)$};
+      \draw[txn] (r1) -- (b) node[midway, right] {$\denote{c}(D)$};
+    \end{tikzpicture}
+    \caption{1-\iconfluence}
+    \label{fig:1-iconfluence}
+  \end{subfigure}
+
+  \vspace{1cm}
+
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+
+    \begin{tikzpicture}[scale=1.5]
+      \inode[label=above:$D_0$]{l1}{0, 4}
+      \dnode[label=left:$D_1$]{l2}{0, 3}
+      \dnode[label=left:$D_2$]{l3}{0, 2}
+      \dnode[label=left:$D_3$]{l4}{0, 1}
+      \dnode{l5}{0, 0}
+
+      \inode[label=above:$D_0'$]{r1}{1, 4}
+      \inode[label=right:$D_1'$]{r2}{1, 3}
+      \inode[label=right:$D_2'$]{r3}{1, 2}
+      \inode[label=right:$D_3'$]{r4}{1, 1}
+      \nnode{r5}{1, 0}
+
+      \draw[txn] (r1) -- (r2) node[midway, right]{$\denote{c_1}(D_0')$};
+      \draw[txn] (r2) -- (r3) node[midway, right]{$\denote{c_2}(D_1')$};
+      \draw[txn] (r3) -- (r4) node[midway, right]{$\denote{c_3}(D_2')$};
+      \draw[txn] (r4) -- (r5) node[midway, right]{$\denote{c_4}(D_3')$};
+
+      \draw[txn] (l1) -- (l2) node[midway, left]{$\denote{c_1}(D_0')$};
+      \draw[txn] (l2) -- (l3) node[midway, left]{$\denote{c_2}(D_1')$};
+      \draw[txn] (l3) -- (l4) node[midway, left]{$\denote{c_3}(D_2')$};
+      \draw[txn] (l4) -- (l5) node[midway, left]{$\denote{c_4}(D_3')$};
+    \end{tikzpicture}
+
+    \caption{$k$-\isafety, $k=3$}
+    \label{fig:k-isafety}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+
+    \begin{tikzpicture}[scale=1.5]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[label=left:$D_{c_1}$]{l1}{$(a) + (240:1)$}
+      \inode[label=left:$D_{c_2}$]{l2}{$(l1) + (240:1)$}
+      \inode[label=left:$D_{c_3}$]{l3}{$(l2) + (240:1)$}
+
+      \inode[label=right:$D_{d_1}$]{r1}{$(a) + (300:1)$}
+      \inode[label=right:$D_{d_2}$]{r2}{$(r1) + (300:1)$}
+      \inode[label=right:$D_{d_3}$]{r3}{$(r2) + (300:1)$}
+
+      \dnode{b}{$(l3) + (300:3)$}
+
+      \draw[txn] (a) -- (l1) node[midway, left] {$\denote{c_1}(D)$};
+      \draw[txn] (l1) -- (l2) node[midway, left] {$\denote{c_2}(D_{c_1})$};
+      \draw[txn] (l2) -- (l3) node[midway, left] {$\denote{c_3}(D_{c_2})$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$\denote{d_1}(D)$};
+      \draw[txn] (r1) -- (r2) node[midway, right] {$\denote{d_2}(D_{d_1})$};
+      \draw[txn] (r2) -- (r3) node[midway, right] {$\denote{d_3}(D_{d_2})$};
+      \draw[txn] (l3) -- (b) node[midway, left] {$\denote{c_1, c_2, c_3}(D)$};
+      \draw[txn] (r3) -- (b) node[midway, right] {$\denote{d_1, d_2, d_3}(D)$};
+    \end{tikzpicture}
+
+    \caption{\iconfluence}
+    \label{fig:iconfluence}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{s2a}{0, 1}
+      \dnode{s2b}{0, 0}
+      \draw[gtxn] (s2a) -- (s2b) node[midway, left]{$\denote{c}(D)$};
+
+      \inode[label=above:$D$]{s3a}{1, 1}
+      \nnode[]{s3b}{1, 0}
+      \nnode[label=above:$D'$]{s3c}{2, 1}
+      \nnode[]{s3d}{2, 0}
+      \draw[txn] (s3a) -- (s3b) node[midway, left] {$\denote{c}(D)$};
+      \draw[dgtxn] (s3c) -- (s3d) node[midway, right] {$\denote{c}(D)$};
+      \draw[gtxn] (s3a) -- (s3c) node[midway, above] {$G_0^*$};
+    \end{tikzpicture}
+    \caption{\istrengthstar}
+    \label{fig:istrengthstar}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{D}{0, 0}
+      \inode[]{l1}{$(D) + (240:1)$}
+      \inode[]{r1}{$(D) + (300:1)$}
+      \dnode{m}{$(l1) + (300:1)$}
+
+      \inode[label=above:$D'$]{D'}{$(r1) + (1.5, 0.5)$}
+      \nnode[]{x}{$(D') + (0, -1)$}
+
+      \inode[label=above:$D''$]{D''}{$(D') + (1, 0)$}
+      \nnode[]{y}{$(D'') + (0, -1)$}
+
+      \draw[txn] (D) -- (l1) node[midway, left] {$\denote{c'}(D')$};
+      \draw[txn] (D) -- (r1) node[midway, right] {$\denote{c''}(D'')$};
+      \draw[txn] (l1) -- (m) node[midway, left] {$\denote{c''}(D'')$};
+      \draw[txn] (r1) -- (m) node[midway, right] {$\denote{c'}(D')$};
+
+      \draw[txn] (D') -- (x) node [midway, left] {$\denote{c'}(D')$};
+
+      \draw[txn] (D'') -- (y) node [midway, left] {$\denote{c''}(D'')$};
+    \end{tikzpicture}
+    \caption{1-\iconvergence}
+    \label{fig:1-iconvergence}
+  \end{subfigure}
+
+  \caption{
+    An illustration of \iconfluence{} alternatives. \todo{Describe drawings.}
+  }
+  \label{fig:iconfluence-alternatives-diagrams}
+\end{figure}
+
+

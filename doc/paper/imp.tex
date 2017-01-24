@@ -1,0 +1,221 @@
+\section{\imp{}}\label{sec:imp}
+So far, we've modelled a transaction $t: \var \rightharpoonup \ints$ as a
+partial function from variables to integers. Intuitively, a transaction chooses
+some \emph{fixed} subset of variables and increments and decrements each by
+some \emph{fixed} amount. We'll call these kinds of transactions \emph{fixed
+transactions}. While simple, fixed transactions are \emph{inexpressive}. We can
+model, for example, a transaction that increments $x$ by 42 and decrements $y$
+by 14, but we \emph{can't} model a transaction that increments $y$ by $x$ or a
+transaction that increments $y$ by 1 whenever $x$ is positive and increments
+$z$ whenever $x$ is negative.
+
+In this subsection, we introduce a simple imperative programming language
+\imp{}\footnote{That's IMP \cite{winskel1993formal} with an $\iinvariant{}$.}.
+Instead of looking at fixed transactions, we'll look at \imp{}
+transactions---transactions written in \imp{}---and ask ourselves the question
+of how do determine whether a set of \imp{} transactions is \iconfluent{} with
+respect to some invariant.
+
+\begin{figure}[h]
+  \centering
+  \begin{gather*}
+    \begin{array}{rrll}
+      \impaexp\;
+        a & ::= & k       & \text{\emph{constant}} \\
+          & |   & x       & \text{\emph{variable}} \\
+          & |   & read(x) & \text{\emph{database read}} \\
+          & |   & a + a   & \text{\emph{addition}} \\
+          & |   & a - a   & \text{\emph{subtraction}} \\
+          & |   & - a     & \text{\emph{negation}} \\
+      &&& \\
+      \impbexp\;
+        b & ::= & \textsf{true}  & \text{\emph{true}} \\
+          & |   & \textsf{false} & \text{\emph{false}} \\
+          & |   & a \odot a      & \text{\emph{linear constraint}} \\
+          & |   & \lnot b        & \text{\emph{negation}} \\
+          & |   & b \lor b       & \text{\emph{disjunction}} \\
+          & |   & b \land b      & \text{\emph{conjunction}} \\
+      &&& \\
+      \impcom\;
+        c  & ::= & \impskip        & \text{\emph{skip}} \\
+           & |   & x := a          & \text{\emph{assignment}} \\
+           & |   & add(x, a)       & \text{\emph{database adds}} \\
+           & |   & c; c            & \text{\emph{sequence}} \\
+           & |   & \impif{b}{c}{c} & \text{\emph{conditional}} \\
+      &&& \\
+      \odot & ::= & =    \vert
+                    \neq \vert
+                    <    \vert
+                    \leq \vert
+                    >    \vert
+                    \geq & \text{\emph{comparator}}
+    \end{array}
+  \end{gather*}
+
+  \caption{
+    A grammar for \imp{}: a simple imperative transaction language inspired by
+    IMP \cite{winskel1993formal} and $\mathcal{L}$ \cite{roy2015homeostasis}.
+    The language consists of arithmetic expressions $\impaexp{}$, boolean
+    expressions $\impbexp{}$, and commands $\impcom{}$.
+  }
+  \label{fig:imp-grammar}
+\end{figure}
+
+The syntax of \imp{} is defined by the grammar in \figref{imp-grammar}. The
+semantics of \imp{} can be defined denotationally. That is, we can define a
+denotational semantics $\denote{\cdot}$ where for an \imp{} program $c$,
+$\denote{c}: (\var \to \ints) \to (\var \rightharpoonup \ints)$ is a function
+from a database to a fixed transaction. Defining these semantics is left as an
+exercise to the reader.  See \cite{cs6110sp2016lecture19} for guidance.
+\todo{Define, explicitly, the denotational semantics if need be.}
+
+\emph{Applying an \imp{} transaction} $c$ to database state $D$, denoted by $D
+\circ c$, is defined as $D \circ c \defeq D \circ (\denote{c}(D))$.  Note that
+unlike fixed transaction application, \imp{} transaction application is
+\emph{not} commutative! For example, consider the database $D=\set{(x, 0)}$ and
+\imp{} transactions $c_1 = add(x, 1)$ and $c_2 = add(x, read(x))$.
+\[
+  D \circ c_1 \circ c_2
+    = \set{(x, 1)} \circ c_2
+    = \set{(x, 2)}
+    \neq \set{(x, 1)}
+    = \set{(x, 0)} \circ c_1
+    = D \circ c_2 \circ c_1
+\]
+
+An \imp{} transaction chain $B$ created from a set of \imp{} transactions $T$
+is a sequence of \imp{} transactions $c_1, \ldots, c_n$ where $c_i \in T$ for
+$1 \leq i \leq n$. Each \imp{} transaction chain $B$ starting with database
+state $D$ has a corresponding fixed transaction chain $C$ denoted
+$\denote{B}(D)$. Let $D_i = D \circ c_1 \circ \cdots \circ c_i$. Then, the
+corresponding fixed transaction chain is $\denote{c_1}(D_0), \ldots,
+\denote{c_n}(D_{n-1})$. We say $B$ \emph{satisfies invariant} $I$ starting at
+$D$, denoted $I(B@D)$, if the corresponding fixed transaction chain $C$
+satisfies invariant $I$ starting at $D$.
+
+We say a set of \imp{} transactions $T$ is \iconfluent{} with respect to
+invariant $I$ if for all database states $D$, all \imp{} chains $B_1$ and $B_2$
+created from $T$, and corresponding fixed transaction chains $C_1$ and $C_2$,
+if $D$ satisfies $I$, $B_1$ satisfies $I$ starting at $D$, and $B_2$ satisfies
+$I$ starting at $D$, then $D \circ C_1 \circ C_2$ satisfies $I$. We define
+$k$-\iconfluence{} similar to how we did in \secref{counter-one}.
+
+Now that we've formalized what it means for a set of \imp{} transactions to be
+\iconfluent{} with respect to some invariant, how do we determine
+\iconfluence{} algorithmically? One initial hunch would be to apply the same
+technique from \secref{solution} with slight modification. Unfortunately,
+\clmref{imp-1-iconfluence} presents a challenge.
+
+\begin{claim}\label{clm:imp-1-iconfluence}
+  For \imp{} transactions, $1$-\iconfluence $\centernot \implies$ \iconfluence.
+\end{claim}
+\begin{proof}
+  Consider the following invariant and \imp{} transactions:
+  \begin{align*}
+    I &\defeq
+      (-2 \leq x \leq 2 \land y = 0) \lor (x = 1 \land 0 \leq y \leq 2) \\
+    c_1 &\defeq \impif{x = 0 \land y = 0}{
+      add(x, 1)
+    }{\impif{x = 1 \land y = 0} {
+      add(y, 1)
+    }{
+      \impskip
+    }} \\
+    c_2 &\defeq \impif{x = 0 \land y = 0}{
+      add(x, -1)
+    }{\impif{x = 1 \land y = 0} {
+      add(y, 1)
+    }{
+      \impskip
+    }}
+  \end{align*}
+
+  $T = \set{c_1, c_2}$ is $1$-\iconfluent{} with respect to $I$, but not
+  $2$-\iconfluent{} with respect to $I$. Proving this is easiest if we
+  interpret \imp{} transactions geometrically, as we did with fixed
+  transactions.
+
+  As before, invariants over $n$ variables correspond to a set of points in
+  $\ints^n$; for example, $I$ is visualized in \figref{iviz}. An \imp{}
+  transaction $c$ can be thought of as vector valued functions $c: \ints^n \to
+  \ints^n$ that maps each point in $\ints^n$ to a $n$-dimensional vector. For
+  example, $c_1$ and $c_2$ are visualized in \figref{c1viz} and \figref{c2viz}.
+  The visualization of $c_1$ has two vectors. The $(1, 0)$ vector originating
+  at the origin corresponds to $c_1$ adding $1$ to $x$ whenever $x = 0 \land y
+  = 0$. Similarly, the $(0, 1)$ originating at $(1, 0)$ corresponds to $c_1$
+  adding $1$ to $y$ whenever $x = 1 \land y = 0$.
+
+  Using this geometric interpretation, it's easy to perform a brute-force check
+  that $T$ is $1$-\iconfluent with respect to $I$. However, consider the
+  transaction chains $B_1 = \set{c_1, c_2}$ and $B_2 = \set{c_2, c_1}$ starting
+  in database state $D = (0, 0)$. We know that
+  \begin{itemize}
+    \item $D = (0, 0)$ satisfies $I$,
+    \item $D \circ c_1 = (0, 1)$ satisfies $I$,
+    \item $D \circ c_1 \circ c_2 = (1, 1)$ satisfies $I$,
+    \item $D \circ c_2 = (-1, 0)$ satisfies $I$, and
+    \item $D \circ c_2 \circ c_1 = (-1, 0)$ satisfies $I$,
+  \end{itemize}
+  but $D \circ C_1 \circ C_2 = D \circ (1, 0) \circ (0, 1) \circ (-1, 0) \circ
+  (0, 0) = (0, 1)$ does not satisfy $I$. Therefore, $T$ is not 2-\iconfluent
+  with respect to $I$ and is therefore not \iconfluent with respect to $I$.
+\end{proof}
+
+\todo{
+  \clmref{imp-1-iconfluence} puts us in a bit of pickle. Think about how to get
+  out of it. Maybe we check for $k$-\iconfluence for some $k$ and then use a
+  reservation system to bound the amount of divergence between replicas? That
+  doesn't seem to make sense for a system with high transaction throughput.
+  Maybe there are some other tricks we can play?
+}
+
+\begin{figure}[h]
+  \centering
+
+  \newcommand{\gridandpoints}{
+    \draw[ultra thick] (-2, 0) -- (2, 0);
+    \draw[ultra thick] (0, 0) -- (0, 2);
+    \draw (-2, 0) grid (2, 2);
+    \foreach \x/\y in {-2/0, -1/0, 0/0, 1/0, 2/0, 1/1, 1/2} {
+      \node[point] (\x-\y) at (\x, \y) {};
+    }
+  }
+
+  \begin{subfigure}[c]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \gridandpoints{}
+    \end{tikzpicture}
+    \caption{Visualization of $I$.}
+    \label{fig:iviz}
+  \end{subfigure}
+  \begin{subfigure}[c]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \gridandpoints{}
+      \draw[vec] (0, 0) -- (1, 0);
+      \draw[vec] (1, 0) -- (1, 1);
+    \end{tikzpicture}
+    \caption{Visualization of $c_1$.}
+    \label{fig:c1viz}
+  \end{subfigure}
+  \begin{subfigure}[c]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \gridandpoints{}
+      \draw[vec] (0, 0) -- (-1, 0);
+      \draw[vec] (1, 0) -- (1, 1);
+    \end{tikzpicture}
+    \caption{Visualization of $c_2$.}
+    \label{fig:c2viz}
+  \end{subfigure}
+
+  \caption{
+    A geometric interpretation of $I$, $c_1$, and $c_2$ from
+    \clmref{imp-1-iconfluence}. $I$ corresponds to a subset of $\ints^2$. $c_1$
+    and $c_2$ correspond to vector valued functions of type $\ints^2 \to
+    \ints^2$.
+  }
+  \label{fig:icviz}
+\end{figure}
+

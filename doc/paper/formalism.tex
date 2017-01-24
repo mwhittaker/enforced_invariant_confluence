@@ -1,0 +1,70 @@
+\section{\iconfluence{}, Formally}\label{sec:formalism}
+Our invariant language is defined by the grammar in \figref{invariant-grammar}
+which includes linear equations and inequalities over variables in a finite set
+$\var$ and integer constants in $\ints$.
+
+\begin{figure}[h]
+  \centering
+
+  \newcommand{\atom}{\textsf{atom}}
+  \newcommand{\aexp}{\textsf{aexp}}
+  \newcommand{\bexp}{\textsf{bexpr}}
+  \begin{gather*}
+    \begin{array}{rrll}
+      \atom & ::= & k & \text{\emph{constants}} \\
+            & |   & x & \text{\emph{variables}} \\
+      &&& \\
+      \aexp  & ::= & \atom         & \text{\emph{atom}} \\
+             & |   & -\atom        & \text{\emph{negation}} \\
+             & |   & \aexp + \aexp & \text{\emph{addition}} \\
+             & |   & \aexp - \aexp & \text{\emph{subtraction}} \\
+      &&& \\
+      \bexp  & ::= & \aexp \leq \aexp  & \text{\emph{inequality}} \\
+             & |   & \lnot \bexp       & \text{\emph{negation}} \\
+             & |   & \bexp \land \bexp & \text{\emph{conjunction}} \\
+             & |   & \bexp \lor \bexp  & \text{\emph{disjunction}} \\
+    \end{array}
+  \end{gather*}
+
+  \caption{
+    A grammar for our linear equation and linear inequality invariant language.
+    Note that the comparison operators $=$, $\neq$, $<$, $>$, and $\geq$ are
+    not included because they can be defined in terms of the existing
+    operators.
+  }
+  \label{fig:invariant-grammar}
+\end{figure}
+
+A \emph{database state} is a total function $D: \var \to \ints$.  We say a
+database state $D$ \emph{satisfies invariant} $I$, denoted $I(D)$, if $I$
+evaluates to true after all variables in $I$ have been replaced by their
+mapping in $D$. Let $\dbs$ denote the set of all database states.
+
+A \emph{transaction} is a partial function $t: \var \rightharpoonup \ints$.
+\emph{Applying a transaction} $t$ to database state $D$, denoted by $D \circ
+t$, produces a new database state defined as follows:
+\[
+  (D \circ t)(x) \defeq \begin{cases*}
+    D(x) + t(x) & $x \in \dom{}(t)$ \\
+    D(x)        & otherwise
+  \end{cases*}
+\]
+Note that transaction application is commutative. That is for all database
+states $D$ and transactions $t_1$ and $t_2$, $D \circ t_1 \circ t_2 = D \circ
+t_2 \circ t_1$.
+
+A transaction chain $C$ created from a set of transactions $T$ is a sequence of
+transactions $t_1, \ldots, t_n$ where $t_i \in T$ for $1 \leq i \leq n$. Let $D
+\circ C$ be syntactic sugar for $D \circ t_1 \circ \cdots \circ t_n$. We say
+$C$ \emph{satisfies invariant} $I$ starting at $D$, denoted $I(C @ D)$, if for
+every prefix $C'$ of $C$, $D \circ C'$ satisfies invariant $I$.
+
+A set of transactions $T$ is \iconfluent{} with respect to invariant $I$ if for
+all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$
+satisfies $I$, $C_1$ satisfies $I$ starting at $D$, and $C_2$ satisfies $I$
+starting at $D$, then $D \circ C_1 \circ C_2$ satisfies $I$.
+\todo{
+  This isn't quite the definition of \iconfluence{} Bailis uses. Ponder whether
+  this simpler definition is okay.
+}
+

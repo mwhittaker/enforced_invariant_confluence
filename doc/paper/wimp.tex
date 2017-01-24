@@ -1,0 +1,160 @@
+\section{\wimp{}}\label{sec:wimp}
+We began this section by looking at fixed transactions and concluded in
+\thmref{one-is-enough} that if a set of fixed transactions is 1-\iconfluent{}
+with respect to an invariant $I$, then it is also \iconfluent{}. Then in
+\secref{imptxns}, we enriched transactions from simple fixed partial functions
+to full-blown programs written in \imp{}. Unfortunately, this increase in
+expressiveness came at the cost of the nice fact that 1-\iconfluence{} is
+equivalent to \iconfluence{}, as we saw in \clmref{imp-1-iconfluence}.
+
+Perhaps \imp{} is too powerful of a transaction language. In particular, it has
+two powerful features that fixed transactions do not have. First, \imp{} has
+conditionals allowing the control flow of an \imp{} program to depend on the
+database against which it is run. Second, even without conditionals, the
+behavior of an \imp{} transaction can still depend on the database state
+against which it is run. For example, the behavior of the transaction $add(x,
+read(x))$ depends on the initial value of $x$, even though the transaction does
+not use a conditional.
+
+Perhaps if we strip \imp{} of some its features, we'll regain the equivalence
+of 1-\iconfluence{} and \iconfluence{}. That is, perhaps there is an
+intermediate language more powerful than fixed transactions but weaker than
+\imp{} for which 1-\iconfluence{} is equivalent to \iconfluence{}.
+
+In this subsection, we'll consider one such language, \wimp{}: a weakened
+version of \imp{}. Then, we'll conclude that for \wimp{}---as for
+\imp{}---1-\iconfluence{} does not imply \iconfluence{}.
+
+Formally, \wimp{} is \imp{} without variables, boolean expressions, skip,
+assignment, and conditionals. Moreover, each database variable can be added to
+at most once. Essentially, \wimp{} programs get to add a single arithmetic
+expression to each database variable. While weaker than \imp{} programs,
+\wimp{} programs are more powerful than fixed transactions because arithmetic
+expressions can include database reads and therefore \wimp{} programs can
+depend on the initial state of the database. In fact, if we remove database
+reads from \wimp{}, we get a language of fixed transactions.
+
+Since \wimp{} is a subset of \imp{}, all the definitions from \imp{} carry over
+directly for \wimp{}. Also note that like \imp{}, \wimp{} transaction
+application is not commutative.
+
+As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
+1-\iconfluence{} and \iconfluence{}: a fact we now prove.
+
+\begin{claim}\label{clm:wimp-1-iconfluence}
+  For \wimp{} transactions, $1$-\iconfluence $\centernot \implies$ \iconfluence.
+\end{claim}
+\begin{proof}
+  Consider the following invariant and \wimp{} transactions:
+  \begin{align*}
+    I   &\defeq x \neq 0 \lor y = 0 \\
+    c_1 &\defeq y.add(1) \\
+    c_2 &\defeq x.add(read(x) + 1) \\
+    c_3 &\defeq x.add(read(x) - 1)
+  \end{align*}
+
+  As usual, we can visualize invariants and transactions geometrically, as
+  shown in \figref{wimp-icviz}. We can perform a brute-force case analysis over
+  all pairs of transactions and all points to show $T = \set{c_1, c_2, c_3}$ is
+  1-\iconfluent{} with respect to $I$. This is left as exercise to the reader.
+
+  However, consider the \wimp{} chains $B_1 = \set{c_2, c_1}$ and $B_2 =
+  \set{c_3, c_1}$ in database $D = (0, 0)$. We know that
+  \begin{itemize}
+    \item $D = (0, 0)$ satisfies $I$,
+    \item $D \circ c_2 = (1, 0)$ satisfies $I$,
+    \item $D \circ c_2 \circ c_1 = (1, 1)$ satisfies $I$,
+    \item $D \circ c_3 = (-1, 0)$ satisfies $I$, and
+    \item $D \circ c_3 \circ c_1 = (-1, 1)$ satisfies $I$,
+  \end{itemize}
+  but $D \circ C_1 \circ C_2 = D \circ (1, 0) \circ (0, 1) \circ (-1, 0) \circ
+  (0, 1) = (0, 2)$ does not satisfy $I$. Therefore, $T$ is not 2-\iconfluent
+  with respect to $I$ and is therefore not \iconfluent with respect to $I$.
+\end{proof}
+
+\todo{
+  We're in a pickle again! I think this result also might suggest that the
+  claims in \cite{balegas2015putting} are wrong? More likely, I'm
+  misunderstanding the paper.
+}
+
+\newcommand{\width}{2}
+\newcommand{\smallwidth}{1}
+\newcommand{\height}{2}
+
+\newcommand{\gridxy}{
+  \draw[ultra thick] (-\width, 0) -- (\width, 0);
+  \draw[ultra thick] (0, -\height) -- (0, \height);
+  \draw (-\width, -\height) grid (\width, \height);
+}
+
+\newcommand{\forxy}[1]{
+  \foreach \x in {-\width, ..., -1} {
+    \foreach \y in {-\height, ..., \height} { #1 } }
+  \foreach \x in {1, ..., \width} {
+    \foreach \y in {-\height, ..., \height} { #1 } }
+  \foreach \x in {0} {
+    \foreach \y in {0} { #1 } }
+}
+
+\newcommand{\forxysmall}[1]{
+  \foreach \x in {-\smallwidth, ..., -1} {
+    \foreach \y in {-\height, ..., \height} { #1 } }
+  \foreach \x in {1, ..., \smallwidth} {
+    \foreach \y in {-\height, ..., \height} { #1 } }
+  \foreach \x in {0} {
+    \foreach \y in {0} { #1 } }
+}
+
+\begin{figure}[h]
+  \centering
+  \newcommand{\thescale}{0.7}
+
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\thescale]
+      \gridxy{}
+      \forxy{\node[point] (\x-\y) at (\x, \y) {};}
+    \end{tikzpicture}
+    \caption{Visualization of $I$.}
+    \label{fig:wimp-iviz}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\thescale]
+      \gridxy{}
+      \forxy{\node[point] (\x-\y) at (\x, \y) {};}
+      \forxy{\draw[vec] (\x, \y) -- (\x, \y + 1);}
+    \end{tikzpicture}
+    \caption{Visualization of $c_1$.}
+    \label{fig:wimp-c1viz}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\thescale]
+      \gridxy{}
+      \forxy{\node[point] (\x-\y) at (\x, \y) {};}
+      \forxysmall{\draw[vec] (\x, \y) -- (\x + \x + 1, \y);}
+    \end{tikzpicture}
+    \caption{Visualization of $c_2$.}
+    \label{fig:wimp-c2viz}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.24\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\thescale]
+      \gridxy{}
+      \forxy{\node[point] (\x-\y) at (\x, \y) {};}
+      \forxysmall{\draw[vec] (\x, \y) -- (\x + \x - 1, \y);}
+    \end{tikzpicture}
+    \caption{Visualization of $c_3$.}
+    \label{fig:wimp-c3viz}
+  \end{subfigure}
+
+  \caption{
+    A geometric interpretation of $I$, $c_1$, $c_2$, and $c_3$ from
+    \clmref{wimp-1-iconfluence}. Note that the visualizations include only a
+    subset of the points satisfying $I$ and that not all vectors are drawn.
+  }
+  \label{fig:wimp-icviz}
+\end{figure}
+

@@ -1,0 +1,283 @@
+\section{One is Enough}\label{sec:oneisenough}
+Define a set of transactions $T$ to be $k$-\iconfluent{} with respect to
+invariant $I$ if for all database states $D$ and chains $C_1$ and $C_2$ created
+from $T$ of length at most $k$, if $D$ satisfies $I$, $C_1$ satisfies $I$
+starting at $D$, and $C_2$ satisfies $I$ starting at $D$, then $D \circ
+C_1 \circ C_2$ satisfies $I$.
+%
+A set of transactions $T$ is \iconfluent{} with respect to an invariant $I$ if
+it is $k$-\iconfluent{} for all $k$. Thus, when reasoning about \iconfluent{}
+transactions, we have to consider potentially large transaction chains which
+can be a bit brain boggling. Reasoning about 1-\iconfluence{} is much easier
+because we only have to consider a pair of transactions at a time. This
+subsection proves a convenient lemma that 1-\iconfluence{} and \iconfluence{}
+are equivalent.
+
+\begin{theorem}\label{thm:one-is-enough}
+  For all sets of transactions $T$ and invariants $I$, T is 1-\iconfluent{} if
+  and only if it is \iconfluent{}.
+\end{theorem}
+\begin{proof}
+  The reverse direction is immediate from the definition of \iconfluence{}. For
+  the forward direction, consider a set of transactions $T$ that is
+  1-\iconfluent{} with respect to an invariant $I$. Consider an arbitrary
+  database state $D$ and two chains $C^t = t_1, t_2, \ldots, t_m$ and $C^u =
+  u_1, u_2, \ldots, u_n$ such that $D$ satisfies $I$, $C^t$ satisfies $I$
+  starting at $D$, and $C^u$ satisfies $I$ starting at $D$. We show $D \circ
+  C^t \circ C^u$ satisfies $I$.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $i$, that $D \circ C^t_j \circ C^u_k$ satisfies $I$
+  for all $0 \leq j \leq m$, $0 \leq k \leq n$, and $0 \leq i = j + k \leq n +
+  m$.
+  %
+  The base case, when $i = 0$, is trivial. $j = k = 0$, and $D \circ C^t_0
+  \circ C^u_0 = D$ which satisfies $I$ by assumption.
+  %
+  For the inductive step, we wish to show for arbitrary $0 \leq j \leq m$, $0
+  \leq k \leq n$, and $i = j + k$ that $D \circ C^t_j \circ C^u_k$ satisfies
+  $I$. If $j = 0$, then $D \circ C^t_0 \circ C^u_k = D \circ C^u_k$ satisfies
+  $I$ by the assumption that $C^u$ satisfies $I$ starting at $D$, and likewise
+  for when $k = 0$. Now consider $j, k > 0$. By the inductive hypothesis, we
+  know
+    (1) $D \circ C^t_{j-1} \circ C^u_{k-1}$,
+    (2) $D \circ C^t_{j-1} \circ C^u_{k}$, and
+    (3) $D \circ C^t_{j}   \circ C^u_{k-1}$
+  all satisfy $I$. If we let (1) be our initial database state, $t_j$ be one
+  chain, and $u_k$ be the other chain, then the 1-\iconfluence{} of $T$ tells
+  us that $(1) \circ t_j \circ u_k = D \circ C^t_j \circ C^u_k$ satisfies
+  $I$.
+\end{proof}
+
+\newcommand{\baseedges}{
+  \begin{scope}[on background layer]
+    \draw[txn] (03) -- (13) node[midway, above]{$u_1$};
+    \draw[txn] (13) -- (23) node[midway, above]{$u_2$};
+    \draw[txn] (23) -- (33) node[midway, above]{$u_3$};
+    \draw[txn] (03) -- (02) node[midway, left]{$t_1$};
+    \draw[txn] (02) -- (01) node[midway, left]{$t_2$};
+    \draw[txn] (01) -- (00) node[midway, left]{$t_3$};
+    \draw[dtxn] (00) -- (30);
+    \draw[dtxn] (33) -- (30);
+  \end{scope}
+}
+
+\begin{figure}[h]
+  \centering
+  \newcommand{\onescale}{1.1}
+
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+             1/3, 2/3, 3/3,
+        0/2,
+        0/1,
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+    \end{tikzpicture}
+    \caption{$i = 0$}
+    \label{fig:one-is-enough-base}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3,      2/3, 3/3,
+        %
+        0/1,
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/2, 1/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+    \end{tikzpicture}
+    \caption{$i=1$}
+    \label{}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3,      3/3,
+        0/2,
+        %
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/1, 1/2, 2/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+    \end{tikzpicture}
+    \caption{$i=2$}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3,
+        0/2, 1/2,
+        0/1%
+        %
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {0/0, 1/1, 2/2, 3/3} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+    \end{tikzpicture}
+    \caption{$i=3$}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3, 3/3,
+        0/2, 1/2, 2/2,
+        0/1, 1/1,
+        0/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {1/0, 2/1, 3/2} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+      \draw[txn] (00) -- (10) node[midway, above] {$u_1$};
+      \draw[txn] (11) -- (10) node[midway, left]  {$t_3$};
+      \draw[txn] (11) -- (21) node[midway, above] {$u_2$};
+      \draw[txn] (22) -- (21) node[midway, left]  {$t_2$};
+      \draw[txn] (22) -- (32) node[midway, above] {$u_3$};
+      \draw[txn] (33) -- (32) node[midway, left]  {$t_1$};
+    \end{tikzpicture}
+    \caption{$i=4$}
+    \label{}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3, 3/3,
+        0/2, 1/2, 2/2, 3/2,
+        0/1, 1/1, 2/1,
+        0/0, 1/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \foreach \x/\y in {2/0, 3/1} {
+        \inode[red]{\x\y}{\x, \y}
+      }
+      \nnode{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+      \draw[txn] (00) -- (10) node[midway, above] {$u_1$};
+      \draw[txn] (11) -- (10) node[midway, left]  {$t_3$};
+      \draw[txn] (11) -- (21) node[midway, above] {$u_2$};
+      \draw[txn] (22) -- (21) node[midway, left]  {$t_2$};
+      \draw[txn] (22) -- (32) node[midway, above] {$u_3$};
+      \draw[txn] (33) -- (32) node[midway, left]  {$t_1$};
+      \draw[txn] (10) -- (20) node[midway, above] {$u_2$};
+      \draw[txn] (21) -- (20) node[midway, left]  {$t_3$};
+      \draw[txn] (21) -- (31) node[midway, above] {$u_3$};
+      \draw[txn] (32) -- (31) node[midway, left]  {$t_2$};
+    \end{tikzpicture}
+    \caption{$i=5$}
+    \label{}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\onescale]
+      \foreach \x/\y in {
+        0/3, 1/3, 2/3, 3/3,
+        0/2, 1/2, 2/2, 3/2,
+        0/1, 1/1, 2/1, 3/1,
+        0/0, 1/0, 2/0%
+      } {
+        \inode{\x\y}{\x, \y}
+      }
+      \inode[red]{30}{3, 0}
+      \baseedges{}
+      \draw[txn] (02) -- (12) node[midway, above] {$u_1$};
+      \draw[txn] (13) -- (12) node[midway, left]  {$t_1$};
+      \draw[txn] (01) -- (11) node[midway, above] {$u_1$};
+      \draw[txn] (12) -- (11) node[midway, left]  {$t_2$};
+      \draw[txn] (12) -- (22) node[midway, above] {$u_2$};
+      \draw[txn] (23) -- (22) node[midway, left]  {$t_1$};
+      \draw[txn] (00) -- (10) node[midway, above] {$u_1$};
+      \draw[txn] (11) -- (10) node[midway, left]  {$t_3$};
+      \draw[txn] (11) -- (21) node[midway, above] {$u_2$};
+      \draw[txn] (22) -- (21) node[midway, left]  {$t_2$};
+      \draw[txn] (22) -- (32) node[midway, above] {$u_3$};
+      \draw[txn] (33) -- (32) node[midway, left]  {$t_1$};
+      \draw[txn] (10) -- (20) node[midway, above] {$u_2$};
+      \draw[txn] (21) -- (20) node[midway, left]  {$t_3$};
+      \draw[txn] (21) -- (31) node[midway, above] {$u_3$};
+      \draw[txn] (32) -- (31) node[midway, left]  {$t_2$};
+      \draw[txn] (20) -- (30) node[midway, above] {$u_3$};
+      \draw[txn] (31) -- (30) node[midway, left]  {$t_3$};
+    \end{tikzpicture}
+    \caption{$i=6$}
+    \label{}
+  \end{subfigure}
+
+  \caption{Illustration of the proof of \thmref{one-is-enough}.}
+  \label{fig:one-is-enough}
+\end{figure}
+
+\figref{one-is-enough} visualizes the proof of \thmref{one-is-enough} using
+\emph{state diagrams}. In a state diagram, each dot represents a database state
+$D$, and we draw an edge labelled $t$ from database $D$ to database $D'$ if $D
+\circ t = D'$. We circle a database dot if we know it satisfies the invariant
+and leave it uncircled otherwise.
+
+\figref{one-is-enough} illustrates an initial database $D$ (top-left dot), a
+chain $C^t = \set{t_1, t_2, t_3}$ (the left edge), a chain $C^u = \set{u_1,
+u_2, u_3}$ (the top edge), and $D \circ C^t \circ C^u$ (the bottom-right dot).
+By assumption, we know $D$, $D \circ C^t_1$, $D \circ C^t_2$, $D \circ C^t$, $D
+\circ C^u_1$, $D \circ C^u_2$, and $D \circ C^u$ satisfy the invariant, and we
+want to show that $D \circ C^t \circ C^u$ satisfies the invariant.
+\figref{one-is-enough-base} illustrates the base case of
+\thmref{one-is-enough}; each of the other six state diagrams illustrate one
+inductive step of \figref{one-is-enough}. In each inductive step, we exploit
+the fact that $T$ is 1-\iconfluent{} to conclude that some set of intermediate
+databases satisfy the invariant.

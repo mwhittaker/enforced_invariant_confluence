@@ -1,0 +1,74 @@
+\section{A Solution}\label{sec:solution}
+This section posed the question: how do we write an algorithm to decide whether
+a set of PN-Counter increment/decrement transactions are \iconfluent{} with
+respect to an invariant expressed as a formula of linear equations and
+inequalities?  Now that we're armed with an intuitive
+(\secref{counter-overview}) and formal (\secref{counter-question})
+understanding of the problem, a geometric interpretation
+(\secref{counter-geometry}), and a useful lemma (\secref{counter-one}), we're
+in a perfect position to present a solution!
+
+In a nutshell, our algorithm translates a set of transactions $T$ and invariant
+$I$ into a universally quantified invariant $F$ in prenex normal form where $F$
+is a tautology if and only if $T$ is 1-\iconfluent{} with respect to $I$. Thus,
+by \thmref{one-is-enough}, $F$ is a tautology if and only if $T$ is
+\iconfluent{} with respect to $I$. Our algorithm then uses Z3 \cite{de2008z3}
+to check if $F$ is a tautology.
+
+The algorithm for constructing $F$ is best explained by way of example.
+Consider a simple case where $I = x + y \geq 0$, and $T$ consists of a single
+transaction $t$ which increments $x$ by 1 and $y$ by 2. Our algorithm
+constructs the following formula
+\begin{align}
+  & \forall x.\> \forall y.\>                \label{eq:vars} \\
+  & \forall dx_1.\> \forall dy_1.\>          \label{eq:dvars1} \\
+  & \forall dx_2.\> \forall dy_2.\>          \label{eq:dvars2} \\
+  & (dx_1 = 1 \land dy_1 = 2) \land {}       \label{eq:t1} \\
+  & (dx_2 = 1 \land dy_2 = 2) \implies {}    \label{eq:t2} \\
+  & x + y \geq 0 \implies {}                 \label{eq:i} \\
+  & x + dx_1 + y + dy_1 \geq 0 \implies {}   \label{eq:i1} \\
+  & x + dx_2 + y + dy_2 \geq 0 \implies {}   \label{eq:i2} \\
+  & x + dx_1 + dx_2 + y + dy_1 + dy_2 \geq 0 \label{eq:i12}
+\end{align}
+where
+\begin{itemize}
+  \item
+    \eqref{eq:vars} universally quantifies the free variables in $I$.
+
+  \item
+    \eqref{eq:dvars1} and \eqref{eq:dvars2} universally quantify variables
+    $dx_1$ and $dx_2$ for each free variable $x$ in the invariant $I$.
+    Intuitively, if the invariant has free variables $a, \ldots, z$, then the
+    variables $da_1, \ldots, dz_1$ represent the increments and decrements of
+    one transaction and $da_2, \ldots, dz_2$ represent the increments and
+    decrements of another transaction.
+
+  \item
+    \eqref{eq:t1} and \eqref{eq:t2} assert that $dx_1$, $dy_1$, $dx_2$, and
+    $dy_2$ must take on values consistent with $t$. Specifically, $x$ must be
+    incremented by 1, and $y$ must be incremented by $2$.
+
+  \item
+    \eqref{eq:i} is $I$. Intuitively, it predicates our implication on the
+    assumption that the current database state satisfies the invariant.
+
+  \item
+    \eqref{eq:i1} is $I$ with every variable $x$ replaced with $x + dx_1$.
+    Intuitively, it predicates our implication on the assumption that if we
+    apply the first transaction, our database still satisfies the invariant.
+    \eqref{eq:i2} is symmetric to \eqref{eq:i1} but for the second transaction
+    instead of the first.
+
+  \item
+    \eqref{eq:i12} is $I$ with every variable $x$ replaced with $x + dx_1 +
+    dx_2$. Intuitively, it says that if we apply both the transactions, we
+    continue to satisfy our invariant.
+\end{itemize}
+
+To summarize, the formula encodes the statement that for all database state
+$(x, y)$ for all transactions $t_1 = (dx_1, dy_1) \in T$, and for all
+transactions $t_2 = (dx_2, dy_2) \in T$, if $(x, y)$, $(x + dx_1, y + dy_1)$,
+and $(x + dx_2, y + dy_2)$ satisfy the invariant, then so does $(x + dx_1 +
+dx_2, y + dy_1 + dy_2)$. In other words, the formula is nothing more than a
+restatement of the definition of 1-\iconfluence!
+
