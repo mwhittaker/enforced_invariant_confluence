@@ -1,1 +1,130 @@
 \section{\iconfluence{}, For Real This Time}\label{sec:alie}
+In \secref{formalism}, we defined a set of fixed transactions $T$ to be
+\emph{\iconfluent{}} with respect to invariant $I$ if for all database states
+$D$ and chains $C_1$ and $C_2$ created from $T$, if $D$ satisfies $I$, $C_1$
+satisfies $I$ starting at $D$, and $C_2$ satisfies $I$ starting at $D$, then $D
+\circ C_1 \circ C_2$ satisfies $I$. In \secref{imp}, we used an almost
+identical definition for \imp{} transactions.
+
+Regrettably, I have to admit that I've been lying to you this entire time. This
+definition of \iconfluence{} is wrong! Specifically, it is a simplification of
+the original definition originally proposed by Bailis
+\etal{}~\cite{bailis2014coordination}. In light of our little white lie, we'll
+rename \iconfluence{} to \liconfluence{}\footnote{pronounced
+``lie-confluence''} and refer to Bailis \etal's properly defined property as
+\iconfluence{} from now on.
+
+First, let's review Bailis \etal's definition of \iconfluence{}. We begin with
+a set of transactions $T$, an invariant $I$, and an arbitrary database state
+$D$ that satisfies the invariant. We then consider two arbitrary database
+states $D_1$ and $D_2$ that were derived from $D$ by applying an arbitrary
+number of transactions or merges such that the invariant was always maintained.
+If the merge of $D_1$ and $D_2$ is guaranteed to satisfy the invariant, then
+$T$ is \iconfluent{} with respect to $I$. A state diagram illustrating this
+definition is given in \figref{iconfluence-example} where $D_d$ and $D_c$ play
+the role of $D_1$ and $D_2$.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[scale=1]
+    \inode[label=above:$D$]{D}{0,0};
+    \inode[label=left:$D_a$]{a}{-2,-1};
+    \inode[label=right:$D_b$]{b}{0,-1};
+    \inode[label=right:$D_c$]{c}{2,-1};
+    \inode[label=left:$D_d$]{d}{-1,-2};
+    \dnode[label=left:$D_e$]{e}{0,-3};
+    \draw[txn] (D) -- (a);
+    \draw[txn] (D) -- (b);
+    \draw[txn] (D) -- (c);
+    \draw[txn] (a) -- (d);
+    \draw[txn] (b) -- (d);
+    \draw[txn] (d) -- (e);
+    \draw[txn] (c) -- (e);
+  \end{tikzpicture}
+  \caption{A state diagram illustrating \iconfluence{}.}
+  \label{fig:iconfluence-example}
+\end{figure}
+
+Clearly, \iconfluence{} implies \liconfluence{}; that is, if $T$ is
+\iconfluent{} with respect to $I$, then it is also \liconfluent{} with respect
+to $I$. However, \liconfluence{} does not imply \iconfluence{}. As a simple
+counterexample, let $I \defeq 0 \leq x \leq 2$ and $t_1 =
+\impif{x=0}{add(x,1)}{}$. By inspection, $\set{t_1}$ is \liconfluent{} with
+respect to $I$. However, letting $D=\set{x:0}$ and each transaction be $t_1$ in
+\figref{iconfluence-example}, we have:
+\begin{align*}
+  D   &= \set{x:0} \\
+  D_a =
+  D_b =
+  D_c &= \set{x:1} \\
+  D_d &= \set{x:2} \\
+  D_e &= \set{x:3}
+\end{align*}
+$D$, $D_a$, $D_b$, $D_c$, and $D_d$ all satisfy $I$, but $D_e$ does not. Thus,
+$T$ is not \iconfluent{} with respect to $I$.
+
+This is an unfortunate result. It says that for a set of transactions $T$ and
+invariant $I$, if \liconfluence{} does not imply \iconfluence{}, then all our
+efforts to determine \liconfluence{} are for naught. However, for some
+transactions $T$ and invariants $I$, \liconfluence{} is equivalent to
+\iconfluence{}! When this is the case, we can check whether $T$ is
+\iconfluent{} with respect to $I$ by checking if it is \liconfluent{} with
+respect to $I$.
+
+So when is \liconfluence{} equivalent to \iconfluence{}? Well, look at $D$,
+$D_a$, $D_b$, and $D_d$ in \figref{iconfluence-example}. If there existed some
+\imp{} transaction chain $B$ such that $D \circ B = D_d$ and $I(B@D)$, then we
+could remove the split and merge created by $D_a$ and $D_b$ and replace it with
+the chain $B$ from $D$ to $D_d$. This is shown in \figref{mergeremoved}. For
+simplicity, we've assumed $B = c_1, c_2, c_3$. Now that \figref{mergeremoved}
+doesn't contain any intermediate merges, \liconfluence{} is equivalent to
+\iconfluence{}.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[yscale=1.2]
+    \inode[label=above:$D$]{D}{0,0};
+    \inode[]{a}{-1,-1};
+    \inode[]{b}{-1,-2};
+    \inode[label=left:$D_d$]{d}{-1,-3};
+    \inode[label=right:$D_c$]{c}{1,-3};
+    \dnode[label=left:$D_e$]{e}{0,-4};
+    \draw[txn] (D) -- node[pos=0.6,above]{$c_1$} (a);
+    \draw[txn] (a) -- node[midway,left]{$c_2$} (b);
+    \draw[txn] (b) -- node[midway,left]{$c_3$} (d);
+    \draw[txn] (d) -- (e);
+    \draw[txn] (D) -- (c);
+    \draw[txn] (c) -- (e);
+  \end{tikzpicture}
+  \caption{A state diagram illustrating \iconfluence{}.}
+  \label{fig:mergeremoved}
+\end{figure}
+
+This suggests the following sufficient condition for \liconfluence{} to be
+equivalent to \iconfluence{}. For a set of transactions $T$ and invariant $I$,
+if for all databases $D$, chains $B_1$ and $B_2$ where $I(B_1@D)$, $I(B_2@D)$,
+and $I(D \circ \denote{B_1}(D) \circ \denote{B_2}(D))$ there exists a chain
+$B_3$ such that $D \circ B_3 = D \circ \denote{B_1}(D) \circ \denote{B_2}(D)$
+and $I(B_3@D)$, then $T$ is \liconfluent{} with respect to $I$ if and only if
+it is \iconfluent{} with respect to $I$. Intuitively, we can repeatedly replace
+merges of chains $B_1$ and $B_2$ with a single chain $B_3$. Repeating this
+process will leave us with a state diagram without any intermediate merges.
+Given such an state diagram, we can check for \liconfluence{}. If a set of
+transactions $T$ and an invariant $I$ satisfies this property, we'll say that
+$T$ is \ireplayable{} with respect to $I$.
+
+\todo{Figure out how hard it is to determine \ireplayability{}. I think the
+Collatz conjecture can be reduced to it, but I haven't worked out the kinks.}
+
+% Unfortunately, determining \ireplayability{} is hard. Like, really really hard.
+% To show just how hard it is, let me introduce the Collatz conjecture. Take any
+% positive integer $n$ and repeatedly perform the following: half $n$ if $n$ is
+% even and otherwise multiply it by $3$ and add $1$. For example, letting $n =
+% 10$, we have $10, 5, 16, 8, 4, 2, 1, 4, 2, 1, \ldots$. The Collatz conjecture
+% states that for any $n$, this process will eventually lead to the value $1$. Is
+% the Collatz conjecture true? Nobody knows. It's an unsolved problem.
+%
+% Now, we'll show that if we could determine \ireplayability{}, we could solve
+% the Collatz conjecture. Assume for contradiction that we had an algorithm to
+% determine whether a set of transactions $T$ was \ireplayable{} with respect to
+% an invariant $I$.

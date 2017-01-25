@@ -1,0 +1,153 @@
+\begin{figure}[h]
+  \centering
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{d1}{0, 0}
+      \inode[label=above:$D'$]{d2}{1, 0}
+      \dnode{b1}{0, -1}
+      \nnode{b2}{1, -1}
+      \draw[txn] (d2) -- (b2) node[midway, right]{$\denote{c}(D')$};
+      \draw[dtxn] (d1) -- (b1) node[midway, left]{$\denote{c}(D')$};
+    \end{tikzpicture}
+    \caption{0-\isafety}
+    \label{fig:0-isafety}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{a}{0, 0}
+      \dnode{b}{0, -1}
+      \draw[txn] (a) -- (b) node[midway, left]{$\denote{c}(D)$};
+    \end{tikzpicture}
+    \caption{\ipreservation}
+    \label{fig:ipreservation}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[label=left:$D_{c}$]{l1}{$(a) + (240:1)$}
+      \inode[label=right:$D_{d}$]{r1}{$(a) + (300:1)$}
+      \dnode{b}{$(l1) + (300:1)$}
+      \draw[txn] (a) -- (l1) node[midway, left] {$\denote{c}(D)$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$\denote{d}(D)$};
+      \draw[txn] (l1) -- (b) node[midway, left] {$\denote{d}(D)$};
+      \draw[txn] (r1) -- (b) node[midway, right] {$\denote{c}(D)$};
+    \end{tikzpicture}
+    \caption{1-\iconfluence}
+    \label{fig:1-iconfluence}
+  \end{subfigure}
+
+  \vspace{1cm}
+
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+
+    \begin{tikzpicture}[scale=1.5]
+      \inode[label=above:$D_0$]{l1}{0, 4}
+      \dnode[label=left:$D_1$]{l2}{0, 3}
+      \dnode[label=left:$D_2$]{l3}{0, 2}
+      \dnode[label=left:$D_3$]{l4}{0, 1}
+      \dnode{l5}{0, 0}
+
+      \inode[label=above:$D_0'$]{r1}{1, 4}
+      \inode[label=right:$D_1'$]{r2}{1, 3}
+      \inode[label=right:$D_2'$]{r3}{1, 2}
+      \inode[label=right:$D_3'$]{r4}{1, 1}
+      \nnode{r5}{1, 0}
+
+      \draw[txn] (r1) -- (r2) node[midway, right]{$\denote{c_1}(D_0')$};
+      \draw[txn] (r2) -- (r3) node[midway, right]{$\denote{c_2}(D_1')$};
+      \draw[txn] (r3) -- (r4) node[midway, right]{$\denote{c_3}(D_2')$};
+      \draw[txn] (r4) -- (r5) node[midway, right]{$\denote{c_4}(D_3')$};
+
+      \draw[txn] (l1) -- (l2) node[midway, left]{$\denote{c_1}(D_0')$};
+      \draw[txn] (l2) -- (l3) node[midway, left]{$\denote{c_2}(D_1')$};
+      \draw[txn] (l3) -- (l4) node[midway, left]{$\denote{c_3}(D_2')$};
+      \draw[txn] (l4) -- (l5) node[midway, left]{$\denote{c_4}(D_3')$};
+    \end{tikzpicture}
+
+    \caption{$k$-\isafety, $k=3$}
+    \label{fig:k-isafety}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+
+    \begin{tikzpicture}[scale=1.5]
+      \inode[label=above:$D$]{a}{0, 0}
+      \inode[label=left:$D_{c_1}$]{l1}{$(a) + (240:1)$}
+      \inode[label=left:$D_{c_2}$]{l2}{$(l1) + (240:1)$}
+      \inode[label=left:$D_{c_3}$]{l3}{$(l2) + (240:1)$}
+
+      \inode[label=right:$D_{d_1}$]{r1}{$(a) + (300:1)$}
+      \inode[label=right:$D_{d_2}$]{r2}{$(r1) + (300:1)$}
+      \inode[label=right:$D_{d_3}$]{r3}{$(r2) + (300:1)$}
+
+      \dnode{b}{$(l3) + (300:3)$}
+
+      \draw[txn] (a) -- (l1) node[midway, left] {$\denote{c_1}(D)$};
+      \draw[txn] (l1) -- (l2) node[midway, left] {$\denote{c_2}(D_{c_1})$};
+      \draw[txn] (l2) -- (l3) node[midway, left] {$\denote{c_3}(D_{c_2})$};
+      \draw[txn] (a) -- (r1) node[midway, right] {$\denote{d_1}(D)$};
+      \draw[txn] (r1) -- (r2) node[midway, right] {$\denote{d_2}(D_{d_1})$};
+      \draw[txn] (r2) -- (r3) node[midway, right] {$\denote{d_3}(D_{d_2})$};
+      \draw[txn] (l3) -- (b) node[midway, left] {$\denote{c_1, c_2, c_3}(D)$};
+      \draw[txn] (r3) -- (b) node[midway, right] {$\denote{d_1, d_2, d_3}(D)$};
+    \end{tikzpicture}
+
+    \caption{\iconfluence}
+    \label{fig:iconfluence}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{s2a}{0, 1}
+      \dnode{s2b}{0, 0}
+      \draw[gtxn] (s2a) -- (s2b) node[midway, left]{$\denote{c}(D)$};
+
+      \inode[label=above:$D$]{s3a}{1, 1}
+      \nnode[]{s3b}{1, 0}
+      \nnode[label=above:$D'$]{s3c}{2, 1}
+      \nnode[]{s3d}{2, 0}
+      \draw[txn] (s3a) -- (s3b) node[midway, left] {$\denote{c}(D)$};
+      \draw[dgtxn] (s3c) -- (s3d) node[midway, right] {$\denote{c}(D)$};
+      \draw[gtxn] (s3a) -- (s3c) node[midway, above] {$G_0^*$};
+    \end{tikzpicture}
+    \caption{\istrengthstar}
+    \label{fig:istrengthstar}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=2]
+      \inode[label=above:$D$]{D}{0, 0}
+      \inode[]{l1}{$(D) + (240:1)$}
+      \inode[]{r1}{$(D) + (300:1)$}
+      \dnode{m}{$(l1) + (300:1)$}
+
+      \inode[label=above:$D'$]{D'}{$(r1) + (1.5, 0.5)$}
+      \nnode[]{x}{$(D') + (0, -1)$}
+
+      \inode[label=above:$D''$]{D''}{$(D') + (1, 0)$}
+      \nnode[]{y}{$(D'') + (0, -1)$}
+
+      \draw[txn] (D) -- (l1) node[midway, left] {$\denote{c'}(D')$};
+      \draw[txn] (D) -- (r1) node[midway, right] {$\denote{c''}(D'')$};
+      \draw[txn] (l1) -- (m) node[midway, left] {$\denote{c''}(D'')$};
+      \draw[txn] (r1) -- (m) node[midway, right] {$\denote{c'}(D')$};
+
+      \draw[txn] (D') -- (x) node [midway, left] {$\denote{c'}(D')$};
+
+      \draw[txn] (D'') -- (y) node [midway, left] {$\denote{c''}(D'')$};
+    \end{tikzpicture}
+    \caption{1-\iconvergence}
+    \label{fig:1-iconvergence}
+  \end{subfigure}
+
+  \caption{
+    An illustration of \iconfluence{} alternatives. \todo{Describe drawings.}
+  }
+  \label{fig:iconfluence-alternatives-diagrams}
+\end{figure}
