@@ -38,7 +38,11 @@ $\var$ and integer constants in $\ints$.
 A \emph{database state} is a total function $D: \var \to \ints$.  We say a
 database state $D$ \emph{satisfies invariant} $I$, denoted $I(D)$, if $I$
 evaluates to true after all variables in $I$ have been replaced by their
-mapping in $D$. Let $\dbs$ denote the set of all database states.
+mapping in $D$.
+%
+For example, if $\var = \set{x, y}$, then $D_1 = \set{x:1, y:2}$ and $D_2 =
+\set{x:42, y:99}$ are both databases. If $I \defeq x \geq 10$, then $D_2$
+satisfies $I$ (i.e. $I(D_2)$) but $D_1$ does not (i.e. $\lnot I(D_1)$).
 
 A \emph{transaction} is a partial function $t: \var \rightharpoonup \ints$.
 \emph{Applying a transaction} $t$ to database state $D$, denoted by $D \circ
@@ -49,22 +53,49 @@ t$, produces a new database state defined as follows:
     D(x)        & otherwise
   \end{cases*}
 \]
+For example, $t_1 = \set{x: 42}$ is the transaction which increments $x$ by 42.
+$t_2 = \set{x: 1, y:-2}$ is the transaction which increments $x$ by 1 and
+decrements $y$ by $-2$. If $D = \set{x: 100, y:100}$, then $D \circ t_1 =
+\set{x:142, y:100}$ and $D \circ t_2 = \set{x:101, y:98}$.
+
 Note that transaction application is commutative. That is for all database
 states $D$ and transactions $t_1$ and $t_2$, $D \circ t_1 \circ t_2 = D \circ
-t_2 \circ t_1$.
+t_2 \circ t_1$. Also note that transactions are \emph{blind} in that they do
+not read from the database. We'll relax this assumption in \secref{imp}, but
+for now we're keeping things simple.
 
 A transaction chain $C$ created from a set of transactions $T$ is a sequence of
 transactions $t_1, \ldots, t_n$ where $t_i \in T$ for $1 \leq i \leq n$. Let $D
 \circ C$ be syntactic sugar for $D \circ t_1 \circ \cdots \circ t_n$. We say
 $C$ \emph{satisfies invariant} $I$ starting at $D$, denoted $I(C @ D)$, if for
-every prefix $C'$ of $C$, $D \circ C'$ satisfies invariant $I$.
+every prefix $C'$ of $C$, $D \circ C'$ satisfies invariant $I$. Note that $I(C
+@ D)$ implies $I(D)$ (the empty prefix of $C$) and $I(D \circ C)$ (the entire
+prefix of $C$).
 
-A set of transactions $T$ is \iconfluent{} with respect to invariant $I$ if for
-all database states $D$ and chains $C_1$ and $C_2$ created from $T$, if $D$
-satisfies $I$, $C_1$ satisfies $I$ starting at $D$, and $C_2$ satisfies $I$
-starting at $D$, then $D \circ C_1 \circ C_2$ satisfies $I$.
-\todo{
-  This isn't quite the definition of \iconfluence{} Bailis uses. Ponder whether
-  this simpler definition is okay.
-}
+A set of transactions $T$ is \emph{\iconfluent{}}\footnote{An astute reader
+will notice that this isn't actually the definition of \iconfluence{} presented
+in \cite{bailis2014coordination}. It's a simpler one. Rest assured, this
+simpler definition will be hard enough to deal with. We'll explore the
+ramifications of this simplification in \secref{alie}.} with respect to
+invariant $I$ if for all database states $D$ and chains $C_1$ and $C_2$ created
+from $T$, if $D$ satisfies $I$, $C_1$ satisfies $I$ starting at $D$, and $C_2$
+satisfies $I$ starting at $D$, then $D \circ C_1 \circ C_2$ satisfies $I$.
 
+For example, let $\var = \set{x}$ and consider a transactions $t_+ = \set{x:
+1}$ and $t_- = \set{x: -1}$ which increment and decrement $x$ respectively. Let
+$I \defeq x > 0$ be the invariant that the value $x$ in the database is
+positive.
+%
+$\set{t_+}$ is \iconfluent{} with respect to $I$ because given any database $D$
+and chains $C_1$ and $C_2$, if $x$ is positive in $D$, then $x$ will be
+certainly be positive in $D \circ C_1 \circ C_2$.
+
+On the other hand, $\set{t_-}$ is not \iconfluent{} with respect to $I$. We can
+prove this with a simple counterexample. Let
+  $D = \set{x:2}$,
+  $C_1 = t_-$, and
+  $C_2 = t_-$.
+Note that $D$ and $D \circ t_1 = \set{x:1}$ satisfy the invariant, so $I(D)$,
+$I(C_1 @ D)$, and $I(C_2 @ D)$. However, $D \circ C_1 \circ C_2 = \set{x: 0}$
+does not satisfy the invariant. Note that this is just a formalization of the
+proof we saw in \figref{decrement}.

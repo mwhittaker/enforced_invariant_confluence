@@ -2,20 +2,26 @@
 \emph{Strong consistency} allows programmers to ignore many of the complexities
 of a distributed system, treating it as if it were running on a single machine.
 However, enforcing strong consistency requires \emph{coordination}, and
-coordination leads to unavailability \cite{gilbert2002brewer} (at worst) or
-increased latency (at best). However, coordination cannot always be avoided.
-Certain application invariants require coordination in order to be globally
-enforced. Bailis et al. developed the notion of invariant confluence
-(\iconfluence{}) as a necessary and sufficient condition for coordination
-freedom \cite{bailis2014coordination}. Intuitively, a set of transactions is
-\iconfluent{} with respect to some invariant $I$ if merging database states
-that satisfy $I$ always results in a database state that also satisfies $I$.
-Bailis characterized many common invariants (e.g. uniqueness constraints,
-foreign key constraints), showing which could be maintained without
-coordination. However, this characterization required hand-written proofs. This
-research project aims to expand on Bailis' research by providing a set of
-CRDTs \cite{shapiro2011comprehensive, shapiro2011conflict}, a language of
-invariants, and a language of transactions that facilitates the ability for
-\iconfluence{} to be determined algorithmically. An \iconfluence{} decision
-procedure would allow programmers to guarantee that their programs can execute
-without coordination.
+coordination leads to unavailability (at worst) or
+increased latency (at best)~\cite{gilbert2002brewer, abadi2012consistency}. Is
+there some way to globally enforce an application's invariants without needing
+to coordinate?
+
+Yes! Well, sometimes.
+
+Bailis et al. developed the notion of invariant confluence (\iconfluence{}) as
+a necessary and sufficient condition for coordination
+freedom~\cite{bailis2014coordination}. Intuitively, if a set of transactions is
+invariant confluent with respect an invariant, then the invariant is guaranteed
+to hold even when the transactions are run without coordination.  Technically,
+a set of transactions is \iconfluent{} with respect to some invariant $I$ if
+merging database states that satisfy $I$ always results in a database state
+that also satisfies $I$.  Bailis characterized many common invariants (e.g.
+uniqueness constraints, foreign key constraints), showing which could be
+maintained without coordination. However, this characterization required
+hand-written proofs. This research project aims to expand on Bailis' research
+by providing a set of CRDTs~\cite{shapiro2011comprehensive,
+shapiro2011conflict}, a language of invariants, and a language of transactions
+that facilitates the ability for \iconfluence{} to be determined
+algorithmically. An \iconfluence{} decision procedure would allow programmers
+to guarantee that their programs can execute correctly without coordination.

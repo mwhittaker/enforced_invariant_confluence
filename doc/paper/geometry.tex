@@ -5,21 +5,30 @@
 \newcommand{\invd}{y \geq 3}
 \newcommand{\inv}{(\inva \land \invb \land \invc) \lor (\invd)}
 
-Sometimes, we can eyeball whether a transaction is \iconfluent{} with respect
-to an invariant. Other times, not so much. For example, which transactions are
-\iconfluent{} with respect to the invariant $\inv$? It's not immediately
-clear.  Surprisingly, we can interpret the question ``Is $T$ \iconfluent{} with
-respect to $I$?'' geometrically, and doing so will make answering the question
-much easier!
+Sometimes---like with the two examples from the previous section---we can
+eyeball whether a transaction is \iconfluent{} with respect to an invariant.
+Other times, not so much. For example, which transactions are \iconfluent{}
+with respect to the invariant $\inv$? It's not immediately clear.
+Surprisingly, we can interpret the question ``Is $T$ \iconfluent{} with respect
+to $I$?'' geometrically, and doing so will make answering the question much
+easier!
 
-Consider an invariant $I$ over $n$ variables $x_1, \ldots, x_n$. If we imagine
-the values of the $n$ variables as an $n$-dimensional point, then we can draw
-the set of points in $\ints^n$ that satisfy $I$. In fact, if we canonicalize
-$I$ by eliminating negations and converting to conjunctive normal form, then
-the set of points satisfying $I$ is the intersection (for $\land)$ and union
-(for $\lor$) of the solutions to a set of linear equations and inequalities,
-which is always straightforward to draw. For example, the set of points
-satisfying $\inv$ is shown in \figref{geometric-example}.
+Consider databases over $n$ variables $\var = \set{x_1, \ldots, x_n}$. We can
+imagine a database $D$ as the $n$-dimensional point $(D(x_i), \ldots, D(x_n))$.
+For example, if $\var = \set{x, y}$, then the database $\set{x:1, y:2}$
+corresponds to the two-dimensional point $(1, 2)$.
+
+We can imagine $I$ as the set of points (or databases) in $\ints^n$ that
+satisfy $I$. For example, the invariant $x + y = 2$ corresponds to the set of
+two-dimensional points $(k_x, k_y)$ where $k_x + k_y = 2$. This corresponds to
+the set of databases $\set{x:k_x, y:k_y}$ where $k_x + k_y = 2$.
+
+Moreover, if we canonicalize $I$ by eliminating negations and converting to
+conjunctive normal form, then the set of points satisfying $I$ is the
+intersection (for $\land)$ and union (for $\lor$) of the solutions to a set of
+linear equations and inequalities, which is always straightforward to draw. For
+example, the set of points satisfying $\inv$ is shown in
+\figref{geometric-example}.
 
 \begin{figure}
   \newenvironment{griddedpic}{
@@ -79,17 +88,24 @@ satisfying $\inv$ is shown in \figref{geometric-example}.
   \label{fig:geometric-example}
 \end{figure}
 
-Next, we can imagine a transaction $t$ as an $n$-dimensional vector $(k_{x_1},
-\ldots, k_{x_n})$ where $t$ adds constant $k_{x_i}$ to variable $x_i$. Now, the
-question of whether a set of transactions $T$ is \iconfluent{} with respect to
-invariant $I$ has been reduced to the following question. Starting at an
-arbitrary point $D$ in the solution space of $I$, if we can add vectors $t^1_1,
-t^1_2, \ldots, t^1_m$ to $D$ and vectors $t^2_1, t^2_2, \ldots, t^2_n$ to $D$
-all while staying in the solution space of $I$, then are we guaranteed that $D
-+ t^1_1 + t^1_2 + \ldots + t^1_m + t^2_1 + t^2_2 + \ldots + t^2_n$ is in the
-solution space of $I$?
+Next, we can imagine a transaction $t = \set{x_1:k_{x_1}, \ldots, x_n:k_{x_n}}$
+as an $n$-dimensional vector $(k_{x_1}, \ldots, k_{x_n})$. For example, given
+the invariant $x + y = 2$, the transaction $\set{x:2, y:4}$ corresponds to the
+vector $(2, 4)$. Applying a transaction $t$ to a database $D$ can be understood
+as adding the vector representing $t$ to the point representing $D$.  For
+example, applying the transaction $\set{x:2, y:4}$ to the database $\set{x:10,
+y:20}$ corresponds to adding the vector $(2, 4)$ to the point $(10, 20)$
+bringing us to the point $(12, 24)$.
+
+Now, the question of whether a set of transactions $T$ is \iconfluent{} with
+respect to invariant $I$ has been reduced to the following question. Starting
+at an arbitrary point $D$ in the solution space of $I$, if we can add vectors
+$t_1, t_2, \ldots, t_m$ to $D$ and vectors $u_1, u_2, \ldots, u_n$ to $D$ all
+while staying in the solution space of $I$, then are we guaranteed that $D +
+t_1 + t_2 + \ldots + t_m + u_1 + u_2 + \ldots + u_n$ is in the solution space
+of $I$?
 
 Turning again to our example in \figref{geometric-example}, it is now clear
-that any transaction $(k_x, k_y)$ where $y \geq 0$ and $|x| \leq y$ is
-\iconfluent{} with respect to $\inv$. These are the vectors that point up and
-not too far left or right.
+that any transaction $\set{x:k_x, y:k_y}$ where $y \geq 0$ and $|x| \leq y$ is
+\iconfluent{} with respect to $\inv$. These correspond to the vectors $(k_x,
+k_y)$ that point up and not too far left or right.

@@ -1,0 +1,288 @@
+\section{\iconfluence{} Alternatives Proofs}\label{app:alternativesproofs}
+\begin{claim}\label{clm:0-isafety-implies-istrengthstar}
+  0-\isafety $\implies$ \istrengthstar.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
+  respect to invariant $I$. We show $T$ is \istrongstar{} with respect to $I$.
+  Let $G_0 = I \times I$. S2 holds trivially: $G_0(I) = I
+  \subseteq I$. Consider an arbitrary $c$, $D$, and $D'$ where $D \in I$ and
+  $(D, D') \in G_0^*$.
+  \begin{align*}
+    & D \in I \land (D, D') \in G_0^*  \\
+    &\implies D \in I \land D' \in I \tag{Definition of $G_0$} \\
+    &\implies D' \in I \land D' \circ \denote{c}(D) \in I \tag{0-\isafety} \\
+    &\implies (D', D' \circ \denote{c}(D)) \in G_0 \tag{Definition of $G_0$}
+  \end{align*}
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-not-implies-0-isafety}
+  \istrengthstar $\centernot\implies$ 0-\isafety
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let
+  \begin{itemize}
+    \item
+      $G \defeq \set{(0, 0), (0, 2)} \cup \setst{(a, b)}{a \geq 2, b \geq a}$
+    \item
+      $I \defeq x = 0 \lor x \geq 2$, and
+    \item
+      the single \imp{} transaction $c \defeq
+      \impif{read(x)=0}{add(x, 0)}{add(x, 1)}$.
+  \end{itemize}
+
+  First note that $c$ is \istrengthstar{} with respect to $I$. S2 holds
+  trivially. To show S3 holds, consider an arbitrary pair $a, b \in G_0^*$.
+  \begin{itemize}
+    \item \textbf{Case $a = 0, b = 0$.}
+      $0 \circ \denote{c}(0) = 0 + 0 = 0$ and $(0, 0) \in G_0$.
+    \item \textbf{Case $a = 0, b >= 2$.}
+      $b \circ \denote{c}(0) = b + 0 = b$ and $(b, b) \in G_0$.
+    \item \textbf{Case $a \geq 2, b >= a$.}
+      $b \circ \denote{c}(a) = b + a$ and $(b, b + a) \in G_0$.
+  \end{itemize}
+
+  Now note that $c$ is not 0-\isafe{} with respect to $I$. Notably, $I(0)$ and
+  $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ and $\lnot I(1)$.
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-implies-ipreservation}
+  \istrengthstar $\implies$ \ipreservation
+\end{claim}
+\begin{proof}
+  Consider a set of transactions $T$ that is \istrongstar{} with respect to
+  invariant $I$ with relation $G_0$. Consider an arbitrary database $D$ that
+  satisfies $I$ and an arbitrary \imp{} transaction $c$. $(D, D) \in G_0^*$,
+  so by S3, $(D, D \circ \denote{c}(D)) \in G_0$. By S2, $I(D \circ \denote{c}(D))$.
+\end{proof}
+
+\begin{claim}\label{clm:istrengthstar-implies-iconfluence}
+  \istrengthstar{} $\implies$ \iconfluence{}.
+\end{claim}
+\begin{proof}
+  Consider a set of transactions $T$ that is \istrongstar{} with respect to an
+  invariant $I$ with relation $G_0$. Consider an arbitrary database state $D$,
+  two \imp{} chains $B^c = c_1, c_2, \ldots, c_m$ and $B^d = d_1, d_2, \ldots,
+  d_n$, and two fixed transaction chains $C^c$ and $C^D$ such that $D$
+  satisfies $I$, $B^c$ satisfies $I$ starting at $D$, $B^d$ satisfies $I$
+  starting at $D$, $C^c = \denote{B^c}(D)$, and $C^d = \denote{B^d}(D)$. We
+  show $D \circ C^c \circ C^d$ satisfies $I$.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $0 \leq i \leq m + n$, that for all natural numbers
+  $j, k, j', k'$ if
+    $j \leq m$,
+    $k \leq n$,
+    $i = j + k$,
+    $j' \leq j$, and
+    $k' \leq k$, then
+  $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_j \circ C^d_k) \in G_0^*$.
+
+  This proof is similar to the proof of \thmref{one-is-enough}, and we can
+  visualize it similar to how we visualized \thmref{one-is-enough} in
+  \figref{one-is-enough}. Intuitively, our induction progresses diagonally from
+  the upper left corner $D$ to the bottom right corner $D \circ C^c_j \circ
+  C^d_k$. For each diagonal, our inductive hypothesis says all states on the
+  diagonal are reachable via $G_0^*$ from points above and to the left.
+
+  %
+  The base case, when $i = 0$, is trivial. $i = j = k = j' = k' = 0$, so $(D
+  \circ C^c_0 \circ C^d_0, D \circ C^c_0 \circ C^d_0) = (D, D) \in G_0^*$ by
+  the definition of a reflexive transaction closure.
+  %
+  For the inductive step, consider an arbitrary set of natural numbers
+  $i, j, k, j', k'$ where
+    $0 < i \leq m + n$,
+    $j \leq m$,
+    $k \leq n$,
+    $i = j + k$,
+    $j' \leq j$
+    $k' \leq k$.
+  If $j' = j$ and $k' = k$, then $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ
+  C^c_{j} \circ C^d_{j}) \in G_0^*$ by the definition of a reflexive transitive
+  closure. Otherwise $j' < j$ or $k' < k$. Without loss of generality, assume
+  $j' < j$; the proof is symmetric for $k' < k$. We can deduce the following
+  facts:
+  \begin{gather}
+    (D, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-a} \\
+    (D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-b} \\
+    I(D \circ C^c_{j-1} \circ C^d_{k})
+      \label{strength-confluence-c} \\
+    (D \circ C^c_{j-1} \circ C^d_{k}, D \circ C^c_{j-1} \circ C^d_{k}) \in G_0^*
+      \label{strength-confluence-d} \\
+    (D \circ C^c_{j-1} \circ C^d_{k}, D \circ C^c_{j} \circ C^d_{k}) \in G_0
+      \label{strength-confluence-e}
+  \end{gather}
+  where
+  \begin{itemize}
+    \item
+      \eqref{strength-confluence-a} and \eqref{strength-confluence-b} are
+      deduced from the inductive hypothesis applied to $i - 1$;
+    \item
+      \eqref{strength-confluence-c} is deduced from
+      \eqref{strength-confluence-a}, the assumption $I(D)$, and S2;
+    \item
+      \eqref{strength-confluence-d} is deduced from the definition of a
+      reflexive transitive closure;
+    \item
+      \eqref{strength-confluence-e} is deduced from
+      \eqref{strength-confluence-d} and S3 applied to $C^c_j$, $D \circ
+      C^c_{j-1} \circ C^d_{k}$, and $D \circ C^c_{j-1} \circ C^d_{k}$.
+  \end{itemize}
+  \eqref{strength-confluence-b} and \eqref{strength-confluence-e} imply
+  $(D \circ C^c_{j'} \circ C^d_{k'}, D \circ C^c_j \circ C^d_k) \in G_0^*$.
+
+  Finally, $I(D)$, $(D, D \circ D^c_m \circ D^d_n) \in G_0^*$, and S2 imply
+  that $I(D \circ D^c_m \circ D^d_n)$.
+\end{proof}
+
+\begin{claim}\label{clm:iconfluence-not-implies-istrengthstar}
+  \iconfluence{} $\centernot\implies$ \istrengthstar{}.
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let $I \defeq x = 0$ and the single \imp{}
+  transaction $c = add(x, 1)$. Note that $c$ is vacuously \iconfluent{} with
+  respect to $I$. Also note that $c$ is not \ipreserving{} with respect to $I$:
+  $0$ satisfies $I$ but $0 \circ \denote{c}(0) = 1$ does not. By the
+  contrapositive of \clmref{istrengthstar-implies-ipreservation}, $c$ is not
+  \istrongstar{} with respect to $I$.
+\end{proof}
+
+\begin{claim}\label{clm:0-isafety-implies-istrength}
+  0-\isafety{} $\implies$ \istrength{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is 0-\isafe{} with
+  respect to invariant $I$; we show $T$ is \istrong{} with respect to $I$. Let
+  $G_0 = I \times I$. $T2$ holds trivially. For all $c \in T$, let $n = 1$ and
+  $P_n = Q_n = I$. T3b, T3c, and T3d reduce to $I \subseteq I$, $I \subseteq
+  I$, and $G_0(I) \subseteq I$ which all hold trivially. T3e reduces to $I
+  \times \denote{c}(I)(I) \subseteq G_0$. To prove this, it is sufficient to
+  prove $\denote{c}(I)(I) \subseteq I$ which holds directly from 0-\isafety{}.
+\end{proof}
+
+\begin{claim}\label{clm:0-istrength-not-implies-0-isafety}
+  \istrength{} $\centernot\implies$ 0-\isafety.
+\end{claim}
+\begin{proof}
+  Consider a database over a single variable $x$. For convenience, we'll denote
+  database states as integers. Let
+  \begin{itemize}
+    \item
+      $G_0 \defeq \set{(0, 0)} \cup \setst{(a, b)}{a \geq 2, b \geq 2}$;
+    \item
+      $I \defeq x = 0 \lor x \geq 2$;
+    \item
+      the single \imp{} transaction $c \defeq
+      \impif{read(x)=0}{add(x, 0)}{add(x, 1)}$;
+    \item
+      $n \defeq 2$;
+    \item
+      $P_1 \defeq Q_1 \defeq \set{0}$; and
+    \item
+      $P_2 \defeq Q_2 \defeq \setst{x}{x \geq 2}$.
+  \end{itemize}
+
+ First note that $c$ is \istrong{} with respect to $I$.  T2, T3b, T3c, and T3d
+ hold trivially. For $i = 1$, T3e reduces to $\set{0} \times
+ \denote{c}(\set{0})(\set{0}) \subseteq G_0$ which holds because $\set{(0, 0
+ \circ \denote{c}(0)} = \set{(0, 0)} \subseteq G_0$. For $i = 2$, consider
+ arbitrary databse states $x,y,z \in P_2 = G_2$. $(x, y \circ \denote{c}(z)) =
+ (x, y + 1) \in G_0$. Thus T3e holds for $i = 2$.
+
+  Now note that $c$ is not 0-\isafe{} with respect to $I$. Notably, $I(0)$ and
+  $I(2)$, but $0 \circ \denote{c}(2) = 0 + 1 = 1$ does not satisfy $I$.
+\end{proof}
+
+\begin{claim}\label{clm:istrength-implies-istrengthstar}
+  \istrength{} $\implies$ \istrengthstar{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is \istrong{} with
+  respect to invariant $I$ with relation $G_0$ and sets $P_1^c, \ldots, P_n^c,
+  Q_1^c, \ldots, Q_n^c$ for every $c \in T$. We show $T$ is \istrongstar{} with
+  respect to $I$ with $G_0$.
+
+  T2 implies S2. To prove S3, consider an arbitrary transaction $c$ and
+  database states $D$ and $D'$ where $I(D)$ and $(D, D') \in G_0^*$. By T3b, $D
+  \in P_i^c$ for some $i$, and by T3c, $D \in Q_i^c$. By T3d, $D' \in Q_i^c$.
+  Finally by T3e, $(D', D' \circ \denote{c}(D)) \in G_0$.
+\end{proof}
+
+\begin{claim}\label{clm:0-isafety-implies-1-iconvergence}
+  0-\isafety{} $\implies$ 1-\iconvergence{}.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ that is \iconfluent{}
+  with respect to invariant $I$. We show that $T$ is 1-\iconvergent{} with
+  respect to $I$.
+
+  Consider arbitrary database states $D$, $D'$, $D''$ and arbitrary
+  transactions $c'$, $c''$ where $I(D)$, $I(D')$, $I(D'')$, $I(D \circ
+  \denote{c'}(D'))$, and $I(D \circ \denote{c''}(D''))$. Applying 0-\isafety{}
+  to $D \circ \denote{c'}(D')$, $D''$, and $c''$, we have $I(D \circ
+  \denote{c'}(D') \circ \denote{c''}(D''))$.
+\end{proof}
+
+\begin{claim}\label{clm:1-iconvergence-implies-iconfluence}
+  1-\iconvergence{} $\implies$ \iconfluence{}.
+\end{claim}
+\begin{proof}
+  Consider a set of \imp{} transactions $T$ that is 1-\iconvergent{} with
+  respect to an invariant $I$. Consider an arbitrary database state $D$, two
+  \imp{} chains $B^c = c_1, c_2, \ldots, c_m$ and $B^d = d_1, d_2, \ldots,
+  d_n$, and two fixed transaction chains $C^c$ and $C^D$ such that $D$
+  satisfies $I$, $B^c$ satisfies $I$ starting at $D$, $B^d$ satisfies $I$
+  starting at $D$, $C^c = \denote{B^c}(D)$, and $C^d = \denote{B^d}(D)$. We
+  show $D \circ C^c \circ C^d$ satisfies $I$.
+
+  Let $C^z_j$ denote the prefix of $C^z$ of length $j$. We show by strong
+  mathematical induction on $0 \leq i \leq m + n$, that for all natural numbers
+  $j, k$ if
+    $j \leq m$,
+    $k \leq n$, and
+    $i = j + k$, then
+    $I(D \circ C^c_j \circ C^d_k)$
+  %
+  The base case, when $i = 0$, is trivial. $i = j = k = 0$, and $D \circ C^c_0
+  \circ C^d_0 = D$ satisfies $I$ by assumption.
+  %
+  For the inductive step, consider arbitrary natural numbers $i, j, k$ where
+    $0 < i \leq m + n$,
+    $j \leq m$,
+    $k \leq n$, and
+    $i = j + k$.
+  If $j = 0$, then $D \circ C^c_0 \circ C^d_k = D \circ C^d_k$ satisfies $I$ by
+  assumption. A symmetric argument holds for $k=0$. Otherwise, $j, k > 0$. Let
+  \newcommand{\wh}{\widehat}
+  \begin{align*}
+    \wh{D}   &\defeq D \circ C^c_{j-1} \circ C^d_{k-1}, \\
+    \wh{D'}  &\defeq D \circ C^c_{j-1}, \\
+    \wh{D''} &\defeq D \circ C^d_{k-1}, \\
+    \wh{c'}  &\defeq c_j,\ \text{and} \\
+    \wh{c''} &\defeq d_k.
+  \end{align*}
+  By the inductive hypothesis, we have
+    $I(\wh{D})$,
+    $I(\wh{D'})$,
+    $I(\wh{D''})$,
+    $I(\wh{D} \circ \denote{\wh{c'}}(\wh{D'}))
+      = I(D \circ C^c_{j} \circ C^d_{k-1})$, and
+    $I(\wh{D} \circ \denote{\wh{c''}}(\wh{D''}))
+      = I(D \circ C^c_{j-1} \circ C^d_{k})$.
+  Applying 1-\iconvergence{} to
+    $\wh{D}$,
+    $\wh{D'}$,
+    $\wh{D''}$,
+    $\wh{c'}$, and
+    $\wh{c''}$,
+  we have
+    $I(\wh{D} \circ \denote{\wh{c'}}(\wh{D'})
+              \circ \denote{\wh{c''}}(\wh{D''}))
+      = I(D \circ C^c_j \circ C^d_k)$.
+\end{proof}
+

@@ -1,11 +1,11 @@
 \section{\wimp{}}\label{sec:wimp}
-We began this section by looking at fixed transactions and concluded in
+We began this paper by looking at fixed transactions and concluded in
 \thmref{one-is-enough} that if a set of fixed transactions is 1-\iconfluent{}
 with respect to an invariant $I$, then it is also \iconfluent{}. Then in
-\secref{imptxns}, we enriched transactions from simple fixed partial functions
+\secref{imp}, we enriched transactions from simple fixed partial functions
 to full-blown programs written in \imp{}. Unfortunately, this increase in
 expressiveness came at the cost of the nice fact that 1-\iconfluence{} is
-equivalent to \iconfluence{}, as we saw in \clmref{imp-1-iconfluence}.
+equivalent to \iconfluence{}, as we saw in \thmref{imp-1-iconfluence}.
 
 Perhaps \imp{} is too powerful of a transaction language. In particular, it has
 two powerful features that fixed transactions do not have. First, \imp{} has
@@ -41,9 +41,9 @@ application is not commutative.
 As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 1-\iconfluence{} and \iconfluence{}: a fact we now prove.
 
-\begin{claim}\label{clm:wimp-1-iconfluence}
+\begin{theorem}\label{thm:wimp-1-iconfluence}
   For \wimp{} transactions, $1$-\iconfluence $\centernot \implies$ \iconfluence.
-\end{claim}
+\end{theorem}
 \begin{proof}
   Consider the following invariant and \wimp{} transactions:
   \begin{align*}
@@ -152,7 +152,7 @@ As mentioned above, \wimp{} is not weak enough to enjoy the equivalence of
 
   \caption{
     A geometric interpretation of $I$, $c_1$, $c_2$, and $c_3$ from
-    \clmref{wimp-1-iconfluence}. Note that the visualizations include only a
+    \thmref{wimp-1-iconfluence}. Note that the visualizations include only a
     subset of the points satisfying $I$ and that not all vectors are drawn.
   }
   \label{fig:wimp-icviz}

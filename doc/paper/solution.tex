@@ -1,12 +1,11 @@
 \section{A Solution}\label{sec:solution}
-This section posed the question: how do we write an algorithm to decide whether
-a set of PN-Counter increment/decrement transactions are \iconfluent{} with
+This paper posed the question: how do we write an algorithm to decide whether a
+set of PN-Counter increment/decrement transactions are \iconfluent{} with
 respect to an invariant expressed as a formula of linear equations and
-inequalities?  Now that we're armed with an intuitive
-(\secref{counter-overview}) and formal (\secref{counter-question})
-understanding of the problem, a geometric interpretation
-(\secref{counter-geometry}), and a useful lemma (\secref{counter-one}), we're
-in a perfect position to present a solution!
+inequalities?  Now that we're armed with an intuitive (\secref{counters}) and
+formal (\secref{formalism}) understanding of the problem, a geometric
+interpretation (\secref{geometry}), and a useful lemma (\secref{oneisenough}),
+we're in a perfect position to present a solution!
 
 In a nutshell, our algorithm translates a set of transactions $T$ and invariant
 $I$ into a universally quantified invariant $F$ in prenex normal form where $F$
@@ -53,16 +52,16 @@ where
     assumption that the current database state satisfies the invariant.
 
   \item
-    \eqref{eq:i1} is $I$ with every variable $x$ replaced with $x + dx_1$.
-    Intuitively, it predicates our implication on the assumption that if we
-    apply the first transaction, our database still satisfies the invariant.
-    \eqref{eq:i2} is symmetric to \eqref{eq:i1} but for the second transaction
-    instead of the first.
+    \eqref{eq:i1} is $I$ with every variable $\alpha$ replaced with $\alpha +
+    d\alpha_1$.  Intuitively, it predicates our implication on the assumption
+    that if we apply the first transaction, our database still satisfies the
+    invariant.  \eqref{eq:i2} is symmetric to \eqref{eq:i1} but for the second
+    transaction instead of the first.
 
   \item
-    \eqref{eq:i12} is $I$ with every variable $x$ replaced with $x + dx_1 +
-    dx_2$. Intuitively, it says that if we apply both the transactions, we
-    continue to satisfy our invariant.
+    \eqref{eq:i12} is $I$ with every variable $\alpha$ replaced with $\alpha +
+    d\alpha_1 + d\alpha_2$. Intuitively, it says that if we apply both the
+    transactions, we continue to satisfy our invariant.
 \end{itemize}
 
 To summarize, the formula encodes the statement that for all database state

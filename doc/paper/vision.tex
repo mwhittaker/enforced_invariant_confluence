@@ -1,30 +1,7 @@
 \section{Research Vision}
-
-At a very high level, this research tackles the same problems tackled by many
-existing research projects like BOOM Analytics \cite{alvaro2010boom}, Bloom
-\cite{alvaro2011consistency}, Bloom$^L$ \cite{conway2012logic}, TARDiS
-\cite{crookstardis}, and IPA \cite{holt2016disciplined}:
-
-\begin{quotation}
-  \emph{How can we make writing weakly consistent programs more principled?}
-\end{quotation}
-
-BOOM Analytics, Bloom, and Bloom$^L$ use data-centric declarative programming
-and program analysis based on the CALM theorem. TARDiS exposes the entire
-history of divergent computations to users in a git-like system to empower them
-to programmatically resolve conflicts. IPA uses a type system to ensure weakly
-consistent data doesn't leak into strongly consistent data.
-
-\begin{todoitemize}
-  \item \todo{Cite and summarize \cite{balegas2015putting},
-    \cite{roy2015homeostasis}, \cite{li2012making}, \cite{li2014automating},
-    and \cite{gotsman2016cause}.}
-  \item \todo{Consider creating a related works section.}
-\end{todoitemize}
-
-This system builds off existing research on CRDTs and \iconfluence{} to provide
-a library of CRDTs, a language to express invariants over those CRDTs, the
-ability to transactionally update the replicated CRDTs, and a decision
+This project builds off existing research on CRDTs and \iconfluence{} to
+provide a library of CRDTs, a language to express invariants over those CRDTs,
+the ability to transactionally update the replicated CRDTs, and a decision
 procedure to algorithmically determine whether the transactions are
 \iconfluent{} with respect to the invariants, ensuring coordination free
 execution if they are and potentially giving illustrative counterexamples when
