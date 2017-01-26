@@ -1,1 +1,85 @@
 \section{\iconfluence{}, Compositionally}\label{sec:composition}
+If a set of \imp{} transactions $T$ is \iconfluent{} with respect to an
+invariant $I_1$ and also with respect to an invariant $I_2$, is it \iconfluent
+with respect to $I_1 \lor I_2$. In this section, we'll answer questions like
+these by seeing how we can compose transactions and invariants while preserving
+\iconfluence{}.
+
+\begin{claim}[conjunction]\label{clm:compose-conjunction}
+  For all sets of \imp{} transactions $T$ and invariants $I_1$ and $I_2$, if
+  $T$ is \iconfluent{} with respect to $I_1$ and $T$ is \iconfluent{} with
+  respect to $I_2$, then $T$ is \iconfluent{} with respect to $I_1 \land I_2$.
+\end{claim}
+\begin{proof}
+  Consider an arbitrary set of \imp{} transactions $T$ and invariants $I_1$ and
+  $I_2$ where $T$ is \iconfluent{} with respect to $I_1$ and $T$ is
+  \iconfluent{} with respect to $I_2$. We show that $T$ is \iconfluent{} with
+  respect to $I_1 \land I_2$.
+
+  Let $I \defeq I_1 \land I_2$. Consider an arbitrary database $D$ and \imp{}
+  chains $C_1$ and $C_2$ such that $I(D)$, $I(C_1@D)$, and $I(C_2@D)$. Since $I
+  \implies I_1$, we also know that $I_1(D)$, $I_1(C_1@D)$, and $I_1(C_2@D)$.
+  Because $T$ is \iconfluent{} with respect to $I_1$, $D' \defeq D \circ
+  \denote{C_1}(D) \circ \denote{C_2}(D)$ satisfies $I_1$. By a symmetric
+  argument, $D'$ also satisfies $I_2$. Thus, $D'$ satisfies $I_1 \land I_2 =
+  I$.
+\end{proof}
+
+\begin{claim}[negation]\label{clm:compose-negation}
+  If $T$ is \iconfluent{} with respect to $I$, then $T$ may not be
+  \iconfluent{} with respect to $\lnot I$.
+\end{claim}
+\begin{proof}
+  Let $t_1 \defeq add(x, 1)$ and $I \defeq x > 0$. As we saw in
+  \secref{formalism}, $\set{t_1}$ is \iconfluent{} with respect to $I$.
+  However, $\set{t_1}$ is not \iconfluent{} with respect to $\lnot I = x \leq
+  0$. For example, letting $D = \set{x:-1}$, $\lnot I(D)$ and $\lnot I(D \circ
+  t_1)$, but $D \circ t_1 \circ t_1$ does not satisfy $\lnot I$.
+\end{proof}
+
+\begin{claim}[disjunction]\label{clm:compose-disjunction}
+  If $T$ is \iconfluent{} with respect to $I_1$ and $T$ is \iconfluent{} with
+  respect to $I_2$, then $T$ may not be \iconfluent{} with respect to $I_1 \lor
+  I_2$.
+\end{claim}
+\begin{proof}
+  Let $t_1 \defeq add(x, 1)$, $I_1 \defeq x = 0$, and $I_2 \defeq x = 1$.
+  $\set{t_1}$ is vacuously \iconfluent{} with respect to $I_1$ and $I_2$.
+  However, $\set{t_1}$ is not \iconfluent{} with respect to $I_1 \lor I_2$.
+  Specifically, let $D = \set{x:0}$. $(I_1 \lor I_2)(D)$ and $I(I_1 \lor I_2)(D
+  \circ t_1)$, but $D \circ t_1 \circ t_1$ does not satisfy $I_1 \lor I_2$.
+\end{proof}
+
+\begin{claim}[union]\label{clm:compose-union}
+  If $T_1$ is \iconfluent{} with respect to $I$ and $T_2$ is \iconfluent{} with
+  respect to $I$, then $T_1 \cup T_2$ may not be \iconfluent{} with respect
+  to $I$.
+\end{claim}
+\begin{proof}
+  Let $t_1 \defeq add(x, 1)$, $t_1 \defeq add(y, 1)$, $T_1 \defeq \set{t_1}$,
+  $T_2 \defeq \set{t_2}$, and $I \defeq x = 0 \lor y = 0$. By inspection, $T_1$
+  and $T_2$ are each individually \iconfluent{} with respect to $I$. However,
+  $T \defeq \set{t_1, t_2}$ is not \iconfluent{} with respect to $I$.
+  %
+  Let $D = \set{x:0,y:0}$, $C_1 = t_1$, and $C_2 = t_2$. $I(D)$, $I(D \circ
+  t_1)$, and $I(D \circ t_2)$, but $D \circ t_1 \circ t_2$ does not satisfy
+  $I$.
+\end{proof}
+
+\begin{claim}[subset]\label{clm:compose-subset}
+  If $T$ is \iconfluent{} with respect to $I$, then every subset of $T$ is
+  \iconfluent{} with respect to $I$.
+\end{claim}
+\begin{proof}
+  This is immediate from the definition of \iconfluence{}.
+\end{proof}
+
+\begin{claim}[intersection]\label{clm:compose-intersection}
+  If $T_1$ is \iconfluent{} with respect to $I$ and $T_2$ is \iconfluent{} with
+  respect to $I$, then $T_1 \cap T_2$ is \iconfluent{} with respect to $I$.
+\end{claim}
+\begin{proof}
+  $T_1 \cap T_2$ is a subset of both $T_1$ and $T_2$, so by
+  \clmref{compose-subset}, it is \iconfluent{} with respect to $I$.
+\end{proof}
+
