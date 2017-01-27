@@ -319,3 +319,42 @@
   = -42$ and $D = 0$. $I(D)$ and $I(D')$ but $D \circ \denote{c}(D') = -41$
   which does not satisfy the invariant.
 \end{proof}
+
+\begin{claim}\label{clm:iconfluence-not-implies-1-iconvergence}
+  \iconfluence{} $\centernot\implies$ 1-\iconvergence{}.
+\end{claim}
+\begin{proof}
+  Let
+    $I \defeq 0 \leq x \leq 2$ and
+    $c = \impif{read(x)=0}{add(x,1)}{}$.
+  First, we show that $\set{c}$ is \iconfluent{} with respect to $I$. Consider
+  an arbitrary
+    $D$,
+    $B_1$, and
+    $B_2$
+  where
+    $I(D)$,
+    $I(B_1@D)$, and
+    $I(B_2@D)$.
+  We perform a case analysis on $D$.
+  \begin{itemize}
+    \item \textbf{Case 1: $D = 1 \lor D = 2$.}
+      In this case, $D \circ \denote{B_1}(D) \circ \denote{B_2}(D)$ is
+      guaranteed to equal $D$ because $c$ does not affect $D$ at all. By
+      assumption, $D$ satisfies the invariant.
+    \item \textbf{Case 1: $D = 0$.}
+      If $D = 0$, then $D \circ \denote{B_1}(D)$ is either $0$ (if $B_1$ is
+      empty) or $1$ if $B_1$ is not empty. A symmetric argument holds for
+      $B_2$. Thus, $D \circ \denote{B_1}(D) \circ \denote{B_2}(D)$ is either 0,
+      1, or 2, all of which satisfy $I$.
+  \end{itemize}
+
+  Next, we show that $\set{c}$ is not 1-\iconvergent{} with respect to $I$. Let
+  $D = 1$ and $D' = D'' = 0$.
+    $I(D)$,
+    $I(D \circ \denote{c}(D'))$,
+    $I(D \circ \denote{c}(D''))$,
+  but
+    $D \circ \denote{c}(D') \circ \denote{c}(D'') = 3$
+  does not satisfy the invariant.
+\end{proof}
