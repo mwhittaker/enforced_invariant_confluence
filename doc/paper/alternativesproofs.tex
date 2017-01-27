@@ -286,3 +286,36 @@
       = I(D \circ C^c_j \circ C^d_k)$.
 \end{proof}
 
+\begin{claim}\label{clm:1-iconvergence-not-implies-0-isafety}
+  1-\iconvergence{} $\centernot\implies$ 0-\isafety{}.
+\end{claim}
+\begin{proof}
+  Let
+    $I \defeq x = -42 \lor x \geq 0$ and
+    $c \defeq \impif{read(x)\geq0}{add(x,1)}{}$.
+  First, we show that $\set{c}$ is 1-\iconvergent{} with respec to $I$.
+  Consider an arbitrary $D$,
+    $D'$, $D''$, such that
+    $I(D)$,
+    $I(D')$,
+    $I(D'')$,
+    $I(D \circ \denote{c}(D'))$, and
+    $I(D \circ \denote{c}(D''))$.
+  We perform a case analysis on $D$.
+  \begin{itemize}
+    \item \textbf{Case 1: $D = -42$.}
+      $D'$ and $D''$ must equal both equal $-42$. If either did not, say $D'$,
+      then $D \circ \denote{c}(D')$ would be $-41$ which violates our
+      assumption that $I(D \circ \denote{c}(D'))$. If both $D'$ and $D''$ equal
+      $-42$, then $D \circ \denote{c}(D') \circ \denote{c}(D'') = -42$ which
+      satisfies $I$.
+    \item \textbf{Case 2: $D \geq 0$.}
+      Depending on the value of $D'$ and $D''$, $D \circ \denote{c}(D') \circ
+      \denote{c}(D'')$ could equal $D$, $D + 1$, or $D + 2$. All three of these
+      datbases satisfy the invariant.
+  \end{itemize}
+
+  Next, we show that $\set{t_1}$ is not 0-\isafe{} with respect to $I$. Let $D
+  = -42$ and $D = 0$. $I(D)$ and $I(D')$ but $D \circ \denote{c}(D') = -41$
+  which does not satisfy the invariant.
+\end{proof}
