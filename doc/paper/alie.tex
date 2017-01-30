@@ -65,20 +65,23 @@ $T$ is not \iconfluent{} with respect to $I$.
 
 This is an unfortunate result. It says that for a set of transactions $T$ and
 invariant $I$, if \liconfluence{} does not imply \iconfluence{}, then all our
-efforts to determine \liconfluence{} are for naught. However, for some
-transactions $T$ and invariants $I$, \liconfluence{} is equivalent to
-\iconfluence{}! When this is the case, we can check whether $T$ is
-\iconfluent{} with respect to $I$ by checking if it is \liconfluent{} with
+efforts to determine \liconfluence{} are for naught. However, not all hope is
+lost. Perhaps for some transactions $T$ and invariants $I$, \liconfluence{} is
+equivalent to \iconfluence{}. When this is the case, we can check whether $T$
+is \iconfluent{} with respect to $I$ by checking if it is \liconfluent{} with
 respect to $I$.
 
-So when is \liconfluence{} equivalent to \iconfluence{}? Well, look at $D$,
-$D_a$, $D_b$, and $D_d$ in \figref{iconfluence-example}. If there existed some
-\imp{} transaction chain $B$ such that $D \circ B = D_d$ and $I(B@D)$, then we
-could remove the split and merge created by $D_a$ and $D_b$ and replace it with
-the chain $B$ from $D$ to $D_d$. This is shown in \figref{mergeremoved}. For
-simplicity, we've assumed $B = c_1, c_2, c_3$. Now that \figref{mergeremoved}
-doesn't contain any intermediate merges, \liconfluence{} is equivalent to
-\iconfluence{}.
+\subsection{\ireplayability{}}
+So when is \liconfluence{} equivalent to \iconfluence{}? Let's take a look at a
+\emph{wrong} first guess.
+
+Look at $D$, $D_a$, $D_b$, and $D_d$ in \figref{iconfluence-example}. If there
+existed some \imp{} transaction chain $B$ such that $D \circ B = D_d$ and
+$I(B@D)$, then we could remove the split and merge created by $D_a$ and $D_b$
+and replace it with the chain $B$ from $D$ to $D_d$. This is shown in
+\figref{mergeremoved}. For simplicity, we've assumed $B = c_1, c_2, c_3$. Now
+that \figref{mergeremoved} doesn't contain any intermediate merges,
+\liconfluence{} is equivalent to \iconfluence{}.
 
 \begin{figure}[h]
   \centering
@@ -113,8 +116,38 @@ Given such an state diagram, we can check for \liconfluence{}. If a set of
 transactions $T$ and an invariant $I$ satisfies this property, we'll say that
 $T$ is \ireplayable{} with respect to $I$.
 
-\todo{Figure out how hard it is to determine \ireplayability{}. I think the
-Collatz conjecture can be reduced to it, but I haven't worked out the kinks.}
+Unfortunately, this line of reasoning is wrong. Consider the state diagram
+shown in \figref{ireplayability-notgoodenough}. Here, we can't use
+\ireplayability{} to reduce the diagram to a simple diamond.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[yscale=1.2]
+    \inode[]{a}{ 1, 5};
+    \inode[]{b}{ 0, 4};
+    \inode[]{c}{ 2, 4};
+    \inode[]{d}{ 0, 3};
+    \inode[]{e}{ 2, 3};
+    \inode[]{f}{ 0, 2};
+    \dnode[]{g}{ 2, 1};
+    \foreach \x/\y in {a/b, a/c, b/d, c/d, c/e, d/f, e/g, f/g} {
+      \draw[txn] (\x) -- (\y);
+    }
+  \end{tikzpicture}
+  \caption{A state diagram illustrating the inadequacy of \ireplayability{}.}
+  \label{fig:ireplayability-notgoodenough}
+\end{figure}
+
+\begin{itemize}
+  \item \todo{%
+    Figure out if \ireplayability{} can be used to determine \iconfluence{}.
+  }
+  \item \todo{%
+    Figure out how hard it is to determine \ireplayability{}. I think the
+    Collatz conjecture can be reduced to it, but I haven't worked out the
+    kinks.
+  }
+\end{itemize}
 
 % Unfortunately, determining \ireplayability{} is hard. Like, really really hard.
 % To show just how hard it is, let me introduce the Collatz conjecture. Take any
