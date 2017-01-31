@@ -1,3 +1,64 @@
 \section{Related Work}\label{sec:related}
-\todo{Cite and summarize \cite{balegas2015putting}, \cite{roy2015homeostasis},
-\cite{li2012making}, \cite{li2014automating}, and \cite{gotsman2016cause}.}
+\todo{Cite and summarize \cite{balegas2015putting} and \cite{roy2015homeostasis}}
+
+\subsection{RedBlue Consistency}
+In their 2012 OSDI publication, Li \etal{} introduce RedBlue consistency as an
+intermediary consistency level between eventual consistency and strict
+serializability \cite{li2012making}. Each transaction is labelled either red or
+blue. A RedBlue consistent system serializes red transactions while running
+blue transactions concurrently.
+
+Li \etal{} also prove that if blue operations commute with all other
+operations, then the system is convergent. That is, all replicas will converge
+to the same result. To make transactions more commutative, they divide each
+transaction into a \emph{generator transaction} and a \emph{shadow operation}.
+This is similar to how an \imp{} transaction $c$ produces a fixed transaction
+$\denote{c}(D)$. They also claim that 1-\isafety{} implies \iconfluence{}.
+
+\subsection{Automating the Choice of Consistency Levels}
+In Li \etal{}'s RedBlue consistency paper, programmers had to manually generate
+shadow operations for each transaction and manually label each shadow operation
+as either blue or red. In their 2014 USENIX ATC paper, Li \etal{} aim to
+automate both these things \cite{li2014automating}.
+
+First, we assume that transactions store all their state in a relational
+database. We treat each relation in the database as a set CRDT, and we treat
+each field in each relation as some sort of CRDT as well (e.g. LWW register,
+G-Counter). Users specify which CRDTs to use by annotating their SQL
+\texttt{CREATE} statements. Doing this, each transaction produces one shadow
+operation for every possible sequence of database operations it invokes. For
+example, assuming \texttt{x} is stored in the database as a CRDT, the following
+code produces three shadow operations:
+  the first is a no-op,
+  the second decrements \texttt{x}, and
+  the third increments \texttt{x}.
+\begin{Verbatim}
+  void generator(string s) {
+      if (SHA1(s) == SOME_CONSTANT) {
+          if (x >= 10) {
+              x -= 10;
+          }
+      } else {
+          x += 10;
+      }
+  }
+\end{Verbatim}
+
+Each shadow operation is then fed through a weakest precondition solver to
+determine the weakest precondition over the parameters of the shadow operations
+that imply the shadow operation is \isafe{}. These findings are cached. At
+runtime, a generator operation is run to produce its corresponding shadow
+operation. The shadow operation's weakest precondition is found in the cache,
+and the shadow operation is checked against it. If it satisfies the weakest
+precondition, then it is labelled blue. Otherwise, it is labelled red.
+
+\subsection{'Cause I'm Strong Enough}
+Li \etal{}'s work on automatically labelling transactions as red or blue uses
+\isafety{}. As we've seen, this is one of the weaker properties that implies
+\iconfluence{}. In their 2016 POPL paper, Gotsman \etal{} propose a much
+stronger property that implies \iconfluence{} \cite{gotsman2016cause}.
+
+Gotsman \etal{} first propose a general consistency model which subsumes a
+bunch of hybrid consistency models like RedBlue consistency. They then present
+versions of \istrength{} and  \istrengthstar{} generalized to their consistency
+model. The proof rules are very complex.
