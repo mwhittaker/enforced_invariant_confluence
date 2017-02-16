@@ -185,31 +185,35 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{\iconfluence{}, Intuitively}
-  \begin{center}
-    \begin{tikzpicture}[scale=1.5]
-      \inode[label=above:$D$]{a}{0, 0}
-      \inode[]{l1}{$(a) + (225:1)$}
-      \inode[]{l2}{$(l1) + (225:1)$}
-      \inode[]{l3}{$(l2) + (225:1)$}
+\newcommand{\iconfluenceintuitively}{
+  \begin{frame}{\iconfluence{}, Intuitively}
+    \begin{center}
+      \begin{tikzpicture}[scale=1.5]
+        \inode[label=above:$D$]{a}{0, 0}
+        \inode[]{l1}{$(a) + (225:1)$}
+        \inode[]{l2}{$(l1) + (225:1)$}
+        \inode[]{l3}{$(l2) + (225:1)$}
 
-      \inode[]{r1}{$(a) + (315:1)$}
-      \inode[]{r2}{$(r1) + (315:1)$}
-      \inode[]{r3}{$(r2) + (315:1)$}
+        \inode[]{r1}{$(a) + (315:1)$}
+        \inode[]{r2}{$(r1) + (315:1)$}
+        \inode[]{r3}{$(r2) + (315:1)$}
 
-      \dnode{b}{$(l3) + (315:3)$}
+        \dnode{b}{$(l3) + (315:3)$}
 
-      \draw[txn] (a)  -- (l1) node[pos=0.3, left]  {$t_1$};
-      \draw[txn] (l1) -- (l2) node[pos=0.3, left]  {$t_2$};
-      \draw[txn] (l2) -- (l3) node[pos=0.3, left]  {$t_3$};
-      \draw[txn] (a)  -- (r1) node[pos=0.3, right] {$u_1$};
-      \draw[txn] (r1) -- (r2) node[pos=0.3, right] {$u_2$};
-      \draw[txn] (r2) -- (r3) node[pos=0.3, right] {$u_3$};
-      \draw[txn] (l3) -- (b)  node[midway, left]  {$t_1, t_2, t_3$};
-      \draw[txn] (r3) -- (b)  node[midway, right] {$u_1, u_2, u_3$};
-    \end{tikzpicture}
-  \end{center}
-\end{frame}
+        \draw[txn] (a)  -- (l1) node[pos=0.3, left]  {$t_1$};
+        \draw[txn] (l1) -- (l2) node[pos=0.3, left]  {$t_2$};
+        \draw[txn] (l2) -- (l3) node[pos=0.3, left]  {$t_3$};
+        \draw[txn] (a)  -- (r1) node[pos=0.3, right] {$u_1$};
+        \draw[txn] (r1) -- (r2) node[pos=0.3, right] {$u_2$};
+        \draw[txn] (r2) -- (r3) node[pos=0.3, right] {$u_3$};
+        \draw[txn] (l3) -- (b)  node[midway, left]  {$t_1, t_2, t_3$};
+        \draw[txn] (r3) -- (b)  node[midway, right] {$u_1, u_2, u_3$};
+      \end{tikzpicture}
+    \end{center}
+  \end{frame}
+}
+
+\iconfluenceintuitively{}
 
 \begin{frame}{\iconfluence{}, Formally}
   \begin{center}
@@ -227,7 +231,7 @@
 \begin{frame}{\iconfluence{}, Formally}
   \begin{center}
     \huge
-    An \emph{invariant} $I$ is an integer linear constraint over $\var$.
+    An \emph{invariant} $I$ is a linear constraint over $\var$.
   \end{center}
   \begin{itemize}
     \item e.g. $\var = \set{x}, x \geq 0$
@@ -285,6 +289,8 @@
     $I(C'@D)$, then $I(D \circ C \circ C')$.
   \end{center}
 \end{frame}
+
+\iconfluenceintuitively{}
 
 \newcommand{\inva}{x + y \geq 0}
 \newcommand{\invb}{x - y \leq 0}
@@ -1086,26 +1092,8 @@
       \draw[impl] (0-isafety) -> (1-isafety);
       \draw[impl] (1-isafety) -> (k-isafety);
       \draw[impl] (istrength) -> (istrengthstar);
-      \draw[impl] (0-isafety) -> (1-iconvergence);
-      \draw[impl] (1-iconvergence) -> (iconfluence);
-    \end{tikzpicture}
-  \end{center}
-\end{frame}
-
-\begin{frame}{0-\isafety{}}
-  \begin{center}
-    \[\forall D, D', c.\>
-      I(D) \land
-      I(D') \implies
-      I(D \circ \denote{c}(D'))\]
-
-    \begin{tikzpicture}[scale=2]
-      \inode[label=above:$D$]{d1}{0, 0}
-      \inode[label=above:$D'$]{d2}{1, 0}
-      \dnode{b1}{0, -1}
-      \nnode{b2}{1, -1}
-      \draw[txn] (d2) -- (b2) node[midway, right]{$\denote{c}(D')$};
-      \draw[dtxn] (d1) -- (b1) node[midway, left]{$\denote{c}(D')$};
+      \draw[ultra thick, impl] (0-isafety) -> (1-iconvergence);
+      \draw[ultra thick, impl] (1-iconvergence) -> (iconfluence);
     \end{tikzpicture}
   \end{center}
 \end{frame}
