@@ -1,22 +1,23 @@
 from typing import Dict, List, Optional, Set, Tuple
 
-from z3 import Solver, BoolRef
+from z3 import And, Solver, Not, BoolRef
 
 from . import max_int
 from .ast import Assign, Expr, Predicate
 from .env import Env
+from .types import Type
 from .z3util import scoped
 
 Transaction = List[Assign]
 
 class Checker:
     def __init__(self):
-        self.vs: Set[str] = set()
+        self.vs: Dict[str, Type] = dict()
         self.transactions: Dict[str, Transaction] = dict()
         self.invariants: List[Predicate] = []
 
-        self.txn_env = Env({'txn'})
-        self.max_int_env = Env({'max_int'})
+        self.txn_counter = 0
+        self.max_int_counter = 0
 
     def check(self):
         solver = Solver()
@@ -26,7 +27,8 @@ class Checker:
 
     def max_int(self, name: str = None) -> max_int.Var:
         name = name or self._get_fresh_max_int_name()
-        self.vs.add(name)
+        assert name not in self.vs
+        self.vs[name] = Type.MAX_INT
         return max_int.Var(name)
 
     def add_transaction(self, name: Optional[str], txn: List[Assign]) -> None:
@@ -38,12 +40,14 @@ class Checker:
         self.invariants.append(invariant)
 
     def _get_fresh_txn_name(self) -> str:
-        self.txn_env = self.txn_env.assign('txn')
-        return self.txn_env.get_name('txn')
+        name = f'txn_{self.txn_counter}'
+        self.txn_counter += 1
+        return name
 
     def _get_fresh_max_int_name(self) -> str:
-        self.max_int_env = self.max_int_env.assign('max_int')
-        return self.max_int_env.get_name('max_int')
+        name = f'txn_{self.max_int_counter}'
+        self.max_int_counter += 1
+        return name
 
     def _txn_to_z3(self, txn: Transaction, env: Env) -> \
                    Tuple[List[BoolRef], Env]:
@@ -58,6 +62,12 @@ class Checker:
         for bexpr in bexprs:
             solver.add(bexpr)
         return env
+
+    def _envs_equal_to_z3(self, env1: Env, env2: Env) -> BoolRef:
+        eqs = [env1.get_z3_var(v) == env2.get_z3_var(v)
+               for v in self.vs
+               if env1.get_name(v) != env2.get_name(v)]
+        return And(*eqs)
 
     def _check_transactions_commute(self, solver: Solver) -> None:
         for (t_name, t) in self.transactions.items():
@@ -75,6 +85,7 @@ class Checker:
                     tu_env = self._run_txn(t, tu_env, solver)
                     ut_env = t_env.with_suffix(f'{u_name}_{t_name}')
                     ut_env = self._run_txn(u, ut_env, solver)
+                    solver.add(Not(self._envs_equal_to_z3(tu_env, ut_env)))
                     print(solver.sexpr())
                     print(solver.check())
 
