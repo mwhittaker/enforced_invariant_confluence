@@ -18,10 +18,10 @@ class Const(Expr):
         return z3.Const(self.k, z3.IntSort())
 
 class Var(Expr):
-    def __init__(self, v: str) -> None:
+    def __init__(self, v: str, ?, ?) -> None:
         self.v = v
 
-    def to_z3(self, env: Env) -> z3.ExprRef:
+    def pair(self, env: Env) -> z3.ExprRef:
         return z3.Const(env.get_name(self.v), z3.IntSort())
 
 class Add(Expr):

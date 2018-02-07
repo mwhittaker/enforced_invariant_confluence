@@ -1,13 +1,11 @@
-from typing import Dict, Tuple
+from typing import Dict, FrozenSet, Tuple
 
 import z3
-
-from .types import Type
 
 Version = Tuple[str, int]
 
 class Env:
-    def __init__(self, vs: Dict[str, Type], suffix: str = "") -> None:
+    def __init__(self, vs: FrozenSet[str], suffix: str = "") -> None:
         self.vs = vs
         self.suffix = suffix
         self.versions: Dict[str, Version] = {v: (suffix, 0) for v in self.vs}
@@ -30,17 +28,6 @@ class Env:
         i_str = f"_{i}" if i != 0 else ""
         s_str = f"_{s}" if s else ""
         return f"{v}{s_str}{i_str}"
-
-    def get_type(self, v: str) -> Type:
-        assert v in self.vs, (v, self.vs)
-        return self.vs[v]
-
-    def get_z3_var(self, v: str) -> z3.ExprRef:
-        typ = self.get_type(v)
-        if typ == Type.MAX_INT:
-            return z3.Int(self.get_name(v))
-        else:
-            raise ValueError(f'Uknown type {typ}.')
 
     def with_suffix(self, suffix: str) -> 'Env':
         env = self._copy()

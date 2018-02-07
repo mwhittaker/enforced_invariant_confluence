@@ -90,7 +90,31 @@ class Checker:
                     print(solver.check())
 
     def _check_join_is_apply(self, solver: Solver) -> None:
-        pass
+        for (t_name, t) in self.transactions.items():
+            for (u_name, u) in self.transactions.items():
+                if t_name <= u_name:
+                    continue
+
+                with scoped(solver):
+                    original_env = Env(self.vs)
+                    u_env = original_env.with_suffix(f'{u_name}')
+                    u_env = self._run_txn(u, u_env, solver)
+                    t_env = original_env.with_suffix(f'{t_name}')
+                    t_env = self._run_txn(t, t_env, solver)
+
+
+                    tu_env = u_env.with_suffix(f'{t_name}_{u_name}')
+                    tu_env = self._run_txn(t, tu_env, solver)
+
+                    tu_env = u_env.with_suffix(f'{t_name}_join_{u_name}')
+                    tu_env = self._run_txn(t, tu_env, solver)
+
+                    ut_env = t_env.with_suffix(f'{u_name}_{t_name}')
+                    ut_env = self._run_txn(u, ut_env, solver)
+
+                    solver.add(Not(self._envs_equal_to_z3(tu_env, ut_env)))
+                    print(solver.sexpr())
+                    print(solver.check())
 
     def _check_one_di_confluence(self, solver: Solver) -> None:
         pass
