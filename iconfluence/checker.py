@@ -22,7 +22,7 @@ class Checker:
     def _register_var(self, name: str, crdt: ast.Crdt) -> ast.EVar:
         assert name not in self.crdt_env
         assert name not in self.type_env
-        self.crdt_env[name] = ast.CIntMax()
+        self.crdt_env[name] = crdt
         self.type_env[name] = self.crdt_env[name].to_type()
         return ast.EVar(name)
 

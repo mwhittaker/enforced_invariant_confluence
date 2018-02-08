@@ -44,7 +44,7 @@ class Checker(checker.Checker):
 
     def _random_value(self, typ: ast.Type) -> Any:
         if isinstance(typ, ast.TInt):
-            return random.randint(-100, 100)
+            return random.randint(8, 10)
         elif isinstance(typ, ast.TBool):
             return random.randint(0, 1) == 0
         elif isinstance(typ, ast.TTuple2):
@@ -63,14 +63,14 @@ class Checker(checker.Checker):
         return self.transactions[random.choice(names)]
 
     def _random_invariant_env(self) -> ValEnv:
-        for _ in range(10):
+        for _ in range(10000):
             env = self._random_env()
             if self._satisfies_invariants(env):
                 return env
         raise _NothingFoundException()
 
     def _apply_random_invariant_txn(self, env: ValEnv) -> ValEnv:
-        for _ in range(10):
+        for _ in range(10000):
             txn = self._random_txn()
             env = eval.eval_txn(txn, env)
             if self._satisfies_invariants(env):
@@ -80,8 +80,8 @@ class Checker(checker.Checker):
     def check_iconfluence(self) -> checker.Decision:
         try:
             self._typecheck()
-            for _ in range(3):
-                env = self._random_env()
+            for _ in range(100):
+                env = self._random_invariant_env()
                 env1 = self._apply_random_invariant_txn(env)
                 env2 = self._apply_random_invariant_txn(env)
                 env_joined = self._join_envs(env1, env2)

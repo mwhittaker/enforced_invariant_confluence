@@ -1,72 +1,55 @@
-from z3 import *
+# import iconfluence
+from iconfluence.guess_and_check.checker import Checker
 
+def iconfluent_example() -> None:
+    checker = Checker()
 
+    # Variable declaration.
+    x = checker.int_max('x')
+    y = checker.int_max('y')
+    tmp = checker.int_max('tmp')
 
+    # Transactions.
+    checker.add_transaction('incr', [
+        x.assign(x + 1),
+        y.assign(y + 1),
+    ])
+    checker.add_transaction('swap', [
+        tmp.assign(x),
+        x.assign(y),
+        y.assign(tmp),
+    ])
 
+    # Invariants.
+    checker.add_invariant('x_eq_y', x.eq(y))
 
+    # This should always print UNKNOWN or YES.
+    print(checker.check_iconfluence())
 
+def not_iconfluent_example() -> None:
+    checker = Checker()
 
+    # Variable declaration.
+    x = checker.int_min('x')
+    y = checker.int_max('y')
 
-x = MaxIntLattice()
-y = SetUnionLattice(IntSort())
-z = MapLattice(IntSort(), PairSort(IntSort(), RealSort()))
+    # Transactions.
+    checker.add_transaction('decr_x', [
+        x.assign(x - 2),
+    ])
+    checker.add_transaction('incr_y', [
+        y.assign(y + 2),
+    ])
 
-tmp = x + y
-x = tmp + y
-y = tmp + x
+    # Invariants.
+    checker.add_invariant('x_ge_y', x >= y)
 
-x >= y
+    # This should always print UNKNOWN or NO.
+    print(checker.check_iconfluence())
 
-1. Commutativity
-assert((>= x y))
-
-2. Join is apply
-
-3. 1-liconfluent
-
-4. 1-replayable
-
-
-def txn():
-    x = x + 1
-    y = y + 2
-    tmp = x + 1
-    z = tmp + 2
-
-oracle = Oracle()
-oracle.add_transaction(x = x + 1, name="")
-oracle.add_transaction(y = y + 2, name="")
-oracle.add_transaction(y = y.interesect(z), name="foo")
-oracle.add_transaction(z = z || z)
-oracle.add_invariant(x > 0)
-oracle.add_invariant(z.forall(lambda x: x > 2))
-
-
-class Pair:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __add__(self, other):
-        return Pair(self.x + other.x, self.y + other.y)
-
-    def __eq__(self, other):
-        return And(self.x == other.x, self.y == other.y)
-
-def main():
-    x_1 = Int('x_1')
-    y_1 = Real('y_1')
-    p_1 = Pair(x_1, y_1)
-
-    x_2 = Int('x_2')
-    y_2 = Real('y_2')
-    p_2 = Pair(x_2, y_2)
-
-    s = Solver()
-    s.add(x_1 > y_2)
-    s.add(p_1 == p_2)
-    s.check()
-    print(s.model())
+def main() -> None:
+    iconfluent_example()
+    not_iconfluent_example()
 
 if __name__ == '__main__':
     main()

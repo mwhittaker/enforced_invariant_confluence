@@ -175,6 +175,9 @@ class EVar(Expr):
     def __init__(self, x: str) -> None:
         self.x = x
 
+    def assign(self, e: Expr) -> 'Assign':
+        return Assign(self, e)
+
 class EInt(Expr):
     def __init__(self, x: int) -> None:
         self.x = x
@@ -224,6 +227,7 @@ class EIntGe(EBinaryOp): pass
 class Stmt(AstNode):
     pass
 
+# TODO(mwhittaker): Rename SAssign
 class Assign(Stmt):
     def __init__(self, x: EVar, e: Expr) -> None:
         self.x = x
