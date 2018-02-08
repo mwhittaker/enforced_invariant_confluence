@@ -82,7 +82,7 @@ class CSetIntersect(Crdt):
 # Expressions ##################################################################
 class Expr(AstNode):
     def __init__(self) -> None:
-        self.typ = None
+        self.typ: Type = None
 
     def _coerce(self, x: Any) -> 'Expr':
         # Note that isinstance(True, int) is true, so we have to check for
@@ -172,7 +172,7 @@ class Expr(AstNode):
         return EIntGe(self, self._coerce(lhs))
 
 class EVar(Expr):
-    def __init__(self, x: int) -> None:
+    def __init__(self, x: str) -> None:
         self.x = x
 
 class EInt(Expr):

@@ -12,7 +12,7 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     elif isinstance(e, ast.EInt):
         return e.x
     elif isinstance(e, ast.EBool):
-        return e.b
+        return e.x
     elif isinstance(e, ast.ETuple2):
         return (e.a, e.b)
     elif isinstance(e, ast.ESet):
@@ -59,12 +59,18 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         raise ValueError(f'Unkown expression {e}.')
 
 def eval_stmt(s: ast.Stmt, env: ValEnv) -> ValEnv:
-    assert s.x.x in env, (s.x, env)
-    new_env = deepcopy(env)
-    new_env[s.x.x] = eval_expr(s.e, env)
-    return new_env
+    if (isinstance(s, ast.Assign)):
+        assert s.x.x in env, (s.x, env)
+        new_env = deepcopy(env)
+        new_env[s.x.x] = eval_expr(s.e, env)
+        return new_env
+    else:
+        raise ValueError(f'Unkown statement {s}.')
 
 def eval_txn(txn: ast.Transaction, env: ValEnv) -> ValEnv:
     for s in txn:
         env = eval_stmt(s, env)
     return env
+
+def eval_invariant(inv: ast.Invariant, env: ValEnv) -> ValEnv:
+    return eval_expr(inv, env)

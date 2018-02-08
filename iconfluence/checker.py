@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Dict, Optional
 
 from . import ast
+from . import typecheck
 
 CrdtEnv = Dict[str, ast.Crdt]
 TypeEnv = Dict[str, ast.Type]
@@ -15,6 +16,8 @@ class Checker:
     def __init__(self):
         self.crdt_env: CrdtEnv = dict()
         self.type_env: TypeEnv = dict()
+        self.transactions: Dict[str, ast.Transaction] = dict()
+        self.invariants: Dict[str, ast.Invariant] = dict()
 
     def _register_var(self, name: str, crdt: ast.Crdt) -> ast.EVar:
         assert name not in self.crdt_env
@@ -23,32 +26,41 @@ class Checker:
         self.type_env[name] = self.crdt_env[name].to_type()
         return ast.EVar(name)
 
+    def _typecheck(self) -> None:
+        for inv in self.invariants.values():
+            typecheck.typecheck_invariant(inv, self.type_env)
+
+        for txn in self.transactions.values():
+            typecheck.typecheck_txn(txn, self.type_env)
+
     def int_max(self, name: str) -> ast.EVar:
         return self._register_var(name, ast.CIntMax())
 
     def int_min(self, name: str) -> ast.EVar:
-        self._register_var(name, ast.CIntMin())
+        return self._register_var(name, ast.CIntMin())
 
     def bool_or(self, name: str) -> ast.EVar:
-        self._register_var(name, ast.CBoolOr())
+        return self._register_var(name, ast.CBoolOr())
 
     def bool_and(self, name: str) -> ast.EVar:
-        self._register_var(name, ast.CBoolAnd())
+        return self._register_var(name, ast.CBoolAnd())
 
     def tuple2(self, name: str, a: ast.Crdt, b: ast.Crdt) -> ast.EVar:
-        self._register_var(name, ast.CTuple2(a, b))
+        return self._register_var(name, ast.CTuple2(a, b))
 
     def set_union(self, name: str, a: ast.Crdt) -> ast.EVar:
-        self._register_var(name, ast.CSetUnion(a))
+        return self._register_var(name, ast.CSetUnion(a))
 
     def set_intersect(self, name: str, a: ast.Crdt) -> ast.EVar:
-        self._register_var(name, ast.CSetIntersect(a))
+        return self._register_var(name, ast.CSetIntersect(a))
 
-    def add_transaction(self, txn: ast.Transaction):
-        raise NotImplementedError()
+    def add_transaction(self, name: str, txn: ast.Transaction):
+        assert name not in self.transactions
+        self.transactions[name] = txn
 
-    def add_invariant(self, txn: ast.Expr):
-        raise NotImplementedError()
+    def add_invariant(self, name: str, inv: ast.Invariant):
+        assert name not in self.invariants
+        self.invariants[name] = inv
 
     def check_iconfluence(self) -> Decision:
         raise NotImplementedError()

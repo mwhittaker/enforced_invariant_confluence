@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Union
+from typing import cast, Dict, Optional, Union
 from copy import deepcopy
 
 from . import ast
@@ -27,16 +27,16 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
     elif isinstance(e, ast.ESet):
         _assert(len(e.xs) >= 0, 'Illegal empty set found.')
         types = {_typecheck_expr(x, env).typ for x in e.xs}
-        _assert(len(types) == 1, 'Set with multiple types: {types}.')
+        _assert(len(types) == 1, f'Set with multiple types: {types}.')
         e.typ = list(types)[0]
     elif isinstance(e, ast.ETuple2First):
         typ = _typecheck_expr(e.x, env).typ
-        _assert(isinstance(typ, ast.TTuple2), '')
-        e.typ = typ.a
+        _assert(isinstance(typ, ast.TTuple2), f'Invalid argument {e}.')
+        e.typ = cast(ast.TTuple2, typ).a
     elif isinstance(e, ast.ETuple2Second):
         typ = _typecheck_expr(e.x, env).typ
-        _assert(isinstance(typ, ast.TTuple2), '')
-        e.typ = typ.b
+        _assert(isinstance(typ, ast.TTuple2), f'Invalid argument {e}.')
+        e.typ = cast(ast.TTuple2, typ).b
     elif (isinstance(e, ast.EIntAdd) or
           isinstance(e, ast.EIntSub) or
           isinstance(e, ast.EIntMul)):
@@ -83,12 +83,9 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
 
     return e
 
-def typecheck_expr(e: ast.Expr, env: TypeEnv) -> Union[ast.Expr, str]:
-    try:
-        e_copy = deepcopy(e)
-        return _typecheck_expr(e_copy, env)
-    except _TypecheckException as exn:
-        return str(exn)
+def typecheck_expr(e: ast.Expr, env: TypeEnv) -> ast.Expr:
+    e_copy = deepcopy(e)
+    return _typecheck_expr(e_copy, env)
 
 def _typecheck_stmt(s: ast.Stmt, env: TypeEnv) -> ast.Stmt:
     if isinstance(s, ast.Assign):
@@ -100,23 +97,15 @@ def _typecheck_stmt(s: ast.Stmt, env: TypeEnv) -> ast.Stmt:
 
     return s
 
-def typecheck_stmt(s: ast.Stmt, env: TypeEnv) -> Union[ast.Expr, str]:
-    try:
-        s_copy = deepcopy(s)
-        return _typecheck_stmt(s_copy, env)
-    except _TypecheckException as exn:
-        return str(exn)
+def typecheck_stmt(s: ast.Stmt, env: TypeEnv) -> ast.Stmt:
+    s_copy = deepcopy(s)
+    return _typecheck_stmt(s_copy, env)
 
-def typecheck_txn(txn: ast.Transaction, env: TypeEnv) -> \
-                  Union[ast.Transaction, str]:
-    try:
-        txn_copy = deepcopy(txn)
-        for s in txn_copy:
-            _typecheck_stmt(s, env)
-        return txn_copy
-    except _TypecheckException as exn:
-        return str(exn)
+def typecheck_txn(txn: ast.Transaction, env: TypeEnv) -> ast.Transaction:
+    txn_copy = deepcopy(txn)
+    for s in txn_copy:
+        _typecheck_stmt(s, env)
+    return txn_copy
 
-def typecheck_invariant(inv: ast.Invariant, env: TypeEnv) -> \
-                        Union[ast.Invariant, str]:
+def typecheck_invariant(inv: ast.Invariant, env: TypeEnv) -> ast.Invariant:
     return typecheck_expr(inv, env)
