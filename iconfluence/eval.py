@@ -59,7 +59,7 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         raise ValueError(f'Unkown expression {e}.')
 
 def eval_stmt(s: ast.Stmt, env: ValEnv) -> ValEnv:
-    if (isinstance(s, ast.Assign)):
+    if (isinstance(s, ast.SAssign)):
         assert s.x.x in env, (s.x, env)
         new_env = deepcopy(env)
         new_env[s.x.x] = eval_expr(s.e, env)

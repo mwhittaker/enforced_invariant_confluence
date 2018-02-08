@@ -28,10 +28,10 @@ class Checker:
 
     def _typecheck(self) -> None:
         for inv in self.invariants.values():
-            typecheck.typecheck_invariant(inv, self.type_env)
+            typecheck._typecheck_invariant(inv, self.type_env)
 
         for txn in self.transactions.values():
-            typecheck.typecheck_txn(txn, self.type_env)
+            typecheck._typecheck_txn(txn, self.type_env)
 
     def int_max(self, name: str) -> ast.EVar:
         return self._register_var(name, ast.CIntMax())
