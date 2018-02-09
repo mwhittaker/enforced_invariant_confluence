@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, List, Tuple
 from functools import lru_cache
 
 import z3
+from termcolor import colored
 
 from .. import checker
 from .. import ast
@@ -11,6 +12,25 @@ from .z3util import scoped
 
 CrdtEnv = Dict[str, ast.Crdt]
 TypeEnv = Dict[str, ast.Type]
+
+def _red(s: str) -> str:
+    return colored(s, 'red')
+
+def _green(s: str) -> str:
+    return colored(s, 'green')
+
+def _cyan(s: str) -> str:
+    return colored(s, 'cyan')
+
+def _result_to_decision(result: z3.CheckSatResult) -> checker.Decision:
+    if result == z3.sat:
+        return checker.Decision.NO
+    elif result == z3.unsat:
+        return checker.Decision.YES
+    elif result == z3.unknown:
+        return checker.Decision.UNKNOWN
+    else:
+        raise ValueError(f'Unkown result {result}.')
 
 def _type_to_string(typ: ast.Type) -> str:
     if isinstance(typ, ast.TInt):
@@ -213,14 +233,25 @@ def _join_to_z3(crdt: ast.Crdt,
         raise ValueError(f'Unkown CRDT {crdt}.')
 
 class Z3Checker(checker.Checker):
-    def __init__(self, verbose: bool = False) -> None:
+    def __init__(self, verbose: int = 0) -> None:
         checker.Checker.__init__(self)
         self.verbose = verbose
 
-    def _log(self, s: str) -> None:
+    def _vlog(self, s: str) -> None:
         # TODO(mwhittaker): Maybe use a logger instead of just printing.
-        if self.verbose:
-            print(s)
+        if self.verbose >= 1:
+            print(s, end='')
+
+    def _vvlog(self, s: str) -> None:
+        # TODO(mwhittaker): Maybe use a logger instead of just printing.
+        if self.verbose >= 2:
+            print(s, end='')
+
+    def _vlogline(self, s: str) -> None:
+        self._vlog(s + '\n')
+
+    def _vvlogline(self, s: str) -> None:
+        self._vvlog(s + '\n')
 
     def _get_fresh_venv(self) -> VersionEnv:
         return VersionEnv(frozenset(self.type_env.keys()))
@@ -293,13 +324,12 @@ class Z3Checker(checker.Checker):
                     # TODO(mwhittaker): Print out the transactions that don't
                     # commute along with an example showing that they don't
                     # commute.
-                    self._log(f'Checking if {t_name} and {u_name} commute:')
-                    self._log(solver.sexpr())
-                    result = solver.check()
-                    if result == z3.unknown:
-                        return checker.Decision.UNKNOWN
-                    if result == z3.sat:
-                        return checker.Decision.NO
+                    self._vvlog(solver.sexpr())
+                    decision = _result_to_decision(solver.check())
+                    msg = f'{t_name} and {u_name} commute = {decision}'
+                    self._vlogline(_red(msg))
+                    if decision != checker.Decision.YES:
+                        return decision
         return checker.Decision.YES
 
     def _join_is_apply(self,
@@ -326,13 +356,12 @@ class Z3Checker(checker.Checker):
                     solver.add(z3.Not(self._venvs_equal(tu_venv, joined_venv)))
 
                     # TODO(mwhittaker): Eliminate boilerplate.
-                    self._log(f'Checking if {t_name} join {u_name} is apply:')
-                    self._log(solver.sexpr())
-                    result = solver.check()
-                    if result == z3.unknown:
-                        return checker.Decision.UNKNOWN
-                    if result == z3.sat:
-                        return checker.Decision.NO
+                    self._vvlog(solver.sexpr())
+                    decision = _result_to_decision(solver.check())
+                    msg = f'{t_name} and {u_name} join is apply = {decision}'
+                    self._vlogline(_green(msg))
+                    if decision != checker.Decision.YES:
+                        return decision
         return checker.Decision.YES
 
     def _one_di_confluent(self, solver: z3.Solver, fresh: FreshName) -> checker.Decision:
@@ -376,20 +405,18 @@ class Z3Checker(checker.Checker):
                     solver.add(z3.Not(joined_i))
 
                     # TODO(mwhittaker): Eliminate boilerplate.
-                    self._log(f'Checking if {t_name} and {u_name} are ' +
-                              f'1-DI-confluent:')
-                    self._log(solver.sexpr())
-                    result = solver.check()
-                    if result == z3.unknown:
-                        return checker.Decision.UNKNOWN
-                    if result == z3.sat:
-                        return checker.Decision.NO
+                    self._vvlog(solver.sexpr())
+                    decision = _result_to_decision(solver.check())
+                    msg = f'{t_name} and {u_name} 1-DI-confluent = {decision}'
+                    self._vlogline(_cyan(msg))
+                    if decision != checker.Decision.YES:
+                        return decision
         return checker.Decision.YES
 
     def check_iconfluence(self) -> checker.Decision:
         self._typecheck()
         if len(self.invariants) == 0:
-            self._log('There are no invariants, we are trivially iconfluent!')
+            self._vlogline('There are no invariants, we are trivially iconfluent!')
             return checker.Decision.YES
 
         solver = z3.Solver()
@@ -397,9 +424,9 @@ class Z3Checker(checker.Checker):
         operations_commute = self._operations_commute(solver, fresh)
         join_is_apply = self._join_is_apply(solver, fresh)
         one_di_confluent = self._one_di_confluent(solver, fresh)
-        self._log(f'operations_commute = {operations_commute}')
-        self._log(f'join_is_apply = {join_is_apply}')
-        self._log(f'one_di_confluent = {one_di_confluent}')
+        self._vlogline(_red(  f'operations_commute = {operations_commute}'))
+        self._vlogline(_cyan( f'join_is_apply      = {join_is_apply}'))
+        self._vlogline(_green(f'one_di_confluent   = {one_di_confluent}'))
 
         yes = checker.Decision.YES
         no = checker.Decision.NO

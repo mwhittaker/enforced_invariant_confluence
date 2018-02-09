@@ -51,12 +51,17 @@ def not_iconfluent_example(checker: Checker) -> None:
 def main() -> None:
     checkers: Dict[str, Callable[[], Checker]] = {
         'guess_and_check': GuessAndCheckChecker,
-        'z3': lambda: Z3Checker(verbose=True),
+        'z3': lambda: Z3Checker(verbose=1),
     }
     for name, checker in checkers.items():
-        print(f'Running {name} checker.')
+        msg = f'# {name} checker #'
+        print('#' * len(msg))
+        print(msg)
+        print('#' * len(msg))
         iconfluent_example(checker())
+        print()
         not_iconfluent_example(checker())
+        print()
 
 if __name__ == '__main__':
     main()
