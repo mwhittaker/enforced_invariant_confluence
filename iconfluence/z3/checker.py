@@ -234,6 +234,18 @@ class Checker(checker.Checker):
             conjuncts.append(x_1 == x_2)
         return z3.And(*conjuncts)
 
+    def _venv_satisfies_invariants(self,
+                                   venv: VersionEnv,
+                                   fresh: FreshName) \
+                                   -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+        es: List[z3.ExprRef] = []
+        conjuncts: List[z3.ExprRef] = []
+        for inv in self.invariants.values():
+            inv_es, inv_e = _expr_to_z3(inv, venv, self.type_env, fresh)
+            es += inv_es
+            conjuncts.append(inv_e)
+        return es, z3.And(*conjuncts)
+
     def _join_venvs(self,
                     solver: z3.Solver,
                     venv: VersionEnv,
@@ -296,7 +308,7 @@ class Checker(checker.Checker):
                        -> checker.Decision:
         for t_name, t in self.transactions.items():
             for u_name, u in self.transactions.items():
-                if t_name <= u_name:
+                if t_name < u_name:
                     continue
 
                 with scoped(solver):
@@ -323,12 +335,62 @@ class Checker(checker.Checker):
                         return checker.Decision.NO
         return checker.Decision.YES
 
-
     def _one_di_confluent(self, solver: z3.Solver, fresh: FreshName) -> checker.Decision:
-        return checker.Decision.UNKNOWN
+        # TODO(mwhittaker): We can turn this into a single call to z3 using
+        # something like:
+        #
+        #   (assert (= x_t_1 ...))
+        #   (assert (= x_u_1 ...))
+        #   (assert (= x_v_1 ...))
+        #   (assert (or (= x_left x_t_1) (= x_left x_u_1) (= x_left x_v_1)))
+        #
+        # It's unclear whether this would be better though.
+        for t_name, t in self.transactions.items():
+            for u_name, u in self.transactions.items():
+                if t_name < u_name:
+                    continue
+
+                with scoped(solver):
+                    tenv = self.type_env
+                    venv = self._get_fresh_venv()
+                    t_venv = venv.with_suffix(f'{t_name}')
+                    t_venv = _apply_txn(solver, t, t_venv, tenv, fresh)
+                    u_venv = venv.with_suffix(f'{u_name}')
+                    u_venv = _apply_txn(solver, u, u_venv, tenv, fresh)
+                    joined_venv = venv.with_suffix(f'{t_name}_joined_{u_name}')
+                    joined_venv = self._join_venvs(solver, joined_venv,
+                                                   t_venv, u_venv, fresh)
+
+                    vsi = self._venv_satisfies_invariants
+                    original_es, original_i = vsi(venv, fresh)
+                    t_es, t_i = vsi(t_venv, fresh)
+                    u_es, u_i = vsi(u_venv, fresh)
+                    joined_es, joined_i = vsi(joined_venv, fresh)
+                    solver.add(original_es)
+                    solver.add(t_es)
+                    solver.add(u_es)
+                    solver.add(joined_es)
+                    solver.add(original_i)
+                    solver.add(t_i)
+                    solver.add(u_i)
+                    solver.add(z3.Not(joined_i))
+
+                    # TODO(mwhittaker): Eliminate boilerplate.
+                    self._log(f'Checking if {t_name} and {u_name} are ' +
+                              f'1-DI-confluent:')
+                    self._log(solver.sexpr())
+                    result = solver.check()
+                    if result == z3.unknown:
+                        return checker.Decision.UNKNOWN
+                    if result == z3.sat:
+                        return checker.Decision.NO
+        return checker.Decision.YES
 
     def check_iconfluence(self) -> checker.Decision:
         self._typecheck()
+        if len(self.invariants) == 0:
+            self._log('There are no invariants, we are trivially iconfluent!')
+            return checker.Decision.YES
 
         solver = z3.Solver()
         fresh = FreshName()
@@ -350,17 +412,5 @@ class Checker(checker.Checker):
             return no
         else:
             return unknown
-
-        # solver = z3.Solver()
-        # for _, inv in self.invariants.items():
-        #     print(f'inv = {inv}')
-        #     with scoped(solver):
-        #         es, e = _expr_to_z3(inv, VersionEnv(frozenset()), self.type_env, FreshName())
-        #         for e_ in es:
-        #             print(f'e = {e_}')
-        #             solver.add(e_)
-        #         print(f'e = {e}')
-        #         solver.add(e)
-        #         print(solver.sexpr())
 
         raise NotImplementedError()
