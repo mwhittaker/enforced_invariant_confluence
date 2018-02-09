@@ -33,6 +33,10 @@ class Checker:
         for txn in self.transactions.values():
             typecheck._typecheck_txn(txn, self.type_env)
 
+    # TODO(mwhittaker): Right now, temporary variables are joined together and
+    # included when checking for properties like commutativity. Think about
+    # whether this is right.
+
     def int_max(self, name: str) -> ast.EVar:
         return self._register_var(name, ast.CIntMax())
 

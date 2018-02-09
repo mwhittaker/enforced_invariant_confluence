@@ -5,10 +5,10 @@ import z3
 Version = Tuple[str, int]
 
 class VersionEnv:
-    def __init__(self, vs: FrozenSet[str], suffix: str = "") -> None:
+    def __init__(self, vs: FrozenSet[str], suffix: str = '') -> None:
         self.vs = vs
         self.suffix = suffix
-        self.versions: Dict[str, Version] = {v: (suffix, 0) for v in self.vs}
+        self.versions: Dict[str, Version] = {v: ('', 0) for v in self.vs}
 
     def __str__(self) -> str:
         return str(self.versions)
@@ -25,9 +25,9 @@ class VersionEnv:
 
     def get_name(self, v: str) -> str:
         (s, i) = self.get_version(v)
-        i_str = f"_{i}" if i != 0 else ""
-        s_str = f"_{s}" if s else ""
-        return f"{v}{s_str}{i_str}"
+        i_str = f'_{i}' if i != 0 else ''
+        s_str = f'_{s}' if s else ''
+        return f'{v}{s_str}{i_str}'
 
     def with_suffix(self, suffix: str) -> 'VersionEnv':
         env = self._copy()

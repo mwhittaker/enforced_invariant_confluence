@@ -132,10 +132,10 @@ def _stmt_to_z3(stmt: ast.Stmt,
                 fresh: FreshName) \
                 -> Tuple[List[z3.ExprRef], VersionEnv]:
     if isinstance(stmt, ast.SAssign):
-        e = _expr_to_z3(stmt.e, venv, tenv, fresh)
+        es, e = _expr_to_z3(stmt.e, venv, tenv, fresh)
         venv = venv.assign(stmt.x.x)
         x = _var_to_z3(stmt.x, venv, tenv)
-        return [x == e], venv
+        return es + [x == e], venv
     else:
         raise ValueError(f'Unkown statement {stmt}.')
 
@@ -144,7 +144,7 @@ def _txn_to_z3(txn: ast.Transaction,
                tenv: TypeEnv,
                fresh: FreshName) \
                -> Tuple[List[z3.ExprRef], VersionEnv]:
-    es: List[z3.ExprRef]
+    es: List[z3.ExprRef] = []
     for s in txn:
         s_es, venv = _stmt_to_z3(s, venv, tenv, fresh)
         es += s_es
@@ -161,7 +161,7 @@ def _apply_txn(solver: z3.Solver,
         solver.add(e)
     return venv
 
-def _join_to_z3(crdt: CrdtEnv,
+def _join_to_z3(crdt: ast.Crdt,
                 lhs: ast.Expr,
                 lhs_venv: VersionEnv,
                 rhs: ast.Expr,
@@ -218,6 +218,7 @@ class Checker(checker.Checker):
         self.verbose = verbose
 
     def _log(self, s: str) -> None:
+        # TODO(mwhittaker): Maybe use a logger instead of just printing.
         if self.verbose:
             print(s)
 
@@ -225,7 +226,7 @@ class Checker(checker.Checker):
         return VersionEnv(frozenset(self.type_env.keys()))
 
     def _venvs_equal(self, venv1: VersionEnv, venv2: VersionEnv) -> z3.ExprRef:
-        conjuncts: List[z3.ExprRef]
+        conjuncts: List[z3.ExprRef] = []
         for x in self.type_env.keys():
             var = ast.EVar(x)
             x_1 = _var_to_z3(var, venv1, self.type_env)
@@ -233,10 +234,16 @@ class Checker(checker.Checker):
             conjuncts.append(x_1 == x_2)
         return z3.And(*conjuncts)
 
-    def _join_venvs(self, solver: z3.Solver, venv: VersionEnv, venv1: VersionEnv, venv2: VersionEnv, fresh: FreshName) -> VersionEnv:
+    def _join_venvs(self,
+                    solver: z3.Solver,
+                    venv: VersionEnv,
+                    venv1: VersionEnv,
+                    venv2: VersionEnv,
+                    fresh: FreshName) \
+                    -> VersionEnv:
         for x in self.type_env.keys():
             es, e = _join_to_z3(
-                self.crdt_env,
+                self.crdt_env[x],
                 ast.EVar(x),
                 venv1,
                 ast.EVar(x),
@@ -274,6 +281,8 @@ class Checker(checker.Checker):
                     # TODO(mwhittaker): Print out the transactions that don't
                     # commute along with an example showing that they don't
                     # commute.
+                    self._log(f'Checking if {t_name} and {u_name} commute:')
+                    self._log(solver.sexpr())
                     result = solver.check()
                     if result == z3.unknown:
                         return checker.Decision.UNKNOWN
@@ -305,6 +314,8 @@ class Checker(checker.Checker):
                     solver.add(z3.Not(self._venvs_equal(tu_venv, joined_venv)))
 
                     # TODO(mwhittaker): Eliminate boilerplate.
+                    self._log(f'Checking if {t_name} join {u_name} is apply:')
+                    self._log(solver.sexpr())
                     result = solver.check()
                     if result == z3.unknown:
                         return checker.Decision.UNKNOWN
@@ -324,6 +335,9 @@ class Checker(checker.Checker):
         operations_commute = self._operations_commute(solver, fresh)
         join_is_apply = self._join_is_apply(solver, fresh)
         one_di_confluent = self._one_di_confluent(solver, fresh)
+        self._log(f'operations_commute = {operations_commute}')
+        self._log(f'join_is_apply = {join_is_apply}')
+        self._log(f'one_di_confluent = {one_di_confluent}')
 
         yes = checker.Decision.YES
         no = checker.Decision.NO

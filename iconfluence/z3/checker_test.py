@@ -123,5 +123,50 @@ class TestChecker(unittest.TestCase):
             self.assertEqual(len(z3_es), 0)
             self.assert_z3_expr_equal(z3_e, expected)
 
+        x = ast.EVar('x')
+        y = ast.EVar('y')
+        var_test_cases: List[Tuple[ast.Expr, z3.ExprRef]] = [
+            (x, z3.Int('x')),
+            (y, z3.Bool('y')),
+            ((x + x >= x) | y,
+             z3.Or(z3.Int('x') + z3.Int('x') >= z3.Int('x'), z3.Bool('y'))),
+        ]
+
+        for e, expected in var_test_cases:
+            venv = VersionEnv(frozenset({'x', 'y'}))
+            tenv = {'x': Int(), 'y': Bool()}
+            fresh = FreshName()
+
+            e = typecheck_expr(e, tenv)
+            z3_es, z3_e = checker._expr_to_z3(e, venv, tenv, fresh)
+            self.assertEqual(len(z3_es), 0)
+            self.assert_z3_expr_equal(z3_e, expected)
+
+    def test_stmt_to_z3(self) -> None:
+        x = ast.EVar('x')
+        y = ast.EVar('y')
+        z3_x = z3.Int('x')
+        z3_y = z3.Int('y')
+        z3_x1 = z3.Int('x_foo_1')
+        z3_x2 = z3.Int('x_foo_2')
+        stmt = x.assign((x + y) * x)
+        venv = VersionEnv(frozenset({'x', 'y'}), suffix='foo')
+        tenv: Dict[str, ast.Type] = {'x': Int(), 'y': Int()}
+        fresh = FreshName()
+
+        es, new_venv = checker._stmt_to_z3(stmt, venv, tenv, fresh)
+        self.assertEqual(len(es), 1)
+        self.assert_z3_expr_equal(es[0], z3_x1 == (z3_x + z3_y) * z3_x)
+        self.assertEqual(venv.get_name('x'), 'x')
+        self.assertEqual(venv.get_name('y'), 'y')
+        self.assertEqual(new_venv.get_name('x'), 'x_foo_1')
+        self.assertEqual(new_venv.get_name('y'), 'y')
+
+        es, new_venv = checker._stmt_to_z3(stmt, new_venv, tenv, fresh)
+        self.assertEqual(len(es), 1)
+        self.assert_z3_expr_equal(es[0], z3_x2 == (z3_x1 + z3_y) * z3_x1)
+        self.assertEqual(new_venv.get_name('x'), 'x_foo_2')
+        self.assertEqual(new_venv.get_name('y'), 'y')
+
 if __name__ == '__main__':
     unittest.main()
