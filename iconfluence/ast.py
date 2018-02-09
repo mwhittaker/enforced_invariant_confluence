@@ -1,40 +1,48 @@
 from typing import Any, List, Set
 
 class AstNode:
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(self, other.__class__):
             return self.__dict__ == other.__dict__
         return NotImplemented
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(tuple(sorted(self.__dict__.items())))
 
-    def __str__(self):
+    def __repr__(self) -> str:
         d = self.__dict__
         fields = ", ".join(f'{k}={v}' for (k, v) in sorted(d.items()))
         return f'{self.__class__.__name__}({fields})'
 
-    def __repr__(self):
-        return self.__str__()
+    def __str__(self) -> str:
+        return self.__repr__()
 
 # Types ########################################################################
 class Type(AstNode):
     pass
 
 class TInt(Type):
-    pass
+    def __str__(self) -> str:
+        return 'Int'
 
 class TBool(Type):
-    pass
+    def __str__(self) -> str:
+        return 'Bool'
 
 class TTuple2(Type):
     def __init__(self, a: Type, b: Type) -> None:
         self.a = a
         self.b = b
 
+    def __str__(self) -> str:
+        return f'Tuple2[{str(self.a)}, {str(self.b)}]'
+
 class TSet(Type):
     def __init__(self, a: Type) -> None:
         self.a = a
+
+    def __str__(self) -> str:
+        return f'Set[{str(self.a)}]'
 
 # CRDTs ########################################################################
 class Crdt(AstNode):
@@ -178,50 +186,114 @@ class EVar(Expr):
     def assign(self, e: Expr) -> 'SAssign':
         return SAssign(self, e)
 
+    def __str__(self) -> str:
+        return self.x
+
 class EInt(Expr):
     def __init__(self, x: int) -> None:
         self.x = x
+
+    def __str__(self) -> str:
+        return str(self.x)
 
 class EBool(Expr):
     def __init__(self, b: bool) -> None:
         self.x = b
 
+    def __str__(self) -> str:
+        return str(self.x)
+
 class ETuple2(Expr):
     def __init__(self, a: Expr, b: Expr) -> None:
-        self.a = a
-        self.b = b
+        self.a = self._coerce(a)
+        self.b = self._coerce(b)
+
+    def __str__(self) -> str:
+        return f'({str(self.a)}, {str(self.b)})'
 
 class ESet(Expr):
     def __init__(self, xs: Set[Expr]) -> None:
-        self.xs = xs
+        self.xs = {self._coerce(x) for x in xs}
+
+    def __str__(self) -> str:
+        return '{' + ', '.join(str(x) for x in self.xs) + '}'
 
 class EUnaryOp(Expr):
     def __init__(self, x: Expr) -> None:
-        self.x = x
+        self.x = self._coerce(x)
 
-class ETuple2First(EUnaryOp): pass
-class ETuple2Second(EUnaryOp): pass
+class ETuple2First(EUnaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.x)})[0]'
+
+class ETuple2Second(EUnaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.x)})[1]'
 
 class EBinaryOp(Expr):
     def __init__(self, lhs: Expr, rhs: Expr) -> None:
-        self.lhs = lhs
-        self.rhs = rhs
+        self.lhs = self._coerce(lhs)
+        self.rhs = self._coerce(rhs)
 
-class EIntAdd(EBinaryOp): pass
-class EIntSub(EBinaryOp): pass
-class EIntMul(EBinaryOp): pass
-class EBoolAnd(EBinaryOp): pass
-class EBoolOr(EBinaryOp): pass
-class EBoolImpl(EBinaryOp): pass
-class ESetUnion(EBinaryOp): pass
-class ESetIntersect(EBinaryOp): pass
-class ESetDiff(EBinaryOp): pass
-class EEq(EBinaryOp): pass
-class ENe(EBinaryOp): pass
-class EIntLt(EBinaryOp): pass
-class EIntLe(EBinaryOp): pass
-class EIntGt(EBinaryOp): pass
-class EIntGe(EBinaryOp): pass
+class EIntAdd(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} + {str(self.rhs)})'
+
+class EIntSub(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} - {str(self.rhs)})'
+
+class EIntMul(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} * {str(self.rhs)})'
+
+class EBoolAnd(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} & {str(self.rhs)})'
+
+class EBoolOr(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} | {str(self.rhs)})'
+
+class EBoolImpl(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} >> {str(self.rhs)})'
+
+class ESetUnion(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} union {str(self.rhs)})'
+
+class ESetIntersect(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} intersect {str(self.rhs)})'
+
+class ESetDiff(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} diff {str(self.rhs)})'
+
+class EEq(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} == {str(self.rhs)})'
+
+class ENe(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} != {str(self.rhs)})'
+
+class EIntLt(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} < {str(self.rhs)})'
+
+class EIntLe(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} <= {str(self.rhs)})'
+
+class EIntGt(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} > {str(self.rhs)})'
+
+class EIntGe(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)} >= {str(self.rhs)})'
 
 # Statements ###################################################################
 class Stmt(AstNode):
