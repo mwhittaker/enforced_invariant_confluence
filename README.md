@@ -20,6 +20,6 @@ without coordination.
 
 This repository contains some [theoretical pencil-and-paper work](doc) to
 characterize with which CRDTs and invariant languages can I-confluence be
-enforced. It also contains some [fully implemented prototypes](src) which
-implement the decision procedures which have been outlined with
-pencil-and-paper.
+enforced. It also contains some [an early prototype](ocaml) and [a more fleshed
+out prototype](iconfluence) which implement the decision procedures that have
+been outlined with pencil-and-paper.
