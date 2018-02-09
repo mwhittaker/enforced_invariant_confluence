@@ -24,8 +24,8 @@ def _type_to_string(typ: ast.Type) -> str:
     else:
         raise ValueError(f'Unkown type {typ}.')
 
-# Note we memoize this function to try and avoid registering the same datatype
-# with z3 multiple times.
+# We memoize this function to avoid redundantly registering the same dataype
+# with z3 multiple times
 @lru_cache()
 def _type_to_z3(typ: ast.Type) -> z3.SortRef:
     if isinstance(typ, ast.TInt):
