@@ -1,10 +1,8 @@
 from typing import Callable, Dict
 
-import iconfluence
-from iconfluence import guess_and_check
-from iconfluence import z3
+from iconfluence import *
 
-def iconfluent_example(checker: iconfluence.checker.Checker) -> None:
+def iconfluent_example(checker: Checker) -> None:
     # Variable declaration.
     x = checker.int_max('x')
     y = checker.int_max('y')
@@ -21,9 +19,9 @@ def iconfluent_example(checker: iconfluence.checker.Checker) -> None:
         y.assign(tmp),
     ])
 
-    one = iconfluence.ast.EInt(1)
-    xs = iconfluence.ast.ESet({one})
-    ys = iconfluence.ast.ESet({one})
+    one = EInt(1)
+    xs = ESet({one})
+    ys = ESet({one})
 
     # Invariants.
     checker.add_invariant('x_eq_y', x.eq(y))
@@ -31,7 +29,7 @@ def iconfluent_example(checker: iconfluence.checker.Checker) -> None:
     # This should always print UNKNOWN or YES.
     print(checker.check_iconfluence())
 
-def not_iconfluent_example(checker: iconfluence.checker.Checker) -> None:
+def not_iconfluent_example(checker: Checker) -> None:
     # Variable declaration.
     x = checker.int_min('x')
     y = checker.int_max('y')
@@ -51,9 +49,9 @@ def not_iconfluent_example(checker: iconfluence.checker.Checker) -> None:
     print(checker.check_iconfluence())
 
 def main() -> None:
-    checkers: Dict[str, Callable[[], iconfluence.checker.Checker]] = {
-        'guess_and_check': guess_and_check.checker.Checker,
-        'z3': lambda: z3.checker.Checker(verbose=True),
+    checkers: Dict[str, Callable[[], Checker]] = {
+        'guess_and_check': GuessAndCheckChecker,
+        'z3': lambda: Z3Checker(verbose=True),
     }
     for name, checker in checkers.items():
         print(f'Running {name} checker.')

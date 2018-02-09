@@ -212,7 +212,7 @@ def _join_to_z3(crdt: ast.Crdt,
     else:
         raise ValueError(f'Unkown CRDT {crdt}.')
 
-class Checker(checker.Checker):
+class Z3Checker(checker.Checker):
     def __init__(self, verbose: bool = False) -> None:
         checker.Checker.__init__(self)
         self.verbose = verbose

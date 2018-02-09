@@ -11,7 +11,7 @@ ValEnv = Dict[str, Any]
 class _NothingFoundException(Exception):
     pass
 
-class Checker(checker.Checker):
+class GuessAndCheckChecker(checker.Checker):
     def _satisfies_invariants(self, env: ValEnv):
         return all(eval.eval_invariant(inv, env)
                    for inv in self.invariants.values())
