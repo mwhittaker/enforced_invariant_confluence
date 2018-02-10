@@ -44,6 +44,14 @@ class TSet(Type):
     def __str__(self) -> str:
         return f'Set[{str(self.a)}]'
 
+class TMap(Type):
+    def __init__(self, a: Type, b: Type) -> None:
+        self.a = a
+        self.b = b
+
+    def __str__(self) -> str:
+        return f'Map[{str(self.a)}, {str(self.b)}]'
+
 # CRDTs ########################################################################
 class Crdt(AstNode):
     def to_type(self) -> Type:
@@ -86,6 +94,14 @@ class CSetIntersect(Crdt):
 
     def to_type(self) -> Type:
         return TSet(self.a.to_type())
+
+class CMap(Crdt):
+    def __init__(self, a: Type, b: Crdt) -> None:
+        self.a = a
+        self.b = b
+
+    def to_type(self) -> Type:
+        return TMap(self.a, self.b.to_type())
 
 # Expressions ##################################################################
 class Expr(AstNode):
@@ -278,6 +294,10 @@ class ESetContains(EBinaryOp):
     def __str__(self) -> str:
         return f'({str(self.rhs)} in {str(self.lhs)})'
 
+class EMapGet(EBinaryOp):
+    def __str__(self) -> str:
+        return f'{str(self.lhs)}[{str(self.rhs)})]'
+
 class EEq(EBinaryOp):
     def __str__(self) -> str:
         return f'({str(self.lhs)} == {str(self.rhs)})'
@@ -301,6 +321,16 @@ class EIntGt(EBinaryOp):
 class EIntGe(EBinaryOp):
     def __str__(self) -> str:
         return f'({str(self.lhs)} >= {str(self.rhs)})'
+
+class ETernaryOp(Expr):
+    def __init__(self, a: Expr, b: Expr, c: Expr) -> None:
+        self.a = self._coerce(a)
+        self.b = self._coerce(b)
+        self.c = self._coerce(c)
+
+class EMapSet(ETernaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.a)}[{str(self.b)}] <- {str(self.c)})'
 
 # Statements ###################################################################
 class Stmt(AstNode):

@@ -43,6 +43,8 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return eval_expr(e.lhs, env).difference(eval_expr(e.rhs, env))
     elif isinstance(e, ast.ESetContains):
         return eval_expr(e.rhs, env) in eval_expr(e.lhs, env)
+    elif isinstance(e, ast.EMapGet):
+        return eval_expr(e.lhs, env)[eval_expr(e.rhs, env)]
     elif isinstance(e, ast.EEq):
         return eval_expr(e.lhs, env) == (eval_expr(e.rhs, env))
     elif isinstance(e, ast.ENe):
@@ -57,6 +59,10 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return eval_expr(e.lhs, env) >= (eval_expr(e.rhs, env))
     elif isinstance(e, ast.EIntGe):
         return eval_expr(e.lhs, env) >= (eval_expr(e.rhs, env))
+    elif isinstance(e, ast.EMapSet):
+        xs = eval_expr(e.a, env)
+        xs[eval_expr(e.b, env)] = eval_expr(e.c, env)
+        return xs
     else:
         raise ValueError(f'Unkown expression {e}.')
 

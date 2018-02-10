@@ -48,6 +48,8 @@ def _type_to_z3(typ: ast.Type) -> z3.SortRef:
         return Tuple2.create()
     elif isinstance(typ, ast.TSet):
         return z3.ArraySort(_type_to_z3(typ.a), z3.BoolSort())
+    elif isinstance(typ, ast.TMap):
+        return z3.ArraySort(_type_to_z3(typ.a), _type_to_z3(typ.b))
     else:
         raise ValueError(f'Unkown type {typ}.')
 
@@ -63,13 +65,24 @@ def _expr_to_z3(e: ast.Expr,
     def to_z3(e_: ast.Expr) -> Tuple[List[z3.ExprRef], z3.ExprRef]:
         return _expr_to_z3(e_, venv, tenv, fresh)
 
-    def flat_app(lhs: ast.Expr,
-                 rhs: ast.Expr,
-                 f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
-                 -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+    def flat_app2(lhs: ast.Expr,
+                  rhs: ast.Expr,
+                  f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
+                  -> Tuple[List[z3.ExprRef], z3.ExprRef]:
         es_lhs, lhs_z3 = to_z3(lhs)
         es_rhs, rhs_z3 = to_z3(rhs)
         return es_lhs + es_rhs, f(lhs_z3, rhs_z3)
+
+    def flat_app3(a: ast.Expr,
+                  b: ast.Expr,
+                  c: ast.Expr,
+                  f: Callable[[z3.ExprRef, z3.ExprRef, z3.ExprRef],
+                              z3.ExprRef]) \
+                  -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+        es_a, a_z3 = to_z3(a)
+        es_b, b_z3 = to_z3(b)
+        es_c, c_z3 = to_z3(c)
+        return es_a + es_b + es_c, f(a_z3, b_z3, c_z3)
 
     if isinstance(e, ast.EVar):
         return [], _var_to_z3(e, venv, tenv)
@@ -79,7 +92,7 @@ def _expr_to_z3(e: ast.Expr,
         return [], z3.Bool(e.x)
     elif isinstance(e, ast.ETuple2):
         Tuple2 = _type_to_z3(e.typ)
-        return flat_app(e.a, e.b, lambda a, b: Tuple2.tuple2(a, b))
+        return flat_app2(e.a, e.b, lambda a, b: Tuple2.tuple2(a, b))
     elif isinstance(e, ast.ESet):
         es: List[z3.ExprRef] = []
         xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
@@ -97,42 +110,46 @@ def _expr_to_z3(e: ast.Expr,
         t_es, t = to_z3(e.x)
         return t_es, Tuple2.b(t)
     elif isinstance(e, ast.EIntAdd):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l + r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l + r)
     elif isinstance(e, ast.EIntSub):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l - r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l - r)
     elif isinstance(e, ast.EIntMul):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l * r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l * r)
     elif isinstance(e, ast.EBoolOr):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Or(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Or(l, r))
     elif isinstance(e, ast.EBoolAnd):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.And(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.And(l, r))
     elif isinstance(e, ast.EBoolImpl):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Implies(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Implies(l, r))
     elif isinstance(e, ast.ESetUnion):
         f = z3.Or(z3.Bool(True), z3.Bool(True)).decl()
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
     elif isinstance(e, ast.ESetIntersect):
         f = z3.And(z3.Bool(True), z3.Bool(True)).decl()
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
     elif isinstance(e, ast.ESetDiff):
         not_ = z3.Not(z3.Bool(True)).decl()
         and_ = z3.And(z3.Bool(True), z3.Bool(True)).decl()
         f = lambda l, r: z3.Map(and_, l, z3.Map(not_, r))
-        return flat_app(e.lhs, e.rhs, f)
+        return flat_app2(e.lhs, e.rhs, f)
     elif isinstance(e, ast.ESetContains):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Select(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Select(l, r))
+    elif isinstance(e, ast.EMapGet):
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Select(l, r))
     elif isinstance(e, ast.EEq):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l == r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l == r)
     elif isinstance(e, ast.ENe):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l != r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l != r)
     elif isinstance(e, ast.EIntLt):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l < r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l < r)
     elif isinstance(e, ast.EIntLe):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l <= r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l <= r)
     elif isinstance(e, ast.EIntGt):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l > r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l > r)
     elif isinstance(e, ast.EIntGe):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l >= r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l >= r)
+    elif isinstance(e, ast.EMapSet):
+        return flat_app3(e.a, e.b, e.c, lambda a, b, c: z3.Store(a, b, c))
     else:
         raise ValueError(f'Unkown expression {e}.')
 
@@ -179,22 +196,22 @@ def _join_to_z3(crdt: ast.Crdt,
                 tenv: TypeEnv,
                 fresh: FreshName) \
                 -> Tuple[List[z3.ExprRef], z3.ExprRef]:
-    def flat_app(lhs: ast.Expr,
-                 rhs: ast.Expr,
-                 f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
-                 -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+    def flat_app2(lhs: ast.Expr,
+                  rhs: ast.Expr,
+                  f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
+                  -> Tuple[List[z3.ExprRef], z3.ExprRef]:
         lhs_z3s, lhs_z3 = _expr_to_z3(lhs, lhs_venv, tenv, fresh)
         rhs_z3s, rhs_z3 = _expr_to_z3(rhs, rhs_venv, tenv, fresh)
         return lhs_z3s + rhs_z3s, f(lhs_z3, rhs_z3)
 
     if isinstance(crdt, ast.CIntMax):
-        return flat_app(lhs, rhs, lambda l, r: z3.If(l >= r, l, r))
+        return flat_app2(lhs, rhs, lambda l, r: z3.If(l >= r, l, r))
     elif isinstance(crdt, ast.CIntMin):
-        return flat_app(lhs, rhs, lambda l, r: z3.If(l <= r, l, r))
+        return flat_app2(lhs, rhs, lambda l, r: z3.If(l <= r, l, r))
     elif isinstance(crdt, ast.CBoolOr):
-        return flat_app(lhs, rhs, lambda l, r: z3.Or(l, r))
+        return flat_app2(lhs, rhs, lambda l, r: z3.Or(l, r))
     elif isinstance(crdt, ast.CBoolAnd):
-        return flat_app(lhs, rhs, lambda l, r: z3.And(l, r))
+        return flat_app2(lhs, rhs, lambda l, r: z3.And(l, r))
     elif isinstance(crdt, ast.CTuple2):
         a_z3s, a_z3 = _join_to_z3(
             crdt.a,
@@ -215,10 +232,15 @@ def _join_to_z3(crdt: ast.Crdt,
         return a_z3s + b_z3s, _type_to_z3(crdt.to_type()).tuple2(a_z3, b_z3)
     elif isinstance(crdt, ast.CSetUnion):
         or_ = z3.Or(z3.Bool(True), z3.Bool(True)).decl()
-        return flat_app(lhs, rhs, lambda l, r: z3.Map(or_, l, r))
+        return flat_app2(lhs, rhs, lambda l, r: z3.Map(or_, l, r))
     elif isinstance(crdt, ast.CSetIntersect):
         and_ = z3.And(z3.Bool(True), z3.Bool(True)).decl()
-        return flat_app(lhs, rhs, lambda l, r: z3.Map(and_, l, r))
+        return flat_app2(lhs, rhs, lambda l, r: z3.Map(and_, l, r))
+    elif isinstance(crdt, ast.CMap):
+        # TODO(mwhittaker): This is going to be hard. We have to declare a
+        # function, then for all assert that it acts like a join, then use the
+        # declared function to map over the map.
+        raise NotImplementedError()
     else:
         raise ValueError(f'Unkown CRDT {crdt}.')
 
