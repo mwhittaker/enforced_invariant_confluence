@@ -3,7 +3,7 @@ import unittest
 
 import z3
 
-from . import checker
+from . import z3_checker
 from .. import ast
 from ..typecheck import typecheck_expr
 from .fresh_name import FreshName
@@ -28,19 +28,6 @@ class TestChecker(unittest.TestCase):
         for x, y in zip(xs, ys):
             self.assert_z3_expr_equal(x, y)
 
-    def test_type_to_string(self) -> None:
-        test_cases: List[Tuple[ast.Type, str]] = [
-            (Int(), 'Int'),
-            (Bool(), 'Bool'),
-            (Pair(Int(), Int()), 'Tuple2[Int, Int]'),
-            (Pair(Int(), Bool()), 'Tuple2[Int, Bool]'),
-            (Set(Int()), 'Set[Int]'),
-            (Set(Pair(Set(Bool()), Pair(Int(), Int()))),
-             'Set[Tuple2[Set[Bool], Tuple2[Int, Int]]]'),
-        ]
-        for typ, s in test_cases:
-            self.assertEqual(s, checker._type_to_string(typ))
-
     def test_type_to_z3(self) -> None:
         test_cases: List[Tuple[ast.Type, z3.SortRef]] = [
             (Int(), z3.IntSort()),
@@ -49,11 +36,11 @@ class TestChecker(unittest.TestCase):
         ]
 
         for typ, sort in test_cases:
-            self.assertEqual(sort, checker._type_to_z3(typ))
+            self.assertEqual(sort, z3_checker._type_to_z3(typ))
 
         # Unit testing TTuple2 is a little bit tricky, since TTuple2 is
         # converted into a user-defined datatype.
-        z3_tuple = checker._type_to_z3(Pair(Int(), Bool()))
+        z3_tuple = z3_checker._type_to_z3(Pair(Int(), Bool()))
         self.assertEqual(z3_tuple.name(), 'Tuple2[Int, Bool]')
         self.assertEqual(z3_tuple.num_constructors(), 1)
         self.assertEqual(z3_tuple.constructor(0).name(), 'tuple2')
@@ -64,7 +51,7 @@ class TestChecker(unittest.TestCase):
         self.assertEqual(z3_tuple.accessor(0, 1).range(), z3.BoolSort())
 
     def test_expr_to_z3(self) -> None:
-        TupleIntBool = checker._type_to_z3(Pair(Int(), Bool()))
+        TupleIntBool = z3_checker._type_to_z3(Pair(Int(), Bool()))
 
         x_one = ast.EInt(1)
         x_two = ast.EInt(2)
@@ -105,6 +92,7 @@ class TestChecker(unittest.TestCase):
             (x_set.union(x_set), z3.Map(or_, z3_set0, z3_set1)),
             (x_set.intersect(x_set), z3.Map(and_, z3_set0, z3_set1)),
             (x_set.diff(x_set), z3.Map(and_, z3_set0, z3.Map(not_, z3_set1))),
+            (x_set.contains(x_one), z3.Select(z3_set0, z3_one)),
             (x_one.eq(x_two), z3_one == z3_two),
             (x_one.ne(x_two), z3_one != z3_two),
             (x_one < x_two, z3_one < z3_two),
@@ -119,7 +107,7 @@ class TestChecker(unittest.TestCase):
             fresh = FreshName()
 
             e = typecheck_expr(e, tenv)
-            z3_es, z3_e = checker._expr_to_z3(e, venv, tenv, fresh)
+            z3_es, z3_e = z3_checker._expr_to_z3(e, venv, tenv, fresh)
             self.assertEqual(len(z3_es), 0)
             self.assert_z3_expr_equal(z3_e, expected)
 
@@ -138,7 +126,7 @@ class TestChecker(unittest.TestCase):
             fresh = FreshName()
 
             e = typecheck_expr(e, tenv)
-            z3_es, z3_e = checker._expr_to_z3(e, venv, tenv, fresh)
+            z3_es, z3_e = z3_checker._expr_to_z3(e, venv, tenv, fresh)
             self.assertEqual(len(z3_es), 0)
             self.assert_z3_expr_equal(z3_e, expected)
 
@@ -154,7 +142,7 @@ class TestChecker(unittest.TestCase):
         tenv: Dict[str, ast.Type] = {'x': Int(), 'y': Int()}
         fresh = FreshName()
 
-        es, new_venv = checker._stmt_to_z3(stmt, venv, tenv, fresh)
+        es, new_venv = z3_checker._stmt_to_z3(stmt, venv, tenv, fresh)
         self.assertEqual(len(es), 1)
         self.assert_z3_expr_equal(es[0], z3_x1 == (z3_x + z3_y) * z3_x)
         self.assertEqual(venv.get_name('x'), 'x')
@@ -162,7 +150,7 @@ class TestChecker(unittest.TestCase):
         self.assertEqual(new_venv.get_name('x'), 'x_foo_1')
         self.assertEqual(new_venv.get_name('y'), 'y')
 
-        es, new_venv = checker._stmt_to_z3(stmt, new_venv, tenv, fresh)
+        es, new_venv = z3_checker._stmt_to_z3(stmt, new_venv, tenv, fresh)
         self.assertEqual(len(es), 1)
         self.assert_z3_expr_equal(es[0], z3_x2 == (z3_x1 + z3_y) * z3_x1)
         self.assertEqual(new_venv.get_name('x'), 'x_foo_2')

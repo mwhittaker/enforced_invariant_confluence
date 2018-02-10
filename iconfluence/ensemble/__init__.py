@@ -1,1 +1,1 @@
-from .checker import *
+from .ensemble_checker import *

@@ -63,6 +63,13 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         _assert(e.lhs.typ == e.rhs.typ,
                 f'Mismatched types {e.lhs.typ} and {e.rhs.typ}.')
         e.typ = e.lhs.typ
+    elif isinstance(e, ast.ESetContains):
+        lhs_typ = _typecheck_expr(e.lhs, env).typ
+        _assert(isinstance(lhs_typ, ast.TSet), f'Ill typed operand {e.lhs}.')
+        lhs_typ = cast(ast.TSet, lhs_typ)
+        rhs_typ = _typecheck_expr(e.rhs, env).typ
+        _assert(lhs_typ.a == rhs_typ, f'Ill typed operand {e.rhs}.')
+        e.typ = ast.TBool()
     elif (isinstance(e, ast.EEq) or isinstance(e, ast.ENe)):
         lhs_typ = _typecheck_expr(e.lhs, env).typ
         rhs_typ = _typecheck_expr(e.rhs, env).typ

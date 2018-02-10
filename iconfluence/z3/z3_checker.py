@@ -32,18 +32,6 @@ def _result_to_decision(result: z3.CheckSatResult) -> checker.Decision:
     else:
         raise ValueError(f'Unkown result {result}.')
 
-def _type_to_string(typ: ast.Type) -> str:
-    if isinstance(typ, ast.TInt):
-        return 'Int'
-    elif isinstance(typ, ast.TBool):
-        return 'Bool'
-    elif isinstance(typ, ast.TTuple2):
-        return f'Tuple2[{_type_to_string(typ.a)}, {_type_to_string(typ.b)}]'
-    elif isinstance(typ, ast.TSet):
-        return f'Set[{_type_to_string(typ.a)}]'
-    else:
-        raise ValueError(f'Unkown type {typ}.')
-
 # We memoize this function to avoid redundantly registering the same dataype
 # with z3 multiple times
 @lru_cache()
@@ -55,7 +43,7 @@ def _type_to_z3(typ: ast.Type) -> z3.SortRef:
     elif isinstance(typ, ast.TTuple2):
         a = _type_to_z3(typ.a)
         b = _type_to_z3(typ.b)
-        Tuple2 = z3.Datatype(_type_to_string(typ))
+        Tuple2 = z3.Datatype(str(typ))
         Tuple2.declare('tuple2', ('a', a), ('b', b))
         return Tuple2.create()
     elif isinstance(typ, ast.TSet):
@@ -131,6 +119,8 @@ def _expr_to_z3(e: ast.Expr,
         and_ = z3.And(z3.Bool(True), z3.Bool(True)).decl()
         f = lambda l, r: z3.Map(and_, l, z3.Map(not_, r))
         return flat_app(e.lhs, e.rhs, f)
+    elif isinstance(e, ast.ESetContains):
+        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Select(l, r))
     elif isinstance(e, ast.EEq):
         return flat_app(e.lhs, e.rhs, lambda l, r: l == r)
     elif isinstance(e, ast.ENe):
