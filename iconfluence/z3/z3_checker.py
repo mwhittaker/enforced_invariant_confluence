@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Tuple
+from typing import cast, Any, Callable, Dict, List, Tuple
 from functools import lru_cache
 
 import z3
@@ -196,22 +196,22 @@ def _join_to_z3(crdt: ast.Crdt,
     elif isinstance(crdt, ast.CBoolAnd):
         return flat_app(lhs, rhs, lambda l, r: z3.And(l, r))
     elif isinstance(crdt, ast.CTuple2):
-        a_z3s, a_z3 = _join_to_z3(
-            crdt.a,
-            ast.ETuple2First(lhs),
-            lhs_venv,
-            ast.ETuple2First(rhs),
-            rhs_venv,
-            tenv,
-            fresh)
-        b_z3s, b_z3 = _join_to_z3(
-            crdt.b,
-            ast.ETuple2Second(lhs),
-            lhs_venv,
-            ast.ETuple2Second(rhs),
-            rhs_venv,
-            tenv,
-            fresh)
+        lhs_first = ast.ETuple2First(lhs)
+        lhs_second = ast.ETuple2Second(lhs)
+        rhs_first = ast.ETuple2First(rhs)
+        rhs_second = ast.ETuple2Second(rhs)
+
+        lhs_type = cast(ast.TTuple2, lhs.typ)
+        rhs_type = cast(ast.TTuple2, rhs.typ)
+        lhs_first.typ = lhs_type.a
+        lhs_second.typ = lhs_type.b
+        rhs_first.typ = rhs_type.a
+        rhs_second.typ = rhs_type.b
+
+        a_z3s, a_z3 = _join_to_z3(crdt.a, lhs_first, lhs_venv,
+                                  rhs_first, rhs_venv, tenv, fresh)
+        b_z3s, b_z3 = _join_to_z3(crdt.b, lhs_second, lhs_venv,
+                                  rhs_second, rhs_venv, tenv, fresh)
         return a_z3s + b_z3s, _type_to_z3(crdt.to_type()).tuple2(a_z3, b_z3)
     elif isinstance(crdt, ast.CSetUnion):
         or_ = z3.Or(z3.Bool(True), z3.Bool(True)).decl()
@@ -250,6 +250,7 @@ class Z3Checker(checker.Checker):
         conjuncts: List[z3.ExprRef] = []
         for x in self.type_env.keys():
             var = ast.EVar(x)
+            var.typ = self.type_env[x]
             x_1 = _var_to_z3(var, venv1, self.type_env)
             x_2 = _var_to_z3(var, venv2, self.type_env)
             conjuncts.append(x_1 == x_2)
@@ -275,18 +276,14 @@ class Z3Checker(checker.Checker):
                     fresh: FreshName) \
                     -> VersionEnv:
         for x in self.type_env.keys():
-            es, e = _join_to_z3(
-                self.crdt_env[x],
-                ast.EVar(x),
-                venv1,
-                ast.EVar(x),
-                venv2,
-                self.type_env,
-                fresh)
+            v = ast.EVar(x)
+            v.typ = self.type_env[x]
+            es, e = _join_to_z3(self.crdt_env[x], v, venv1, v, venv2,
+                                self.type_env, fresh)
             for e_ in es:
                 solver.add(e_)
             venv = venv.assign(x)
-            solver.add(_var_to_z3(ast.EVar(x), venv, self.type_env) == e)
+            solver.add(_var_to_z3(v, venv, self.type_env) == e)
         return venv
 
     def _operations_commute(self,
@@ -405,6 +402,7 @@ class Z3Checker(checker.Checker):
 
     def check_iconfluence(self) -> checker.Decision:
         self._typecheck()
+
         if len(self.invariants) == 0:
             self._vlogline('There are no invariants, we are trivially iconfluent!')
             return checker.Decision.YES

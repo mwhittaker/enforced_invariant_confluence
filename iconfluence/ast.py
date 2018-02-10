@@ -1,4 +1,4 @@
-from typing import Any, List, Set
+from typing import Any, List, Set, Union
 
 class AstNode:
     def __eq__(self, other) -> bool:
@@ -11,7 +11,7 @@ class AstNode:
 
     def __repr__(self) -> str:
         d = self.__dict__
-        fields = ", ".join(f'{k}={v}' for (k, v) in sorted(d.items()))
+        fields = ", ".join(f'{k}={repr(v)}' for (k, v) in sorted(d.items()))
         return f'{self.__class__.__name__}({fields})'
 
     def __str__(self) -> str:
@@ -74,39 +74,41 @@ class CTuple2(Crdt):
         return TTuple2(self.a.to_type(), self.b.to_type())
 
 class CSetUnion(Crdt):
-    def __init__(self, a: Crdt) -> None:
+    def __init__(self, a: Type) -> None:
         self.a = a
 
     def to_type(self) -> Type:
-        return TSet(self.a.to_type())
+        return TSet(self.a)
 
 class CSetIntersect(Crdt):
-    def __init__(self, a: Crdt) -> None:
+    def __init__(self, a: Type) -> None:
         self.a = a
 
     def to_type(self) -> Type:
-        return TSet(self.a.to_type())
+        return TSet(self.a)
 
 # Expressions ##################################################################
+Coercible = Union[bool, int, tuple, set, 'Expr']
+
+def _coerce(x: Coercible) -> 'Expr':
+    # Note that isinstance(True, int) is true, so we have to check for
+    # bools before we check for ints.
+    if isinstance(x, bool):
+        return EBool(x)
+    elif isinstance(x, int):
+        return EInt(x)
+    elif isinstance(x, tuple) and len(x) == 2:
+        return ETuple2(_coerce(x[0]), _coerce(x[1]))
+    elif isinstance(x, set):
+        return ESet({_coerce(e) for e in x})
+    elif isinstance(x, Expr):
+        return x
+    else:
+        raise ValueError(f'Unrecognized expression {x}.')
+
 class Expr(AstNode):
     def __init__(self) -> None:
         self.typ: Type = None
-
-    def _coerce(self, x: Any) -> 'Expr':
-        # Note that isinstance(True, int) is true, so we have to check for
-        # bools before we check for ints.
-        if isinstance(x, bool):
-            return EBool(x)
-        elif isinstance(x, int):
-            return EInt(x)
-        elif isinstance(x, tuple) and len(x) == 2:
-            return ETuple2(self._coerce(x[0]), self._coerce(x[1]))
-        elif isinstance(x, set):
-            return ESet({self._coerce(e) for e in x})
-        elif isinstance(x, Expr):
-            return x
-        else:
-            raise ValueError(f'Unrecognized expression {x}.')
 
     def __getitem__(self, i: int) -> 'Expr':
         if i == 0:
@@ -116,78 +118,78 @@ class Expr(AstNode):
         else:
             raise ValueError(f'Unsupported index {i}.')
 
-    def __add__(self, rhs: Any) -> 'Expr':
-        return EIntAdd(self, self._coerce(rhs))
+    def __add__(self, rhs: Coercible) -> 'Expr':
+        return EIntAdd(self, _coerce(rhs))
 
-    def __radd__(self, lhs: Any) -> 'Expr':
-        return self._coerce(lhs) + self
+    def __radd__(self, lhs: Coercible) -> 'Expr':
+        return _coerce(lhs) + self
 
-    def __sub__(self, rhs: Any) -> 'Expr':
-        return EIntSub(self, self._coerce(rhs))
+    def __sub__(self, rhs: Coercible) -> 'Expr':
+        return EIntSub(self, _coerce(rhs))
 
-    def __rsub__(self, lhs: Any) -> 'Expr':
-        return self._coerce(lhs) - self
+    def __rsub__(self, lhs: Coercible) -> 'Expr':
+        return _coerce(lhs) - self
 
-    def __mul__(self, rhs: Any) -> 'Expr':
-        return EIntMul(self, self._coerce(rhs))
+    def __mul__(self, rhs: Coercible) -> 'Expr':
+        return EIntMul(self, _coerce(rhs))
 
-    def __rmul__(self, lhs: Any) -> 'Expr':
-        return self._coerce(lhs) * self
+    def __rmul__(self, lhs: Coercible) -> 'Expr':
+        return _coerce(lhs) * self
 
-    def __and__(self, rhs: Any) -> 'Expr':
-        return EBoolAnd(self, self._coerce(rhs))
+    def __and__(self, rhs: Coercible) -> 'Expr':
+        return EBoolAnd(self, _coerce(rhs))
 
-    def __rand__(self, lhs: Any) -> 'Expr':
-        return self._coerce(lhs) * self
+    def __rand__(self, lhs: Coercible) -> 'Expr':
+        return _coerce(lhs) * self
 
-    def __or__(self, rhs: Any) -> 'Expr':
-        return EBoolOr(self, self._coerce(rhs))
+    def __or__(self, rhs: Coercible) -> 'Expr':
+        return EBoolOr(self, _coerce(rhs))
 
-    def __ror__(self, lhs: Any) -> 'Expr':
-        return self._coerce(lhs) | self
+    def __ror__(self, lhs: Coercible) -> 'Expr':
+        return _coerce(lhs) | self
 
-    def __rshift__(self, rhs: Any) -> 'Expr':
-        return EBoolImpl(self, self._coerce(rhs))
+    def __rshift__(self, rhs: Coercible) -> 'Expr':
+        return EBoolImpl(self, _coerce(rhs))
 
-    def __rrshift__(self, lhs: Any) -> 'Expr':
-        return self._coerce(lhs) | self
+    def __rrshift__(self, lhs: Coercible) -> 'Expr':
+        return _coerce(lhs) | self
 
-    def union(self, lhs: Any) -> 'Expr':
-        return ESetUnion(self, self._coerce(lhs))
+    def union(self, lhs: Coercible) -> 'Expr':
+        return ESetUnion(self, _coerce(lhs))
 
-    def intersect(self, lhs: Any) -> 'Expr':
-        return ESetIntersect(self, self._coerce(lhs))
+    def intersect(self, lhs: Coercible) -> 'Expr':
+        return ESetIntersect(self, _coerce(lhs))
 
-    def diff(self, lhs: Any) -> 'Expr':
-        return ESetDiff(self, self._coerce(lhs))
+    def diff(self, lhs: Coercible) -> 'Expr':
+        return ESetDiff(self, _coerce(lhs))
 
-    def contains(self, x: Any) -> 'Expr':
-        return ESetContains(self, self._coerce(x))
+    def contains(self, x: Coercible) -> 'Expr':
+        return ESetContains(self, _coerce(x))
 
-    def eq(self, lhs: Any) -> 'Expr':
-        return EEq(self, self._coerce(lhs))
+    def eq(self, lhs: Coercible) -> 'Expr':
+        return EEq(self, _coerce(lhs))
 
-    def ne(self, lhs: Any) -> 'Expr':
-        return ENe(self, self._coerce(lhs))
+    def ne(self, lhs: Coercible) -> 'Expr':
+        return ENe(self, _coerce(lhs))
 
-    def __lt__(self, lhs: Any) -> 'Expr':
-        return EIntLt(self, self._coerce(lhs))
+    def __lt__(self, lhs: Coercible) -> 'Expr':
+        return EIntLt(self, _coerce(lhs))
 
-    def __le__(self, lhs: Any) -> 'Expr':
-        return EIntLe(self, self._coerce(lhs))
+    def __le__(self, lhs: Coercible) -> 'Expr':
+        return EIntLe(self, _coerce(lhs))
 
-    def __gt__(self, lhs: Any) -> 'Expr':
-        return EIntGt(self, self._coerce(lhs))
+    def __gt__(self, lhs: Coercible) -> 'Expr':
+        return EIntGt(self, _coerce(lhs))
 
-    def __ge__(self, lhs: Any) -> 'Expr':
-        return EIntGe(self, self._coerce(lhs))
+    def __ge__(self, lhs: Coercible) -> 'Expr':
+        return EIntGe(self, _coerce(lhs))
 
 class EVar(Expr):
     def __init__(self, x: str) -> None:
         self.x = x
 
-    def assign(self, e: Expr) -> 'SAssign':
-        return SAssign(self, e)
+    def assign(self, e: Coercible) -> 'SAssign':
+        return SAssign(self, _coerce(e))
 
     def __str__(self) -> str:
         return self.x
@@ -207,23 +209,23 @@ class EBool(Expr):
         return str(self.x)
 
 class ETuple2(Expr):
-    def __init__(self, a: Expr, b: Expr) -> None:
-        self.a = self._coerce(a)
-        self.b = self._coerce(b)
+    def __init__(self, a: Coercible, b: Coercible) -> None:
+        self.a = _coerce(a)
+        self.b = _coerce(b)
 
     def __str__(self) -> str:
         return f'({str(self.a)}, {str(self.b)})'
 
 class ESet(Expr):
-    def __init__(self, xs: Set[Expr]) -> None:
-        self.xs = {self._coerce(x) for x in xs}
+    def __init__(self, xs: Set[Coercible]) -> None:
+        self.xs = {_coerce(x) for x in xs}
 
     def __str__(self) -> str:
         return '{' + ', '.join(str(x) for x in self.xs) + '}'
 
 class EUnaryOp(Expr):
-    def __init__(self, x: Expr) -> None:
-        self.x = self._coerce(x)
+    def __init__(self, x: Coercible) -> None:
+        self.x = _coerce(x)
 
 class ETuple2First(EUnaryOp):
     def __str__(self) -> str:
@@ -234,9 +236,9 @@ class ETuple2Second(EUnaryOp):
         return f'({str(self.x)})[1]'
 
 class EBinaryOp(Expr):
-    def __init__(self, lhs: Expr, rhs: Expr) -> None:
-        self.lhs = self._coerce(lhs)
-        self.rhs = self._coerce(rhs)
+    def __init__(self, lhs: Coercible, rhs: Coercible) -> None:
+        self.lhs = _coerce(lhs)
+        self.rhs = _coerce(rhs)
 
 class EIntAdd(EBinaryOp):
     def __str__(self) -> str:
@@ -307,9 +309,9 @@ class Stmt(AstNode):
     pass
 
 class SAssign(Stmt):
-    def __init__(self, x: EVar, e: Expr) -> None:
+    def __init__(self, x: EVar, e: Coercible) -> None:
         self.x = x
-        self.e = e
+        self.e = _coerce(e)
 
 # Transactions #################################################################
 Transaction = List[Stmt]

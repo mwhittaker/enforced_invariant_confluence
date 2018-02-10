@@ -27,11 +27,13 @@ class Checker:
         return ast.EVar(name)
 
     def _typecheck(self) -> None:
-        for inv in self.invariants.values():
-            typecheck._typecheck_invariant(inv, self.type_env)
+        for name, inv in self.invariants.items():
+            inv = typecheck.typecheck_invariant(inv, self.type_env)
+            self.invariants[name] = inv
 
-        for txn in self.transactions.values():
-            typecheck._typecheck_txn(txn, self.type_env)
+        for name, txn in self.transactions.items():
+            txn = typecheck.typecheck_txn(txn, self.type_env)
+            self.transactions[name] = txn
 
     # TODO(mwhittaker): Right now, temporary variables are joined together and
     # included when checking for properties like commutativity. Think about
@@ -52,10 +54,10 @@ class Checker:
     def tuple2(self, name: str, a: ast.Crdt, b: ast.Crdt) -> ast.EVar:
         return self._register_var(name, ast.CTuple2(a, b))
 
-    def set_union(self, name: str, a: ast.Crdt) -> ast.EVar:
+    def set_union(self, name: str, a: ast.Type) -> ast.EVar:
         return self._register_var(name, ast.CSetUnion(a))
 
-    def set_intersect(self, name: str, a: ast.Crdt) -> ast.EVar:
+    def set_intersect(self, name: str, a: ast.Type) -> ast.EVar:
         return self._register_var(name, ast.CSetIntersect(a))
 
     def add_transaction(self, name: str, txn: ast.Transaction) -> None:
