@@ -49,19 +49,29 @@ def not_iconfluent_example(checker: Checker) -> None:
     print(checker.check_iconfluence())
 
 def main() -> None:
+    GACC = GuessAndCheckChecker
+    Z3C = Z3Checker
     checkers: Dict[str, Callable[[], Checker]] = {
-        'guess_and_check': GuessAndCheckChecker,
-        'z3': lambda: Z3Checker(verbose=1),
+        'guess_and_check': GACC,
+        'z3': lambda: Z3C(verbose=1),
+        'ensemble': lambda: EnsembleChecker([GACC(), Z3C()]),
     }
+
+    examples: Dict[str, Callable[[Checker], None]] = {
+        'iconfluent_example': iconfluent_example,
+        'not_iconfluent_example': not_iconfluent_example,
+    }
+
     for name, checker in checkers.items():
         msg = f'# {name} checker #'
         print('#' * len(msg))
         print(msg)
         print('#' * len(msg))
-        iconfluent_example(checker())
-        print()
-        not_iconfluent_example(checker())
-        print()
+
+        for f_name, f in sorted(examples.items()):
+            print(f'Checking {f_name}')
+            f(checker())
+            print()
 
 if __name__ == '__main__':
     main()

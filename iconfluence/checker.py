@@ -58,11 +58,11 @@ class Checker:
     def set_intersect(self, name: str, a: ast.Crdt) -> ast.EVar:
         return self._register_var(name, ast.CSetIntersect(a))
 
-    def add_transaction(self, name: str, txn: ast.Transaction):
+    def add_transaction(self, name: str, txn: ast.Transaction) -> None:
         assert name not in self.transactions
         self.transactions[name] = txn
 
-    def add_invariant(self, name: str, inv: ast.Invariant):
+    def add_invariant(self, name: str, inv: ast.Invariant) -> None:
         assert name not in self.invariants
         self.invariants[name] = inv
 
