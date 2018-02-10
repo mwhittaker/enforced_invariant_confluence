@@ -28,11 +28,11 @@ class EnsembleChecker(checker.Checker):
         xs = [checker.tuple2(name, a, b) for checker in self.checkers]
         return xs[0]
 
-    def set_union(self, name: str, a: ast.Crdt) -> ast.EVar:
+    def set_union(self, name: str, a: ast.Type) -> ast.EVar:
         xs = [checker.set_union(name, a) for checker in self.checkers]
         return xs[0]
 
-    def set_intersect(self, name: str, a: ast.Crdt) -> ast.EVar:
+    def set_intersect(self, name: str, a: ast.Type) -> ast.EVar:
         xs = [checker.set_intersect(name, a) for checker in self.checkers]
         return xs[0]
 

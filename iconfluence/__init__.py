@@ -4,4 +4,4 @@ from .ast import *
 from .checker import *
 from .ensemble import *
 from .guess_and_check import *
-from .z3 import *
+from .z3_ import *

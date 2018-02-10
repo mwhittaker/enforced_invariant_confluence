@@ -74,19 +74,20 @@ def _expr_to_z3(e: ast.Expr,
     if isinstance(e, ast.EVar):
         return [], _var_to_z3(e, venv, tenv)
     elif isinstance(e, ast.EInt):
-        return [], z3.Int(e.x)
+        return [], z3.IntVal(e.x)
     elif isinstance(e, ast.EBool):
-        return [], z3.Bool(e.x)
+        return [], z3.BoolVal(e.x)
     elif isinstance(e, ast.ETuple2):
         Tuple2 = _type_to_z3(e.typ)
         return flat_app(e.a, e.b, lambda a, b: Tuple2.tuple2(a, b))
     elif isinstance(e, ast.ESet):
-        es: List[z3.ExprRef] = []
         xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
+        x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))
+        es = [z3.ForAll(x, z3.Select(xs, x) == z3.BoolVal(False))]
         for x in e.xs:
             x_es, x_z3 = to_z3(x)
             es += x_es
-            xs = z3.Store(xs, x_z3, z3.Bool(True))
+            xs = z3.Store(xs, x_z3, z3.BoolVal(True))
         return es, xs
     elif isinstance(e, ast.ETuple2First):
         Tuple2 = _type_to_z3(e.x.typ)
@@ -109,14 +110,14 @@ def _expr_to_z3(e: ast.Expr,
     elif isinstance(e, ast.EBoolImpl):
         return flat_app(e.lhs, e.rhs, lambda l, r: z3.Implies(l, r))
     elif isinstance(e, ast.ESetUnion):
-        f = z3.Or(z3.Bool(True), z3.Bool(True)).decl()
+        f = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
         return flat_app(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
     elif isinstance(e, ast.ESetIntersect):
-        f = z3.And(z3.Bool(True), z3.Bool(True)).decl()
+        f = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
         return flat_app(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
     elif isinstance(e, ast.ESetDiff):
-        not_ = z3.Not(z3.Bool(True)).decl()
-        and_ = z3.And(z3.Bool(True), z3.Bool(True)).decl()
+        not_ = z3.Not(z3.BoolVal(True)).decl()
+        and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
         f = lambda l, r: z3.Map(and_, l, z3.Map(not_, r))
         return flat_app(e.lhs, e.rhs, f)
     elif isinstance(e, ast.ESetContains):
@@ -214,10 +215,10 @@ def _join_to_z3(crdt: ast.Crdt,
                                   rhs_second, rhs_venv, tenv, fresh)
         return a_z3s + b_z3s, _type_to_z3(crdt.to_type()).tuple2(a_z3, b_z3)
     elif isinstance(crdt, ast.CSetUnion):
-        or_ = z3.Or(z3.Bool(True), z3.Bool(True)).decl()
+        or_ = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
         return flat_app(lhs, rhs, lambda l, r: z3.Map(or_, l, r))
     elif isinstance(crdt, ast.CSetIntersect):
-        and_ = z3.And(z3.Bool(True), z3.Bool(True)).decl()
+        and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
         return flat_app(lhs, rhs, lambda l, r: z3.Map(and_, l, r))
     else:
         raise ValueError(f'Unkown CRDT {crdt}.')

@@ -24,7 +24,7 @@ class TestChecker(unittest.TestCase):
                               xs: List[z3.ExprRef],
                               ys: List[z3.ExprRef]) \
                               -> None:
-        self.assertEqual(len(xs), len(ys))
+        self.assertEqual(len(xs), len(ys), f'{xs} != {ys}')
         for x, y in zip(xs, ys):
             self.assert_z3_expr_equal(x, y)
 
@@ -60,27 +60,28 @@ class TestChecker(unittest.TestCase):
         x_tuple = ast.ETuple2(x_one, x_true)
         x_set = ast.ESet({x_one})
 
-        z3_one = z3.Int(1)
-        z3_two = z3.Int(2)
-        z3_true = z3.Bool(True)
-        z3_false = z3.Bool(False)
+        z3_one = z3.IntVal(1)
+        z3_two = z3.IntVal(2)
+        z3_true = z3.BoolVal(True)
+        z3_false = z3.BoolVal(False)
         z3_tuple = TupleIntBool.tuple2(z3_one, z3_true)
-        z3_set0 = z3.Const('_fresh_name_0',
-                          z3.ArraySort(z3.IntSort(), z3.BoolSort()))
+        z3_set0 = z3.Const('foo_0', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
         z3_set0 = z3.Store(z3_set0, z3_one, z3_true)
-        z4_set0 = z3.Const('_fresh_name_1',
-                          z3.ArraySort(z3.IntSort(), z3.BoolSort()))
-        z3_set1 = z3.Store(z4_set0, z3_one, z3_true)
+        z3_set1 = z3.Const('foo_1', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
+        z3_set1 = z3.Store(z3_set1, z3_one, z3_true)
+        z3_set2 = z3.Const('foo_2', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
+        z3_set2 = z3.Store(z3_set2, z3_one, z3_true)
+        z3_set3 = z3.Const('foo_3', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
+        z3_set3 = z3.Store(z3_set3, z3_one, z3_true)
 
         and_ = z3.And(z3_true, z3_true).decl()
         or_ = z3.Or(z3_true, z3_true).decl()
         not_ = z3.Not(z3_true).decl()
 
-        var_free_test_cases: List[Tuple[ast.Expr, z3.ExprRef]] = [
+        no_var_no_set_test_cases: List[Tuple[ast.Expr, z3.ExprRef]] = [
             (x_one, z3_one),
             (x_true, z3_true),
             (x_tuple, z3_tuple),
-            (x_set, z3_set0),
             (x_tuple[0], TupleIntBool.a(z3_tuple)),
             (x_tuple[1], TupleIntBool.b(z3_tuple)),
             (x_one + x_two, z3_one + z3_two),
@@ -89,10 +90,6 @@ class TestChecker(unittest.TestCase):
             (x_true | x_false, z3.Or(z3_true, z3_false)),
             (x_true & x_false, z3.And(z3_true, z3_false)),
             (x_true >> x_false, z3.Implies(z3_true, z3_false)),
-            (x_set.union(x_set), z3.Map(or_, z3_set0, z3_set1)),
-            (x_set.intersect(x_set), z3.Map(and_, z3_set0, z3_set1)),
-            (x_set.diff(x_set), z3.Map(and_, z3_set0, z3.Map(not_, z3_set1))),
-            (x_set.contains(x_one), z3.Select(z3_set0, z3_one)),
             (x_one.eq(x_two), z3_one == z3_two),
             (x_one.ne(x_two), z3_one != z3_two),
             (x_one < x_two, z3_one < z3_two),
@@ -101,15 +98,55 @@ class TestChecker(unittest.TestCase):
             (x_one >= x_two, z3_one >= z3_two),
         ]
 
-        for e, expected in var_free_test_cases:
+        for e, expected in no_var_no_set_test_cases:
             venv = VersionEnv(frozenset())
             tenv: Dict[str, ast.Type] = dict()
-            fresh = FreshName()
+            fresh = FreshName('foo')
 
             e = typecheck_expr(e, tenv)
             z3_es, z3_e = z3_checker._expr_to_z3(e, venv, tenv, fresh)
             self.assertEqual(len(z3_es), 0)
             self.assert_z3_expr_equal(z3_e, expected)
+
+
+        foo1_int = z3.Int('foo_1')
+        foo3_int = z3.Int('foo_3')
+        foo0_set = z3.Const('foo_0', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
+        foo2_set = z3.Const('foo_2', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
+        forall_1 = z3.ForAll(
+            foo1_int,
+            z3.Select(foo0_set, foo1_int) == z3.BoolVal(False))
+        forall_2 = z3.ForAll(
+            foo3_int,
+            z3.Select(foo2_set, foo3_int) == z3.BoolVal(False))
+
+        set_test_cases: List[Tuple[ast.Expr, List[z3.ExprRef], z3.ExprRef]] = [
+            (x_set,
+             [forall_1],
+             z3_set0),
+            (x_set.union(x_set),
+             [forall_1, forall_2],
+             z3.Map(or_, z3_set0, z3_set2)),
+            (x_set.intersect(x_set),
+             [forall_1, forall_2],
+             z3.Map(and_, z3_set0, z3_set2)),
+            (x_set.diff(x_set),
+             [forall_1, forall_2],
+             z3.Map(and_, z3_set0, z3.Map(not_, z3_set2))),
+            (x_set.contains(x_one),
+             [forall_1],
+             z3.Select(z3_set0, z3_one)),
+        ]
+
+        for e, expected_z3_es, expected_z3_e in set_test_cases:
+            venv = VersionEnv(frozenset())
+            tenv = dict()
+            fresh = FreshName('foo')
+
+            e = typecheck_expr(e, tenv)
+            z3_es, z3_e = z3_checker._expr_to_z3(e, venv, tenv, fresh)
+            self.assert_z3_exprs_equal(z3_es, expected_z3_es)
+            self.assert_z3_expr_equal(z3_e, expected_z3_e)
 
         x = ast.EVar('x')
         y = ast.EVar('y')
