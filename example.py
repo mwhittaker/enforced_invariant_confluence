@@ -102,6 +102,16 @@ def vacuously_iconfluent(checker: Checker) -> Decision:
     checker.add_invariant('false', EBool(False))
     return checker.check_iconfluence()
 
+def simple_set_unions(checker: Checker) -> Decision:
+    xs = checker.set_union('xs', TInt())
+    ys = checker.set_union('ys', TInt())
+    checker.add_transaction('union_xs', [xs.assign(xs.union(ys))])
+    checker.add_transaction('union_ys', [ys.assign(ys.union(xs))])
+    checker.add_invariant(
+        'some_subset',
+        xs.intersect(ys).eq(xs) | xs.intersect(ys).eq(ys))
+    return checker.check_iconfluence()
+
 def main() -> None:
     GACC = GuessAndCheckChecker
     Z3C = Z3Checker
@@ -115,6 +125,7 @@ def main() -> None:
         'all_datatypes_example': all_datatypes_example,
         'iconfluent_example': iconfluent_example,
         'not_iconfluent_example': not_iconfluent_example,
+        'simple_set_unions': simple_set_unions,
         'vacuously_iconfluent': vacuously_iconfluent,
     }
 
