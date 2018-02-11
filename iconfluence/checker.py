@@ -60,6 +60,9 @@ class Checker:
     def set_intersect(self, name: str, a: ast.Type) -> ast.EVar:
         return self._register_var(name, ast.CSetIntersect(a))
 
+    def option(self, name: str, a: ast.Crdt) -> ast.EVar:
+        return self._register_var(name, ast.COption(a))
+
     def add_transaction(self, name: str, txn: ast.Transaction) -> None:
         assert name not in self.transactions
         self.transactions[name] = txn

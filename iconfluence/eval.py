@@ -17,10 +17,22 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return (e.a, e.b)
     elif isinstance(e, ast.ESet):
         return {eval_expr(x, env) for x in e.xs}
+    elif isinstance(e, ast.ENone):
+        return None
+    elif isinstance(e, ast.ESome):
+        return eval_expr(e.x, env)
     elif isinstance(e, ast.ETuple2First):
         return eval_expr(e, env)[0]
     elif isinstance(e, ast.ETuple2Second):
         return eval_expr(e, env)[1]
+    elif isinstance(e, ast.EOptionIsNone):
+        return eval_expr(e.x, env) is None
+    elif isinstance(e, ast.EOptionIsSome):
+        return eval_expr(e.x, env) is not None
+    elif isinstance(e, ast.EOptionUnwrap):
+        x = eval_expr(e.x, env)
+        assert x is not None
+        return x
     elif isinstance(e, ast.EIntAdd):
         return eval_expr(e.lhs, env) + eval_expr(e.rhs, env)
     elif isinstance(e, ast.EIntSub):

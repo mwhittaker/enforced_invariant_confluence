@@ -44,6 +44,13 @@ class TSet(Type):
     def __str__(self) -> str:
         return f'Set[{str(self.a)}]'
 
+class TOption(Type):
+    def __init__(self, a: Type) -> None:
+        self.a = a
+
+    def __str__(self) -> str:
+        return f'Option[{str(self.a)}]'
+
 # CRDTs ########################################################################
 class Crdt(AstNode):
     def to_type(self) -> Type:
@@ -87,6 +94,13 @@ class CSetIntersect(Crdt):
     def to_type(self) -> Type:
         return TSet(self.a)
 
+class COption(Crdt):
+    def __init__(self, a: Crdt) -> None:
+        self.a = a
+
+    def to_type(self) -> Type:
+        return TOption(self.a.to_type())
+
 # Expressions ##################################################################
 Coercible = Union[bool, int, tuple, set, 'Expr']
 
@@ -117,6 +131,15 @@ class Expr(AstNode):
             return ETuple2Second(self)
         else:
             raise ValueError(f'Unsupported index {i}.')
+
+    def is_none(self) -> 'Expr':
+        return EOptionIsNone(self)
+
+    def is_some(self) -> 'Expr':
+        return EOptionIsSome(self)
+
+    def unwrap(self) -> 'Expr':
+        return EOptionUnwrap(self)
 
     def __add__(self, rhs: Coercible) -> 'Expr':
         return EIntAdd(self, _coerce(rhs))
@@ -223,6 +246,20 @@ class ESet(Expr):
     def __str__(self) -> str:
         return '{' + ', '.join(str(x) for x in self.xs) + '}'
 
+class ENone(Expr):
+    def __init__(self, t: Type) -> None:
+        self.t = t
+
+    def __str__(self) -> str:
+        return 'None'
+
+class ESome(Expr):
+    def __init__(self, x: Coercible) -> None:
+        self.x = _coerce(x)
+
+    def __str__(self) -> str:
+        return f'Some({str(self.x)})'
+
 class EUnaryOp(Expr):
     def __init__(self, x: Coercible) -> None:
         self.x = _coerce(x)
@@ -234,6 +271,18 @@ class ETuple2First(EUnaryOp):
 class ETuple2Second(EUnaryOp):
     def __str__(self) -> str:
         return f'({str(self.x)})[1]'
+
+class EOptionIsNone(EUnaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.x)} is None)'
+
+class EOptionIsSome(EUnaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.x)} is not None)'
+
+class EOptionUnwrap(EUnaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.x)}.unwrap())'
 
 class EBinaryOp(Expr):
     def __init__(self, lhs: Coercible, rhs: Coercible) -> None:

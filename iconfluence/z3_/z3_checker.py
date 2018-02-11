@@ -48,6 +48,11 @@ def _type_to_z3(typ: ast.Type) -> z3.SortRef:
         return Tuple2.create()
     elif isinstance(typ, ast.TSet):
         return z3.ArraySort(_type_to_z3(typ.a), z3.BoolSort())
+    elif isinstance(typ, ast.TOption):
+        Option = z3.Datatype(str(typ))
+        Option.declare('none')
+        Option.declare('some', ('x',  _type_to_z3(typ.a)))
+        return Option.create()
     else:
         raise ValueError(f'Unkown type {typ}.')
 
@@ -89,6 +94,13 @@ def _expr_to_z3(e: ast.Expr,
             es += x_es
             xs = z3.Store(xs, x_z3, z3.BoolVal(True))
         return es, xs
+    elif isinstance(e, ast.ENone):
+        Option = _type_to_z3(e.typ)
+        return [], Option.none
+    elif isinstance(e, ast.ESome):
+        Option = _type_to_z3(e.typ)
+        z3_es, z3_e = to_z3(e.x)
+        return z3_es, Option.some(z3_e)
     elif isinstance(e, ast.ETuple2First):
         Tuple2 = _type_to_z3(e.x.typ)
         t_es, t = to_z3(e.x)
@@ -97,6 +109,18 @@ def _expr_to_z3(e: ast.Expr,
         Tuple2 = _type_to_z3(e.x.typ)
         t_es, t = to_z3(e.x)
         return t_es, Tuple2.b(t)
+    elif isinstance(e, ast.EOptionIsNone):
+        Option = _type_to_z3(e.x.typ)
+        z3_es, z3_e = to_z3(e.x)
+        return z3_es, Option.is_none(z3_e)
+    elif isinstance(e, ast.EOptionIsSome):
+        Option = _type_to_z3(e.x.typ)
+        z3_es, z3_e = to_z3(e.x)
+        return z3_es, Option.is_some(z3_e)
+    elif isinstance(e, ast.EOptionUnwrap):
+        Option = _type_to_z3(e.x.typ)
+        z3_es, z3_e = to_z3(e.x)
+        return z3_es, Option.x(z3_e)
     elif isinstance(e, ast.EIntAdd):
         return flat_app(e.lhs, e.rhs, lambda l, r: l + r)
     elif isinstance(e, ast.EIntSub):
@@ -172,6 +196,38 @@ def _apply_txn(solver: z3.Solver,
         solver.add(e)
     return venv
 
+def _join_z3_to_z3(crdt: ast.Crdt,
+                   lhs: z3.ExprRef,
+                   rhs: z3.ExprRef) \
+                   -> z3.ExprRef:
+    if isinstance(crdt, ast.CIntMax):
+        return z3.If(lhs >= rhs, lhs, rhs)
+    elif isinstance(crdt, ast.CIntMin):
+        return z3.If(lhs <= rhs, lhs, rhs)
+    elif isinstance(crdt, ast.CBoolOr):
+        return z3.Or(lhs, rhs)
+    elif isinstance(crdt, ast.CBoolAnd):
+        return z3.And(lhs, rhs)
+    elif isinstance(crdt, ast.CTuple2):
+        Tuple2 = _type_to_z3(crdt.to_type())
+        a = _join_z3_to_z3(crdt.a, Tuple2.a(lhs), Tuple2.a(rhs))
+        b = _join_z3_to_z3(crdt.b, Tuple2.b(lhs), Tuple2.b(rhs))
+        return Tuple2.tuple2(a, b)
+    elif isinstance(crdt, ast.CSetUnion):
+        or_ = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
+        return z3.Map(or_, lhs, rhs)
+    elif isinstance(crdt, ast.CSetIntersect):
+        and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
+        return z3.Map(and_, lhs, rhs)
+    elif isinstance(crdt, ast.COption):
+        Option = _type_to_z3(crdt.to_type())
+        joined = _join_z3_to_z3(crdt.a, Option.x(lhs), Option.x(rhs))
+        return z3.If(Option.is_none(lhs), rhs,
+               z3.If(Option.is_none(rhs), lhs,
+               Option.some(joined)))
+    else:
+        raise ValueError(f'Unkown CRDT {crdt}.')
+
 def _join_to_z3(crdt: ast.Crdt,
                 lhs: ast.Expr,
                 lhs_venv: VersionEnv,
@@ -180,48 +236,9 @@ def _join_to_z3(crdt: ast.Crdt,
                 tenv: TypeEnv,
                 fresh: FreshName) \
                 -> Tuple[List[z3.ExprRef], z3.ExprRef]:
-    def flat_app(lhs: ast.Expr,
-                 rhs: ast.Expr,
-                 f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
-                 -> Tuple[List[z3.ExprRef], z3.ExprRef]:
-        lhs_z3s, lhs_z3 = _expr_to_z3(lhs, lhs_venv, tenv, fresh)
-        rhs_z3s, rhs_z3 = _expr_to_z3(rhs, rhs_venv, tenv, fresh)
-        return lhs_z3s + rhs_z3s, f(lhs_z3, rhs_z3)
-
-    if isinstance(crdt, ast.CIntMax):
-        return flat_app(lhs, rhs, lambda l, r: z3.If(l >= r, l, r))
-    elif isinstance(crdt, ast.CIntMin):
-        return flat_app(lhs, rhs, lambda l, r: z3.If(l <= r, l, r))
-    elif isinstance(crdt, ast.CBoolOr):
-        return flat_app(lhs, rhs, lambda l, r: z3.Or(l, r))
-    elif isinstance(crdt, ast.CBoolAnd):
-        return flat_app(lhs, rhs, lambda l, r: z3.And(l, r))
-    elif isinstance(crdt, ast.CTuple2):
-        lhs_first = ast.ETuple2First(lhs)
-        lhs_second = ast.ETuple2Second(lhs)
-        rhs_first = ast.ETuple2First(rhs)
-        rhs_second = ast.ETuple2Second(rhs)
-
-        lhs_type = cast(ast.TTuple2, lhs.typ)
-        rhs_type = cast(ast.TTuple2, rhs.typ)
-        lhs_first.typ = lhs_type.a
-        lhs_second.typ = lhs_type.b
-        rhs_first.typ = rhs_type.a
-        rhs_second.typ = rhs_type.b
-
-        a_z3s, a_z3 = _join_to_z3(crdt.a, lhs_first, lhs_venv,
-                                  rhs_first, rhs_venv, tenv, fresh)
-        b_z3s, b_z3 = _join_to_z3(crdt.b, lhs_second, lhs_venv,
-                                  rhs_second, rhs_venv, tenv, fresh)
-        return a_z3s + b_z3s, _type_to_z3(crdt.to_type()).tuple2(a_z3, b_z3)
-    elif isinstance(crdt, ast.CSetUnion):
-        or_ = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return flat_app(lhs, rhs, lambda l, r: z3.Map(or_, l, r))
-    elif isinstance(crdt, ast.CSetIntersect):
-        and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return flat_app(lhs, rhs, lambda l, r: z3.Map(and_, l, r))
-    else:
-        raise ValueError(f'Unkown CRDT {crdt}.')
+    lhs_z3_es, lhs_z3_e = _expr_to_z3(lhs, lhs_venv, tenv, fresh)
+    rhs_z3_es, rhs_z3_e = _expr_to_z3(rhs, rhs_venv, tenv, fresh)
+    return lhs_z3_es + rhs_z3_es, _join_z3_to_z3(crdt, lhs_z3_e, rhs_z3_e)
 
 class Z3Checker(checker.Checker):
     def __init__(self, verbose: int = 0) -> None:

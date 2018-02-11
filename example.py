@@ -63,6 +63,8 @@ def all_datatypes_example(checker: Checker) -> None:
     y_set_intersect = checker.set_intersect('y_set_intersect', TInt())
     x_tuple2 = checker.tuple2('x_tuple2', CIntMax(), CIntMin())
     y_tuple2 = checker.tuple2('y_tuple2', CIntMax(), CIntMin())
+    x_option = checker.option('x_option', CIntMax())
+    y_option = checker.option('y_option', CIntMax())
 
     checker.add_transaction('t1', [
         x_int_max.assign(((y_int_max + 1) * 2) - 3),
@@ -74,6 +76,9 @@ def all_datatypes_example(checker: Checker) -> None:
         x_set_intersect.assign(
             y_set_intersect.intersect({1, 2}).union({3, 4}).diff({5, 6})),
         x_tuple2.assign(ETuple2(y_tuple2[0] + y_tuple2[1], 2)),
+        x_option.assign(ENone(CIntMax().to_type())),
+        y_option.assign(ESome(2)),
+        x_option.assign(ESome(y_option.unwrap())),
     ])
 
     checker.add_invariant('inv0', x_int_max >= y_int_max)
@@ -97,6 +102,10 @@ def all_datatypes_example(checker: Checker) -> None:
     checker.add_invariant('inv18', x_set_intersect.contains(1))
     checker.add_invariant('inv19', y_set_intersect.contains(1))
     checker.add_invariant('inv20', x_tuple2.eq(y_tuple2))
+    checker.add_invariant('inv21', x_option.is_none())
+    checker.add_invariant('inv22', x_option.is_some())
+    checker.add_invariant('inv23', x_option.eq(y_option))
+    checker.add_invariant('inv24', x_option.ne(y_option))
 
     print(checker.check_iconfluence())
 

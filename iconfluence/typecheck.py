@@ -29,6 +29,11 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         types = {_typecheck_expr(x, env).typ for x in e.xs}
         _assert(len(types) == 1, f'Set with multiple types: {types}.')
         e.typ = ast.TSet(list(types)[0])
+    elif isinstance(e, ast.ENone):
+        e.typ = ast.TOption(e.t)
+    elif isinstance(e, ast.ESome):
+        typ = _typecheck_expr(e.x, env).typ
+        e.typ = ast.TOption(typ)
     elif isinstance(e, ast.ETuple2First):
         typ = _typecheck_expr(e.x, env).typ
         _assert(isinstance(typ, ast.TTuple2), f'Invalid argument {e}.')
@@ -37,6 +42,15 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         typ = _typecheck_expr(e.x, env).typ
         _assert(isinstance(typ, ast.TTuple2), f'Invalid argument {e}.')
         e.typ = cast(ast.TTuple2, typ).b
+    elif (isinstance(e, ast.EOptionIsNone) or
+          isinstance(e, ast.EOptionIsSome)):
+        typ = _typecheck_expr(e.x, env).typ
+        _assert(isinstance(typ, ast.TOption), 'Ill typed operand {e.x}.')
+        e.typ = ast.TBool()
+    elif isinstance(e, ast.EOptionUnwrap):
+        typ = _typecheck_expr(e.x, env).typ
+        _assert(isinstance(typ, ast.TOption), 'Ill typed operand {e.x}.')
+        e.typ = cast(ast.TOption, typ).a
     elif (isinstance(e, ast.EIntAdd) or
           isinstance(e, ast.EIntSub) or
           isinstance(e, ast.EIntMul)):

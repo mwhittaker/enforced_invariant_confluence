@@ -33,6 +33,15 @@ class GuessAndCheckChecker(checker.Checker):
             return lhs.union(rhs)
         elif isinstance(crdt, ast.CSetIntersect):
             return lhs.intersect(rhs)
+        elif isinstance(crdt, ast.COption):
+            if lhs is None:
+                return rhs
+            if rhs is None:
+                return lhs
+            else:
+                return self._join(crdt.a, lhs, rhs)
+        else:
+            raise ValueError(f'Unrecognized CRDT {crdt}.')
 
     def _join_envs(self, val_env1: ValEnv, val_env2: ValEnv) -> ValEnv:
         env: ValEnv = {}
@@ -52,6 +61,9 @@ class GuessAndCheckChecker(checker.Checker):
         elif isinstance(typ, ast.TSet):
             cardinality = random.randint(1, 10)
             return {self._random_value(typ.a) for _ in range(cardinality)}
+        elif isinstance(typ, ast.TOption):
+            is_none = random.choice([True, False])
+            return None if is_none else self._random_value(typ.a)
         else:
             raise ValueError(f'Unrecognized type {typ}.')
 
