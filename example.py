@@ -17,10 +17,6 @@ def iconfluent_example(checker: Checker) -> Decision:
         y.assign(tmp),
     ])
 
-    one = EInt(1)
-    xs = ESet({one})
-    ys = ESet({one})
-
     checker.add_invariant('x_eq_y', x.eq(y))
 
     return checker.check_iconfluence()
