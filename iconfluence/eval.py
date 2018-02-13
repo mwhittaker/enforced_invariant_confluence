@@ -79,6 +79,12 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         m = eval_expr(e.a, env)
         m[eval_expr(e.b, env)] = eval_expr(e.c, env)
         return m
+    elif isinstance(e, ast.EIf):
+        b = eval_expr(e.a, env)
+        if b:
+            return eval_expr(e.b, env)
+        else:
+            return eval_expr(e.c, env)
     else:
         raise ValueError(f'Unkown expression {e}.')
 

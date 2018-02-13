@@ -199,6 +199,8 @@ def _expr_to_z3(e: ast.Expr,
         Option = _type_to_z3(ast.TOption(typ.b))
         return flat_app3(e.a, e.b, e.c,
                          lambda a, b, c: z3.Store(a, b, Option.some(c)))
+    elif isinstance(e, ast.EIf):
+        return flat_app3(e.a, e.b, e.c, z3.If)
     else:
         raise ValueError(f'Unkown expression {e}.')
 

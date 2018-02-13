@@ -131,6 +131,14 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         v_typ = _typecheck_expr(e.c, env).typ
         _assert(map_typ.b == v_typ, f'Ill typed operand {e.c}.')
         e.typ = map_typ
+    elif isinstance(e, ast.EIf):
+        b_typ = _typecheck_expr(e.a, env).typ
+        if_typ = _typecheck_expr(e.b, env).typ
+        else_typ = _typecheck_expr(e.c, env).typ
+        _assert(b_typ == ast.TBool(), f'Ill typed operand {e.a}.')
+        _assert(if_typ == else_typ,
+                f'Inconsistently typed operands {e.b} and {e.c}.')
+        e.typ = if_typ
     else:
         raise ValueError(f'Unkown expression {e}.')
 

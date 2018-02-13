@@ -403,6 +403,10 @@ class EMapSet(ETernaryOp):
     def __str__(self) -> str:
         return f'({self.a}[{self.b}] <- {self.c})'
 
+class EIf(ETernaryOp):
+    def __str__(self) -> str:
+        return f'(if ({self.a}) then {self.b} else {self.c})'
+
 # Statements ###################################################################
 class Stmt(AstNode):
     pass

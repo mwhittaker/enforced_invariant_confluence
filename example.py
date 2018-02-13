@@ -50,6 +50,7 @@ def all_datatypes_example(checker: Checker) -> Decision:
     checker.add_transaction('t1', [
         x_int_max.assign(((y_int_max + 1) * 2) - 3),
         x_int_min.assign(((y_int_min + 1) * 2) - 3),
+        x_int_min.assign(EIf(y_int_max >= x_int_max, y_int_max, x_int_max)),
         x_bool_or.assign(((y_bool_or & True) | False) >> True),
         x_bool_and.assign(((y_bool_and & True) | False) >> True),
         x_set_union.assign(
