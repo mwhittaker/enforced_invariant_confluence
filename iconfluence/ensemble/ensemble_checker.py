@@ -36,6 +36,9 @@ class EnsembleChecker(checker.Checker):
     def set_intersect(self, name: str, a: ast.Type) -> ast.EVar:
         return self._apply(lambda checker: checker.set_intersect(name, a))
 
+    def map(self, name: str, a: ast.Type, b: ast.Crdt) -> ast.EVar:
+        return self._apply(lambda checker: checker.map(name, a, b))
+
     def option(self, name: str, a: ast.Crdt) -> ast.EVar:
         return self._apply(lambda checker: checker.option(name, a))
 

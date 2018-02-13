@@ -33,6 +33,14 @@ class GuessAndCheckChecker(checker.Checker):
             return lhs.union(rhs)
         elif isinstance(crdt, ast.CSetIntersect):
             return lhs.intersect(rhs)
+        elif isinstance(crdt, ast.CMap):
+            joined = lhs.copy()
+            for k in rhs:
+                if k in joined:
+                    joined[k] = self._join(crdt.b, lhs[k], rhs[k])
+                else:
+                    joined[k] = rhs[k]
+            return joined
         elif isinstance(crdt, ast.COption):
             if lhs is None:
                 return rhs
@@ -61,6 +69,10 @@ class GuessAndCheckChecker(checker.Checker):
         elif isinstance(typ, ast.TSet):
             cardinality = random.randint(1, 10)
             return {self._random_value(typ.a) for _ in range(cardinality)}
+        elif isinstance(typ, ast.TMap):
+            cardinality = random.randint(1, 10)
+            return {self._random_value(typ.a): self._random_value(typ.b)
+                    for _ in range(cardinality)}
         elif isinstance(typ, ast.TOption):
             is_none = random.choice([True, False])
             return None if is_none else self._random_value(typ.a)

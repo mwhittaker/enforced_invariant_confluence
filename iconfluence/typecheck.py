@@ -29,6 +29,15 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         types = {_typecheck_expr(x, env).typ for x in e.xs}
         _assert(len(types) == 1, f'Set with multiple types: {types}.')
         e.typ = ast.TSet(list(types)[0])
+    elif isinstance(e, ast.EMap):
+        _assert(len(e.kvs) >= 0, 'Illegal empty map found.')
+        key_types = {_typecheck_expr(k, env).typ for k in e.kvs.keys()}
+        value_types = {_typecheck_expr(v, env).typ for v in e.kvs.values()}
+        _assert(len(key_types) == 1,
+                f'Map with multiple key types: {key_types}.')
+        _assert(len(value_types) == 1,
+                f'Map with multiple value types: {value_types}.')
+        e.typ = ast.TMap(list(key_types)[0], list(value_types)[0])
     elif isinstance(e, ast.ENone):
         e.typ = ast.TOption(e.t)
     elif isinstance(e, ast.ESome):
@@ -84,6 +93,20 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         rhs_typ = _typecheck_expr(e.rhs, env).typ
         _assert(lhs_typ.a == rhs_typ, f'Ill typed operand {e.rhs}.')
         e.typ = ast.TBool()
+    elif isinstance(e, ast.EMapContainsKey):
+        lhs_typ = _typecheck_expr(e.lhs, env).typ
+        _assert(isinstance(lhs_typ, ast.TMap), f'Ill typed operand {e.lhs}.')
+        lhs_typ = cast(ast.TMap, lhs_typ)
+        rhs_typ = _typecheck_expr(e.rhs, env).typ
+        _assert(lhs_typ.a == rhs_typ, f'Ill typed operand {e.rhs}.')
+        e.typ = ast.TBool()
+    elif isinstance(e, ast.EMapGet):
+        lhs_typ = _typecheck_expr(e.lhs, env).typ
+        _assert(isinstance(lhs_typ, ast.TMap), f'Ill typed operand {e.lhs}.')
+        lhs_typ = cast(ast.TMap, lhs_typ)
+        rhs_typ = _typecheck_expr(e.rhs, env).typ
+        _assert(lhs_typ.a == rhs_typ, f'Ill typed operand {e.rhs}.')
+        e.typ = lhs_typ.b
     elif (isinstance(e, ast.EEq) or isinstance(e, ast.ENe)):
         lhs_typ = _typecheck_expr(e.lhs, env).typ
         rhs_typ = _typecheck_expr(e.rhs, env).typ
@@ -99,6 +122,15 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         _assert(_typecheck_expr(e.rhs, env).typ == ast.TInt(),
                 f'Ill typed operand {e.rhs}.')
         e.typ = ast.TBool()
+    elif isinstance(e, ast.EMapSet):
+        map_typ = _typecheck_expr(e.a, env).typ
+        _assert(isinstance(map_typ, ast.TMap), f'Ill typed operand {e.a}.')
+        map_typ = cast(ast.TMap, map_typ)
+        k_typ = _typecheck_expr(e.b, env).typ
+        _assert(map_typ.a == k_typ, f'Ill typed operand {e.b}.')
+        v_typ = _typecheck_expr(e.c, env).typ
+        _assert(map_typ.b == v_typ, f'Ill typed operand {e.c}.')
+        e.typ = map_typ
     else:
         raise ValueError(f'Unkown expression {e}.')
 

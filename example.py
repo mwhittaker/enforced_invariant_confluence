@@ -56,7 +56,7 @@ def all_datatypes_example(checker: Checker) -> Decision:
             y_set_union.intersect({1, 2}).union({3, 4}).diff({5, 6})),
         x_set_intersect.assign(
             y_set_intersect.intersect({1, 2}).union({3, 4}).diff({5, 6})),
-        x_tuple2.assign(ETuple2(y_tuple2[0] + y_tuple2[1], 2)),
+        x_tuple2.assign(ETuple2(y_tuple2.first() + y_tuple2.second(), 2)),
         x_option.assign(ENone(CIntMax().to_type())),
         y_option.assign(ESome(2)),
         x_option.assign(ESome(y_option.unwrap())),
@@ -108,6 +108,42 @@ def simple_set_unions(checker: Checker) -> Decision:
         xs.intersect(ys).eq(xs) | xs.intersect(ys).eq(ys))
     return checker.check_iconfluence()
 
+def map_example(checker: Checker) -> Decision:
+    x = checker.int_max('x')
+    y = checker.int_max('y')
+    xs = checker.map('xs', TInt(), CIntMax())
+    ys = checker.map('ys', TInt(), CIntMax())
+    checker.add_transaction('set_xs', [
+        xs.assign(xs.set(x, x)),
+        xs.assign(xs.set(1, 1)),
+    ])
+    checker.add_transaction('set_ys', [
+        ys.assign(ys.set(y, y)),
+        ys.assign(ys.set(1, 1)),
+    ])
+    checker.add_invariant('literal_contains_key',
+        EMap({1: 1, 2: 2}).contains_key(1))
+    checker.add_invariant('contains_key', xs.contains_key(1))
+    checker.add_invariant('get', xs[1].eq(1))
+    return checker.check_iconfluence()
+
+def nested_map_example(checker: Checker) -> Decision:
+    x = checker.int_max('x')
+    y = checker.int_max('y')
+    xs = checker.map('xs', TInt(), CMap(TInt(), CIntMax()))
+    ys = checker.map('ys', TInt(), CMap(TInt(), CIntMax()))
+    checker.add_transaction('set_xs', [
+        xs.assign(xs.set(x, {x: x})),
+        xs.assign(xs.set(1, {1: 1})),
+    ])
+    checker.add_transaction('set_ys', [
+        ys.assign(ys.set(y, {y: y})),
+        ys.assign(ys.set(1, {1: 1})),
+    ])
+    checker.add_invariant('contains_key', xs.contains_key(1))
+    checker.add_invariant('get', xs[1].eq({1: 1}))
+    return checker.check_iconfluence()
+
 def main() -> None:
     GACC = GuessAndCheckChecker
     Z3C = Z3Checker
@@ -120,6 +156,8 @@ def main() -> None:
     examples: Dict[str, Callable[[Checker], Decision]] = {
         'all_datatypes_example': all_datatypes_example,
         'iconfluent_example': iconfluent_example,
+        'map_example': map_example,
+        'nested_map_example': nested_map_example,
         'not_iconfluent_example': not_iconfluent_example,
         'simple_set_unions': simple_set_unions,
         'vacuously_iconfluent': vacuously_iconfluent,

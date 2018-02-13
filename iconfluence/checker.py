@@ -60,6 +60,9 @@ class Checker:
     def set_intersect(self, name: str, a: ast.Type) -> ast.EVar:
         return self._register_var(name, ast.CSetIntersect(a))
 
+    def map(self, name: str, a: ast.Type, b: ast.Crdt) -> ast.EVar:
+        return self._register_var(name, ast.CMap(a, b))
+
     def option(self, name: str, a: ast.Crdt) -> ast.EVar:
         return self._register_var(name, ast.COption(a))
 

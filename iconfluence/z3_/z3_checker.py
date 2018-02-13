@@ -48,6 +48,10 @@ def _type_to_z3(typ: ast.Type) -> z3.SortRef:
         return Tuple2.create()
     elif isinstance(typ, ast.TSet):
         return z3.ArraySort(_type_to_z3(typ.a), z3.BoolSort())
+    elif isinstance(typ, ast.TMap):
+        key_sort = _type_to_z3(typ.a)
+        val_sort = _type_to_z3(ast.TOption(typ.b))
+        return z3.ArraySort(key_sort, val_sort)
     elif isinstance(typ, ast.TOption):
         Option = z3.Datatype(str(typ))
         Option.declare('none')
@@ -68,13 +72,24 @@ def _expr_to_z3(e: ast.Expr,
     def to_z3(e_: ast.Expr) -> Tuple[List[z3.ExprRef], z3.ExprRef]:
         return _expr_to_z3(e_, venv, tenv, fresh)
 
-    def flat_app(lhs: ast.Expr,
-                 rhs: ast.Expr,
-                 f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
-                 -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+    def flat_app2(lhs: ast.Expr,
+                  rhs: ast.Expr,
+                  f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
+                  -> Tuple[List[z3.ExprRef], z3.ExprRef]:
         es_lhs, lhs_z3 = to_z3(lhs)
         es_rhs, rhs_z3 = to_z3(rhs)
         return es_lhs + es_rhs, f(lhs_z3, rhs_z3)
+
+    def flat_app3(a: ast.Expr,
+                  b: ast.Expr,
+                  c: ast.Expr,
+                  f: Callable[[z3.ExprRef, z3.ExprRef, z3.ExprRef],
+                               z3.ExprRef]) \
+                  -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+        a_z3s, a_z3 = to_z3(a)
+        b_z3s, b_z3 = to_z3(b)
+        c_z3s, c_z3 = to_z3(c)
+        return a_z3s + b_z3s + c_z3s, f(a_z3, b_z3, c_z3)
 
     if isinstance(e, ast.EVar):
         return [], _var_to_z3(e, venv, tenv)
@@ -84,7 +99,7 @@ def _expr_to_z3(e: ast.Expr,
         return [], z3.BoolVal(e.x)
     elif isinstance(e, ast.ETuple2):
         Tuple2 = _type_to_z3(e.typ)
-        return flat_app(e.a, e.b, lambda a, b: Tuple2.tuple2(a, b))
+        return flat_app2(e.a, e.b, lambda a, b: Tuple2.tuple2(a, b))
     elif isinstance(e, ast.ESet):
         xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
         x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))
@@ -94,6 +109,18 @@ def _expr_to_z3(e: ast.Expr,
             es += x_es
             xs = z3.Store(xs, x_z3, z3.BoolVal(True))
         return es, xs
+    elif isinstance(e, ast.EMap):
+        typ = cast(ast.TMap, e.typ)
+        kvs = z3.Const(fresh.get(), _type_to_z3(typ))
+        k = z3.Const(fresh.get(), _type_to_z3(typ.a))
+        Option = _type_to_z3(ast.TOption(typ.b))
+        es = [z3.ForAll(k, z3.Select(kvs, k) == Option.none)]
+        for k, v in e.kvs.items():
+            k_es, k_z3 = to_z3(k)
+            v_es, v_z3 = to_z3(v)
+            es += (k_es + v_es)
+            kvs = z3.Store(kvs, k_z3, Option.some(v_z3))
+        return es, kvs
     elif isinstance(e, ast.ENone):
         Option = _type_to_z3(e.typ)
         return [], Option.none
@@ -122,42 +149,56 @@ def _expr_to_z3(e: ast.Expr,
         z3_es, z3_e = to_z3(e.x)
         return z3_es, Option.x(z3_e)
     elif isinstance(e, ast.EIntAdd):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l + r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l + r)
     elif isinstance(e, ast.EIntSub):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l - r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l - r)
     elif isinstance(e, ast.EIntMul):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l * r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l * r)
     elif isinstance(e, ast.EBoolOr):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Or(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Or(l, r))
     elif isinstance(e, ast.EBoolAnd):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.And(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.And(l, r))
     elif isinstance(e, ast.EBoolImpl):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Implies(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Implies(l, r))
     elif isinstance(e, ast.ESetUnion):
         f = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
     elif isinstance(e, ast.ESetIntersect):
         f = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Map(f, l, r))
     elif isinstance(e, ast.ESetDiff):
         not_ = z3.Not(z3.BoolVal(True)).decl()
         and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
         f = lambda l, r: z3.Map(and_, l, z3.Map(not_, r))
-        return flat_app(e.lhs, e.rhs, f)
+        return flat_app2(e.lhs, e.rhs, f)
     elif isinstance(e, ast.ESetContains):
-        return flat_app(e.lhs, e.rhs, lambda l, r: z3.Select(l, r))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Select(l, r))
+    elif isinstance(e, ast.EMapContainsKey):
+        typ = cast(ast.TMap, e.lhs.typ)
+        Option = _type_to_z3(ast.TOption(typ.b))
+        return flat_app2(e.lhs, e.rhs,
+                        lambda l, r: Option.is_none(z3.Select(l, r)))
+    elif isinstance(e, ast.EMapGet):
+        typ = cast(ast.TMap, e.lhs.typ)
+        Option = _type_to_z3(ast.TOption(typ.b))
+        return flat_app2(e.lhs, e.rhs, lambda l, r: Option.x(z3.Select(l, r)))
     elif isinstance(e, ast.EEq):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l == r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l == r)
     elif isinstance(e, ast.ENe):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l != r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l != r)
     elif isinstance(e, ast.EIntLt):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l < r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l < r)
     elif isinstance(e, ast.EIntLe):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l <= r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l <= r)
     elif isinstance(e, ast.EIntGt):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l > r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l > r)
     elif isinstance(e, ast.EIntGe):
-        return flat_app(e.lhs, e.rhs, lambda l, r: l >= r)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: l >= r)
+    elif isinstance(e, ast.EMapSet):
+        typ = cast(ast.TMap, e.typ)
+        Option = _type_to_z3(ast.TOption(typ.b))
+        return flat_app3(e.a, e.b, e.c,
+                         lambda a, b, c: z3.Store(a, b, Option.some(c)))
     else:
         raise ValueError(f'Unkown expression {e}.')
 
@@ -198,33 +239,48 @@ def _apply_txn(solver: z3.Solver,
 
 def _join_z3_to_z3(crdt: ast.Crdt,
                    lhs: z3.ExprRef,
-                   rhs: z3.ExprRef) \
-                   -> z3.ExprRef:
+                   rhs: z3.ExprRef,
+                   fresh: FreshName) \
+                   -> Tuple[List[z3.ExprRef], z3.ExprRef]:
     if isinstance(crdt, ast.CIntMax):
-        return z3.If(lhs >= rhs, lhs, rhs)
+        return [], z3.If(lhs >= rhs, lhs, rhs)
     elif isinstance(crdt, ast.CIntMin):
-        return z3.If(lhs <= rhs, lhs, rhs)
+        return [], z3.If(lhs <= rhs, lhs, rhs)
     elif isinstance(crdt, ast.CBoolOr):
-        return z3.Or(lhs, rhs)
+        return [], z3.Or(lhs, rhs)
     elif isinstance(crdt, ast.CBoolAnd):
-        return z3.And(lhs, rhs)
+        return [], z3.And(lhs, rhs)
     elif isinstance(crdt, ast.CTuple2):
         Tuple2 = _type_to_z3(crdt.to_type())
-        a = _join_z3_to_z3(crdt.a, Tuple2.a(lhs), Tuple2.a(rhs))
-        b = _join_z3_to_z3(crdt.b, Tuple2.b(lhs), Tuple2.b(rhs))
-        return Tuple2.tuple2(a, b)
+        a_es, a = _join_z3_to_z3(crdt.a, Tuple2.a(lhs), Tuple2.a(rhs), fresh)
+        b_es, b = _join_z3_to_z3(crdt.b, Tuple2.b(lhs), Tuple2.b(rhs), fresh)
+        return a_es + b_es, Tuple2.tuple2(a, b)
     elif isinstance(crdt, ast.CSetUnion):
         or_ = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return z3.Map(or_, lhs, rhs)
+        return [], z3.Map(or_, lhs, rhs)
     elif isinstance(crdt, ast.CSetIntersect):
         and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return z3.Map(and_, lhs, rhs)
+        return [], z3.Map(and_, lhs, rhs)
+    elif isinstance(crdt, ast.CMap):
+        typ = cast(ast.TMap, crdt.to_type())
+        Option = _type_to_z3(ast.TOption(typ.b))
+        f = z3.Function(fresh.get(), Option, Option, Option)
+
+        # TODO(mwhittaker): This function only has to be declared and foralled
+        # once per type, not once per join.
+        x = z3.Const(fresh.get(), Option)
+        y = z3.Const(fresh.get(), Option)
+        j_es, j = _join_z3_to_z3(ast.COption(crdt.b), x, y, fresh)
+        forall = z3.ForAll([x, y], z3.And(*j_es, f(x, y) == j))
+
+        return [forall], z3.Map(f, lhs, rhs)
     elif isinstance(crdt, ast.COption):
         Option = _type_to_z3(crdt.to_type())
-        joined = _join_z3_to_z3(crdt.a, Option.x(lhs), Option.x(rhs))
-        return z3.If(Option.is_none(lhs), rhs,
-               z3.If(Option.is_none(rhs), lhs,
-               Option.some(joined)))
+        j_es, j = _join_z3_to_z3(crdt.a, Option.x(lhs), Option.x(rhs), fresh)
+        return (j_es,
+                z3.If(Option.is_none(lhs), rhs,
+                z3.If(Option.is_none(rhs), lhs,
+                Option.some(j))))
     else:
         raise ValueError(f'Unkown CRDT {crdt}.')
 
@@ -238,7 +294,8 @@ def _join_to_z3(crdt: ast.Crdt,
                 -> Tuple[List[z3.ExprRef], z3.ExprRef]:
     lhs_z3_es, lhs_z3_e = _expr_to_z3(lhs, lhs_venv, tenv, fresh)
     rhs_z3_es, rhs_z3_e = _expr_to_z3(rhs, rhs_venv, tenv, fresh)
-    return lhs_z3_es + rhs_z3_es, _join_z3_to_z3(crdt, lhs_z3_e, rhs_z3_e)
+    joined_es, joined_e = _join_z3_to_z3(crdt, lhs_z3_e, rhs_z3_e, fresh)
+    return lhs_z3_es + rhs_z3_es + joined_es, joined_e
 
 class Z3Checker(checker.Checker):
     def __init__(self, verbose: int = 0) -> None:
@@ -426,6 +483,8 @@ class Z3Checker(checker.Checker):
             return checker.Decision.YES
 
         solver = z3.Solver()
+        # TODO(mwhittaker): Make this a parameter of Z3Solver.
+        solver.set('timeout', 5 * 1000)
         fresh = FreshName()
         operations_commute = self._operations_commute(solver, fresh)
         join_is_apply = self._join_is_apply(solver, fresh)

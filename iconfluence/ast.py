@@ -1,4 +1,4 @@
-from typing import Any, List, Set, Union
+from typing import Any, Dict, List, Set, Union
 
 class AstNode:
     def __eq__(self, other) -> bool:
@@ -51,6 +51,14 @@ class TOption(Type):
     def __str__(self) -> str:
         return f'Option[{str(self.a)}]'
 
+class TMap(Type):
+    def __init__(self, a: Type, b: Type) -> None:
+        self.a = a
+        self.b = b
+
+    def __str__(self) -> str:
+        return f'Map[{str(self.a)}, {str(self.b)}]'
+
 # CRDTs ########################################################################
 class Crdt(AstNode):
     def to_type(self) -> Type:
@@ -101,8 +109,16 @@ class COption(Crdt):
     def to_type(self) -> Type:
         return TOption(self.a.to_type())
 
+class CMap(Crdt):
+    def __init__(self, a: Type, b: Crdt) -> None:
+        self.a = a
+        self.b = b
+
+    def to_type(self) -> Type:
+        return TMap(self.a, self.b.to_type())
+
 # Expressions ##################################################################
-Coercible = Union[bool, int, tuple, set, 'Expr']
+Coercible = Union[bool, int, tuple, set, dict, 'Expr']
 
 def _coerce(x: Coercible) -> 'Expr':
     # Note that isinstance(True, int) is true, so we have to check for
@@ -115,6 +131,8 @@ def _coerce(x: Coercible) -> 'Expr':
         return ETuple2(_coerce(x[0]), _coerce(x[1]))
     elif isinstance(x, set):
         return ESet({_coerce(e) for e in x})
+    elif isinstance(x, dict):
+        return EMap({_coerce(k): _coerce(v) for k, v in x.items()})
     elif isinstance(x, Expr):
         return x
     else:
@@ -123,14 +141,6 @@ def _coerce(x: Coercible) -> 'Expr':
 class Expr(AstNode):
     def __init__(self) -> None:
         self.typ: Type = None
-
-    def __getitem__(self, i: int) -> 'Expr':
-        if i == 0:
-            return ETuple2First(self)
-        elif i == 1:
-            return ETuple2Second(self)
-        else:
-            raise ValueError(f'Unsupported index {i}.')
 
     def is_none(self) -> 'Expr':
         return EOptionIsNone(self)
@@ -177,6 +187,12 @@ class Expr(AstNode):
     def __rrshift__(self, lhs: Coercible) -> 'Expr':
         return _coerce(lhs) | self
 
+    def first(self) -> 'Expr':
+        return ETuple2First(self)
+
+    def second(self) -> 'Expr':
+        return ETuple2Second(self)
+
     def union(self, lhs: Coercible) -> 'Expr':
         return ESetUnion(self, _coerce(lhs))
 
@@ -188,6 +204,15 @@ class Expr(AstNode):
 
     def contains(self, x: Coercible) -> 'Expr':
         return ESetContains(self, _coerce(x))
+
+    def contains_key(self, x: Coercible) -> 'Expr':
+        return EMapContainsKey(self, _coerce(x))
+
+    def __getitem__(self, x: Coercible) -> 'Expr':
+        return EMapGet(self, _coerce(x))
+
+    def set(self, k: Coercible, v: Coercible) -> 'Expr':
+        return EMapSet(self, k, v)
 
     def eq(self, lhs: Coercible) -> 'Expr':
         return EEq(self, _coerce(lhs))
@@ -260,6 +285,13 @@ class ESome(Expr):
     def __str__(self) -> str:
         return f'Some({str(self.x)})'
 
+class EMap(Expr):
+    def __init__(self, kvs: Dict[Coercible, Coercible]) -> None:
+        self.kvs = {_coerce(k): _coerce(v) for k, v in kvs.items()}
+
+    def __str__(self) -> str:
+        return '{' + ', '.join(f'{k}: {v}' for k, v in self.kvs.items()) + '}'
+
 class EUnaryOp(Expr):
     def __init__(self, x: Coercible) -> None:
         self.x = _coerce(x)
@@ -329,6 +361,14 @@ class ESetContains(EBinaryOp):
     def __str__(self) -> str:
         return f'({str(self.rhs)} in {str(self.lhs)})'
 
+class EMapContainsKey(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.rhs)} in {str(self.lhs)})'
+
+class EMapGet(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({str(self.lhs)}[{str(self.rhs)}])'
+
 class EEq(EBinaryOp):
     def __str__(self) -> str:
         return f'({str(self.lhs)} == {str(self.rhs)})'
@@ -352,6 +392,16 @@ class EIntGt(EBinaryOp):
 class EIntGe(EBinaryOp):
     def __str__(self) -> str:
         return f'({str(self.lhs)} >= {str(self.rhs)})'
+
+class ETernaryOp(Expr):
+    def __init__(self, a: Coercible, b: Coercible, c: Coercible) -> None:
+        self.a = _coerce(a)
+        self.b = _coerce(b)
+        self.c = _coerce(c)
+
+class EMapSet(ETernaryOp):
+    def __str__(self) -> str:
+        return f'({self.a}[{self.b}] <- {self.c})'
 
 # Statements ###################################################################
 class Stmt(AstNode):
