@@ -35,21 +35,21 @@ class TTuple2(Type):
         self.b = b
 
     def __str__(self) -> str:
-        return f'Tuple2[{str(self.a)}, {str(self.b)}]'
+        return f'Tuple2[{self.a}, {self.b}]'
 
 class TSet(Type):
     def __init__(self, a: Type) -> None:
         self.a = a
 
     def __str__(self) -> str:
-        return f'Set[{str(self.a)}]'
+        return f'Set[{self.a}]'
 
 class TOption(Type):
     def __init__(self, a: Type) -> None:
         self.a = a
 
     def __str__(self) -> str:
-        return f'Option[{str(self.a)}]'
+        return f'Option[{self.a}]'
 
 class TMap(Type):
     def __init__(self, a: Type, b: Type) -> None:
@@ -57,7 +57,7 @@ class TMap(Type):
         self.b = b
 
     def __str__(self) -> str:
-        return f'Map[{str(self.a)}, {str(self.b)}]'
+        return f'Map[{self.a}, {self.b}]'
 
 # CRDTs ########################################################################
 class Crdt(AstNode):
@@ -262,7 +262,7 @@ class ETuple2(Expr):
         self.b = _coerce(b)
 
     def __str__(self) -> str:
-        return f'({str(self.a)}, {str(self.b)})'
+        return f'({self.a}, {self.b})'
 
 class ESet(Expr):
     def __init__(self, xs: Set[Coercible]) -> None:
@@ -283,7 +283,7 @@ class ESome(Expr):
         self.x = _coerce(x)
 
     def __str__(self) -> str:
-        return f'Some({str(self.x)})'
+        return f'Some({self.x})'
 
 class EMap(Expr):
     def __init__(self, kvs: Dict[Coercible, Coercible]) -> None:
@@ -298,23 +298,23 @@ class EUnaryOp(Expr):
 
 class ETuple2First(EUnaryOp):
     def __str__(self) -> str:
-        return f'({str(self.x)})[0]'
+        return f'({self.x})[0]'
 
 class ETuple2Second(EUnaryOp):
     def __str__(self) -> str:
-        return f'({str(self.x)})[1]'
+        return f'({self.x})[1]'
 
 class EOptionIsNone(EUnaryOp):
     def __str__(self) -> str:
-        return f'({str(self.x)} is None)'
+        return f'({self.x} is None)'
 
 class EOptionIsSome(EUnaryOp):
     def __str__(self) -> str:
-        return f'({str(self.x)} is not None)'
+        return f'({self.x} is not None)'
 
 class EOptionUnwrap(EUnaryOp):
     def __str__(self) -> str:
-        return f'({str(self.x)}.unwrap())'
+        return f'({self.x}.unwrap())'
 
 class EBinaryOp(Expr):
     def __init__(self, lhs: Coercible, rhs: Coercible) -> None:
@@ -323,75 +323,75 @@ class EBinaryOp(Expr):
 
 class EIntAdd(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} + {str(self.rhs)})'
+        return f'({self.lhs} + {self.rhs})'
 
 class EIntSub(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} - {str(self.rhs)})'
+        return f'({self.lhs} - {self.rhs})'
 
 class EIntMul(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} * {str(self.rhs)})'
+        return f'({self.lhs} * {self.rhs})'
 
 class EBoolAnd(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} & {str(self.rhs)})'
+        return f'({self.lhs} & {self.rhs})'
 
 class EBoolOr(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} | {str(self.rhs)})'
+        return f'({self.lhs} | {self.rhs})'
 
 class EBoolImpl(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} >> {str(self.rhs)})'
+        return f'({self.lhs} >> {self.rhs})'
 
 class ESetUnion(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} union {str(self.rhs)})'
+        return f'({self.lhs} union {self.rhs})'
 
 class ESetIntersect(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} intersect {str(self.rhs)})'
+        return f'({self.lhs} intersect {self.rhs})'
 
 class ESetDiff(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} diff {str(self.rhs)})'
+        return f'({self.lhs} diff {self.rhs})'
 
 class ESetContains(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.rhs)} in {str(self.lhs)})'
+        return f'({self.rhs} in {self.lhs})'
 
 class EMapContainsKey(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.rhs)} in {str(self.lhs)})'
+        return f'({self.rhs} in {self.lhs})'
 
 class EMapGet(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)}[{str(self.rhs)}])'
+        return f'({self.lhs}[{self.rhs}])'
 
 class EEq(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} == {str(self.rhs)})'
+        return f'({self.lhs} == {self.rhs})'
 
 class ENe(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} != {str(self.rhs)})'
+        return f'({self.lhs} != {self.rhs})'
 
 class EIntLt(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} < {str(self.rhs)})'
+        return f'({self.lhs} < {self.rhs})'
 
 class EIntLe(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} <= {str(self.rhs)})'
+        return f'({self.lhs} <= {self.rhs})'
 
 class EIntGt(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} > {str(self.rhs)})'
+        return f'({self.lhs} > {self.rhs})'
 
 class EIntGe(EBinaryOp):
     def __str__(self) -> str:
-        return f'({str(self.lhs)} >= {str(self.rhs)})'
+        return f'({self.lhs} >= {self.rhs})'
 
 class ETernaryOp(Expr):
     def __init__(self, a: Coercible, b: Coercible, c: Coercible) -> None:
