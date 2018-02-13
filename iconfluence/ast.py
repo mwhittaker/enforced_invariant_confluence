@@ -298,11 +298,11 @@ class EUnaryOp(Expr):
 
 class ETuple2First(EUnaryOp):
     def __str__(self) -> str:
-        return f'({self.x})[0]'
+        return f'({self.x}).first()'
 
 class ETuple2Second(EUnaryOp):
     def __str__(self) -> str:
-        return f'({self.x})[1]'
+        return f'({self.x}).second()'
 
 class EOptionIsNone(EUnaryOp):
     def __str__(self) -> str:

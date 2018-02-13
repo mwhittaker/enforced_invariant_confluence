@@ -43,11 +43,12 @@ class TestChecker(unittest.TestCase):
         z3_tuple = z3_checker._type_to_z3(Pair(Int(), Bool()))
         self.assertEqual(z3_tuple.name(), 'Tuple2[Int, Bool]')
         self.assertEqual(z3_tuple.num_constructors(), 1)
-        self.assertEqual(z3_tuple.constructor(0).name(), 'tuple2')
+        self.assertEqual(z3_tuple.constructor(0).name(),
+                         'Tuple2[Int, Bool].tuple2')
         self.assertEqual(z3_tuple.constructor(0).arity(), 2)
-        self.assertEqual(z3_tuple.accessor(0, 0).name(), 'a')
+        self.assertEqual(z3_tuple.accessor(0, 0).name(), 'Tuple2[Int, Bool].a')
         self.assertEqual(z3_tuple.accessor(0, 0).range(), z3.IntSort())
-        self.assertEqual(z3_tuple.accessor(0, 1).name(), 'b')
+        self.assertEqual(z3_tuple.accessor(0, 1).name(), 'Tuple2[Int, Bool].b')
         self.assertEqual(z3_tuple.accessor(0, 1).range(), z3.BoolSort())
 
     def test_expr_to_z3(self) -> None:
@@ -64,7 +65,7 @@ class TestChecker(unittest.TestCase):
         z3_two = z3.IntVal(2)
         z3_true = z3.BoolVal(True)
         z3_false = z3.BoolVal(False)
-        z3_tuple = TupleIntBool.tuple2(z3_one, z3_true)
+        z3_tuple = TupleIntBool.constructor(0)(z3_one, z3_true)
         z3_set0 = z3.Const('foo_0', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
         z3_set0 = z3.Store(z3_set0, z3_one, z3_true)
         z3_set1 = z3.Const('foo_1', z3.ArraySort(z3.IntSort(), z3.BoolSort()))
@@ -82,8 +83,8 @@ class TestChecker(unittest.TestCase):
             (x_one, z3_one),
             (x_true, z3_true),
             (x_tuple, z3_tuple),
-            (x_tuple.first(), TupleIntBool.a(z3_tuple)),
-            (x_tuple.second(), TupleIntBool.b(z3_tuple)),
+            (x_tuple.first(), TupleIntBool.accessor(0, 0)(z3_tuple)),
+            (x_tuple.second(), TupleIntBool.accessor(0, 1)(z3_tuple)),
             (x_one + x_two, z3_one + z3_two),
             (x_one - x_two, z3_one - z3_two),
             (x_one * x_two, z3_one * z3_two),
