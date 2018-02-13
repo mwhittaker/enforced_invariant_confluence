@@ -112,6 +112,13 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         _assert_type_instance(_typecheck_expr(rhs, env).typ, ast.TSet, rhs, e)
         _assert_type_uniform(lhs.typ, rhs.typ, lhs, rhs, e)
         e.typ = lhs.typ
+    elif isinstance(e, ast.ESetSubsetEq):
+        lhs = e.lhs
+        rhs = e.rhs
+        _assert_type_instance(_typecheck_expr(lhs, env).typ, ast.TSet, lhs, e)
+        _assert_type_instance(_typecheck_expr(rhs, env).typ, ast.TSet, rhs, e)
+        _assert_type_uniform(lhs.typ, rhs.typ, lhs, rhs, e)
+        e.typ = ast.TBool()
     elif isinstance(e, ast.ESetContains):
         lhs_typ = _typecheck_expr(e.lhs, env).typ
         _assert_type_instance(lhs_typ, ast.TSet, e.lhs, e)

@@ -202,6 +202,9 @@ class Expr(AstNode):
     def diff(self, lhs: Coercible) -> 'Expr':
         return ESetDiff(self, _coerce(lhs))
 
+    def subseteq(self, lhs: Coercible) -> 'Expr':
+        return ESetSubsetEq(self, _coerce(lhs))
+
     def contains(self, x: Coercible) -> 'Expr':
         return ESetContains(self, _coerce(x))
 
@@ -363,6 +366,10 @@ class ESetIntersect(EBinaryOp):
 class ESetDiff(EBinaryOp):
     def __str__(self) -> str:
         return f'({self.lhs} diff {self.rhs})'
+
+class ESetSubsetEq(EBinaryOp):
+    def __str__(self) -> str:
+        return f'({self.lhs} subseteq {self.rhs})'
 
 class ESetContains(EBinaryOp):
     def __str__(self) -> str:

@@ -4,8 +4,9 @@ from functools import lru_cache
 import z3
 from termcolor import colored
 
-from .. import checker
 from .. import ast
+from .. import checker
+from .. import typecheck
 from .fresh_name import FreshName
 from .version_env import VersionEnv
 from .z3util import scoped
@@ -201,6 +202,10 @@ def _expr_to_z3(e: ast.Expr,
         and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
         f = lambda l, r: z3.Map(and_, l, z3.Map(not_, r))
         return flat_app2(e.lhs, e.rhs, f)
+    elif isinstance(e, ast.ESetSubsetEq):
+        set_typ = cast(ast.TSet, e.lhs.typ)
+        empty = typecheck.typecheck_expr(ast.EEmptySet(set_typ.a), {})
+        return to_z3((e.lhs.diff(e.rhs)).eq(empty))
     elif isinstance(e, ast.ESetContains):
         return flat_app2(e.lhs, e.rhs, lambda l, r: z3.Select(l, r))
     elif isinstance(e, ast.EMapContainsKey):

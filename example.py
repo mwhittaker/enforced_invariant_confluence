@@ -106,9 +106,7 @@ def simple_set_unions(checker: Checker) -> Decision:
     ys = checker.set_union('ys', TInt())
     checker.add_transaction('union_xs', [xs.assign(xs.union(ys))])
     checker.add_transaction('union_ys', [ys.assign(ys.union(xs))])
-    checker.add_invariant(
-        'some_subset',
-        xs.intersect(ys).eq(xs) | xs.intersect(ys).eq(ys))
+    checker.add_invariant('some_subset', xs.subseteq(ys) | ys.subseteq(xs))
     return checker.check_iconfluence()
 
 def map_example(checker: Checker) -> Decision:

@@ -57,6 +57,8 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return eval_expr(e.lhs, env).intersection(eval_expr(e.rhs, env))
     elif isinstance(e, ast.ESetDiff):
         return eval_expr(e.lhs, env).difference(eval_expr(e.rhs, env))
+    elif isinstance(e, ast.ESetSubsetEq):
+        return eval_expr(e.lhs, env).issubset(eval_expr(e.rhs, env))
     elif isinstance(e, ast.ESetContains):
         return eval_expr(e.rhs, env) in eval_expr(e.lhs, env)
     elif isinstance(e, ast.EMapContainsKey):
