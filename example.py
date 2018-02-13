@@ -149,8 +149,8 @@ def main() -> None:
     Z3C = Z3Checker
     checkers: Dict[str, Callable[[], Checker]] = {
         'guess_and_check': GACC,
-        'z3': lambda: Z3C(verbose=1),
-        'ensemble': lambda: EnsembleChecker([GACC(), Z3C()]),
+        'z3': lambda: Z3C(verbose=1, timeout=1*1000),
+        'ensemble': lambda: EnsembleChecker([GACC(), Z3C(timeout=1*1000)]),
     }
 
     examples: Dict[str, Callable[[Checker], Decision]] = {

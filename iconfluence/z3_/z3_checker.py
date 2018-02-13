@@ -1,4 +1,4 @@
-from typing import cast, Any, Callable, Dict, List, Tuple
+from typing import cast, Any, Callable, Dict, List, Optional, Tuple
 from functools import lru_cache
 
 import z3
@@ -298,9 +298,10 @@ def _join_to_z3(crdt: ast.Crdt,
     return lhs_z3_es + rhs_z3_es + joined_es, joined_e
 
 class Z3Checker(checker.Checker):
-    def __init__(self, verbose: int = 0) -> None:
+    def __init__(self, verbose: int = 0, timeout: Optional[int] = None) -> None:
         checker.Checker.__init__(self)
         self.verbose = verbose
+        self.timeout = timeout
 
     def _vlog(self, s: str) -> None:
         # TODO(mwhittaker): Maybe use a logger instead of just printing.
@@ -483,8 +484,9 @@ class Z3Checker(checker.Checker):
             return checker.Decision.YES
 
         solver = z3.Solver()
-        # TODO(mwhittaker): Make this a parameter of Z3Solver.
-        solver.set('timeout', 5 * 1000)
+        if self.timeout is not None:
+            solver.set('timeout', self.timeout)
+
         fresh = FreshName()
         operations_commute = self._operations_commute(solver, fresh)
         join_is_apply = self._join_is_apply(solver, fresh)
