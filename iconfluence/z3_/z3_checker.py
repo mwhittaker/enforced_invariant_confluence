@@ -44,7 +44,7 @@ def _type_to_z3(typ: ast.Type) -> z3.SortRef:
         a = _type_to_z3(typ.a)
         b = _type_to_z3(typ.b)
         Tuple2 = z3.Datatype(str(typ))
-        Tuple2.declare('tuple2', ('a', a), ('b', b))
+        Tuple2.declare(f'{typ}.tuple2', (f'{typ}.a', a), (f'{typ}.b', b))
         return Tuple2.create()
     elif isinstance(typ, ast.TSet):
         return z3.ArraySort(_type_to_z3(typ.a), z3.BoolSort())
@@ -54,11 +54,35 @@ def _type_to_z3(typ: ast.Type) -> z3.SortRef:
         return z3.ArraySort(key_sort, val_sort)
     elif isinstance(typ, ast.TOption):
         Option = z3.Datatype(str(typ))
-        Option.declare('none')
-        Option.declare('some', ('x',  _type_to_z3(typ.a)))
+        Option.declare(f'{typ}.none')
+        Option.declare(f'{typ}.some', (f'{typ}.x',  _type_to_z3(typ.a)))
         return Option.create()
     else:
         raise ValueError(f'Unkown type {typ}.')
+
+def _tuple2_tuple2(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.constructor(0)
+
+def _tuple2_a(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.accessor(0, 0)
+
+def _tuple2_b(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.accessor(0, 1)
+
+def _option_none(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.constructor(0)
+
+def _option_some(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.constructor(1)
+
+def _option_x(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.accessor(1, 0)
+
+def _option_is_none(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.recognizer(0)
+
+def _option_is_some(dt: z3.DatatypeSortRef) -> z3.FuncDeclRef:
+    return dt.recognizer(1)
 
 def _var_to_z3(x: ast.EVar, venv: VersionEnv, tenv: TypeEnv) -> z3.ExprRef:
     assert x.x in tenv, (x.x, tenv)
@@ -99,7 +123,8 @@ def _expr_to_z3(e: ast.Expr,
         return [], z3.BoolVal(e.x)
     elif isinstance(e, ast.ETuple2):
         Tuple2 = _type_to_z3(e.typ)
-        return flat_app2(e.a, e.b, lambda a, b: Tuple2.tuple2(a, b))
+        tuple2 = _tuple2_tuple2(Tuple2)
+        return flat_app2(e.a, e.b, lambda a, b: tuple2(a, b))
     elif isinstance(e, ast.ESet):
         xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
         x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))
@@ -114,40 +139,40 @@ def _expr_to_z3(e: ast.Expr,
         kvs = z3.Const(fresh.get(), _type_to_z3(typ))
         k = z3.Const(fresh.get(), _type_to_z3(typ.a))
         Option = _type_to_z3(ast.TOption(typ.b))
-        es = [z3.ForAll(k, z3.Select(kvs, k) == Option.none)]
+        es = [z3.ForAll(k, z3.Select(kvs, k) == _option_none(Option)())]
         for k, v in e.kvs.items():
             k_es, k_z3 = to_z3(k)
             v_es, v_z3 = to_z3(v)
             es += (k_es + v_es)
-            kvs = z3.Store(kvs, k_z3, Option.some(v_z3))
+            kvs = z3.Store(kvs, k_z3, _option_some(Option)(v_z3))
         return es, kvs
     elif isinstance(e, ast.ENone):
         Option = _type_to_z3(e.typ)
-        return [], Option.none
+        return [], _option_none(Option)()
     elif isinstance(e, ast.ESome):
         Option = _type_to_z3(e.typ)
         z3_es, z3_e = to_z3(e.x)
-        return z3_es, Option.some(z3_e)
+        return z3_es, _option_some(Option)(z3_e)
     elif isinstance(e, ast.ETuple2First):
         Tuple2 = _type_to_z3(e.x.typ)
         t_es, t = to_z3(e.x)
-        return t_es, Tuple2.a(t)
+        return t_es, _tuple2_a(Tuple2)(t)
     elif isinstance(e, ast.ETuple2Second):
         Tuple2 = _type_to_z3(e.x.typ)
         t_es, t = to_z3(e.x)
-        return t_es, Tuple2.b(t)
+        return t_es, _tuple2_b(Tuple2)(t)
     elif isinstance(e, ast.EOptionIsNone):
         Option = _type_to_z3(e.x.typ)
         z3_es, z3_e = to_z3(e.x)
-        return z3_es, Option.is_none(z3_e)
+        return z3_es, _option_is_none(Option)(z3_e)
     elif isinstance(e, ast.EOptionIsSome):
         Option = _type_to_z3(e.x.typ)
         z3_es, z3_e = to_z3(e.x)
-        return z3_es, Option.is_some(z3_e)
+        return z3_es, _option_is_some(Option)(z3_e)
     elif isinstance(e, ast.EOptionUnwrap):
         Option = _type_to_z3(e.x.typ)
         z3_es, z3_e = to_z3(e.x)
-        return z3_es, Option.x(z3_e)
+        return z3_es, _option_x(Option)(z3_e)
     elif isinstance(e, ast.EIntAdd):
         return flat_app2(e.lhs, e.rhs, lambda l, r: l + r)
     elif isinstance(e, ast.EIntSub):
@@ -177,11 +202,12 @@ def _expr_to_z3(e: ast.Expr,
         typ = cast(ast.TMap, e.lhs.typ)
         Option = _type_to_z3(ast.TOption(typ.b))
         return flat_app2(e.lhs, e.rhs,
-                        lambda l, r: Option.is_none(z3.Select(l, r)))
+                        lambda l, r: _option_is_none(Option)(z3.Select(l, r)))
     elif isinstance(e, ast.EMapGet):
         typ = cast(ast.TMap, e.lhs.typ)
         Option = _type_to_z3(ast.TOption(typ.b))
-        return flat_app2(e.lhs, e.rhs, lambda l, r: Option.x(z3.Select(l, r)))
+        x = _option_x(Option)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: x(z3.Select(l, r)))
     elif isinstance(e, ast.EEq):
         return flat_app2(e.lhs, e.rhs, lambda l, r: l == r)
     elif isinstance(e, ast.ENe):
@@ -197,8 +223,9 @@ def _expr_to_z3(e: ast.Expr,
     elif isinstance(e, ast.EMapSet):
         typ = cast(ast.TMap, e.typ)
         Option = _type_to_z3(ast.TOption(typ.b))
+        some = _option_some(Option)
         return flat_app3(e.a, e.b, e.c,
-                         lambda a, b, c: z3.Store(a, b, Option.some(c)))
+                         lambda a, b, c: z3.Store(a, b, some(c)))
     elif isinstance(e, ast.EIf):
         return flat_app3(e.a, e.b, e.c, z3.If)
     else:
@@ -254,9 +281,13 @@ def _join_z3_to_z3(crdt: ast.Crdt,
         return [], z3.And(lhs, rhs)
     elif isinstance(crdt, ast.CTuple2):
         Tuple2 = _type_to_z3(crdt.to_type())
-        a_es, a = _join_z3_to_z3(crdt.a, Tuple2.a(lhs), Tuple2.a(rhs), fresh)
-        b_es, b = _join_z3_to_z3(crdt.b, Tuple2.b(lhs), Tuple2.b(rhs), fresh)
-        return a_es + b_es, Tuple2.tuple2(a, b)
+        get_a = _tuple2_a(Tuple2)
+        get_b = _tuple2_b(Tuple2)
+        tuple2 = _tuple2_tuple2(Tuple2)
+
+        a_es, a = _join_z3_to_z3(crdt.a, get_a(lhs), get_a(rhs), fresh)
+        b_es, b = _join_z3_to_z3(crdt.b, get_b(lhs), get_b(rhs), fresh)
+        return a_es + b_es, tuple2(a, b)
     elif isinstance(crdt, ast.CSetUnion):
         or_ = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
         return [], z3.Map(or_, lhs, rhs)
@@ -278,11 +309,15 @@ def _join_z3_to_z3(crdt: ast.Crdt,
         return [forall], z3.Map(f, lhs, rhs)
     elif isinstance(crdt, ast.COption):
         Option = _type_to_z3(crdt.to_type())
-        j_es, j = _join_z3_to_z3(crdt.a, Option.x(lhs), Option.x(rhs), fresh)
+        x = _option_x(Option)
+        is_none = _option_is_none(Option)
+        some = _option_some(Option)
+
+        j_es, j = _join_z3_to_z3(crdt.a, x(lhs), x(rhs), fresh)
         return (j_es,
-                z3.If(Option.is_none(lhs), rhs,
-                z3.If(Option.is_none(rhs), lhs,
-                Option.some(j))))
+                z3.If(is_none(lhs), rhs,
+                z3.If(is_none(rhs), lhs,
+                some(j))))
     else:
         raise ValueError(f'Unkown CRDT {crdt}.')
 
