@@ -55,8 +55,10 @@ def all_datatypes_example(checker: Checker) -> Decision:
         x_bool_and.assign(((y_bool_and & True) | False) >> True),
         x_set_union.assign(
             y_set_union.intersect({1, 2}).union({3, 4}).diff({5, 6})),
+        x_set_union.assign(y_set_union.union(EEmptySet(TInt()))),
         x_set_intersect.assign(
             y_set_intersect.intersect({1, 2}).union({3, 4}).diff({5, 6})),
+        x_set_intersect.assign(y_set_intersect.union(EEmptySet(TInt()))),
         x_tuple2.assign(ETuple2(y_tuple2.first() + y_tuple2.second(), 2)),
         x_option.assign(ENone(CIntMax().to_type())),
         y_option.assign(ESome(2)),

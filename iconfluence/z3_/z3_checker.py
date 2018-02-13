@@ -125,6 +125,11 @@ def _expr_to_z3(e: ast.Expr,
         Tuple2 = _type_to_z3(e.typ)
         tuple2 = _tuple2_tuple2(Tuple2)
         return flat_app2(e.a, e.b, lambda a, b: tuple2(a, b))
+    elif isinstance(e, ast.EEmptySet):
+        xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
+        x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))
+        es = [z3.ForAll(x, z3.Select(xs, x) == z3.BoolVal(False))]
+        return es, xs
     elif isinstance(e, ast.ESet):
         xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
         x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))

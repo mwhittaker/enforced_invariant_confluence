@@ -15,6 +15,8 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return e.x
     elif isinstance(e, ast.ETuple2):
         return (e.a, e.b)
+    elif isinstance(e, ast.EEmptySet):
+        return {}
     elif isinstance(e, ast.ESet):
         return {eval_expr(x, env) for x in e.xs}
     elif isinstance(e, ast.EMap):

@@ -264,6 +264,13 @@ class ETuple2(Expr):
     def __str__(self) -> str:
         return f'({self.a}, {self.b})'
 
+class EEmptySet(Expr):
+    def __init__(self, t: Type) -> None:
+        self.t = t
+
+    def __str__(self) -> str:
+        return '{}'
+
 class ESet(Expr):
     def __init__(self, xs: Set[Coercible]) -> None:
         self.xs = {_coerce(x) for x in xs}

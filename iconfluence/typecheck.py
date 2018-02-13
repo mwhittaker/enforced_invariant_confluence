@@ -53,6 +53,8 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         _typecheck_expr(e.a, env)
         _typecheck_expr(e.b, env)
         e.typ = ast.TTuple2(e.a.typ, e.b.typ)
+    elif isinstance(e, ast.EEmptySet):
+        e.typ = ast.TSet(e.t)
     elif isinstance(e, ast.ESet):
         _assert(len(e.xs) >= 0, 'Illegal empty set found.')
         types = {_typecheck_expr(x, env).typ for x in e.xs}
