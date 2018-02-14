@@ -89,6 +89,23 @@ def _var_to_z3(x: ast.EVar, venv: VersionEnv, tenv: TypeEnv) -> z3.ExprRef:
     assert x.x in tenv, (x.x, tenv)
     return z3.Const(venv.get_name(x.x), _type_to_z3(tenv[x.x]))
 
+@lru_cache()
+def _empty_set_to_z3(typ: ast.TSet) -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+    z3_typ = _type_to_z3(typ)
+    empty = z3.Const(f'{typ}.empty_set', z3_typ)
+    x = z3.Const(f'{typ}.empty_set_x', z3_typ.domain())
+    forall = z3.ForAll(x, z3.Select(empty, x) == z3.BoolVal(False))
+    return [forall], empty
+
+@lru_cache()
+def _empty_map_to_z3(typ: ast.Type) -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+    z3_typ = _type_to_z3(typ)
+    none = _option_none(z3_typ.range())
+    empty = z3.Const(f'{typ}.empty_map', z3_typ)
+    k = z3.Const(f'{typ}.empty_set_k', z3_typ.domain())
+    forall = z3.ForAll(k, z3.Select(empty, k) == none())
+    return [forall], empty
+
 def _expr_to_z3(e: ast.Expr,
                 venv: VersionEnv,
                 tenv: TypeEnv,
@@ -127,41 +144,33 @@ def _expr_to_z3(e: ast.Expr,
         tuple2 = _tuple2_tuple2(Tuple2)
         return flat_app2(e.a, e.b, lambda a, b: tuple2(a, b))
     elif isinstance(e, ast.EEmptySet):
-        xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
-        x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))
-        es = [z3.ForAll(x, z3.Select(xs, x) == z3.BoolVal(False))]
-        return es, xs
+        # TODO(mwhittaker): We should make sure that the empty set forall can
+        # be pulled out of any other foralls. It doens't need to be nested.
+        set_typ = cast(ast.TSet, e.typ)
+        return _empty_set_to_z3(set_typ)
     elif isinstance(e, ast.ESet):
-        # TODO(mwhittaker): The empty set for a given type can be shared across
-        # all instances of the type. Moreover, it can be pulled out of any
-        # quantifiers.
-        xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
-        x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))
-        es = [z3.ForAll(x, z3.Select(xs, x) == z3.BoolVal(False))]
+        set_typ = cast(ast.TSet, e.typ)
+        z3_es, z3_e = _empty_set_to_z3(set_typ)
         for x in e.xs:
-            x_es, x_z3 = to_z3(x)
-            es += x_es
-            xs = z3.Store(xs, x_z3, z3.BoolVal(True))
-        return es, xs
+            z3_es_, z3_e_ = to_z3(x)
+            z3_es += z3_es_
+            z3_e = z3.Store(z3_e, z3_e_, z3.BoolVal(True))
+        return z3_es, z3_e
     elif isinstance(e, ast.EEmptyMap):
-        typ = cast(ast.TMap, e.typ)
-        kvs = z3.Const(fresh.get(), _type_to_z3(typ))
-        k = z3.Const(fresh.get(), _type_to_z3(typ.a))
-        Option = _type_to_z3(ast.TOption(typ.b))
-        es = [z3.ForAll(k, z3.Select(kvs, k) == _option_none(Option)())]
-        return es, kvs
+        map_typ = cast(ast.TMap, e.typ)
+        return _empty_map_to_z3(map_typ)
     elif isinstance(e, ast.EMap):
-        typ = cast(ast.TMap, e.typ)
-        kvs = z3.Const(fresh.get(), _type_to_z3(typ))
-        k = z3.Const(fresh.get(), _type_to_z3(typ.a))
-        Option = _type_to_z3(ast.TOption(typ.b))
-        es = [z3.ForAll(k, z3.Select(kvs, k) == _option_none(Option)())]
+        map_typ = cast(ast.TMap, e.typ)
+        z3_map_typ = _type_to_z3(map_typ)
+        some = _option_some(z3_map_typ.range())
+
+        z3_es, z3_e = _empty_map_to_z3(map_typ)
         for k, v in e.kvs.items():
-            k_es, k_z3 = to_z3(k)
-            v_es, v_z3 = to_z3(v)
-            es += (k_es + v_es)
-            kvs = z3.Store(kvs, k_z3, _option_some(Option)(v_z3))
-        return es, kvs
+            k_z3_es, k_z3_e = to_z3(k)
+            v_z3_es, v_z3_e = to_z3(v)
+            z3_es += (k_z3_es + v_z3_es)
+            z3_e = z3.Store(z3_e, k_z3_e, some(v_z3_e))
+        return z3_es, z3_e
     elif isinstance(e, ast.ENone):
         Option = _type_to_z3(e.typ)
         return [], _option_none(Option)()
