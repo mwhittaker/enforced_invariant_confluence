@@ -132,6 +132,9 @@ def _expr_to_z3(e: ast.Expr,
         es = [z3.ForAll(x, z3.Select(xs, x) == z3.BoolVal(False))]
         return es, xs
     elif isinstance(e, ast.ESet):
+        # TODO(mwhittaker): The empty set for a given type can be shared across
+        # all instances of the type. Moreover, it can be pulled out of any
+        # quantifiers.
         xs = z3.Const(fresh.get(), _type_to_z3(e.typ))
         x = z3.Const(fresh.get(), _type_to_z3(cast(ast.TSet, e.typ).a))
         es = [z3.ForAll(x, z3.Select(xs, x) == z3.BoolVal(False))]
@@ -140,6 +143,13 @@ def _expr_to_z3(e: ast.Expr,
             es += x_es
             xs = z3.Store(xs, x_z3, z3.BoolVal(True))
         return es, xs
+    elif isinstance(e, ast.EEmptyMap):
+        typ = cast(ast.TMap, e.typ)
+        kvs = z3.Const(fresh.get(), _type_to_z3(typ))
+        k = z3.Const(fresh.get(), _type_to_z3(typ.a))
+        Option = _type_to_z3(ast.TOption(typ.b))
+        es = [z3.ForAll(k, z3.Select(kvs, k) == _option_none(Option)())]
+        return es, kvs
     elif isinstance(e, ast.EMap):
         typ = cast(ast.TMap, e.typ)
         kvs = z3.Const(fresh.get(), _type_to_z3(typ))

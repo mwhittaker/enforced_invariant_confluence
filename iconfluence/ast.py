@@ -295,6 +295,11 @@ class ESome(Expr):
     def __str__(self) -> str:
         return f'Some({self.x})'
 
+class EEmptyMap(Expr):
+    def __init__(self, k: Type, v: Type) -> None:
+        self.k = k
+        self.v = v
+
 class EMap(Expr):
     def __init__(self, kvs: Dict[Coercible, Coercible]) -> None:
         self.kvs = {_coerce(k): _coerce(v) for k, v in kvs.items()}

@@ -60,6 +60,8 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         types = {_typecheck_expr(x, env).typ for x in e.xs}
         _assert(len(types) == 1, f'Illegal set with multiple types: {types}.')
         e.typ = ast.TSet(list(types)[0])
+    elif isinstance(e, ast.EEmptyMap):
+        e.typ = ast.TMap(e.k, e.v)
     elif isinstance(e, ast.EMap):
         _assert(len(e.kvs) >= 0, 'Illegal empty map found.')
         key_types = {_typecheck_expr(k, env).typ for k in e.kvs.keys()}

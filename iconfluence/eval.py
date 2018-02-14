@@ -16,9 +16,11 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     elif isinstance(e, ast.ETuple2):
         return (e.a, e.b)
     elif isinstance(e, ast.EEmptySet):
-        return {}
+        return set()
     elif isinstance(e, ast.ESet):
         return {eval_expr(x, env) for x in e.xs}
+    elif isinstance(e, ast.EEmptyMap):
+        return dict()
     elif isinstance(e, ast.EMap):
         return {eval_expr(k, env): eval_expr(v, env) for k, v in e.kvs.items()}
     elif isinstance(e, ast.ENone):

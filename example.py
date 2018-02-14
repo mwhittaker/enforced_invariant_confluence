@@ -46,6 +46,8 @@ def all_datatypes_example(checker: Checker) -> Decision:
     y_tuple2 = checker.tuple2('y_tuple2', CIntMax(), CIntMin())
     x_option = checker.option('x_option', CIntMax())
     y_option = checker.option('y_option', CIntMax())
+    x_map = checker.map('x_map', TInt(), CIntMax())
+    y_map = checker.map('y_map', TInt(), CIntMax())
 
     checker.add_transaction('t1', [
         x_int_max.assign(((y_int_max + 1) * 2) - 3),
@@ -63,6 +65,8 @@ def all_datatypes_example(checker: Checker) -> Decision:
         x_option.assign(ENone(CIntMax().to_type())),
         y_option.assign(ESome(2)),
         x_option.assign(ESome(y_option.unwrap())),
+        x_map.assign(y_map),
+        y_map.assign(EEmptyMap(TInt(), TInt())),
     ])
 
     checker.add_invariant('inv0', x_int_max >= y_int_max)
