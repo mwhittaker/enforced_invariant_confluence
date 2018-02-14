@@ -1,8 +1,9 @@
 from typing import cast, Any, Callable, Dict, List, Optional, Tuple
 from functools import lru_cache
 
-import z3
+from orderedset import OrderedSet
 from termcolor import colored
+import z3
 
 from .. import ast
 from .. import checker
@@ -90,55 +91,55 @@ def _var_to_z3(x: ast.EVar, venv: VersionEnv, tenv: TypeEnv) -> z3.ExprRef:
     return z3.Const(venv.get_name(x.x), _type_to_z3(tenv[x.x]))
 
 @lru_cache()
-def _empty_set_to_z3(typ: ast.TSet) -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+def _empty_set_to_z3(typ: ast.TSet) -> Tuple[OrderedSet, z3.ExprRef]:
     z3_typ = _type_to_z3(typ)
     empty = z3.Const(f'{typ}.empty_set', z3_typ)
     x = z3.Const(f'{typ}.empty_set_x', z3_typ.domain())
     forall = z3.ForAll(x, z3.Select(empty, x) == z3.BoolVal(False))
-    return [forall], empty
+    return OrderedSet([forall]), empty
 
 @lru_cache()
-def _empty_map_to_z3(typ: ast.Type) -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+def _empty_map_to_z3(typ: ast.Type) -> Tuple[OrderedSet, z3.ExprRef]:
     z3_typ = _type_to_z3(typ)
     none = _option_none(z3_typ.range())
     empty = z3.Const(f'{typ}.empty_map', z3_typ)
     k = z3.Const(f'{typ}.empty_set_k', z3_typ.domain())
     forall = z3.ForAll(k, z3.Select(empty, k) == none())
-    return [forall], empty
+    return OrderedSet([forall]), empty
 
 def _expr_to_z3(e: ast.Expr,
                 venv: VersionEnv,
                 tenv: TypeEnv,
                 fresh: FreshName) \
-                -> Tuple[List[z3.ExprRef], z3.ExprRef]:
-    def to_z3(e_: ast.Expr) -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+                -> Tuple[OrderedSet, z3.ExprRef]:
+    def to_z3(e_: ast.Expr) -> Tuple[OrderedSet, z3.ExprRef]:
         return _expr_to_z3(e_, venv, tenv, fresh)
 
     def flat_app2(lhs: ast.Expr,
                   rhs: ast.Expr,
                   f: Callable[[z3.ExprRef, z3.ExprRef], z3.ExprRef]) \
-                  -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+                  -> Tuple[OrderedSet, z3.ExprRef]:
         es_lhs, lhs_z3 = to_z3(lhs)
         es_rhs, rhs_z3 = to_z3(rhs)
-        return es_lhs + es_rhs, f(lhs_z3, rhs_z3)
+        return es_lhs | es_rhs, f(lhs_z3, rhs_z3)
 
     def flat_app3(a: ast.Expr,
                   b: ast.Expr,
                   c: ast.Expr,
                   f: Callable[[z3.ExprRef, z3.ExprRef, z3.ExprRef],
                                z3.ExprRef]) \
-                  -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+                  -> Tuple[OrderedSet, z3.ExprRef]:
         a_z3s, a_z3 = to_z3(a)
         b_z3s, b_z3 = to_z3(b)
         c_z3s, c_z3 = to_z3(c)
-        return a_z3s + b_z3s + c_z3s, f(a_z3, b_z3, c_z3)
+        return a_z3s | b_z3s | c_z3s, f(a_z3, b_z3, c_z3)
 
     if isinstance(e, ast.EVar):
-        return [], _var_to_z3(e, venv, tenv)
+        return OrderedSet([]), _var_to_z3(e, venv, tenv)
     elif isinstance(e, ast.EInt):
-        return [], z3.IntVal(e.x)
+        return OrderedSet([]), z3.IntVal(e.x)
     elif isinstance(e, ast.EBool):
-        return [], z3.BoolVal(e.x)
+        return OrderedSet([]), z3.BoolVal(e.x)
     elif isinstance(e, ast.ETuple2):
         Tuple2 = _type_to_z3(e.typ)
         tuple2 = _tuple2_tuple2(Tuple2)
@@ -153,7 +154,7 @@ def _expr_to_z3(e: ast.Expr,
         z3_es, z3_e = _empty_set_to_z3(set_typ)
         for x in e.xs:
             z3_es_, z3_e_ = to_z3(x)
-            z3_es += z3_es_
+            z3_es |= z3_es_
             z3_e = z3.Store(z3_e, z3_e_, z3.BoolVal(True))
         return z3_es, z3_e
     elif isinstance(e, ast.EEmptyMap):
@@ -168,12 +169,12 @@ def _expr_to_z3(e: ast.Expr,
         for k, v in e.kvs.items():
             k_z3_es, k_z3_e = to_z3(k)
             v_z3_es, v_z3_e = to_z3(v)
-            z3_es += (k_z3_es + v_z3_es)
+            z3_es |= (k_z3_es | v_z3_es)
             z3_e = z3.Store(z3_e, k_z3_e, some(v_z3_e))
         return z3_es, z3_e
     elif isinstance(e, ast.ENone):
         Option = _type_to_z3(e.typ)
-        return [], _option_none(Option)()
+        return OrderedSet([]), _option_none(Option)()
     elif isinstance(e, ast.ESome):
         Option = _type_to_z3(e.typ)
         z3_es, z3_e = to_z3(e.x)
@@ -235,8 +236,8 @@ def _expr_to_z3(e: ast.Expr,
     elif isinstance(e, ast.EMapGet):
         typ = cast(ast.TMap, e.lhs.typ)
         Option = _type_to_z3(ast.TOption(typ.b))
-        x = _option_x(Option)
-        return flat_app2(e.lhs, e.rhs, lambda l, r: x(z3.Select(l, r)))
+        get_x = _option_x(Option)
+        return flat_app2(e.lhs, e.rhs, lambda l, r: get_x(z3.Select(l, r)))
     elif isinstance(e, ast.EEq):
         return flat_app2(e.lhs, e.rhs, lambda l, r: l == r)
     elif isinstance(e, ast.ENe):
@@ -264,12 +265,12 @@ def _stmt_to_z3(stmt: ast.Stmt,
                 venv: VersionEnv,
                 tenv: TypeEnv,
                 fresh: FreshName) \
-                -> Tuple[List[z3.ExprRef], VersionEnv]:
+                -> Tuple[OrderedSet, VersionEnv]:
     if isinstance(stmt, ast.SAssign):
         es, e = _expr_to_z3(stmt.e, venv, tenv, fresh)
         venv = venv.assign(stmt.x.x)
         x = _var_to_z3(stmt.x, venv, tenv)
-        return es + [x == e], venv
+        return es | OrderedSet([x == e]), venv
     else:
         raise ValueError(f'Unkown statement {stmt}.')
 
@@ -277,11 +278,11 @@ def _txn_to_z3(txn: ast.Transaction,
                venv: VersionEnv,
                tenv: TypeEnv,
                fresh: FreshName) \
-               -> Tuple[List[z3.ExprRef], VersionEnv]:
-    es: List[z3.ExprRef] = []
+               -> Tuple[OrderedSet, VersionEnv]:
+    es: OrderedSet = OrderedSet([])
     for s in txn:
         s_es, venv = _stmt_to_z3(s, venv, tenv, fresh)
-        es += s_es
+        es |= s_es
     return es, venv
 
 def _apply_txn(solver: z3.Solver,
@@ -299,15 +300,15 @@ def _join_z3_to_z3(crdt: ast.Crdt,
                    lhs: z3.ExprRef,
                    rhs: z3.ExprRef,
                    fresh: FreshName) \
-                   -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+                   -> Tuple[OrderedSet, z3.ExprRef]:
     if isinstance(crdt, ast.CIntMax):
-        return [], z3.If(lhs >= rhs, lhs, rhs)
+        return OrderedSet([]), z3.If(lhs >= rhs, lhs, rhs)
     elif isinstance(crdt, ast.CIntMin):
-        return [], z3.If(lhs <= rhs, lhs, rhs)
+        return OrderedSet([]), z3.If(lhs <= rhs, lhs, rhs)
     elif isinstance(crdt, ast.CBoolOr):
-        return [], z3.Or(lhs, rhs)
+        return OrderedSet([]), z3.Or(lhs, rhs)
     elif isinstance(crdt, ast.CBoolAnd):
-        return [], z3.And(lhs, rhs)
+        return OrderedSet([]), z3.And(lhs, rhs)
     elif isinstance(crdt, ast.CTuple2):
         Tuple2 = _type_to_z3(crdt.to_type())
         get_a = _tuple2_a(Tuple2)
@@ -316,13 +317,13 @@ def _join_z3_to_z3(crdt: ast.Crdt,
 
         a_es, a = _join_z3_to_z3(crdt.a, get_a(lhs), get_a(rhs), fresh)
         b_es, b = _join_z3_to_z3(crdt.b, get_b(lhs), get_b(rhs), fresh)
-        return a_es + b_es, tuple2(a, b)
+        return a_es | b_es, tuple2(a, b)
     elif isinstance(crdt, ast.CSetUnion):
         or_ = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return [], z3.Map(or_, lhs, rhs)
+        return OrderedSet([]), z3.Map(or_, lhs, rhs)
     elif isinstance(crdt, ast.CSetIntersect):
         and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
-        return [], z3.Map(and_, lhs, rhs)
+        return OrderedSet([]), z3.Map(and_, lhs, rhs)
     elif isinstance(crdt, ast.CMap):
         typ = cast(ast.TMap, crdt.to_type())
         Option = _type_to_z3(ast.TOption(typ.b))
@@ -335,7 +336,7 @@ def _join_z3_to_z3(crdt: ast.Crdt,
         j_es, j = _join_z3_to_z3(ast.COption(crdt.b), x, y, fresh)
         forall = z3.ForAll([x, y], z3.And(*j_es, f(x, y) == j))
 
-        return [forall], z3.Map(f, lhs, rhs)
+        return OrderedSet([forall]), z3.Map(f, lhs, rhs)
     elif isinstance(crdt, ast.COption):
         Option = _type_to_z3(crdt.to_type())
         x = _option_x(Option)
@@ -357,11 +358,11 @@ def _join_to_z3(crdt: ast.Crdt,
                 rhs_venv: VersionEnv,
                 tenv: TypeEnv,
                 fresh: FreshName) \
-                -> Tuple[List[z3.ExprRef], z3.ExprRef]:
+                -> Tuple[OrderedSet, z3.ExprRef]:
     lhs_z3_es, lhs_z3_e = _expr_to_z3(lhs, lhs_venv, tenv, fresh)
     rhs_z3_es, rhs_z3_e = _expr_to_z3(rhs, rhs_venv, tenv, fresh)
     joined_es, joined_e = _join_z3_to_z3(crdt, lhs_z3_e, rhs_z3_e, fresh)
-    return lhs_z3_es + rhs_z3_es + joined_es, joined_e
+    return lhs_z3_es | rhs_z3_es | joined_es, joined_e
 
 class Z3Checker(checker.Checker):
     def __init__(self, verbose: int = 0, timeout: Optional[int] = None) -> None:
@@ -389,25 +390,25 @@ class Z3Checker(checker.Checker):
         return VersionEnv(frozenset(self.type_env.keys()))
 
     def _venvs_equal(self, venv1: VersionEnv, venv2: VersionEnv) -> z3.ExprRef:
-        conjuncts: List[z3.ExprRef] = []
+        conjuncts: OrderedSet = OrderedSet([])
         for x in self.type_env.keys():
             var = ast.EVar(x)
             var.typ = self.type_env[x]
             x_1 = _var_to_z3(var, venv1, self.type_env)
             x_2 = _var_to_z3(var, venv2, self.type_env)
-            conjuncts.append(x_1 == x_2)
+            conjuncts.add(x_1 == x_2)
         return z3.And(*conjuncts)
 
     def _venv_satisfies_invariants(self,
                                    venv: VersionEnv,
                                    fresh: FreshName) \
-                                   -> Tuple[List[z3.ExprRef], z3.ExprRef]:
-        es: List[z3.ExprRef] = []
-        conjuncts: List[z3.ExprRef] = []
+                                   -> Tuple[OrderedSet, z3.ExprRef]:
+        es: OrderedSet = OrderedSet([])
+        conjuncts: OrderedSet = OrderedSet([])
         for inv in self.invariants.values():
             inv_es, inv_e = _expr_to_z3(inv, venv, self.type_env, fresh)
-            es += inv_es
-            conjuncts.append(inv_e)
+            es |= inv_es
+            conjuncts.add(inv_e)
         return es, z3.And(*conjuncts)
 
     def _join_venvs(self,
@@ -524,10 +525,7 @@ class Z3Checker(checker.Checker):
                     t_es, t_i = vsi(t_venv, fresh)
                     u_es, u_i = vsi(u_venv, fresh)
                     joined_es, joined_i = vsi(joined_venv, fresh)
-                    solver.add(original_es)
-                    solver.add(t_es)
-                    solver.add(u_es)
-                    solver.add(joined_es)
+                    solver.add(list(original_es | t_es | u_es | joined_es))
                     solver.add(original_i)
                     solver.add(t_i)
                     solver.add(u_i)
