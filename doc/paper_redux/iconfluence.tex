@@ -1,11 +1,11 @@
 \section{\Iconfluence{}}
 A \emph{distributed object} is a triple $(S, s_0, \join)$ where $S$ is a set of
 states, $s_0 \in S$ is a designated start state, and $\join: S \times S \to S$
-is a commutative binary merge operator. A \emph{transaction} $t: S \to S$ is a
-function that maps one state to another. An \emph{invariant} $I: S \to
-\set{\text{true}, \text{false}}$ is a predicate on states. For example,
-$(\nats, +)$ is a distributed object, $t(x) = 2x$ is a transaction, and $I(x) =
-x \geq 0$ is an invariant.
+is a commutative binary merge operator that we call join. A \emph{transaction}
+$t: S \to S$ is a function that maps one state to another. An \emph{invariant}
+$I: S \to \set{\text{true}, \text{false}}$ is a predicate on states. For
+example, $(\nats, +)$ is a distributed object, $t(x) = 2x$ is a transaction,
+and $I(x) = x \geq 0$ is an invariant.
 
 There are three ways to think about \Iconfluence{}: a process-based approach, a
 graph-based approach, and an expression-based approach. All three approaches
@@ -36,8 +36,8 @@ parents. The vertices are labelled with states, and the edges are either
 labelled with transactions or are unlabelled if they correspond to a join. The
 graph is really just an alternate way of representing an execution in the
 process-based model, but with duplicate states collapsed into a single vertex.
-As with the process-based model, we say $T$ is \Iconfluent{} if the join of any
-two invariant satisfying states with invariant satisfying ancestors is
+As with the process-based model, we say that $T$ is \Iconfluent{} if the join
+of any two invariant satisfying states with invariant satisfying ancestors is
 guaranteed to satisfy the invariant.
 
 \subsection{Expression-Based}
