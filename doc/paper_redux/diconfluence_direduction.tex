@@ -1,1 +1,83 @@
 \section{\dIconfluence{} and \dIreduction{}}
+A \defword{join-free} expression $e = t_1(t_2(\ldots t_n(s_0) \ldots))$ is an
+expression that does not contain a join.
+
+We say $T$ is \defword{\dIconfluent{}} if for every pair $e_1$ and $e_2$ of
+join-free expressions, $\Irec{e_1}$ and $\Irec{e_2}$ implies that $I(e_1 \join
+e_2)$. Intuitively, \dIconfluence{} is the same thing as \Iconfluence{} with
+the added restriction that subexpressions are join-free.
+
+We say $T$ is \defword{\dIreducible{}} if for every pair $e_1$ and $e_2$ of
+join-free expressions, $\Irec{e_1 \join e_2}$ implies that there exists some
+join-free expression $e_3$ such that $\Irec{e_3}$ and $eval(e3) = eval(e1 \join
+e_2)$.  Intuitively, \dIreduction{} allows us to eliminate join operators by
+substituting $e_1 \join e_2$ (which contains 1 join) with $e_3$ (which does not
+contain any joins).
+
+\input{diconfluence_direduction.fig}
+
+We can also interpret \dIconfluence{} and \dIreduction{} using the graph-based
+model of \Iconfluence{}, as illustrated in
+\figref{diconfluence_and_direduction}. Intuitively, \dIconfluence{} is the
+property that any two divergent join-free paths that satisfy $I$ can be joined
+together to form a new state that satisfies $I$. \dIreduction{} is the property
+that the join of any two divergent join-free paths that satisfy $I$ can be
+replaced with a single join-free path that satisfies $I$. Both conditions
+involve diamond diagrams, hence the names \dIconfluence{} and \dIreduction{}.
+
+\begin{claim}\clmlabel{diconfluence_direducible_implies_iconfluence}
+  If $T$ is \dIconfluent{} and \dIreducible, then it is \Iconfluent.
+\end{claim}
+\begin{proof}
+  First, we prove that for all join-free $e$, if $\Irec{e}$ then there exists a
+  join free $e'$ where $\Irec{e'}$ and $eval(e) = eval(e')$. We proceed by a
+  pretty straightforward structural induction on $e$.
+  \begin{itemize}
+    \item \textbf{Case 1: $e = s_0$.}
+      Trivially, $e' = s_0.$
+
+    \item \textbf{Case 2: $e = t(e_1)$.}
+      $\Irec{t(e_1)}$, so $\Irec{e_1}$. Thus, by the inductive hypothesis,
+      there exists a join-free $e_1'$ such that $\Irec{e_1'}$ and $eval(e_1) =
+      eval(e_1')$. Now, let $e' = t(e_1')$ which is clearly join-free.
+      \[
+        eval(e')
+          = eval(t(e_1'))
+          = t(eval(e_1'))
+          = t(eval(e_1))
+          = eval(t(e_1))
+          = eval(e)
+      \]
+      This also implies that $\Irec{e'}$.
+
+    \item \textbf{Case 3: $e = e_1 \join e_2$.}
+      $\Irec{e_1 \join e_2}$, so $\Irec{e_1}$ and $\Irec{e_2}$. Thus, by the
+      inductive hypothesis, there exist join-free expressions $e_1'$ and $e_2'$
+      where $eval(e_1') = eval(e_1)$, $\Irec{e_1'}$, $eval(e_2') = eval(e_2)$,
+      and $\Irec{e_2'}$. Let $e'' = e_1' \join e_2'$
+      \[
+        eval(e'')
+          = eval(e_1' \join e_2')
+          = eval(e_1') \join eval(e_2')
+          = eval(e_1) \join eval(e_2)
+          = eval(e_1 \join e_2)
+          = eval(e)
+      \]
+      This implies that $\Irec{e''}$. Because $T$ is \dIreducible, there exists
+      a join-free $e'$ such that $\Irec{e'}$ and $eval(e') = eval(e'') =
+      eval(e)$.
+  \end{itemize}
+
+  Next, consider arbitrary expressions $e_1$ and $e_2$ where $\Irec{e_1}$ and
+  $\Irec{e_2}$. To show that $T$ is \Iconfluent, we must show that $I(e_1 \join
+  e_2)$. Using our little lemma above, we know there exists join-free $e_1'$
+  and $e_2'$ where $eval(e_1') = eval(e_1)$, $\Irec{e_1'}$, $eval(e_2') =
+  eval(e_2)$, and $\Irec{e_2'}$. Because $T$ is \dIconfluent, $I(e_1' \join e_2')$, and
+  \[
+    eval(e_1' \join e_2')
+      = eval(e_1') \join eval(e_2')
+      = eval(e_1) \join eval(e_2)
+      = eval(e_1 \join e_2)
+  \]
+  Thus, $I(e_1 \join e_2)$.
+\end{proof}

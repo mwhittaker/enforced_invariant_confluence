@@ -2,12 +2,15 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{colors}
 \usepackage{mathrsfs}
 \usepackage{mathtools}
 
 % Theorems, Lemmas, Claims, etc.
+\theoremstyle{definition}
 \newtheorem{claim}{Claim}
 \newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
 \newtheorem{example}{Example}
 \newtheorem{lemma}{Lemma}
 \newtheorem{theorem}{Theorem}
@@ -58,3 +61,4 @@
 \newcommand{\inv}[1]{{#1}^{-1}}
 \newcommand{\seq}[3]{{#1}_{#2}, \ldots, {#1}_{#3}}
 \newcommand{\seqonen}[1]{\seq{#1}{1}{n}}
+\newcommand{\defword}[1]{\textcolor{flatpurple}{\textbf{#1}}}

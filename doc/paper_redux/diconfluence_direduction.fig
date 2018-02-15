@@ -1,0 +1,61 @@
+\begin{figure}[ht]
+  \centering
+
+  \tikzstyle{mynode}=[state, fill=flatgrayalt]
+  \tikzstyle{txnedge}=[ultra thick, ->]
+
+  \newcommand{\baseimage}{
+  }
+
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+      \node[mynode, inv] (o) at (0, 0) {};
+      \draw (o)++(225:1) node[mynode, inv] (l1) {};
+      \draw (l1)++(225:1.5) node[mynode, inv] (l2) {};
+      \draw (o)++(-45:1) node[mynode, inv] (r1) {};
+      \draw (r1)++(-45:1.5) node[mynode, inv] (r2) {};
+      \draw (l2)++(-45:2.5) node[mynode, ninv] (f) {};
+
+      \draw[txnedge] (o) to (l1);
+      \draw[txnedge, dotted] (l1) to (l2);
+      \draw[txnedge] (o) to (r1);
+      \draw[txnedge, dotted] (r1) to (r2);
+      \draw[txnedge] (l2) to (f);
+      \draw[txnedge] (r2) to (f);
+    \end{tikzpicture}
+    \caption{Understanding \dIconfluence{} with the graph-based model}%
+    \figlabel{diconfluence}
+  \end{subfigure}\qquad\qquad
+  \begin{subfigure}[b]{0.4\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+      \node[mynode, inv] (o) at (0, 0) {};
+      \draw (o)++(225:1) node[mynode, inv] (l1) {};
+      \draw (l1)++(225:1.5) node[mynode, inv] (l2) {};
+      \draw (o)++(-45:1) node[mynode, inv] (r1) {};
+      \draw (r1)++(-45:1.5) node[mynode, inv] (r2) {};
+      \draw (l2)++(-45:2.5) node[mynode, inv] (f) {};
+
+      \draw[txnedge] (o) to (l1);
+      \draw[txnedge, dotted] (l1) to (l2);
+      \draw[txnedge] (o) to (r1);
+      \draw[txnedge, dotted] (r1) to (r2);
+      \draw[txnedge] (l2) to (f);
+      \draw[txnedge] (r2) to (f);
+
+      \draw (o)++(-90:1) node[mynode, fill=flatred, inv] (m1) {};
+      \draw (m1)++(-90:1.5) node[mynode, fill=flatred, inv] (m2) {};
+      \draw[txnedge] (o) to (m1);
+      \draw[txnedge, dotted] (m1) to (m2);
+      \draw[txnedge] (m2) to (f);
+    \end{tikzpicture}
+    \caption{Understanding \dIreduction{} with the graph-based model}%
+    \figlabel{direduction}
+  \end{subfigure}%
+
+  \caption{%
+    \dIconfluence{} and \dIreduction{} in the grpah-based model of
+    \Iconfluence{}
+  }\figlabel{diconfluence_and_direduction}
+\end{figure}

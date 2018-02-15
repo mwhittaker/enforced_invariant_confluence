@@ -1,11 +1,11 @@
 \section{\Iconfluence{}}
-A \emph{distributed object} is a triple $(S, s_0, \join)$ where $S$ is a set of
-states, $s_0 \in S$ is a designated start state, and $\join: S \times S \to S$
-is a commutative binary merge operator that we call join. A \emph{transaction}
-$t: S \to S$ is a function that maps one state to another. An \emph{invariant}
-$I: S \to \set{\text{true}, \text{false}}$ is a predicate on states. For
-example, $(\nats, +)$ is a distributed object, $t(x) = 2x$ is a transaction,
-and $I(x) = x \geq 0$ is an invariant.
+A \defword{distributed object} is a triple $(S, s_0, \join)$ where $S$ is a set
+of states, $s_0 \in S$ is a designated start state, and $\join: S \times S \to
+S$ is a commutative binary merge operator that we call join. A
+\defword{transaction} $t: S \to S$ is a function that maps one state to
+another.  An \defword{invariant} $I: S \to \set{\text{true}, \text{false}}$ is
+a predicate on states. For example, $(\nats, +)$ is a distributed object, $t(x)
+= 2x$ is a transaction, and $I(x) = x \geq 0$ is an invariant.
 
 There are three ways to think about \Iconfluence{}: a process-based approach, a
 graph-based approach, and an expression-based approach. All three approaches
@@ -26,7 +26,8 @@ $s'$ causing the other processor to transition from state $s'$ to state $s
 Consider any two processors $p_i$ and $p_j$ with states $s_i^0, \ldots, s_i^n$
 and $s_j^0, \ldots, s_j^m$ such that every state $s_i^0, \ldots, s_i^n, s_j^0,
 \ldots, s_j^m$ satisfies $I$. $T$ is invariant-confluent with respect to $I$,
-abbreviated \Iconfluent{}, if $s_i^n \join s_j^m$ is guaranteed to satisfy $I$.
+abbreviated \defword{\Iconfluent{}}, if $s_i^n \join s_j^m$ is guaranteed to
+satisfy $I$.
 
 \subsection{Graph-Based}
 The graph-based approach is most similar to the model used by Bailis et al.\
@@ -57,16 +58,18 @@ denoted $eval(e)$, in the obvious way:
   eval(e_1 \join e_2) \defeq eval(e_1) \join eval(e_2)
 \end{mathpar}
 
-We say an expression $e$ satisfies $I$ if $I(eval(e))$. We say an expression
-recursively satisfies $I$, denoted $\Irec{e}$, if $e$ and all of $e$'s children
-satisfy $I$. That is,
+We say an expression $e$ \defword{satisfies $I$}, denoted $I(e)$, if
+$I(eval(e))$. We say an expression \defword{recursively satisfies $I$}, denoted
+$\Irec{e}$, if $e$ and all of $e$'s children satisfy $I$. That is,
 \begin{mathpar}
   \Irec{s_0} \defeq I(s_0)
 
-  \Irec{t(e)} \defeq I(t(e)) \land I(e)
+  \Irec{t(e)} \defeq I(t(e)) \land \Irec{e}
 
-  \Irec{e_1 \join e_2} \defeq I(e_1 \join e_2) \land I(e_1) \land I(e_2)
+  \Irec{e_1 \join e_2}
+    \defeq I(e_1 \join e_2) \land \Irec{e_1} \land \Irec{e_2}
 \end{mathpar}
 
-We say $T$ is \Iconfluent, if for all expressions $e_1, e_2$, if $\Irec{e_1}$
-and $\Irec{e_2}$, then $I(e_1 \join e_2)$.
+We say $T$ is \defword{\Iconfluent}, if for all expressions $e_1$ and $e_2$,
+$\Irec{e_1}$ and $\Irec{e_2}$ implies $I(e_1 \join e_2)$. From now on, we will
+work mostly with the expression-based model of \Iconfluence{}.
