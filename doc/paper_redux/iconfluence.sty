@@ -1,0 +1,20 @@
+\usepackage{tikz}
+
+\newcommand{\iconfluence}[1]{{#1}-confluence}
+\newcommand{\iconfluent}[1]{{#1}-confluent}
+\newcommand{\Iconfluence}{\iconfluence{I}}
+\newcommand{\Iconfluent}{\iconfluent{I}}
+
+\newcommand{\diconfluence}[1]{$\Diamond${#1}-confluence}
+\newcommand{\diconfluent}[1]{$\Diamond${#1}-confluent}
+\newcommand{\dIconfluence}{\diconfluence{I}}
+\newcommand{\dIconfluent}{\diconfluent{I}}
+
+\newcommand{\direduction}[1]{$\Diamond${#1}-confluence}
+\newcommand{\direducible}[1]{$\Diamond${#1}-confluent}
+\newcommand{\dIreduction}{\direduction{I}}
+\newcommand{\dIreducible}{\direducible{I}}
+
+\tikzstyle{state}=[shape=circle, fill=black, inner sep=4pt, line width=1.5pt, draw=white]
+\tikzstyle{inv}=[draw=black]
+\tikzstyle{ninv}=[draw=black, dashed]
