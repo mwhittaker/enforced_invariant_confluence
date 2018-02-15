@@ -114,10 +114,15 @@
         \draw[astedge] (j1) to (j2) to (j3) to (u3) to (s3);
       \end{tikzpicture}
 
-      \caption{Expression-Based}\figlabel{graphbased}
+      \caption{Expression-Based}\figlabel{expressionbased}
     \end{subfigure}
   }
 
-  \caption{The three models of \Iconfluence{}}
+  \caption{%
+    The three models of \Iconfluence{}. We assume that states with a solid
+    border (i.e.\ $s_0, \ldots, s_6$) satisfy the invariant, and we have to
+    prove that the state with the dashed boundary (i.e.\ $s_7$) satisfies the
+    invariant.
+  }
   \figlabel{threeconfluencemodels}
 \end{figure}
