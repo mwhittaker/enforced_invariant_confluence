@@ -8,29 +8,28 @@ e_2)$. Intuitively, \dIconfluence{} is the same thing as \Iconfluence{} with
 the added restriction that subexpressions are join-free.
 
 We say $T$ is \defword{\dIreducible{}} if for every pair $e_1$ and $e_2$ of
-join-free expressions, $\Irec{e_1 \join e_2}$ implies that there exists some
-join-free expression $e_3$ such that $\Irec{e_3}$ and $eval(e3) = eval(e1 \join
+join-free expressions, $\Irec{e_1 \join e_2}$ implies that there exists some join-free expression $e_3$ such that $\Irec{e_3}$ and $eval(e3) = eval(e1 \join
 e_2)$.  Intuitively, \dIreduction{} allows us to eliminate join operators by
 substituting $e_1 \join e_2$ (which contains 1 join) with $e_3$ (which does not
 contain any joins).
 
-\input{diconfluence_direduction.fig}
-
-We can also interpret \dIconfluence{} and \dIreduction{} using the graph-based
-model of \Iconfluence{}, as illustrated in
-\figref{diconfluence_and_direduction}. Intuitively, \dIconfluence{} is the
-property that any two divergent join-free paths that satisfy $I$ can be joined
-together to form a new state that satisfies $I$. \dIreduction{} is the property
-that the join of any two divergent join-free paths that satisfy $I$ can be
-replaced with a single join-free path that satisfies $I$. Both conditions
-involve diamond diagrams, hence the names \dIconfluence{} and \dIreduction{}.
+% \input{diconfluence_direduction.fig}
+%
+% We can also interpret \dIconfluence{} and \dIreduction{} using the graph-based
+% model of \Iconfluence{}, as illustrated in
+% \figref{diconfluence_and_direduction}. Intuitively, \dIconfluence{} is the
+% property that any two divergent join-free paths that satisfy $I$ can be joined
+% together to form a new state that satisfies $I$. \dIreduction{} is the property
+% that the join of any two divergent join-free paths that satisfy $I$ can be
+% replaced with a single join-free path that satisfies $I$. Both conditions
+% involve diamond diagrams, hence the names \dIconfluence{} and \dIreduction{}.
 
 \begin{claim}\clmlabel{diconfluence_direducible_implies_iconfluence}
   If $T$ is \dIconfluent{} and \dIreducible, then it is \Iconfluent.
 \end{claim}
 \begin{proof}
   First, we prove that for all join-free $e$, if $\Irec{e}$ then there exists a
-  join free $e'$ where $\Irec{e'}$ and $eval(e) = eval(e')$. We proceed by a
+  join-free $e'$ where $\Irec{e'}$ and $eval(e) = eval(e')$. We proceed by a
   pretty straightforward structural induction on $e$.
   \begin{itemize}
     \item \textbf{Case 1: $e = s_0$.}
@@ -55,14 +54,14 @@ involve diamond diagrams, hence the names \dIconfluence{} and \dIreduction{}.
       inductive hypothesis, there exist join-free expressions $e_1'$ and $e_2'$
       where $eval(e_1') = eval(e_1)$, $\Irec{e_1'}$, $eval(e_2') = eval(e_2)$,
       and $\Irec{e_2'}$. Let $e'' = e_1' \join e_2'$
-      \[
+      \begin{align*}
         eval(e'')
-          = eval(e_1' \join e_2')
-          = eval(e_1') \join eval(e_2')
-          = eval(e_1) \join eval(e_2)
-          = eval(e_1 \join e_2)
-          = eval(e)
-      \]
+        &= eval(e_1' \join e_2') \\
+        &= eval(e_1') \join eval(e_2') \\
+        &= eval(e_1) \join eval(e_2) \\
+        &= eval(e_1 \join e_2) \\
+        &= eval(e)
+      \end{align*}
       This implies that $\Irec{e''}$. Because $T$ is \dIreducible, there exists
       a join-free $e'$ such that $\Irec{e'}$ and $eval(e') = eval(e'') =
       eval(e)$.

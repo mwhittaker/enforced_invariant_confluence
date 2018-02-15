@@ -1,11 +1,11 @@
 \section{\Iconfluence{}}
 A \defword{distributed object} is a triple $(S, s_0, \join)$ where $S$ is a set
 of states, $s_0 \in S$ is a designated start state, and $\join: S \times S \to
-S$ is a commutative binary merge operator that we call join. A
-\defword{transaction} $t: S \to S$ is a function that maps one state to
-another.  An \defword{invariant} $I: S \to \set{\text{true}, \text{false}}$ is
-a predicate on states. For example, $(\nats, +)$ is a distributed object, $t(x)
-= 2x$ is a transaction, and $I(x) = x \geq 0$ is an invariant.
+S$ is a binary merge operator that we call join. A \defword{transaction} $t: S
+\to S$ is a function that maps one state to another.  An \defword{invariant}
+$I: S \to \set{\text{true}, \text{false}}$ is a predicate on states. For
+example, $(\nats, +)$ is a distributed object, $t(x) = 2x$ is a transaction,
+and $I(x) = x \geq 0$ is an invariant.
 
 There are three ways to think about \Iconfluence{}: a process-based approach, a
 graph-based approach, and an expression-based approach. All three approaches
