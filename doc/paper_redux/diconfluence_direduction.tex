@@ -8,7 +8,8 @@ e_2)$. Intuitively, \dIconfluence{} is the same thing as \Iconfluence{} with
 the added restriction that subexpressions are join-free.
 
 We say $T$ is \defword{\dIreducible{}} if for every pair $e_1$ and $e_2$ of
-join-free expressions, $\Irec{e_1 \join e_2}$ implies that there exists some join-free expression $e_3$ such that $\Irec{e_3}$ and $eval(e3) = eval(e1 \join
+join-free expressions, $\Irec{e_1 \join e_2}$ implies that there exists some
+join-free expression $e_3$ such that $\Irec{e_3}$ and $eval(e3) = eval(e1 \join
 e_2)$.  Intuitively, \dIreduction{} allows us to eliminate join operators by
 substituting $e_1 \join e_2$ (which contains 1 join) with $e_3$ (which does not
 contain any joins).
@@ -28,9 +29,9 @@ contain any joins).
   If $T$ is \dIconfluent{} and \dIreducible, then it is \Iconfluent.
 \end{claim}
 \begin{proof}
-  First, we prove that for all join-free $e$, if $\Irec{e}$ then there exists a
-  join-free $e'$ where $\Irec{e'}$ and $eval(e) = eval(e')$. We proceed by a
-  pretty straightforward structural induction on $e$.
+  First, we prove that for all $e$, if $\Irec{e}$ then there exists a join-free
+  $e'$ where $\Irec{e'}$ and $eval(e) = eval(e')$. We proceed by a pretty
+  straightforward structural induction on $e$.
   \begin{itemize}
     \item \textbf{Case 1: $e = s_0$.}
       Trivially, $e' = s_0.$

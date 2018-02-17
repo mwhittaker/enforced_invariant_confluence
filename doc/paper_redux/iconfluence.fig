@@ -92,7 +92,7 @@
           line width=1pt,
           inner sep=2pt,
           text opacity=1,
-        fill opacity=0.7]
+          fill opacity=0.7]
         \node[astnode, ninv, s7color] (j1) at (0, 0) {$\boldsymbol \land$};
         \draw (j1)++(-30:1) node[astnode, inv, s5color] (w) {$\boldsymbol w$};
         \draw (j1)++(210:1) node[astnode, inv, s6color] (j2) {$\boldsymbol \land$};

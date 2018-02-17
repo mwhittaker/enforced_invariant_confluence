@@ -1,0 +1,59 @@
+\section{Sufficient Conditions for \Iconfluence{}}
+\newcommand{\Icommutativity}{$I$-commutativity}
+\newcommand{\Ijoinisapply}{$I$-join-is-apply}
+\newcommand{\nestedapply}[3]{{#1}_1({#1}_2(\ldots ({#1}_#2(#3)) \ldots))}
+\newcommand{\bart}[1]{\overline{t_{#1}}}
+\newcommand{\baru}[1]{\overline{u_{#1}}}
+
+In this section, we prove that the following three conditions imply
+\Iconfluence.
+\begin{enumerate}
+  \item
+    $(S, \join)$ is a semilattice.
+
+  \item
+    Every transaction $t \in T$ is of the form $t(s) = s \join s_t$ for some
+    $s_t \in S$.
+
+  \item
+    For all $u, t \in T$, and for all $s \in S$, if $I(s)$, $I(t(s))$, and
+    $I(u(s))$, then $I(t(s) \join u(s))$.
+\end{enumerate}
+
+Using \clmref{diconfluence_direducible_implies_iconfluence}, it suffices to
+show that the three properties imply \dIconfluence{} and \dIreduction{}. We do
+so in \clmref{threepropsdiconfluence} and \clmref{threepropsdireducible}.
+
+\begin{claim}\clmlabel{threepropsdiconfluence}
+  \Icommutativity, \Ijoinisapply, and \onedIconfluence{} imply \dIconfluence.
+\end{claim}
+\begin{proof}
+  Consider arbitrary join-free expressions $e_1$ and $e_2$ where $\Irec{e_1}$
+  and $\Irec{e_2}$. We want to show that $I(e_1 \join e_2)$. Because $e_1$ and
+  $e_2$ are join-free, they are of the following form:
+  \begin{mathpar}
+    e_1 = \nestedapply{t}{n}{s_0}
+
+    e_2 = \nestedapply{u}{m}{s_0}
+  \end{mathpar}
+  where $n, m \in \nats$ and $t_i, u_j \in T$. As a syntactic convenience, let
+  $\bart{i}(e) = \nestedapply{t}{i}{e}$. Similarly define $\baru{j}(e)$.
+  Then,
+  \begin{mathpar}
+    e_1 = \bart{n}(s_0)
+
+    e_2 = \baru{m}(s_0)
+  \end{mathpar}
+  We prove by strong mathematical induction on m that for all i + j = m, I(barti join baruj).kjkj
+
+\end{proof}
+
+\begin{claim}\clmlabel{threepropsdireducible}
+  \Icommutativity, \Ijoinisapply, and \onedIconfluence{} imply \dIreduction.
+\end{claim}
+\begin{proof}
+
+\end{proof}
+
+TODO(mwhittaker): Give examples of when these conditions are met.
+TODO(mwhittaker): Explain that 1-I-confluence is necessary.

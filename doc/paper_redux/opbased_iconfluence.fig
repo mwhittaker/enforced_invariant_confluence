@@ -12,83 +12,112 @@
   \tikzstyle{s8color}=[fill=flatdarkgray]
   \tikzstyle{txnline}=[black, thick, ->]
 
-  \begin{subfigure}[c]{0.5\textwidth}
+  \begin{subfigure}[c]{0.4\textwidth}
     \centering
 
-    \begin{tikzpicture}[xscale=2, yscale=2]
+    \begin{tikzpicture}[xscale=1.5, yscale=1]
       \node (p3) at (0.5, 3) {$p_3$};
       \node (p2) at (0.5, 2) {$p_2$};
       \node (p1) at (0.5, 1) {$p_1$};
 
       \tikzstyle{pline}=[gray, opacity=0.5, thick, ->]
-      \draw[pline] (p3) to (5.5, 3);
-      \draw[pline] (p2) to (5.5, 2);
-      \draw[pline] (p1) to (5.5, 1);
+      \draw[pline] (p3) to (4.5, 3);
+      \draw[pline] (p2) to (4.5, 2);
+      \draw[pline] (p1) to (4.5, 1);
 
       \node[state, s0color, inv, label={90:$s_0$}] (s03) at (1, 3) {};
       \node[state, s1color, inv, label={90:$s_1$}] (s13) at (2, 3) {};
       \node[state, s3color, inv, label={90:$s_3$}] (s23) at (3, 3) {};
       \node[state, s6color, inv, label={90:$s_6$}] (s33) at (4, 3) {};
 
-
-
-      % \node[state, s1color, inv, label={90:$s_1$}] (s13) at (2, 3) {};
-      % \node[state, s3color, inv, label={90:$s_3$}] (s23) at (3, 3) {};
-      % \node[state, s6color, inv, label={90:$s_6$}] (s33) at (4, 3) {};
-
       \node[state, s0color, inv, label={90:$s_0$}] (s02) at (1, 2) {};
       \node[state, s2color, inv, label={90:$s_2$}] (s12) at (2, 2) {};
       \node[state, s4color, inv, label={90:$s_4$}] (s22) at (3, 2) {};
       \node[state, s7color, ninv, label={90:$s_7$}] (s32) at (4, 2) {};
-      % \node[state, s2color, inv, label={90:$s_2$}] (s12) at (2, 2) {};
-      % \node[state, s4color, inv, label={90:$s_4$}] (s22) at (3, 2) {};
 
       \node[state, s0color, inv, label={90:$s_0$}] (s01) at (1, 1) {};
       \node[state, s2color, inv, label={90:$s_2$}] (s11) at (2, 1) {};
       \node[state, s5color, inv, label={90:$s_5$}] (s21) at (3, 1) {};
       \node[state, s8color, inv, label={90:$s_8$}] (s31) at (4, 1) {};
-      % \node[state, s2color, inv, label={90:$s_2$}] (s11) at (2, 1) {};
-      % \node[state, s5color, inv, label={90:$s_5$}] (s21) at (3, 1) {};
-      % \node[state, s7color, ninv, label={90:$s_7$}] (s31) at (5, 1) {};
 
       \tikzstyle{txntext}=[sloped, above]
-      \tikzstyle{sendline}=[opacity=0.1, gray]
-      \draw[txnline] (s03) to node[txntext]{$t(s_0)$} (s13);
+      \tikzstyle{sendline}=[opacity=0.25, gray]
       \draw[txnline, sendline] (s03) to node[txntext]{} (s22);
       \draw[txnline, sendline] (s03) to node[txntext]{} (s31);
-
       \draw[txnline, sendline] (s02) to node[txntext]{} (s23);
-      \draw[txnline] (s02) to node[txntext]{$u(s_0)$} (s12);
       \draw[txnline, sendline] (s02) to node[txntext]{} (s11);
-
       \draw[txnline, sendline] (s11) to node[txntext]{} (s33);
       \draw[txnline, sendline] (s11) to node[txntext]{} (s32);
-      \draw[txnline] (s11) to node[txntext]{$v(s_2)$} (s21);
 
+      \draw[txnline] (s03) to node[txntext]{$t(s_0)$} (s13);
+      \draw[txnline] (s02) to node[txntext]{$u(s_0)$} (s12);
+      \draw[txnline] (s11) to node[txntext]{$v(s_2)$} (s21);
       \draw[txnline] (s13) to node[txntext]{$u(s_0)$} (s23);
       \draw[txnline] (s23) to node[txntext]{$v(s_2)$} (s33);
-
       \draw[txnline] (s12) to node[txntext]{$t(s_0)$} (s22);
       \draw[txnline] (s22) to node[txntext]{$v(s_2)$} (s32);
-
       \draw[txnline] (s01) to node[txntext]{$u(s_0)$} (s11);
       \draw[txnline] (s21) to node[txntext]{$t(s_2)$} (s31);
-
-      % \draw[txnline] (s03) to node[txntext]{$t$} (s13);
-      % \draw[txnline] (s13) to node[txntext]{$v$} (s23);
-      % \draw[txnline] (s02) to node[txntext]{$u$} (s12);
-      % \draw[txnline] (s01) to node[txntext]{$u$} (s11);
-      % \draw[txnline] (s11) to node[txntext]{$w$} (s21);
-      %
-      % \draw[txnline] (s13) to node[txntext]{} (s22);
-      % \draw[txnline] (s12) to node[txntext]{} (s22);
-      % \draw[txnline] (s22) to node[txntext]{} (s33);
-      % \draw[txnline] (s23) to node[txntext]{} (s33);
-      % \draw[txnline] (s21) to node[txntext]{} (s31);
-      % \draw[txnline] (s33) to node[txntext]{} (s31);
     \end{tikzpicture}
 
-    \caption{}\figlabel{}
+    \caption{Process-Based}\figlabel{opprocessbased}
+  \end{subfigure}%
+  \begin{subfigure}[c]{0.29\textwidth}
+    \centering
+
+    \begin{tikzpicture}[y=1.5cm]
+      \node[state, s0color, inv, label={90:$s_0$}] (o) at (1, 3) {};
+      \node[state, s1color, inv, label={180:$s_1$}] (l) at (0, 2) {};
+      \node[state, s3color, inv, label={180:$s_2$}] (ld) at (0, 1) {};
+      \node[state, s6color, inv, label={180:$s_6$}] (ldd) at (0, 0) {};
+      \node[state, s2color, inv, label={180:$s_2$}] (r) at (2, 2) {};
+      \node[state, s4color, inv, label={180:$s_4$}] (rl) at (1.25, 1) {};
+      \node[state, s7color, ninv, label={180:$s_7$}] (rld) at (1.25, 0) {};
+      \node[state, s5color, inv, label={180:$s_5$}] (rr) at (2.75, 1) {};
+      \node[state, s8color, inv, label={180:$s_8$}] (rrd) at (2.75, 0) {};
+
+      \draw[txnline] (o) to node[sloped, above] {$t(s_0)$} (l);
+      \draw[txnline] (l) to node[sloped, above, rotate=180] {$u(s_0)$} (ld);
+      \draw[txnline] (ld) to node[sloped, above, rotate=180] {$v(s_2)$} (ldd);
+      \draw[txnline] (o) to node[sloped, above] {$u(s_0)$} (r);
+      \draw[txnline] (r) to node[sloped, above] {$v(s_2)$} (rr);
+      \draw[txnline] (rr) to node[sloped, above] {$t(s_2)$} (rrd);
+      \draw[txnline] (r) to node[sloped, above] {$t(s_0)$} (rl);
+      \draw[txnline] (rl) to node[sloped, above, rotate=180] {$v(s_2)$} (rld);
+    \end{tikzpicture}
+
+    \caption{Graph-Based}\figlabel{opgraphbased}
+  \end{subfigure}
+  \begin{subfigure}[c]{0.3\textwidth}
+    \centering
+
+    \begin{tikzpicture}[xscale=0.75]
+        \tikzstyle{astnode}=[%
+          shape=circle,
+          line width=1pt,
+          inner sep=2pt,
+          text opacity=1,
+          fill opacity=0.7]
+        \node[astnode, ninv, s7color] (o) at (0, 0) {$\boldsymbol v$};
+
+        \draw (o)++(210:1.5) node[astnode, inv, s2color] (l) {$\boldsymbol u$};
+        \draw (l)++(225:1) node[astnode, inv, s0color] (ll) {$\boldsymbol s_0$};
+        \draw (l)++(-45:1) node[astnode, inv, s0color] (lr) {$\boldsymbol s_0$};
+        \draw (o)++(-30:1.5) node[astnode, inv, s4color] (r) {$\boldsymbol t$};
+        \draw (r)++(225:1) node[astnode, inv, s0color] (rl) {$\boldsymbol s_0$};
+        \draw (r)++(-45:1) node[astnode, inv, s2color] (rr) {$\boldsymbol u$};
+        \draw (rr)++(225:1) node[astnode, inv, s0color] (rrl) {$\boldsymbol s_0$};
+        \draw (rr)++(-45:1) node[astnode, inv, s0color] (rrr) {$\boldsymbol s_0$};
+
+        \tikzstyle{astedge}=[thick]
+        \draw[astedge] (o) to (l) to (ll);
+        \draw[astedge] (l) to (lr);
+        \draw[astedge] (o) to (r) to (rl);
+        \draw[astedge] (r) to (rr) to (rrl);
+        \draw[astedge] (rr) to (rrr);
+    \end{tikzpicture}
+
+    \caption{Expression-Based}\figlabel{opexpressionbased}
   \end{subfigure}
 
   \caption{}\figlabel{}
