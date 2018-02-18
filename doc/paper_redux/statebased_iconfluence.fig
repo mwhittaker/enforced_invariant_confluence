@@ -119,10 +119,10 @@
   }
 
   \caption{%
-    The three models of \Iconfluence{}. We assume that states with a solid
-    border (i.e.\ $s_0, \ldots, s_6$) satisfy the invariant, and we have to
-    prove that the state with the dashed boundary (i.e.\ $s_7$) satisfies the
-    invariant.
+    Three models of state-based \Iconfluence{}. We assume that states with a
+    solid border (i.e.\ $s_0, \ldots, s_6$) satisfy the invariant, and we have
+    to prove that the state with the dashed boundary (i.e.\ $s_7$) satisfies
+    the invariant.
   }
-  \figlabel{threeconfluencemodels}
+  \figlabel{statebasedmodels}
 \end{figure}

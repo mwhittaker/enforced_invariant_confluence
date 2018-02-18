@@ -1,21 +1,39 @@
 \section{\Iconfluence{}}
-A \defword{distributed object} is a triple $(S, s_0, \join)$ where $S$ is a set
-of states, $s_0 \in S$ is a designated start state, and $\join: S \times S \to
-S$ is a binary merge operator that we call join. A \defword{transaction} $t: S
-\to S$ is a function that maps one state to another.  An \defword{invariant}
-$I: S \to \set{\text{true}, \text{false}}$ is a predicate on states. For
-example, $(\nats, +)$ is a distributed object, $t(x) = 2x$ is a transaction,
-and $I(x) = x \geq 0$ is an invariant.
+In this section, we present six different ways to think about \Iconfluence{}:
+three state-based approaches and three operation-based approaches.
 
-There are three ways to think about \Iconfluence{}: a process-based approach, a
-graph-based approach, and an expression-based approach. All three approaches
-are illustrated in \figref{threeconfluencemodels} and are described in more
-detail below.
+\subsection{State-Based}
+\begin{definition}
+  A \defword{distributed state-based object} is a triple $(S, s_0, \join)$
+  where $S$ is a set of states, $s_0 \in S$ is a designated start state, and
+  $\join: S \times S \to S$ is a binary merge operator that we call join.
+\end{definition}
 
-\input{iconfluence.fig}
-\input{opbased_iconfluence.fig}
+The notion of state-based objects is taken from~\cite{shapiro2011conflict}.
 
-\subsection{Process-Based}
+\begin{definition}
+  A \defword{state-based transaction} $t: S \to S$ is a function that maps one
+  state to another.
+\end{definition}
+
+\begin{definition}
+  An \defword{invariant} $I: S \to \set{\text{true}, \text{false}}$ is a
+  predicate on states.
+\end{definition}
+
+\begin{example}
+  $(\nats, 0, +)$ is a distributed object, $t(x) = 2x$ is a transaction, and
+  $I(x) = x \geq 0$ is an invariant.
+\end{example}
+
+There are three ways to think about state-based \Iconfluence{}: a process-based
+approach, a graph-based approach, and an expression-based approach. All three
+approaches are illustrated in \figref{statebasedmodels} and are described in
+more detail below.
+
+\input{statebased_iconfluence.fig}
+
+\subsubsection{Process-Based}
 The process-based model is most similar to the process model described by
 Shapiro et al.\ in~\cite{shapiro2011conflict}. We are given a set
 $\seq{p}{1}{n}$ of $n$ processors each of which begins with state $s_0$.
@@ -30,7 +48,7 @@ and $s_j^0, \ldots, s_j^m$ such that every state $s_i^0, \ldots, s_i^n, s_j^0,
 abbreviated \defword{\Iconfluent{}}, if $s_i^n \join s_j^m$ is guaranteed to
 satisfy $I$.
 
-\subsection{Graph-Based}
+\subsubsection{Graph-Based}
 The graph-based approach is most similar to the model used by Bailis et al.\
 in~\cite{bailis2014coordination}. We are given a directed acyclic graph in
 which vertices can have an arbitrary number of children but at most two
@@ -38,11 +56,11 @@ parents. The vertices are labelled with states, and the edges are either
 labelled with transactions or are unlabelled if they correspond to a join. The
 graph is really just an alternate way of representing an execution in the
 process-based model, but with duplicate states collapsed into a single vertex.
-As with the process-based model, we say that $T$ is \Iconfluent{} if the join
-of any two invariant satisfying states with invariant satisfying ancestors is
-guaranteed to satisfy the invariant.
+As with the process-based model, we say that $T$ is \defword{\Iconfluent{}} if
+the join of any two invariant satisfying states with invariant satisfying
+ancestors is guaranteed to satisfy the invariant.
 
-\subsection{Expression-Based}
+\subsubsection{Expression-Based}
 The expression-based approach deals with expressions built from $s_0$,
 transactions in $T$, and $\join$. That is, expressions $e$ are built from the
 grammar
@@ -59,25 +77,111 @@ denoted $eval(e)$, in the obvious way:
   eval(e_1 \join e_2) \defeq eval(e_1) \join eval(e_2)
 \end{mathpar}
 
-We say an expression $e$ \defword{satisfies $I$}, denoted $I(e)$, if
-$I(eval(e))$. We say an expression \defword{recursively satisfies $I$}, denoted
-$\Irec{e}$, if $e$ and all of $e$'s children satisfy $I$. That is,
-\begin{mathpar}
-  \Irec{s_0} \defeq I(s_0)
+\begin{definition}
+  An expression $e$ \defword{satisfies $I$}, denoted $I(e)$, if $I(eval(e))$.
+\end{definition}
 
-  \Irec{t(e)} \defeq I(t(e)) \land \Irec{e}
+\begin{definition}
+  An expression \defword{recursively satisfies $I$}, denoted $\Irec{e}$, if $e$
+  and all of $e$'s children satisfy $I$. That is,
+  \begin{mathpar}
+    \Irec{s_0} \defeq I(s_0)
 
-  \Irec{e_1 \join e_2}
+    \Irec{t(e)} \defeq I(t(e)) \land \Irec{e}
+
+    \Irec{e_1 \join e_2}
     \defeq I(e_1 \join e_2) \land \Irec{e_1} \land \Irec{e_2}
+  \end{mathpar}
+\end{definition}
+
+\begin{definition}
+  $T$ is \defword{\Iconfluent}, if for all expressions $e_1$ and $e_2$,
+  $\Irec{e_1}$ and $\Irec{e_2}$ implies $I(e_1 \join e_2)$.
+\end{definition}
+
+\subsection{Operation-Based}
+\begin{definition}
+  A \defword{distributed operation-based object} is a pair $(S, s_0)$
+  where $S$ is a set of states and $s_0 \in S$ is a designated start state.
+\end{definition}
+
+The notion of operation-based objects is also taken
+from~\cite{shapiro2011conflict}. Note that we do not have a join function like
+we did with state-based objects.
+
+\begin{definition}
+  An \defword{operation-based transaction} $t: S \to (S \to S)$ is a function
+  that maps a state to a \defword{shadow transaction} $t(s): S \to S$. The term
+  shadow transaction is taken from~\cite{li2014automating}.
+\end{definition}
+
+The definition of invariants remains unchanged.
+
+\begin{example}
+  $(\nats, 0)$ is a distributed object. Let $f_k(x) = x + k$. $t(x) = f_x$ is a
+  transaction. $I(x) = x \geq 0$ is an invariant.
+\end{example}
+
+As with state-based objects, there are three ways to think about
+operation-based \Iconfluence{}: a process-based approach, a graph-based
+approach, and an expression-based approach. All three approaches are
+illustrated in \figref{opbasedmodels} and are described in more detail below.
+
+\input{opbased_iconfluence.fig}
+
+\subsubsection{Process-Based}
+As with the state-based approach, the process-based model is most similar to
+the process model described by Shapiro et al.\ in~\cite{shapiro2011conflict}.
+We are given a set $\seq{p}{1}{n}$ of $n$ processors each of which begins with
+state $s_0$. Repeatedly, a processor executes a transaction $t$ on its current
+state $s$ and then transitions from state $s$ to state $t(s)(s)$. It also
+broadcasts $t(s)$ to all other processes exactly once. When a processor with
+state $s'$ receives $t(s)$, it transitions from state $s'$ to state $t(s)(s')$.
+
+Consider any two processors $p_i$ and $p_j$ with states $s_i^0, \ldots, s_i^n$
+and $s_j^0, \ldots, s_j^m$ such that every state $s_i^0, \ldots, s_i^n, s_j^0,
+\ldots, s_j^m$ satisfies $I$. $T$ is invariant-confluent with respect to $I$,
+abbreviated \defword{\Iconfluent{}}, if for all $t \in T$, $I(t(s_i^n)(s_i^n))$
+implies $I(t(s_i^n)(s_j^m))$.
+
+\subsubsection{Graph-Based}
+In the graph-based model, we are given a directed acyclic graph in which each
+vertex is associated with a state $s$ and each edge is labelled with a shadow
+operation $t(s)$ where $s$ is associated with some vertex in the graph.
+%
+Consider two invariant-satisfying states $s$ and $s'$ with invariant satisfying
+ancestors. $T$ is \defword{\Iconfluent{}} if for all $t$, $I(t(s)(s))$ implies
+$I(t(s)(s'))$.
+
+\subsubsection{Expression-Based}
+The expression-based approach deals with expressions built from $s_0$ and
+transactions in $T$. That is, expressions $e$ are built from the grammar
+\[
+  e ::= s_0 \mid t(e_1)(e_2)
+\]
+where $t$ corresponds to a transaction in $T$. We can evaluate an expression,
+denoted $eval(e)$, in the obvious way:
+\begin{mathpar}
+  eval(s_0) \defeq s_0
+
+  eval(t(e_1)(e_2)) \defeq t(eval(e_1))(eval(e_2))
 \end{mathpar}
 
-We say $T$ is \defword{\Iconfluent}, if for all expressions $e_1$ and $e_2$,
-$\Irec{e_1}$ and $\Irec{e_2}$ implies $I(e_1 \join e_2)$. From now on, we will
-work mostly with the expression-based model of \Iconfluence{}.
+\begin{definition}
+  An expression $e$ \defword{satisfies $I$}, denoted $I(e)$, if $I(eval(e))$.
+\end{definition}
 
+\begin{definition}
+  An expression \defword{recursively satisfies $I$}, denoted $\Irec{e}$, if $e$
+  and all of $e$'s children satisfy $I$. That is,
+  \begin{mathpar}
+    \Irec{s_0} \defeq I(s_0)
 
+    \Irec{t(e_1)(e_2)} \defeq I(t(e_1)(e_2)) \land \Irec{e_1} \land \Irec{e_2}
+  \end{mathpar}
+\end{definition}
 
-
-
-
-
+\begin{definition}
+  $T$ is \defword{\Iconfluent}, if for all expressions $e_1$ and $e_2$,
+  $\Irec{e_1}$, $\Irec{e_2}$, and $I(t(e_1)(e_1))$ implies $I(t(e_1)(e_2))$.
+\end{definition}

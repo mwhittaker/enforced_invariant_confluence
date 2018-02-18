@@ -120,5 +120,10 @@
     \caption{Expression-Based}\figlabel{opexpressionbased}
   \end{subfigure}
 
-  \caption{}\figlabel{}
+  \caption{%
+    Three models of operation-based \Iconfluence. As with the state-based
+    models, we assume states with a solid border satisfy the invariant, and we
+    have to prove that the state with a dashed border satisfies the
+    invariant.
+  }\figlabel{opbasedmodels}
 \end{figure}
