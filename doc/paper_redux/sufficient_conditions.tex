@@ -1,59 +1,84 @@
-\section{Sufficient Conditions for \Iconfluence{}}
-\newcommand{\Icommutativity}{$I$-commutativity}
-\newcommand{\Ijoinisapply}{$I$-join-is-apply}
-\newcommand{\nestedapply}[3]{{#1}_1({#1}_2(\ldots ({#1}_#2(#3)) \ldots))}
-\newcommand{\bart}[1]{\overline{t_{#1}}}
-\newcommand{\baru}[1]{\overline{u_{#1}}}
+\section{Sufficient Conditions}
+In this section, we present sufficient conditions for state-based and
+operation-based invariant confluence. It turns out that these conditions are
+sufficient but not necessary. However, if we relax the assumption of a fixed
+start state $s_0$, then they are both sufficient and necessary.
 
-In this section, we prove that the following three conditions imply
-\Iconfluence.
-\begin{enumerate}
-  \item
-    $(S, \join)$ is a semilattice.
-
-  \item
-    Every transaction $t \in T$ is of the form $t(s) = s \join s_t$ for some
-    $s_t \in S$.
-
-  \item
-    For all $u, t \in T$, and for all $s \in S$, if $I(s)$, $I(t(s))$, and
-    $I(u(s))$, then $I(t(s) \join u(s))$.
-\end{enumerate}
-
-Using \clmref{diconfluence_direducible_implies_iconfluence}, it suffices to
-show that the three properties imply \dIconfluence{} and \dIreduction{}. We do
-so in \clmref{threepropsdiconfluence} and \clmref{threepropsdireducible}.
-
-\begin{claim}\clmlabel{threepropsdiconfluence}
-  \Icommutativity, \Ijoinisapply, and \onedIconfluence{} imply \dIconfluence.
+\begin{claim}\clmlabel{statebasedsufficient}
+  If for all states $s_1$ and $s_2$, $I(s_1)$ and $I(s_2)$ implies $I(s_1 \join
+  s_2)$, then $T$ is \Iconfluent{}. In other words, if invariant satisfying
+  states are closed under join, then $T$ is \Iconfluent.
 \end{claim}
 \begin{proof}
-  Consider arbitrary join-free expressions $e_1$ and $e_2$ where $\Irec{e_1}$
-  and $\Irec{e_2}$. We want to show that $I(e_1 \join e_2)$. Because $e_1$ and
-  $e_2$ are join-free, they are of the following form:
-  \begin{mathpar}
-    e_1 = \nestedapply{t}{n}{s_0}
-
-    e_2 = \nestedapply{u}{m}{s_0}
-  \end{mathpar}
-  where $n, m \in \nats$ and $t_i, u_j \in T$. As a syntactic convenience, let
-  $\bart{i}(e) = \nestedapply{t}{i}{e}$. Similarly define $\baru{j}(e)$.
-  Then,
-  \begin{mathpar}
-    e_1 = \bart{n}(s_0)
-
-    e_2 = \baru{m}(s_0)
-  \end{mathpar}
-  We prove by strong mathematical induction on m that for all i + j = m, I(barti join baruj).kjkj
-
+  Let $e_1, e_2$ be expressions such that $\Irec{e_1}$ and $\Irec{e_2}$. Then,
+  $I(eval(e_1))$ and $I(eval(e_2))$, so $I(eval(e_1) \join eval(e_2))$ which
+  implies $I(e_1 \join e_2)$.
 \end{proof}
 
-\begin{claim}\clmlabel{threepropsdireducible}
-  \Icommutativity, \Ijoinisapply, and \onedIconfluence{} imply \dIreduction.
+\begin{claim}\clmlabel{opbasedsufficient}
+  If for all transactions $t \in T$ and for all states $s_1$ and $s_2$,
+  $I(s_1)$ and $I(s_2)$ and $I(t(s_1)(s_1))$ implies $I(t(s_1)(s_2))$, then $T$
+  is \Iconfluent{}.
 \end{claim}
 \begin{proof}
-
+  Let $t \in T$ and $e_1, e_2$ be expressions such that $\Irec{e_1}$,
+  $\Irec{e_2}$, and $I(t(e_1)(e_2))$. Let $s_1 = eval(e_1)$ and $s_2 =
+  eval(s_2)$. Then, $I(s_1)$, $I(s_2)$, and $I(t(s_1)(s_1))$, so
+  $I(t(s_1)(s_2))$. This implies $I(t(e_1)(e_2))$.
 \end{proof}
 
-TODO(mwhittaker): Give examples of when these conditions are met.
-TODO(mwhittaker): Explain that 1-I-confluence is necessary.
+While the conditions in \clmref{statebasedsufficient} and
+\clmref{opbasedsufficient} are sufficient, they are not necessary.
+
+\begin{claim}\clmlabel{statebasednotnecessary}
+  If $T$ is \Iconfluent, it may not satisfy the condition in
+  \clmref{statebasedsufficient}.
+\end{claim}
+\begin{proof}
+  Consider the state based object $(S, s_0, \join)$ where $S$ is the set of all
+  finite non-empty sets of integers, $s_0 = \set{0}$, and $\join = \cup$. We
+  have a single transaction $t(x) = x \cup \set{\max(x) + 2}$ which retrieves
+  the largest element from the set (which is guaranteed to exist because it is
+  finite and non-empty), adds two to it, and then adds it into the set. $T =
+  \set{t}$. Let $I$ be the invariant that all elements of $S$ are either odd or
+  even.
+
+  Note that $T$ is \Iconfluent{}. Beginning with our initial state, we can
+  derive states $\set{0}, \set{0, 2}, \set{0, 2, 4}, \ldots$ all of which
+  satisfy the invariant. Moreover, merging any such states satisfies the
+  invariant.
+  %
+  However, $T$ doesn't satisfy the condition in \clmref{statebasedsufficient}.
+  $\set{0}$ and $\set{1}$ satisfy the invariant, but $\set{0} \cup \set{1}$
+  does not.
+\end{proof}
+
+\begin{claim}\clmlabel{opbasednotnecessary}
+  If $T$ is \Iconfluent, it may not satisfy the condition in
+  \clmref{opbasedsufficient}.
+\end{claim}
+\begin{proof}
+  We play the same trick as \clmref{statebasednotnecessary}. Let $S$, $s_0$,
+  and $I$ be as in \clmref{statebasednotnecessary}. Consider a single
+  transaction $t(x) = u_{\max(x) + 2}$ where $u_k(x) = x \cup \set{k}$. Let $T
+  = \set{t}$.
+
+  $T$ is \Iconfluent{}. Beginning with our initial state, we can derive any
+  finite set of even integers containing $0$. All these states satisfy the
+  invariant. Letting $s, s'$ be any of these states, $I(t(s)(s'))$.
+  %
+  However, $T$ doesn't satisfy the condition in \clmref{opbasedsufficient}.
+  $\set{0}$ and $\set{1}$ satisfy the invariant, and so does
+  $t(\set{0})(\set{0})$, but $t(\set{0})(\set{1}) = \set{1, 2}$ does not.
+\end{proof}
+
+\todo{Think of more compelling examples.}
+
+The conditions in \clmref{statebasedsufficient} and \clmref{opbasedsufficient}
+are not necessary. Intuitively, this makes quite a bit of sense. Neither
+condition depended on the initial state $s_0$, and both
+\clmref{statebasednotnecessary} and \clmref{opbasednotnecessary} exploit this.
+If we relax our assumption of a fixed start state, then both these conditions
+become sufficient and necessary.
+
+\todo{Prove this more carefully. It's pretty straightforward though.}
