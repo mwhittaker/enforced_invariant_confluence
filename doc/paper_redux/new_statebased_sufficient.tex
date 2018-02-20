@@ -87,7 +87,8 @@ contain any joins).
   $\Irec{e_2}$. To show that $T$ is \Iconfluent, we must show that $I(e_1 \join
   e_2)$. Using our little lemma above, we know there exists join-free $e_1'$
   and $e_2'$ where $eval(e_1') = eval(e_1)$, $\Irec{e_1'}$, $eval(e_2') =
-  eval(e_2)$, and $\Irec{e_2'}$. Because $T$ is \dIconfluent, $I(e_1' \join e_2')$, and
+  eval(e_2)$, and $\Irec{e_2'}$. Because $T$ is \dIconfluent, $I(e_1' \join
+  e_2')$, and
   \[
     eval(e_1' \join e_2')
       = eval(e_1') \join eval(e_2')
@@ -103,13 +104,10 @@ contain any joins).
   \begin{enumerate}
     \item
       $(S, \join)$ is a semilattice.
-    \item
-      For every $t \in T$, there exists some $t': S \to S$ such that for all
-      $s \in S$, $t(s) = s \join t'(s)$.
 
     \item
-      For every pair of transactions $t_1, t_2 \in T$ and for all states $s \in
-      S$, $t_1(t_2(s)) = t_2(t_1(s))$.
+      For every $t \in T$, there exists some $s_t \in S$ such that $t(s) = s
+      \join s_t$.
 
     \item
       For every pair of transactions $t_1, t_2 \in T$ and for all states $s \in
@@ -118,9 +116,73 @@ contain any joins).
   \end{enumerate}
 \end{claim}
 \begin{proof}
-  foo
-\end{proof}
+  \newcommand{\bart}[1]{\overline{t_{#1}}}
+  \newcommand{\baru}[1]{\overline{u_{#1}}}
 
-\todo{State conditions}
-\todo{Prove sufficient}
-\todo{Show more general than naive conditions}
+  To show that $T$ is \Iconfluent{}, it suffices to show that $T$ is
+  \dIconfluent{} and \dIreducible{} (by
+  \clmref{diconfluence_direducible_implies_iconfluence}). We begin by showing
+  that $T$ is \dIconfluent{}. Let
+  \[
+    e_1 = t_n(t_{n-1}(\ldots (t_1(s_0))\ldots))
+    \quad \text{and} \quad
+    e_2 = u_m(u_{m-1}(\ldots (u_1(s_0))\ldots))
+  \]
+  be two arbitrary join-free expressions that recursively satisfy $I$. For ease
+  of notation, let
+  \[
+    \bart{i} = t_i(\ldots(t_1(s_0))\ldots)
+    \quad\text{and}\quad
+    \baru{i} = u_j(\ldots(u_1(s_0))\ldots)
+  \]
+  We prove by strong induction on $m \in \nats$ that if $m = i + j$ where $0
+  \leq i \leq n$ and $0 \leq j \leq m$, then $\Irec{\bart{i}(\baru{j}(s_0))}$.
+  From this, it's immediate that $\Irec{\bart{n}(\baru{m}(s_0))}$, so
+  $\Irec{e_1 \join e_2}$, which proves that $T$ is \dIconfluent{}.
+  \begin{itemize}
+    \item \textbf{Case $m = 0$.}
+      $i = j = 0$, so $\bart{0}(\baru{0}(s_0)) = s_0$. $\Irec{s_0}$ because
+      $\Irec{e_1}$.
+
+    \item \textbf{Case $m = 1$.}
+      Without loss of generality, assume $i = 1$ and $j = 0$. Then,
+      \[
+        \bart{1}(\baru{0}(s_0))
+          = t_1(s_0)
+      \]
+      $\Irec{t_1(s_0)}$ because $\Irec{e_1}$.
+
+    \item \textbf{Case $m \geq 2$.}
+      If $i = 0$, then $j = m$ and $\bart{0}(s_0) \join \baru{j}(s_0) =
+      \baru{j}(s_0)$ which recursively satisfies $I$ because $\Irec{e_2}$.
+      Similarly if $j = 0$, then $i = m$ and $\bart{i}(s_0) \join \baru{0}(s_0)
+      = \bart{i}(s_0)$ which recursively satisfies $I$ because $\Irec{e_1}$.
+      %
+      Otherwise, $i, j > 1$. Let
+      \begin{align*}
+        e_{i-1,j-1}
+          &= \bart{i-1}(\baru{j-1}(s_0)) \\
+        e_{i,j-1}
+          &= \bart{i}(\baru{j-1}(s_0))
+           = t_i(e_{i-1,j-1}) \\
+        e_{i-1,j}
+          &= \bart{i-1}(\baru{j}(s_0))
+           = u_j(e_{i-1,j-1})
+      \end{align*}
+      By the inductive hypothesis, $\Irec{e_{i-1,j-1}}$, $\Irec{e_{i,j-1}}$,
+      and $\Irec{e_{i-1,j}}$. By condition 3, $e_{i-1,j} \join e_{i,j-1} =
+      \bart{i}(s_0) \join \baru{j}(s_0) = \bart{i}(\baru{j}(s_0))$ satisfies
+      $I$. This implies that $\Irec{\bart{i}(\baru{j}(s_0))}$.
+  \end{itemize}
+
+  Next, we show that $T$ is \dIreducible{}. Again let
+  \[
+    e_1 = t_n(t_{n-1}(\ldots (t_1(s_0))\ldots))
+    \quad \text{and} \quad
+    e_2 = u_m(u_{m-1}(\ldots (u_1(s_0))\ldots))
+  \]
+  be two arbitrary join-free expressions that recursively satisfy $I$. We just
+  proved that $\Irec{\bart{n}(\baru{m}(s_0))}$. Also, $eval(e_1 \join e_2) =
+  eval(\bart{n}(\baru{m}(s_0)))$. $\bart{n}(\baru{m}(s_0))$ is a join-free
+  expression, so $T$ is \dIreducible{}.
+\end{proof}
