@@ -1,16 +1,31 @@
-\section{\dIconfluence{} and \dIreduction{}}
-A \defword{join-free} expression $e = t_1(t_2(\ldots t_n(s_0) \ldots))$ is an
-expression that does not contain a join.
+\section{New Sufficient State-Based Conditions}
+In this section, we outline a new sufficient condition for state-based
+\Iconfluence{} that is more general than the one in
+\clmref{statebasedsufficient}. To prove that the condition is sufficient, we
+introduce the concepts of \dIconfluence{} and \dIreduction{}.
 
-We say $T$ is \defword{\dIconfluent{}} if for every pair $e_1$ and $e_2$ of
-join-free expressions, $\Irec{e_1}$ and $\Irec{e_2}$ implies that $I(e_1 \join
-e_2)$. Intuitively, \dIconfluence{} is the same thing as \Iconfluence{} with
+\begin{definition}
+  A \defword{join-free} expression $e = t_1(t_2(\ldots t_n(s_0) \ldots))$ is an
+  expression that does not contain a join.
+\end{definition}
+
+\begin{definition}
+  $T$ is \defword{\dIconfluent{}} if for every pair $e_1$ and $e_2$ of
+  join-free expressions, $\Irec{e_1}$ and $\Irec{e_2}$ implies that $I(e_1
+  \join e_2)$.
+\end{definition}
+
+Intuitively, \dIconfluence{} is the same thing as \Iconfluence{} with
 the added restriction that subexpressions are join-free.
 
-We say $T$ is \defword{\dIreducible{}} if for every pair $e_1$ and $e_2$ of
-join-free expressions, $\Irec{e_1 \join e_2}$ implies that there exists some
-join-free expression $e_3$ such that $\Irec{e_3}$ and $eval(e3) = eval(e1 \join
-e_2)$.  Intuitively, \dIreduction{} allows us to eliminate join operators by
+\begin{definition}
+  $T$ is \defword{\dIreducible{}} if for every pair $e_1$ and $e_2$ of
+  join-free expressions, $\Irec{e_1 \join e_2}$ implies that there exists some
+  join-free expression $e_3$ such that $\Irec{e_3}$ and $eval(e3) = eval(e1
+  \join e_2)$.
+\end{definition}
+
+Intuitively, \dIreduction{} allows us to eliminate join operators by
 substituting $e_1 \join e_2$ (which contains 1 join) with $e_3$ (which does not
 contain any joins).
 
@@ -81,3 +96,31 @@ contain any joins).
   \]
   Thus, $I(e_1 \join e_2)$.
 \end{proof}
+
+\begin{claim}
+  Consider a state-based object $(S, s_0, \join)$, a set of transactions $T$,
+  and an invariant $I$. $T$ is \Iconfluent{} if the following criteria are met:
+  \begin{enumerate}
+    \item
+      $(S, \join)$ is a semilattice.
+    \item
+      For every $t \in T$, there exists some $t': S \to S$ such that for all
+      $s \in S$, $t(s) = s \join t'(s)$.
+
+    \item
+      For every pair of transactions $t_1, t_2 \in T$ and for all states $s \in
+      S$, $t_1(t_2(s)) = t_2(t_1(s))$.
+
+    \item
+      For every pair of transactions $t_1, t_2 \in T$ and for all states $s \in
+      S$, if $I(s)$, $I(t_1(s))$, and $I(t_2(s))$, then $I(t_1(s) \join
+      t_2(s))$.
+  \end{enumerate}
+\end{claim}
+\begin{proof}
+  foo
+\end{proof}
+
+\todo{State conditions}
+\todo{Prove sufficient}
+\todo{Show more general than naive conditions}

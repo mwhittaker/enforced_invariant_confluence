@@ -75,11 +75,18 @@ While the conditions in \clmref{statebasedsufficient} and
 \todo{Think of more compelling examples.}
 
 The conditions in \clmref{statebasedsufficient} and \clmref{opbasedsufficient}
-are not necessary. Intuitively, this makes quite a bit of sense. Neither
-condition depends on the initial state $s_0$, and both
-\clmref{statebasednotnecessary} and \clmref{opbasednotnecessary} exploit this.
-If we relax our assumption of a fixed start state, then both these conditions
-are sufficient and necessary. Similarly, if every state in $S$ is reachable
-from $s_0$, then the conditions are sufficient and necessary.
+are not necessary. Intuitively, this makes quite a bit of sense. The condition
+in \clmref{statebasedsufficient} doesn't depend on $T$ and neither condition
+depends on the initial state $s_0$. However, if we relax our assumption of a
+fixed start state $s_0$ and instead allow replicas to begin with an arbitrary
+state, then both conditions are sufficient and necessary. Alternatively, if
+every state in $S$ is reachable from $s_0$, then the conditions are sufficient
+and necessary.
 
 \todo{Prove these facts more carefully. It's pretty straightforward though.}
+
+
+% | Data Model                              | I           | SC  | T | IC  |
+% | State based set with union              | phi(x)      | yes |   | yes |
+% | State based two sets with union         | foreign key | yes |   | yes |
+% | State-based increment-decrement counter | >           |
