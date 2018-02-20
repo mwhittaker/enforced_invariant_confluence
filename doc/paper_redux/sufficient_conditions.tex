@@ -85,6 +85,14 @@ and necessary.
 
 \todo{Prove these facts more carefully. It's pretty straightforward though.}
 
+\todo{Write this up in full.}
+Imagine we are building a system to group students together. We have a relation
+of (student id, grade) and a map (group id -> set of student ids). We want to
+enforce the invariant that every student in every group is in the same grade.
+If we start off with an initially empty mapping, then there are conflicts. If
+we start off with at least one student mapped into each group, then there are
+not any conflicts.
+
 
 % | Data Model                              | I           | SC  | T | IC  |
 % | State based set with union              | phi(x)      | yes |   | yes |
