@@ -138,11 +138,11 @@ Bailis et al.\ probably ought to have also added the condition $I(s_0)$ to
 their definition of \Iconfluence{}. Doing so, the two definitions become
 equivalent.
 
-\begin{claim}\clmlabel{irec_implies_reachable}
+\begin{claim}\clmlabel{state_irec_implies_reachable}
   $\Irec{e} \implies \reachable{e}$
 \end{claim}
 \begin{elidableproof}
-  We perform a structural induction on $e$.
+  We perform structural induction on $e$.
   \begin{itemize}
     \item \textbf{Case $s_0$.}
       Axiomatically, $\reachable{s_0}$.
@@ -173,7 +173,7 @@ equivalent.
 \begin{elidableproof}
   First, we show that (1) implies (2). Axiomatically, $\reachable{s_0}$, so by
   (1), $I(s_0)$. Let $e_1$ and $e_2$ be arbitrary expressions such that
-  $\Irec{e_1}$ and $\Irec{e_2}$. By \clmref{irec_implies_reachable},
+  $\Irec{e_1}$ and $\Irec{e_2}$. By \clmref{state_irec_implies_reachable},
   $\reachable{e_1}$ and $\reachable{e_2}$. Thus, $\reachable{e_1 \join e_2}$,
   so by (1), $I(e_1 \join e_2)$.
 
@@ -197,11 +197,11 @@ equivalent.
 
 \subsection{Operation-Based}
 \begin{definition}
-  A \defword{distributed operation-based object} is a pair $(S, s_0)$
-  where $S$ is a set of states and $s_0 \in S$ is a designated start state.
+  A \defword{distributed operation-based object} is a pair $(S, s_0)$ where $S$
+  is a set of states and $s_0 \in S$ is a designated start state.
 \end{definition}
 
-The notion of operation-based objects is also taken
+Like state-based objects, the notion of operation-based objects is taken
 from~\cite{shapiro2011conflict}. Note that we do not have a join function like
 we did with state-based objects.
 
@@ -211,11 +211,13 @@ we did with state-based objects.
   shadow transaction is taken from~\cite{li2014automating}.
 \end{definition}
 
-The definition of invariants remains unchanged.
+The definition of an invariant is the same in the state-based and
+operation-based model.
 
 \begin{example}
-  $(\nats, 0)$ is a distributed object. Let $f_k(x) = x + k$. $t(x) = f_x$ is a
-  transaction. $I(x) = x \geq 0$ is an invariant.
+  $(\nats, 0)$ is a distributed object. $t(x) = y \mapsto x + y$ is a
+  transaction that given a state $x$ returns a function $y \mapsto x + y$ that
+  adds $x$ to its argument. $\setst{x \geq 0}{x \in \nats}$ is an invariant.
 \end{example}
 
 As with state-based objects, there are three ways to think about
@@ -229,29 +231,30 @@ illustrated in \figref{opbasedmodels} and are described in more detail below.
 As with the state-based approach, the process-based model is most similar to
 the process model described by Shapiro et al.\ in~\cite{shapiro2011conflict}.
 We are given a set $\seq{p}{1}{n}$ of $n$ processors each of which begins with
-state $s_0$. Repeatedly, a processor executes a transaction $t$ on its current
-state $s$ and then transitions from state $s$ to state $t(s)(s)$. It also
-broadcasts $t(s)$ to all other processes exactly once. When a processor with
-state $s'$ receives $t(s)$, it transitions from state $s'$ to state $t(s)(s')$.
+state $s_0$. A processor $p_i$ can do one of two things.
 
-Consider any two processors $p_i$ and $p_j$ with states $s_i^0, \ldots, s_i^n$
-and $s_j^0, \ldots, s_j^m$ such that every state $s_i^0, \ldots, s_i^n, s_j^0,
-\ldots, s_j^m$ satisfies $I$. $T$ is invariant-confluent with respect to $I$,
-abbreviated \defword{\Iconfluent{}}, if for all $t \in T$, $I(t(s_i^n)(s_i^n))$
-implies $I(t(s_i^n)(s_j^m))$.
+First, $p_i$ can execute a transaction $t$ on its current state $s$ and then
+transitions from state $s$ to state $t(s)(s)$, given that $I(t(s)(s))$. If
+$\lnot I(t(s)(s))$, then $p_i$ will not perform $t$. If $p_i$ does execute $t$,
+then it broadcasts $t(s)$ to all other processors exactly once.
+
+Second, $p_i$ can receive a broadcasted shadow transaction $t(s_j)$ from some
+other processor $p_j$. When $p_i$ receives $t(s_j)$, it transitions from its
+state $s_i$ to state $t(s_j)(s_i)$. When $p_i$ receives a shadow transaction,
+it must execute it, even if $\lnot I(t(s_j)(s_i))$.
+
+$T$ is \Iconfluent{} if every reachable state (including $s_0$) satisfies the
+invariant.
 
 \subsubsection{Graph-Based}
 In the graph-based model, we are given a directed acyclic graph in which each
-vertex is associated with a state $s$ and each edge is labelled with a shadow
-operation $t(s)$ where $s$ is associated with some vertex in the graph.
-%
-Consider two invariant-satisfying states $s$ and $s'$ with invariant satisfying
-ancestors. $T$ is \defword{\Iconfluent{}} if for all $t$, $I(t(s)(s))$ implies
-$I(t(s)(s'))$.
+vertex is a state $s$ and each edge is labelled with a shadow operation $t(s)$
+where $s$ is some other vertex in the graph. $T$ is \Iconfluent{} if every
+vertex in the graph satisfies $I$.
 
 \subsubsection{Expression-Based}
-The expression-based approach deals with expressions built from $s_0$ and
-transactions in $T$. That is, expressions $e$ are built from the grammar
+Given an operation-based object $(S, s_0)$ and a set of transactions $T$, we
+consider expressions built from the following grammar:
 \[
   e ::= s_0 \mid t(e_1)(e_2)
 \]
@@ -268,6 +271,28 @@ denoted $eval(e)$, in the obvious way:
 \end{definition}
 
 \begin{definition}
+  As with state-based expressions, we formalize which operation-based
+  expressions are reachable.
+
+  \begin{mathpar}
+    \inferrule{ }{\reachable{s_0}}
+
+    \inferrule{
+      \reachable{e_1} \\
+      \reachable{e_2} \\
+      I(t(e_1)(e_1))
+    }{\reachable{t(e_1)(e_2)}}
+  \end{mathpar}
+\end{definition}
+
+\begin{definition}
+  $T$ is \Iconfluent{} if $\setst{e}{\reachable{e}} \subseteq I$.
+\end{definition}
+
+As with state-based objects, we have an equivalent definition of \Iconfluence{}
+that deals with the closure of recursively invariant satisfying states.
+
+\begin{definition}
   An expression \defword{recursively satisfies $I$}, denoted $\Irec{e}$, if $e$
   and all of $e$'s children satisfy $I$. That is,
   \begin{mathpar}
@@ -277,13 +302,50 @@ denoted $eval(e)$, in the obvious way:
   \end{mathpar}
 \end{definition}
 
-\begin{definition}
-  $T$ is \defword{\Iconfluent}, if for all expressions $e_1$ and $e_2$,
-  $\Irec{e_1}$, $\Irec{e_2}$, and $I(t(e_1)(e_1))$ implies $I(t(e_1)(e_2))$.
-\end{definition}
+\begin{claim}\clmlabel{op_irec_implies_reachable}
+  $\Irec{e} \implies \reachable{e}$
+\end{claim}
+\begin{elidableproof}
+  We perform a structural induction on $e$.
+  \begin{itemize}
+    \item \textbf{Case $s_0$.}
+      Axiomatically, $\reachable{s_0}$.
 
-\todo{Define ``reachable'' states and describe that \Iconfluence{} is
-equivalent to saying that reachable states are a subset of invariant satisfying
-states.}
-\todo{Maybe define Iconfluence to say that the initial state satisfies the
-invariant?}
+    \item \textbf{Case $t(e_1)(e_2)$.}
+      $\Irec{t(e_1)(e_2)}$, so $\Irec{e_1}$, $\Irec{e_2}$, and $t(e_1)(e_1)$.
+      By the inductive hypothesis, $\reachable{e_1}$ and $\reachable{e_2}$.
+      Thus, $\reachable{t(e_1)(e_2)}$.
+  \end{itemize}
+\end{elidableproof}
+
+\begin{claim}
+  Given an operation-based object $(S, s_0)$, a set of transactions $T$, and an
+  invariant $I$, the following two are equivalent:
+  \begin{enumerate}[\quad(1)]
+    \item
+      $\setst{e}{\reachable{e}} \subseteq I$
+
+    \item
+      $I(s_0)$ and $\Irec{e_1} \land \Irec{e_2} \land I(t(e_1)(e_1)) \implies
+      I(t(e_1)(e_2))$.
+  \end{enumerate}
+\end{claim}
+\begin{elidableproof}
+  First, we show that (1) implies (2). $\reachable{s_0}$, so by (1), $I(s_0)$.
+  Let $e_1$ and $e_2$ be arbitrary expressions such that $\Irec{e_1}$,
+  $\Irec{e_2}$, and $I(t(e_1)(e_1))$. By \clmref{op_irec_implies_reachable},
+  $\reachable{e_1}$ and $\reachable{e_2}$, so $\reachable{t(e_1)(e_2)}$. By
+  (1), $I(t(e_1)(e_2))$.
+
+  Next, we show that (2) implies (1). We show by structural induction that
+  $\reachable{e} \implies \Irec{e}$. From this, (1) is immediate.
+  \begin{itemize}
+    \item \textbf{Case $s_0$.}
+      By (2), $I(s_0)$, so $\Irec{s_0}$.
+
+    \item \textbf{Case $t(e_1)(e_2)$.}
+      $\reachable{t(e_1)(e_2)}$, so $\reachable{e_1}$, $\reachable{e_2}$, and
+      $I(t(e_1)(e_1))$. By the inductive hypothesis, $\Irec{e_1}$ and
+      $\Irec{e_2}$. By (2), $I(t(e_1)(e_2))$, so $\Irec{t(e_1)(e_2)}$.
+  \end{itemize}
+\end{elidableproof}

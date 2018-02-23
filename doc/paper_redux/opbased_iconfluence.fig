@@ -33,7 +33,7 @@
       \node[state, s0color, inv, label={90:$s_0$}] (s02) at (1, 2) {};
       \node[state, s2color, inv, label={90:$s_2$}] (s12) at (2, 2) {};
       \node[state, s4color, inv, label={90:$s_4$}] (s22) at (3, 2) {};
-      \node[state, s7color, ninv, label={90:$s_7$}] (s32) at (4, 2) {};
+      \node[state, s7color, inv, label={90:$s_7$}] (s32) at (4, 2) {};
 
       \node[state, s0color, inv, label={90:$s_0$}] (s01) at (1, 1) {};
       \node[state, s2color, inv, label={90:$s_2$}] (s11) at (2, 1) {};
@@ -72,7 +72,7 @@
       \node[state, s6color, inv, label={180:$s_6$}] (ldd) at (0, 0) {};
       \node[state, s2color, inv, label={180:$s_2$}] (r) at (2, 2) {};
       \node[state, s4color, inv, label={180:$s_4$}] (rl) at (1.25, 1) {};
-      \node[state, s7color, ninv, label={180:$s_7$}] (rld) at (1.25, 0) {};
+      \node[state, s7color, inv, label={180:$s_7$}] (rld) at (1.25, 0) {};
       \node[state, s5color, inv, label={180:$s_5$}] (rr) at (2.75, 1) {};
       \node[state, s8color, inv, label={180:$s_8$}] (rrd) at (2.75, 0) {};
 
@@ -98,7 +98,7 @@
           inner sep=2pt,
           text opacity=1,
           fill opacity=0.7]
-        \node[astnode, ninv, s7color] (o) at (0, 0) {$\boldsymbol v$};
+        \node[astnode, inv, s7color] (o) at (0, 0) {$\boldsymbol v$};
 
         \draw (o)++(210:1.5) node[astnode, inv, s2color] (l) {$\boldsymbol u$};
         \draw (l)++(225:1) node[astnode, inv, s0color] (ll) {$\boldsymbol s_0$};
@@ -120,10 +120,6 @@
     \caption{Expression-Based}\figlabel{opexpressionbased}
   \end{subfigure}
 
-  \caption{%
-    Three models of operation-based \Iconfluence. As with the state-based
-    models, we assume states with a solid border satisfy the invariant, and we
-    have to prove that the state with a dashed border satisfies the
-    invariant.
-  }\figlabel{opbasedmodels}
+  \caption{Three models of operation-based \Iconfluence.}
+  \figlabel{opbasedmodels}
 \end{figure}
