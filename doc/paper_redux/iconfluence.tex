@@ -66,7 +66,8 @@ vertices are states, and edges are either labelled with transactions or are
 unlabelled if they correspond to a join. The graph is really just an alternate
 way of representing an execution in the process-based model, but with duplicate
 states collapsed into a single vertex. As with the process-based model, we say
-that $T$ is \Iconfluent{} if every vertex in the graph satisfies the invariant.
+that $T$ is \Iconfluent{} if every vertex in every graph satisfies the
+invariant.
 
 \subsubsection{Expression-Based}
 The expression-based approach formalizes the process-based and graph-based
@@ -131,9 +132,9 @@ is the same as the definition in~\cite{gotsman2016cause}), but they are
 Bailis et al.\ defined \Iconfluence{} to mean that expressions recursively
 satisfying $I$ are closed under join. That is, $T$ is \Iconfluent{} if
 \[
-  \forall e_1, e_2.\; \Irec{e_1} \land \Irec{e_2} \implies I{e_1 \join e_2}
+  \forall e_1, e_2.\; \Irec{e_1} \land \Irec{e_2} \implies I(e_1 \join e_2)
 \]
-If $\lnot I(s_0)$, then \Iconfluence holds vacuously which is a bit silly, so
+If $\lnot I(s_0)$, then \Iconfluence{} holds vacuously which is a bit silly, so
 Bailis et al.\ probably ought to have also added the condition $I(s_0)$ to
 their definition of \Iconfluence{}. Doing so, the two definitions become
 equivalent.
@@ -167,7 +168,7 @@ equivalent.
       $\setst{e}{\reachable{e}} \subseteq I$
 
     \item
-      $I(s_0)$ and $\Irec{e_1} \land \Irec{e_2} \implies I{e_1 \join e_2}$
+      $I(s_0)$ and $\Irec{e_1} \land \Irec{e_2} \implies I(e_1 \join e_2)$
   \end{enumerate}
 \end{claim}
 \begin{elidableproof}
@@ -250,7 +251,7 @@ invariant.
 In the graph-based model, we are given a directed acyclic graph in which each
 vertex is a state $s$ and each edge is labelled with a shadow operation $t(s)$
 where $s$ is some other vertex in the graph. $T$ is \Iconfluent{} if every
-vertex in the graph satisfies $I$.
+vertex in every graph satisfies $I$.
 
 \subsubsection{Expression-Based}
 Given an operation-based object $(S, s_0)$ and a set of transactions $T$, we
@@ -312,9 +313,9 @@ that deals with the closure of recursively invariant satisfying states.
       Axiomatically, $\reachable{s_0}$.
 
     \item \textbf{Case $t(e_1)(e_2)$.}
-      $\Irec{t(e_1)(e_2)}$, so $\Irec{e_1}$, $\Irec{e_2}$, and $t(e_1)(e_1)$.
-      By the inductive hypothesis, $\reachable{e_1}$ and $\reachable{e_2}$.
-      Thus, $\reachable{t(e_1)(e_2)}$.
+      $\Irec{t(e_1)(e_2)}$, so $\Irec{e_1}$, $\Irec{e_2}$, and
+      $I(t(e_1)(e_1))$. By the inductive hypothesis, $\reachable{e_1}$ and
+      $\reachable{e_2}$. Thus, $\reachable{t(e_1)(e_2)}$.
   \end{itemize}
 \end{elidableproof}
 
@@ -337,8 +338,8 @@ that deals with the closure of recursively invariant satisfying states.
   $\reachable{e_1}$ and $\reachable{e_2}$, so $\reachable{t(e_1)(e_2)}$. By
   (1), $I(t(e_1)(e_2))$.
 
-  Next, we show that (2) implies (1). We show by structural induction that
-  $\reachable{e} \implies \Irec{e}$. From this, (1) is immediate.
+  Next, we show that (2) implies (1). We show by structural induction on $e$
+  that $\reachable{e} \implies \Irec{e}$. From this, (1) is immediate.
   \begin{itemize}
     \item \textbf{Case $s_0$.}
       By (2), $I(s_0)$, so $\Irec{s_0}$.
