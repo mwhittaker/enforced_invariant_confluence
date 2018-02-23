@@ -37,7 +37,7 @@
         \node[state, s0color, inv, label={90:$s_0$}] (s01) at (1, 1) {};
         \node[state, s2color, inv, label={90:$s_2$}] (s11) at (2, 1) {};
         \node[state, s5color, inv, label={90:$s_5$}] (s21) at (3, 1) {};
-        \node[state, s7color, ninv, label={90:$s_7$}] (s31) at (5, 1) {};
+        \node[state, s7color, inv, label={90:$s_7$}] (s31) at (5, 1) {};
 
         \tikzstyle{txntext}=[sloped, above]
         \draw[txnline] (s03) to node[txntext]{$t$} (s13);
@@ -67,7 +67,7 @@
         \draw (s1)++(-45:1) node[state, s4color, inv, label={90:$s_4$}] (s4) {};
         \draw (s2)++(-45:1) node[state, s5color, inv, label={45:$s_5$}] (s5) {};
         \draw (s3)++(-45:1) node[state, s6color, inv, label={225:$s_6$}] (s6) {};
-        \draw (s6)++(-45:1) node[state, s7color, ninv, label={-90:$s_7$}] (s7) {};
+        \draw (s6)++(-45:1) node[state, s7color, inv, label={-90:$s_7$}] (s7) {};
 
         \draw[txnline] (s0) to node[sloped, above] {$t$} (s1);
         \draw[txnline] (s0) to node[sloped, above] {$u$} (s2);
@@ -93,7 +93,7 @@
           inner sep=2pt,
           text opacity=1,
           fill opacity=0.7]
-        \node[astnode, ninv, s7color] (j1) at (0, 0) {$\boldsymbol \land$};
+        \node[astnode, inv, s7color] (j1) at (0, 0) {$\boldsymbol \land$};
         \draw (j1)++(-30:1) node[astnode, inv, s5color] (w) {$\boldsymbol w$};
         \draw (j1)++(210:1) node[astnode, inv, s6color] (j2) {$\boldsymbol \land$};
         \draw (w)++(-90:1) node[astnode, inv, s2color] (u1) {$\boldsymbol u$};
@@ -118,11 +118,6 @@
     \end{subfigure}
   }
 
-  \caption{%
-    Three models of state-based \Iconfluence{}. We assume that states with a
-    solid border (i.e.\ $s_0, \ldots, s_6$) satisfy the invariant, and we have
-    to prove that the state with the dashed boundary (i.e.\ $s_7$) satisfies
-    the invariant.
-  }
+  \caption{Three models of state-based \Iconfluence{}}
   \figlabel{statebasedmodels}
 \end{figure}

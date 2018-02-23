@@ -2,10 +2,25 @@
 
 \usepackage{bm}
 \usepackage{colors}
+\usepackage{enumerate}
+\usepackage{environ}
+\usepackage{etoolbox}
 \usepackage{iconfluence}
 \usepackage{mathpartir}
 \usepackage{pervasives}
 \usepackage{subcaption}
+
+\newtoggle{showproofs}
+\toggletrue{showproofs}
+% \togglefalse{showproofs}
+\NewEnviron{elidableproof}{%
+  \begin{proof}
+    \iftoggle%
+      {showproofs}
+      {\BODY}
+      {This proof is elided; toggle \texttt{showproofs} to show the proof.}
+  \end{proof}
+}
 
 \begin{document}
   \begin{center}
