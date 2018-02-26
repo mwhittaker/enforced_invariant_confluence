@@ -1,14 +1,66 @@
 \section{Interactive \Iconfluence{} Decision Procedure}
-Let us revisit \exampleref{statebased_not_necessary}
+Imagine we have an \Iclosed{} decision procedure, and let's revisit
+\exampleref{StateBasedNotNecessary}. We have a state-based object $O$, a set of
+transactions $T$, and an invariant $I$. We want to know if $T$ is
+\Iconfluent{}. We can hand $O$, $T$, and $I$ to the \Iclosed{} decision
+procedure to see if $O$ is \Iclosed{}. If the decision procedure says yes, then
+by \clmref{StateBasedSufficient}, we know that $T$ is \Iconfluent{}.
 
-% \clmref{sufficientandnecessary} arms us with some potent understanding of
-% \Iconfluence! Imagine we have an \Iclosed{} decision procedure that informs us
-% that our state-based object from \exampleref{statebasednotnecessary} is not
-% \Iclosed{}. Without \clmref{sufficientandnecessary}, we'd be a bit stuck. We'd
-% have to seek out alternative means to determine whether or not our transactions
-% were \Iconfluent{}. With the intuition provided by
-% \clmref{sufficientandnecessary}, we can instead restrict our invariant to $I =
-% \setst{(x, y)}{xy \leq 0 \land x \geq 0 \land y \leq 0}$. Now, the \Iclosed{}
-% decision procedure informs us that we are indeed \Iclosed{}, so we know we're
-% \Iconfluent{}.
-%
+However, in our example, $O$ is not \Iclosed{}, so the decision procedure will
+say no. \clmref{SufficientAndNecessary} tells us that this means one of two
+things. Either (1) $T$ is not \Iconfluent{} or (2) $T$ is \Iconfluent{}, but
+there are some invariant satisfying states that are not reachable. If we think
+harder about the set of reachable states, we may realize that all reachable
+states have a non-negative value of $x$. Thus, we may modify our invariant to
+$\setst{(x, y)}{xy \leq 0 \land x \geq 0}$. Now, $O$ is \Iclosed{}! If we hand
+$O$, $T$, and $I$ to the decision procedure, it will say yes, and we can
+conclude that $T$ is \Iconfluent{}.
+
+\newcommand{\comment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
+\begin{algorithm}
+  \caption{Interactive \Iconfluence{} Decision Procedure}%
+  \algolabel{InteractiveDecisionProcedure}
+  \begin{algorithmic}
+    \Function{IsIconfluent}{$O$, $T$, $I$}
+      \State \Return \Call{Helper}{$O$, $T$, $I$, $\emptyset$, $\emptyset$}
+    \EndFunction
+
+    \State
+
+    \comment{$R$ is a set of reachable states.}
+    \comment{$NR$ is a set of non-reachable states.}
+    \Function{Helper}{$O$, $T$, $I$, $R$, $NR$}
+      \State closed, $s_1$, $s_2$ $\gets$
+               \Call{IsIclosed}{$O$, $T$, $(I \cap R) - NR$}
+      \If {closed $=$ unknown}
+        \State \Return unknown
+      \ElsIf {closed $=$ yes}
+        \State \Return{yes}
+      \Else
+        \State Augment $R$ and $NR$ with random search and user input
+        \State Make sure $s_1$ and $s_2$ are included in $R$ or $NR$
+        \If{$s_1, s_2 \in R$}
+          \State \Return no
+        \Else
+          \State \Return \Call{Helper}{$O$, $T$, $I$, $R$, $NR$}
+        \EndIf
+      \EndIf
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+This example motivates \algoref{InteractiveDecisionProcedure}, a general
+purpose interactive \Iconfluence{} decision procedure in which a user
+iteratively refines the invariants until the decision procedure terminates.
+Given an object $O$, a set of transactions $T$, and an invariant $I$, we call
+\textsc{IsIconfluent}$(O, T, I)$ to determine if $T$ is \Iconfluent{}.
+\textsc{IsIconfluent} assumes access to an \Iclosed{} decision procedure
+\textsc{IsIclosed}$(O, T, I)$ which returns whether $O$ is \Iconfluent{} (yes,
+no, or unknown). If it returns no, it also returns a counterexample $s_1$ and
+$s_2$.
+
+\todo{%
+  Describe \textsc{IsIconfluent}. Describe how we can implement
+  \textsc{IsIclosed} with Z3 and how users can specify $R$ and $NR$ with
+  invariants.
+}
