@@ -60,7 +60,7 @@
       \draw[txnline] (s21) to node[txntext]{$t(s_2)$} (s31);
     \end{tikzpicture}
 
-    \caption{Process-Based}\figlabel{opprocessbased}
+    \caption{Process-Based}\figlabel{OpProcessBased}
   \end{subfigure}%
   \begin{subfigure}[c]{0.29\textwidth}
     \centering
@@ -86,7 +86,7 @@
       \draw[txnline] (rl) to node[sloped, above, rotate=180] {$v(s_2)$} (rld);
     \end{tikzpicture}
 
-    \caption{Graph-Based}\figlabel{opgraphbased}
+    \caption{Graph-Based}\figlabel{OpGraphBased}
   \end{subfigure}
   \begin{subfigure}[c]{0.3\textwidth}
     \centering
@@ -117,9 +117,9 @@
         \draw[astedge] (rr) to (rrr);
     \end{tikzpicture}
 
-    \caption{Expression-Based}\figlabel{opexpressionbased}
+    \caption{Expression-Based}\figlabel{OpExpressionBased}
   \end{subfigure}
 
   \caption{Three models of operation-based \Iconfluence.}
-  \figlabel{opbasedmodels}
+  \figlabel{OpBasedModels}
 \end{figure}

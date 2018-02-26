@@ -88,7 +88,7 @@
       \node[statelabel] at (1, -1) {$s_2$};
       \node[statelabel] at (1, 1) {$s_3$};
     \end{tikzpicture}
-    \caption{Invariant satisfying points}\figlabel{statebasednotnecessary_inv}
+    \caption{Invariant satisfying points}\figlabel{StateBasedNotNecessaryInv}
   \end{subfigure}%
   \begin{subfigure}[b]{0.5\textwidth}
     \centering
@@ -110,7 +110,7 @@
       \node[statelabel] at (1, -1) {$s_2$};
       \node[statelabel] at (1, 1) {$s_3$};
     \end{tikzpicture}
-    \caption{Reachable points}\figlabel{statebasednotnecessary_reachable}
+    \caption{Reachable points}\figlabel{StateBasedNotNecessaryReachable}
   \end{subfigure}
 
   \caption{%
@@ -120,5 +120,5 @@
     reachable, but $s_1$ is not. Their join, $s_3$ does not satisfy the
     invariant, so the object is not \Iclosed.
   }
-  \figlabel{statebasednotnecessary}
+  \figlabel{StateBasedNotNecessary}
 \end{figure}

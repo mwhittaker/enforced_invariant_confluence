@@ -22,7 +22,7 @@ circumstances under which the sufficient conditions are also necessary.
   }
 \end{definition}
 
-\begin{claim}\clmlabel{statebasedsufficient}
+\begin{claim}\clmlabel{StateBasedSufficient}
   Given a state-based object $O = (S, s_0, \join)$, a set of transactions $T$,
   and an invariant $I$, if $O$ is \Iclosed{}, then $T$ is \Iconfluent.
 \end{claim}
@@ -30,10 +30,10 @@ circumstances under which the sufficient conditions are also necessary.
   Let $e_1, e_2$ be expressions such that $\Irec{e_1}$ and $\Irec{e_2}$. Let
   $s_1 = eval(e_1)$ and $s_2 = eval(e_2)$. Then, $I(s_1)$ and $I(s_2)$, so
   $I(s_1 \join s_2)$ which implies $I(e_1 \join e_2)$. Thus, by
-  \clmref{statebased_two_iconfluence_defs}, $T$ is \Iconfluent{}.
+  \clmref{StateBasedTwoIconfluenceDefs}, $T$ is \Iconfluent{}.
 \end{elidableproof}
 
-\begin{claim}\clmlabel{opbasedsufficient}
+\begin{claim}\clmlabel{OpBasedSufficient}
   Given a operation-based object $O = (S, s_0)$, a set of transactions $T$, and
   an invariant $I$, if $O$ is \Iclosed{}, then $T$ is \Iconfluent.
 \end{claim}
@@ -42,13 +42,13 @@ circumstances under which the sufficient conditions are also necessary.
   $\Irec{e_2}$, and $I(t(e_1)(e_1))$. Let $s_1 = eval(e_1)$ and $s_2 =
   eval(s_2)$. Then, $I(s_1)$, $I(s_2)$, and $I(t(s_1)(s_1))$, so
   $I(t(s_1)(s_2))$. This implies $I(t(e_1)(e_2))$, so by
-  \clmref{opbased_two_iconfluence_defs}, $T$ is \Iconfluent.
+  \clmref{OpBasedTwoIconfluenceDefs}, $T$ is \Iconfluent.
 \end{elidableproof}
 
-As a special case, \clmref{statebasedsufficient} tells us that a set $T$ of
+As a special case, \clmref{StateBasedSufficient} tells us that a set $T$ of
 transactions is \Iconfluent{} if $I$ is monotonic and $O$ is a semilattice.
 
-\begin{claim}\clmlabel{monotonicity}
+\begin{claim}\clmlabel{Monotonicity}
   Let $O = (S, s_0, \join)$ be a state-based object where $(S, \join)$ is a
   semilattice. Let $s \leq s' \defeq s \join s' = s'$. Let $T$ be an arbitrary
   set of transactions. Let $I$ be a \defword{monotonic}: for all $s, s'\in S$,
@@ -58,14 +58,14 @@ transactions is \Iconfluent{} if $I$ is monotonic and $O$ is a semilattice.
 \begin{elidableproof}
   Let $s_1$ and $s_2$ be arbitrary states such that $I(s_1)$ and $I(s_2)$. $s_1
   \leq s_1 \join s_2$, so by monotonicity, $I(s_1 \join s_2)$. Thus, by
-  \clmref{statebasedsufficient}, $T$ is \Iconfluent{}.
+  \clmref{StateBasedSufficient}, $T$ is \Iconfluent{}.
 \end{elidableproof}
 
-Unfortunately, the converses of \clmref{statebasedsufficient} and
-\clmref{opbasedsufficient} are not true. Being \Iconfluent{} does not
+Unfortunately, the converses of \clmref{StateBasedSufficient} and
+\clmref{OpBasedSufficient} are not true. Being \Iconfluent{} does not
 necessarily imply being \Iclosed{}, as the next two examples show.
 
-\begin{example}\examplelabel{statebasednotnecessary}
+\begin{example}\examplelabel{StateBasedNotNecessary}
   Consider the state-based object $O = (S, s_0, \join)$ where $(S, \join)$ is
   $(\ints, \max) \times (\ints, \max)$ and $s_0 = (0, 0)$. Let $T$ consist of
   two transactions $t_{x+1} \defeq \lambda (x, y).\ (x + 1, y)$ and $t_{y-1} =
@@ -91,8 +91,8 @@ necessarily imply being \Iclosed{}, as the next two examples show.
 
 \input{not_necessary.fig}
 
-Let's take a closer look at \exampleref{statebasednotnecessary} (illustrated in
-\figref{statebasednotnecessary}) to understand why being \Iconfluent{} doesn't
+Let's take a closer look at \exampleref{StateBasedNotNecessary} (illustrated in
+\figref{StateBasedNotNecessary}) to understand why being \Iconfluent{} doesn't
 imply being \Iclosed{}. Our counterexample considers points $s_1 = (-1, 1)$ and
 $s_2 = (1, -1)$. $s_2$ is reachable, but $s_1$ is not. This is not a
 coincidence! If we consider an \Iconfluent{} set of transactions, then any two
@@ -102,7 +102,7 @@ invariant satisfying points and end up not satisfying the invariant is if one
 or both points are not reachable. Thus, if we know that $I$ is a subset of
 reachable points, then being \Iconfluent{} and being \Iclosed{} are equivalent.
 
-\begin{claim}\clmlabel{sufficientandnecessary}
+\begin{claim}\clmlabel{SufficientAndNecessary}
   If every invariant satisfying state is reachable, then being \Iconfluent{}
   and being \Iclosed{} are equivalent. Being \Iclosed{} is always sufficient,
   but if we can establish that every invariant satisfying point is reachable,

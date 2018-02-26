@@ -139,7 +139,7 @@ Bailis et al.\ probably ought to have also added the condition $I(s_0)$ to
 their definition of \Iconfluence{}. Doing so, the two definitions become
 equivalent.
 
-\begin{claim}\clmlabel{state_irec_implies_reachable}
+\begin{claim}\clmlabel{StateBasedIrecImpliesReachable}
   $\Irec{e} \implies \reachable{e}$
 \end{claim}
 \begin{elidableproof}
@@ -160,7 +160,7 @@ equivalent.
   \end{itemize}
 \end{elidableproof}
 
-\begin{claim}\clmlabel{statebased_two_iconfluence_defs}
+\begin{claim}\clmlabel{StateBasedTwoIconfluenceDefs}
   Consider a state based object $(S, s_0, \join)$, a set of transactions $T$,
   and an invariant $I$. The following two are equivalent:
   \begin{enumerate}[\quad(1)]
@@ -174,7 +174,7 @@ equivalent.
 \begin{elidableproof}
   First, we show that (1) implies (2). Axiomatically, $\reachable{s_0}$, so by
   (1), $I(s_0)$. Let $e_1$ and $e_2$ be arbitrary expressions such that
-  $\Irec{e_1}$ and $\Irec{e_2}$. By \clmref{state_irec_implies_reachable},
+  $\Irec{e_1}$ and $\Irec{e_2}$. By \clmref{StateBasedIrecImpliesReachable},
   $\reachable{e_1}$ and $\reachable{e_2}$. Thus, $\reachable{e_1 \join e_2}$,
   so by (1), $I(e_1 \join e_2)$.
 
@@ -303,7 +303,7 @@ that deals with the closure of recursively invariant satisfying states.
   \end{mathpar}
 \end{definition}
 
-\begin{claim}\clmlabel{op_irec_implies_reachable}
+\begin{claim}\clmlabel{OpBasedIrecImpliesReachable}
   $\Irec{e} \implies \reachable{e}$
 \end{claim}
 \begin{elidableproof}
@@ -319,7 +319,7 @@ that deals with the closure of recursively invariant satisfying states.
   \end{itemize}
 \end{elidableproof}
 
-\begin{claim}\clmlabel{opbased_two_iconfluence_defs}
+\begin{claim}\clmlabel{OpBasedTwoIconfluenceDefs}
   Given an operation-based object $(S, s_0)$, a set of transactions $T$, and an
   invariant $I$, the following two are equivalent:
   \begin{enumerate}[\quad(1)]
@@ -334,7 +334,7 @@ that deals with the closure of recursively invariant satisfying states.
 \begin{elidableproof}
   First, we show that (1) implies (2). $\reachable{s_0}$, so by (1), $I(s_0)$.
   Let $e_1$ and $e_2$ be arbitrary expressions such that $\Irec{e_1}$,
-  $\Irec{e_2}$, and $I(t(e_1)(e_1))$. By \clmref{op_irec_implies_reachable},
+  $\Irec{e_2}$, and $I(t(e_1)(e_1))$. By \clmref{OpBasedIrecImpliesReachable},
   $\reachable{e_1}$ and $\reachable{e_2}$, so $\reachable{t(e_1)(e_2)}$. By
   (1), $I(t(e_1)(e_2))$.
 

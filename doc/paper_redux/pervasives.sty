@@ -3,6 +3,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{colors}
+\usepackage{etoolbox}
 \usepackage{mathrsfs}
 \usepackage{mathtools}
 
@@ -17,23 +18,30 @@
 \renewcommand{\qedsymbol}{$\blacksquare$}
 
 % References.
-\newcommand{\applabel}[1]{\label{app:#1}}
+\newtoggle{showlabels}
+\toggletrue{showlabels}
+% \togglefalse{showlabels}
+\newcommand{\genericlabel}[2]{%
+  \label{#1:#2}%
+  \iftoggle{showlabels}{\textcolor{flatdarkgray}{\texttt{[#2]}}}{}%
+}
+\newcommand{\applabel}[1]{\genericlabel{app}{#1}}
 \newcommand{\appref}[1]{Appendix~\ref{app:#1}}
-\newcommand{\clmlabel}[1]{\label{clm:#1}}
+\newcommand{\clmlabel}[1]{\genericlabel{clm}{#1}}
 \newcommand{\clmref}[1]{Claim~\ref{clm:#1}}
-\newcommand{\eqnlabel}[1]{\label{eqn:#1}}
+\newcommand{\eqnlabel}[1]{\genericlabel{eqn}{#1}}
 \newcommand{\eqnref}[1]{\eqref{eqn:#1}}
-\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\figlabel}[1]{\genericlabel{fig}{#1}}
 \newcommand{\figref}[1]{Figure~\ref{fig:#1}}
-\newcommand{\lemlabel}[1]{\label{lem:#1}}
+\newcommand{\lemlabel}[1]{\genericlabel{lem}{#1}}
 \newcommand{\lemref}[1]{Lemma~\ref{lem:#1}}
-\newcommand{\lstlabel}[1]{\label{lst:#1}}
+\newcommand{\lstlabel}[1]{\genericlabel{lst}{#1}}
 \newcommand{\lstref}[1]{Listing~\ref{lst:#1}}
-\newcommand{\seclabel}[1]{\label{sec:#1}}
+\newcommand{\seclabel}[1]{\genericlabel{sec}{#1}}
 \newcommand{\secref}[1]{Section~\ref{sec:#1}}
-\newcommand{\thmlabel}[1]{\label{thm:#1}}
+\newcommand{\thmlabel}[1]{\genericlabel{thm}{#1}}
 \newcommand{\thmref}[1]{Theorem~\ref{thm:#1}}
-\newcommand{\examplelabel}[1]{\label{exa:#1}}
+\newcommand{\examplelabel}[1]{\genericlabel{exa}{#1}}
 \newcommand{\exampleref}[1]{Example~\ref{exa:#1}}
 
 % Surrounding symbols.

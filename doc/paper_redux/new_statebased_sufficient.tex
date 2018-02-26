@@ -1,7 +1,7 @@
 \section{New Sufficient State-Based Conditions}
 In this section, we outline a new sufficient condition for state-based
 \Iconfluence{} that is more general than the one in
-\clmref{statebasedsufficient}. To prove that the condition is sufficient, we
+\clmref{StateBasedSufficient}. To prove that the condition is sufficient, we
 introduce the concepts of \dIconfluence{} and \dIreduction{}.
 
 \begin{definition}
@@ -40,7 +40,7 @@ contain any joins).
 % replaced with a single join-free path that satisfies $I$. Both conditions
 % involve diamond diagrams, hence the names \dIconfluence{} and \dIreduction{}.
 
-\begin{claim}\clmlabel{diconfluence_direducible_implies_iconfluence}
+\begin{claim}\clmlabel{DiconfluenceDireducibleImpliesIconfluence}
   If $T$ is \dIconfluent{} and \dIreducible, then it is \Iconfluent.
 \end{claim}
 \begin{proof}
@@ -121,7 +121,7 @@ contain any joins).
 
   To show that $T$ is \Iconfluent{}, it suffices to show that $T$ is
   \dIconfluent{} and \dIreducible{} (by
-  \clmref{diconfluence_direducible_implies_iconfluence}). We begin by showing
+  \clmref{DiconfluenceDireducibleImpliesIconfluence}). We begin by showing
   that $T$ is \dIconfluent{}. Let
   \[
     e_1 = t_n(t_{n-1}(\ldots (t_1(s_0))\ldots))

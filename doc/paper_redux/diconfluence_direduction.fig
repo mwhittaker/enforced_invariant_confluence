@@ -25,7 +25,7 @@
       \draw[txnedge] (r2) to (f);
     \end{tikzpicture}
     \caption{Understanding \dIconfluence{} with the graph-based model}%
-    \figlabel{diconfluence}
+    \figlabel{Diconfluence}
   \end{subfigure}\qquad\qquad
   \begin{subfigure}[b]{0.4\textwidth}
     \centering
@@ -51,11 +51,11 @@
       \draw[txnedge] (m2) to (f);
     \end{tikzpicture}
     \caption{Understanding \dIreduction{} with the graph-based model}%
-    \figlabel{direduction}
+    \figlabel{Direduction}
   \end{subfigure}%
 
   \caption{%
     \dIconfluence{} and \dIreduction{} in the grpah-based model of
     \Iconfluence{}
-  }\figlabel{diconfluence_and_direduction}
+  }\figlabel{DiconfluenceAndDireduction}
 \end{figure}

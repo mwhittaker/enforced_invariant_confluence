@@ -54,7 +54,7 @@
         \draw[txnline] (s33) to node[txntext]{} (s31);
       \end{tikzpicture}
 
-      \caption{Process-Based}\figlabel{processbased}
+      \caption{Process-Based}\figlabel{StateProcessBased}
     \end{subfigure}%
     \begin{subfigure}[c]{0.35\textwidth}
       \centering
@@ -81,7 +81,7 @@
         \draw[txnline] (s5) to (s7);
       \end{tikzpicture}
 
-      \caption{Graph-Based}\figlabel{graphbased}
+      \caption{Graph-Based}\figlabel{StateGraphBased}
     \end{subfigure}%
     \begin{subfigure}[c]{0.3\textwidth}
       \centering
@@ -114,10 +114,10 @@
         \draw[astedge] (j1) to (j2) to (j3) to (u3) to (s3);
       \end{tikzpicture}
 
-      \caption{Expression-Based}\figlabel{expressionbased}
+      \caption{Expression-Based}\figlabel{StateExpressionBased}
     \end{subfigure}
   }
 
   \caption{Three models of state-based \Iconfluence{}}
-  \figlabel{statebasedmodels}
+  \figlabel{StateBasedModels}
 \end{figure}
