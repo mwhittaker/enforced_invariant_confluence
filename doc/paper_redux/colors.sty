@@ -21,3 +21,31 @@
 \definecolor{flatbluealt}{HTML}{3498DB}
 \definecolor{flatgreenalt}{HTML}{2ECC71}
 \definecolor{flatcyanalt}{HTML}{1ABC9C}
+
+\newcommand{\showcolors}{%
+  \begin{center}
+    \begin{tikzpicture}
+      \tikzstyle{swatch}=[minimum width=3cm, minimum height=0.5cm, y=0.5cm]
+      \node[swatch, fill=flatdarkgray]    at (0, 9) {\texttt{flatdarkgray}};
+      \node[swatch, fill=flatgray]        at (0, 8) {\texttt{flatgray}};
+      \node[swatch, fill=flatred]         at (0, 7) {\texttt{flatred}};
+      \node[swatch, fill=flatorange]      at (0, 6) {\texttt{flatorange}};
+      \node[swatch, fill=flatyellow]      at (0, 5) {\texttt{flatyellow}};
+      \node[swatch, fill=flatdenim]       at (0, 4) {\texttt{flatdenim}};
+      \node[swatch, fill=flatpurple]      at (0, 3) {\texttt{flatpurple}};
+      \node[swatch, fill=flatblue]        at (0, 2) {\texttt{flatblue}};
+      \node[swatch, fill=flatgreen]       at (0, 1) {\texttt{flatgreen}};
+      \node[swatch, fill=flatcyan]        at (0, 0) {\texttt{flatcyan}};
+      \node[swatch, fill=flatdarkgrayalt] at (3, 9) {\texttt{flatdarkgrayalt}};
+      \node[swatch, fill=flatgrayalt]     at (3, 8) {\texttt{flatgrayalt}};
+      \node[swatch, fill=flatredalt]      at (3, 7) {\texttt{flatredalt}};
+      \node[swatch, fill=flatorangealt]   at (3, 6) {\texttt{flatorangealt}};
+      \node[swatch, fill=flatyellowalt]   at (3, 5) {\texttt{flatyellowalt}};
+      \node[swatch, fill=flatdenimalt]    at (3, 4) {\texttt{flatdenimalt}};
+      \node[swatch, fill=flatpurplealt]   at (3, 3) {\texttt{flatpurplealt}};
+      \node[swatch, fill=flatbluealt]     at (3, 2) {\texttt{flatbluealt}};
+      \node[swatch, fill=flatgreenalt]    at (3, 1) {\texttt{flatgreenalt}};
+      \node[swatch, fill=flatcyanalt]     at (3, 0) {\texttt{flatcyanalt}};
+    \end{tikzpicture}
+  \end{center}
+}

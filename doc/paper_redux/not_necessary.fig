@@ -1,0 +1,124 @@
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt]
+\tikzstyle{inv}=[line width=1pt, draw=black]
+\tikzstyle{invregion}=[rounded corners, fill=flatgreen!50, draw=none]
+\tikzstyle{reachableregion}=[rounded corners, fill=flatred!50, draw=none]
+
+% Quadrant 1.
+\newcommand{\quadi}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {0, ..., \argxmax} {
+    \foreach \y in {0, ..., \argymax} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+% Quadrant 2.
+\newcommand{\quadii}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {\argxmin, ..., 0} {
+    \foreach \y in {0, ..., \argymax} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+% Quadrant 3.
+\newcommand{\quadiii}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {\argxmin, ..., 0} {
+    \foreach \y in {\argymin, ..., 0} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+% Quadrant 4.
+\newcommand{\quadiv}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {0, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., 0} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+\newcommand{\xmin}{-2}
+\newcommand{\xmax}{2}
+\newcommand{\ymin}{-2}
+\newcommand{\ymax}{2}
+
+\begin{figure}[ht]
+  \centering
+
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.75]
+      \draw[invregion] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invregion] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+
+      \draw[] (\xmin, 0) to (\xmax, 0);
+      \draw[] (0, \ymin) to (0, \ymax);
+
+      \tikzstyle{pointinv}=[point, inv]
+      \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadii{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
+
+      \tikzstyle{statelabel}=[anchor=south west, inner sep=1.5pt]
+      \node[statelabel] at (0, 0) {$s_0$};
+      \node[statelabel] at (-1, 1) {$s_1$};
+      \node[statelabel] at (1, -1) {$s_2$};
+      \node[statelabel] at (1, 1) {$s_3$};
+    \end{tikzpicture}
+    \caption{Invariant satisfying points}\figlabel{statebasednotnecessary_inv}
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.75]
+      \draw[reachableregion] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+
+      \draw[] (\xmin, 0) to (\xmax, 0);
+      \draw[] (0, \ymin) to (0, \ymax);
+
+      \tikzstyle{pointinv}=[point, inv]
+      \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
+
+      \tikzstyle{statelabel}=[anchor=south west, inner sep=1.5pt]
+      \node[statelabel] at (0, 0) {$s_0$};
+      \node[statelabel] at (-1, 1) {$s_1$};
+      \node[statelabel] at (1, -1) {$s_2$};
+      \node[statelabel] at (1, 1) {$s_3$};
+    \end{tikzpicture}
+    \caption{Reachable points}\figlabel{statebasednotnecessary_reachable}
+  \end{subfigure}
+
+  \caption{%
+    An illustration of \exampleref{statebasednotnecessary}. All reachable
+    points satisfy the invariant, so the transactions are \Iconfluent{}.
+    However, not every invariant satisfying point is reachable. $s_2$ is
+    reachable, but $s_1$ is not. Their join, $s_3$ does not satisfy the
+    invariant, so the object is not \Iclosed.
+  }
+  \figlabel{statebasednotnecessary}
+\end{figure}

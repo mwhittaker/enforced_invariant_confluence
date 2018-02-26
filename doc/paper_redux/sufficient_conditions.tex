@@ -1,105 +1,140 @@
 \section{Sufficient Conditions}
-In this section, we present sufficient conditions for state-based and
-operation-based invariant confluence. It turns out that these conditions are
-sufficient but not necessary. However, if we relax the assumption of a fixed
-start state $s_0$, then they are both sufficient and necessary.
+In this section, we present sufficient (but not always necessary) conditions
+for state-based and operation-based invariant confluence. We also explain
+circumstances under which the sufficient conditions are also necessary.
+
+\begin{definition}
+  We say a state-based object is \defword{\Iclosed{}} if $I(s_0)$ and for all
+  states $s_1$ and $s_2$, if $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
+  \[
+    I(s_1) \land I(s_2) \implies I(s_1 \join s_2)
+  \]
+  Similarly, we say on operation-based object is \defword{\Iclosed{}} if
+  $I(s_0)$ and for all states $s_1$ and $s_2$ and all transactions $t$, if
+  $I(s_1)$, $I(s_2)$, and $I(t(s_1)(s_1))$, then $I(t(s_1)(s_2))$.
+  \[
+    I(s_1) \land I(s_2) \land I(t(s_1)(s_1)) \implies I(t(s_1)(s_2))
+  \]
+
+  \todo{%
+    We probably don't want to include $I(s_0)$ in the definition of \Iclosed{}
+    because it's a bit confusing.
+  }
+\end{definition}
 
 \begin{claim}\clmlabel{statebasedsufficient}
-  If for all states $s_1$ and $s_2$, $I(s_1)$ and $I(s_2)$ implies $I(s_1 \join
-  s_2)$, then $T$ is \Iconfluent{}. In other words, if invariant satisfying
-  states are closed under join, then $T$ is \Iconfluent.
+  Given a state-based object $O = (S, s_0, \join)$, a set of transactions $T$,
+  and an invariant $I$, if $O$ is \Iclosed{}, then $T$ is \Iconfluent.
 \end{claim}
-\begin{proof}
-  Let $e_1, e_2$ be expressions such that $\Irec{e_1}$ and $\Irec{e_2}$. Then,
-  $I(eval(e_1))$ and $I(eval(e_2))$, so $I(eval(e_1) \join eval(e_2))$ which
-  implies $I(e_1 \join e_2)$.
-\end{proof}
+\begin{elidableproof}
+  Let $e_1, e_2$ be expressions such that $\Irec{e_1}$ and $\Irec{e_2}$. Let
+  $s_1 = eval(e_1)$ and $s_2 = eval(e_2)$. Then, $I(s_1)$ and $I(s_2)$, so
+  $I(s_1 \join s_2)$ which implies $I(e_1 \join e_2)$. Thus, by
+  \clmref{statebased_two_iconfluence_defs}, $T$ is \Iconfluent{}.
+\end{elidableproof}
 
 \begin{claim}\clmlabel{opbasedsufficient}
-  If for all transactions $t \in T$ and for all states $s_1$ and $s_2$,
-  $I(s_1)$ and $I(s_2)$ and $I(t(s_1)(s_1))$ implies $I(t(s_1)(s_2))$, then $T$
-  is \Iconfluent{}.
+  Given a operation-based object $O = (S, s_0)$, a set of transactions $T$, and
+  an invariant $I$, if $O$ is \Iclosed{}, then $T$ is \Iconfluent.
 \end{claim}
-\begin{proof}
+\begin{elidableproof}
   Let $t \in T$ and $e_1, e_2$ be expressions such that $\Irec{e_1}$,
-  $\Irec{e_2}$, and $I(t(e_1)(e_2))$. Let $s_1 = eval(e_1)$ and $s_2 =
+  $\Irec{e_2}$, and $I(t(e_1)(e_1))$. Let $s_1 = eval(e_1)$ and $s_2 =
   eval(s_2)$. Then, $I(s_1)$, $I(s_2)$, and $I(t(s_1)(s_1))$, so
-  $I(t(s_1)(s_2))$. This implies $I(t(e_1)(e_2))$.
-\end{proof}
+  $I(t(s_1)(s_2))$. This implies $I(t(e_1)(e_2))$, so by
+  \clmref{opbased_two_iconfluence_defs}, $T$ is \Iconfluent.
+\end{elidableproof}
 
-While the conditions in \clmref{statebasedsufficient} and
-\clmref{opbasedsufficient} are sufficient, they are not necessary.
+Unfortunately, the converses of \clmref{statebasedsufficient} and
+\clmref{opbasedsufficient} are not true. Being \Iconfluent{} does not
+necessarily imply being \Iclosed{}, as the next two examples show.
 
-\begin{claim}\clmlabel{statebasednotnecessary}
-  If $T$ is \Iconfluent, it may not satisfy the condition in
-  \clmref{statebasedsufficient}.
-\end{claim}
-\begin{proof}
-  Consider the state based object $(S, s_0, \join)$ where $S$ is the set of all
-  finite non-empty sets of integers, $s_0 = \set{0}$, and $\join = \cup$. We
-  have a single transaction $t(x) = x \cup \set{\max(x) + 2}$ which retrieves
-  the largest element from the set (which is guaranteed to exist because it is
-  finite and non-empty), adds two to it, and then adds it into the set. $T =
-  \set{t}$. Let $I$ be the invariant that all elements of $S$ are either odd or
-  even.
-
-  Note that $T$ is \Iconfluent{}. Beginning with our initial state, we can
-  derive states $\set{0}, \set{0, 2}, \set{0, 2, 4}, \ldots$ all of which
-  satisfy the invariant. Moreover, merging any such states satisfies the
-  invariant.
+\begin{example}\examplelabel{statebasednotnecessary}
+  Consider the state-based object $O = (S, s_0, \join)$ where $(S, \join)$ is
+  $(\ints, \max) \times (\ints, \max)$ and $s_0 = (0, 0)$. Let $T$ consist of
+  two transactions $t_{x+1} \defeq \lambda (x, y).\ (x + 1, y)$ and $t_{y-1} =
+  \lambda (x, y).\ (x, y - 1)$. Let $I = \setst{(x, y)}{xy \leq 0}$.
   %
-  However, $T$ doesn't satisfy the condition in \clmref{statebasedsufficient}.
-  $\set{0}$ and $\set{1}$ satisfy the invariant, but $\set{0} \cup \set{1}$
-  does not.
-\end{proof}
+  $\setst{(x, y)}{\reachable{(x, y)}} = \nats \times -\nats \subseteq I$, so
+  $T$ is \Iconfluent. However, let $s_1 = (-1, 1)$ and $s_2 = (1, -1)$.
+  $I(s_1)$ and $I(s_2)$. However, $s_1 \join s_2 = (1, 1)$, and $\lnot I((1,
+  1))$. Thus, $O$ is not \Iclosed{}.
+\end{example}
 
-\begin{claim}\clmlabel{opbasednotnecessary}
-  If $T$ is \Iconfluent, it may not satisfy the condition in
-  \clmref{opbasedsufficient}.
-\end{claim}
-\begin{proof}
-  We play the same trick as \clmref{statebasednotnecessary}. Let $S$, $s_0$,
-  and $I$ be as in \clmref{statebasednotnecessary}. Consider a single
-  transaction $t(x) = u_{\max(x) + 2}$ where $u_k(x) = x \cup \set{k}$. Let $T
-  = \set{t}$.
-
-  $T$ is \Iconfluent{}. Beginning with our initial state, we can derive any
-  finite set of even integers containing $0$. All these states satisfy the
-  invariant. Letting $s, s'$ be any of these states, $I(t(s)(s'))$.
+\begin{example}
+  Consider the operation-based object $O = (S, s_0)$ where $S$ is $\ints \times
+  \ints$ and $s_0 = (0, 0)$. Let $T$ consist of two transactions $t_{x+1}
+  \defeq \lambda s.\ \lambda (x, y).\ (x + 1, y)$ and $t_{y-1} = \lambda s.\
+  \lambda (x, y).\ (x, y - 1)$. Let $I = \setst{(x, y)}{xy \leq 0}$.
   %
-  However, $T$ doesn't satisfy the condition in \clmref{opbasedsufficient}.
-  $\set{0}$ and $\set{1}$ satisfy the invariant, and so does
-  $t(\set{0})(\set{0})$, but $t(\set{0})(\set{1}) = \set{1, 2}$ does not.
-\end{proof}
+  $\setst{(x, y)}{\reachable{(x, y)}} = \nats \times -\nats \subseteq I$, so
+  $T$ is \Iconfluent. However, let $s_1 = (1, -1)$ and $s_2 = (0, 1)$.
+  $I(s_1)$, $I(s_2)$, and $I(t_{x+1}(s_1)(s_1))$. However, $t_{x+1}(s_1)(s_2) =
+  (1, 1)$, and $\lnot I((1, 1))$. Thus, $O$ is not \Iclosed{}.
+\end{example}
 
-\todo{Think of more compelling examples.}
+\input{not_necessary.fig}
 
-The conditions in \clmref{statebasedsufficient} and \clmref{opbasedsufficient}
-are not necessary. Intuitively, this makes quite a bit of sense. The condition
-in \clmref{statebasedsufficient} doesn't depend on $T$ and neither condition
-depends on the initial state $s_0$. However, if we relax our assumption of a
-fixed start state $s_0$ and instead allow replicas to begin with an arbitrary
-state, then both conditions are sufficient and necessary. Alternatively, if
-every state in $S$ is reachable from $s_0$, then the conditions are sufficient
-and necessary.
+Let's take a closer look at \exampleref{statebasednotnecessary} (illustrated in
+\figref{statebasednotnecessary}) to understand why being \Iconfluent{} doesn't
+imply being \Iclosed{}. Our counterexample considers points $s_1 = (-1, 1)$ and
+$s_2 = (1, -1)$. $s_2$ is reachable, but $s_1$ is not. This is not a
+coincidence! If we consider an \Iconfluent{} set of transactions, then any two
+reachable points satisfy the invariant, and the join of the two points is again
+reachable, so it must satisfy the invariant as well. The only way to join two
+invariant satisfying points and end up not satisfying the invariant is if one
+or both points are not reachable. Thus, if we know that $I$ is a subset of
+reachable points, then being \Iconfluent{} and being \Iclosed{} are equivalent.
 
-\todo{Prove these facts more carefully. It's pretty straightforward though.}
+\begin{claim}\clmlabel{sufficientandnecessary}
+  If every invariant satisfying state is reachable, then being \Iconfluent{}
+  and being \Iclosed{} are equivalent. Being \Iclosed{} is always sufficient,
+  but if we can establish that every invariant satisfying point is reachable,
+  then being \Iclosed{} is a both necessary and sufficient for being
+  \Iconfluent{}.
+  \[
+    I \subseteq \setst{e}{\reachable{e}} \implies
+    (\text{\Iclosed{}} \iff \text{\Iconfluent})
+  \]
+\end{claim}
+\begin{elidableproof}
+  Consider a state-based object $O = (S, s_0, \join)$, a set of transactions
+  $T$, and an invariant $I$ where $I \subseteq \setst{e}{\reachable{e}}$.
+  %
+  Being \Iclosed{} always implies being \Iconfluent{} whether or not $I
+  \subseteq \setst{e}{\reachable{e}}$. Thus, we only have to prove that if $T$
+  is \Iconfluent{}, then $O$ is \Iclosed. If $T$ is \Iconfluent{}, then
+  $I(s_0)$. Next, let $s_1$ and $s_2$ be arbitrary states such that $I(s_1)$
+  and $I(s_2)$. Both states satisfy the invariant, so both are reachable. That
+  is, there exist expressions $e_1$ and $e_2$ where $eval(e_1) = s_1$  and
+  $eval(e_2) = s_2$. $e_1 \join e_2$ is again reachable, so since $T$ is
+  \Iconfluent{}, $I(e_1 \join e_2)$ which implies $I(s_1 \join s_2)$. Thus, $O$
+  is \Iclosed.
+\end{elidableproof}
 
-\todo{Write this up in full.}
-Imagine we are building a system to group students together. We have a relation
-of (student id, grade) and a map (group id -> set of student ids). We want to
-enforce the invariant that every student in every group is in the same grade
-and that all groups are non-empty. If we start off with an initially empty
-mapping, then there are conflicts. If we start off with at least one student
-mapped into each group, then there are not any conflicts.
+\clmref{sufficientandnecessary} arms us with some potent understanding of
+\Iconfluence! Imagine we have an \Iclosed{} decision procedure that informs us
+that our state-based object from \exampleref{statebasednotnecessary} is not
+\Iclosed{}. Without \clmref{sufficientandnecessary}, we'd be a bit stuck. We'd
+have to seek out alternative means to determine whether or not our transactions
+were \Iconfluent{}. With the intuition provided by
+\clmref{sufficientandnecessary}, we can instead restrict our invariant to $I =
+\setst{(x, y)}{xy \leq 0 \land x \geq 0 \land y \leq 0}$. Now, the \Iclosed{}
+decision procedure informs us that we are indeed \Iclosed{}, so we know we're
+\Iconfluent{}.
 
-% | Data Model                              | I           | SC  | T | IC  |
-% | State based set with union              | phi(x)      | yes |   | yes |
-% | State based two sets with union         | foreign key | yes |   | yes |
-% | State-based increment-decrement counter | >           |
+Here are some more examples of transactions $T$ and invariants $I$ that are
+\Iconfluent{} but not \Iclosed{}. \todo{Think of more compelling examples.}
 
-Here are some examples of transactions $T$ and invariants $I$ that do not
-satisfy \clmlabel{statebasedsufficient} but are \Iconfluent{}.
+\begin{example}
+  \todo{Write this up in full.}
+  Imagine we are building a system to group students together. We have a relation
+  of (student id, grade) and a map (group id -> set of student ids). We want to
+  enforce the invariant that every student in every group is in the same grade
+  and that all groups are non-empty. If we start off with an initially empty
+  mapping, then there are conflicts. If we start off with at least one student
+  mapped into each group, then there are not any conflicts.
+\end{example}
 
 \begin{example}
   Consider the state-based object $(S, s_0, \join)$ where $(S, \join) = (\ints,
