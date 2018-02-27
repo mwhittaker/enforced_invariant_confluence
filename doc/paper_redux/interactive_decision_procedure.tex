@@ -22,7 +22,7 @@ conclude that $T$ is \Iconfluent{}.
   \algolabel{InteractiveDecisionProcedure}
   \begin{algorithmic}
     \Function{IsIconfluent}{$O$, $T$, $I$}
-      \State \Return \Call{Helper}{$O$, $T$, $I$, $\emptyset$, $\emptyset$}
+      \State \Return \Call{Helper}{$O$, $T$, $I$, $\set{s_0}$, $\emptyset$}
     \EndFunction
 
     \State
@@ -31,7 +31,7 @@ conclude that $T$ is \Iconfluent{}.
     \comment{$NR$ is a set of non-reachable states.}
     \Function{Helper}{$O$, $T$, $I$, $R$, $NR$}
       \State closed, $s_1$, $s_2$ $\gets$
-               \Call{IsIclosed}{$O$, $T$, $(I \cap R) - NR$}
+               \Call{IsIclosed}{$O$, $T$, $I - NR$}
       \If {closed $=$ unknown}
         \State \Return unknown
       \ElsIf {closed $=$ yes}
@@ -49,18 +49,115 @@ conclude that $T$ is \Iconfluent{}.
   \end{algorithmic}
 \end{algorithm}
 
+\newcommand{\IsIconfluent}{\textsc{IsIconfluent}}
+\newcommand{\IsIclosed}{\textsc{IsIclosed}}
+\newcommand{\Helper}{\textsc{Helper}}
+
 This example motivates \algoref{InteractiveDecisionProcedure}, a general
 purpose interactive \Iconfluence{} decision procedure in which a user
-iteratively refines the invariants until the decision procedure terminates.
+iteratively refines the invariant until the decision procedure terminates.
 Given an object $O$, a set of transactions $T$, and an invariant $I$, we call
-\textsc{IsIconfluent}$(O, T, I)$ to determine if $T$ is \Iconfluent{}.
-\textsc{IsIconfluent} assumes access to an \Iclosed{} decision procedure
-\textsc{IsIclosed}$(O, T, I)$ which returns whether $O$ is \Iconfluent{} (yes,
-no, or unknown). If it returns no, it also returns a counterexample $s_1$ and
-$s_2$.
+\IsIconfluent$(O, T, I)$ to determine if $T$ is \Iconfluent{}.
 
-\todo{%
-  Describe \textsc{IsIconfluent}. Describe how we can implement
-  \textsc{IsIclosed} with Z3 and how users can specify $R$ and $NR$ with
-  invariants.
-}
+\IsIconfluent{} assumes access to an \Iclosed{} decision procedure
+\IsIclosed$(O, T, I)$ which returns whether $O$ is \Iclosed{} (yes, no, or
+unknown). If it returns no, it also returns a counterexample $s_1$ and $s_2$
+such that $I(s_1)$ and $I(s_2)$, but $\lnot I(s_1 \join s_2)$.  Constructing an
+\Iclosed{} decision procedure is hard (undecidable, I think), but we can do
+pretty well using an SMT solver like Z3. There is also some existing research
+on how to built smart \Iclosed{} decision procedures that we can
+leverage~\cite{li2014automating}.
+
+\IsIconfluent{} takes in $O$, $T$, and $I$. Formally, $I$ is set of states
+(e.g. $\setst{(x, y)}{x \in \ints, y \in \ints, xy \leq 0}$), but an actual
+implementation of \IsIconfluent{} would likely take in $I$ as a logical formula
+(e.g. $xy \leq 0$). From now on, whenever we mention a (possibly infinite) set
+of states, remember that we can always represent the set as a finite formula.
+
+\IsIconfluent{} calls a helper function \Helper{} which---in addition to $O$,
+$T$, and $I$---takes as arguments a set $R$ of reachable states and a set $NR$
+of unreachable states. Like \IsIconfluent, \Helper$(O, T, I, R, NR)$ returns
+whether $T$ is \Iconfluent. Intuitively, $NR$ helps remove unreachable states
+from $I$ moving us closer to the case where $I \subseteq
+\setst{e}{\reachable{e}}$.
+
+\Helper{} first checks to see if $O$ is \iclosed{$(I - NR)$}. There are three
+cases to consider.
+\begin{itemize}
+  \item
+    If \IsIclosed{} gets stuck and doesn't know whether or not $O$ is
+    \iclosed{$(I - NR)$}, then \Helper{} is stuck too and is forced to return
+    unknown.
+  \item
+    If \IsIclosed{} determines that $O$ is \iclosed{$(I - NR)$}, then by
+    \clmref{StateBasedSufficient}, $T$ is \iconfluent{$(I - NR)$}, so
+    $\setst{e}{\reachable{e}} \subseteq I - NR$. $I - NR \subseteq I$, so $T$
+    is therefore also \Iconfluent{}. Thus, \Helper{} return yes.
+  \item
+    If \IsIclosed{} determines that $O$ is not \iclosed{$(I - NR)$}, then we
+    have a counterexample $s_1$ and $s_2$. We want to determine whether $s_1$
+    and $s_2$ are reachable or unreachable. We can do so in two ways.
+
+    First, we can randomly generate a set of reachable states and add them to
+    $R$.
+
+    Second, we can prompt the user to tell us whether or not the states are
+    reachable or unreachable. In addition to labelling $s_1$ and $s_2$ as
+    reachable or not, the user can also refine $I$ by augmenting $NR$. Taking
+    \exampleref{StateBasedNotNecessary} as an example, the user might look
+    through the existing reachable and unreachable states and have an aha
+    moment realizing that every point with a negative $x$-coordinate is
+    unreachable. They can use this knowledge to add all points with negative
+    $x$-coordinates to $NR$.
+
+    After $s_1$ and $s_2$ have been labelled reachable or not, we continue. If
+    both $s_1$ and $s_2$ are reachable, then so is $s_1 \join s_2$, but $\lnot
+    I(s_1 \join s_2)$. Thus, $T$ is not \Iconfluent{}, so \Helper{} returns no.
+    Otherwise, one of $s_1$ and $s_2$ is unreachable. Now, we recurse.
+\end{itemize}
+
+Let's walk through how we might use \IsIconfluent{} on
+\exampleref{StateBasedNotNecessary}.
+\begin{itemize}
+  \item
+    \IsIconfluent{} calls \Helper{} with $R = {(0, 0)}, NR = \emptyset{}$.
+
+  \item
+    \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
+    counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. We take the third
+    branch.
+
+  \item
+    We randomly generate some reachable points and update $R$ to $\set{(0, 0),
+    (1, 0), (0, -1), (1, -1)}$. Lucky for us, $s_2 \in R$, so we know it is
+    reachable. We're not sure about $s_1$, so we ask the user. After some
+    thought, the user tells us that $s_1$ is unreachable. We recurse with $R =
+    \set{(0, 0), (1, 0), (0, -1), (1, -1)}$ and $NR = \set{(-1, 1)}$.
+
+  \item
+    \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
+    counterexample $s_1 = (-1, 2)$ and $s_2 = (10, -10)$. We take the third
+    branch.
+
+  \item
+    We randomly generate some more reachable points and update $R$ to $\set{(0,
+    0), (1, 0), (0, -1), (1, -1), (2, 0), (0, -2)}$. $s_1, s_2 \notin R, NR$,
+    so we ask the user to label them. The user puts $s_1$ in $NR$ and $s_2$ in
+    $R$. We recurse with $R = \set{(0, 0), (1, 0), (0, -1), (1, -1), (2, 0),
+    (0, -2), (10, -10)}$ and $NR = \set{(-1, 1), (-1, 2)}$.
+
+  \item
+    \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
+    counterexample $s_1 = (-2, 1)$ and $s_2 = (4, -3)$. We take the third
+    branch.
+
+  \item
+    We randomly generate some more reachable points and update $R$. $s_1, s_2
+    \notin R, NR$, so we ask the user to label them. The user notices a pattern
+    in $R$ and $NR$ and after some thought, concludes that every point with
+    negative $x$-coordinate is unreachable. They update $NR$ to $-\ints \times
+    \ints$. We recurse.
+
+  \item
+    \Helper{} determines that $O$ is \iclosed{$(I - R)$} and returns yes!
+\end{itemize}
