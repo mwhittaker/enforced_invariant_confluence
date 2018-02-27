@@ -45,7 +45,7 @@ contain any joins).
 \begin{claim}\clmlabel{DiconfluenceDireducibleImpliesIconfluence}
   If $T$ is \dIconfluent{} and \dIreducible, then it is \Iconfluent.
 \end{claim}
-\begin{proof}
+\begin{elidableproof}
   First, we prove that for all $e$, if $\Irec{e}$ then there exists a join-free
   $e'$ where $\Irec{e'}$ and $eval(e) = eval(e')$. We proceed by a pretty
   straightforward structural induction on $e$.
@@ -98,7 +98,7 @@ contain any joins).
       = eval(e_1 \join e_2)
   \]
   Thus, $I(e_1 \join e_2)$.
-\end{proof}
+\end{elidableproof}
 
 \begin{claim}
   Consider a state-based object $(S, s_0, \join)$, a set of transactions $T$,
@@ -117,7 +117,7 @@ contain any joins).
       t_2(s))$.
   \end{enumerate}
 \end{claim}
-\begin{proof}
+\begin{elidableproof}
   \newcommand{\bart}[1]{\overline{t_{#1}}}
   \newcommand{\baru}[1]{\overline{u_{#1}}}
 
@@ -187,4 +187,4 @@ contain any joins).
   proved that $\Irec{\bart{n}(\baru{m}(s_0))}$. Also, $eval(e_1 \join e_2) =
   eval(\bart{n}(\baru{m}(s_0)))$. $\bart{n}(\baru{m}(s_0))$ is a join-free
   expression, so $T$ is \dIreducible{}.
-\end{proof}
+\end{elidableproof}
