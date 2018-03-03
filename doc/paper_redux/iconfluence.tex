@@ -4,15 +4,14 @@ three state-based approaches and three operation-based approaches.
 
 \subsection{State-Based}
 \begin{definition}
-  A \defword{distributed state-based object} is a triple $(S, s_0, \join)$
+  A \defword{distributed state-based object} $O$ is a triple $(S, s_0, \join)$
   where $S$ is a set of states, $s_0 \in S$ is a designated start state, and
   $\join: S \times S \to S$ is a binary merge operator that we call join.
 \end{definition}
 
 The notion of state-based objects is taken from~\cite{shapiro2011conflict}.
 Note that $\join$ is an \emph{arbitrary} function. It does not necessarily have
-to satisfy any special properties like associativity or commutativity, though
-later we will see that often it does.
+to satisfy any special properties like associativity or commutativity.
 
 \begin{definition}
   A \defword{state-based transaction} $t: S \to S$ is a function that maps one
@@ -24,39 +23,50 @@ later we will see that often it does.
   we say $I(s)$ to mean $s \in I$ and $\lnot I(s)$ to mean $s \notin I$.
 \end{definition}
 
+We formalize an invariant as a set of states, but we can also think of a
+predicate as a formula over states. For example, we can think of the invariant
+$\setst{(x, y) \in \ints \times \ints}{x \geq y}$ as the formula $x \geq y$ and
+vice-versa.
+
 \begin{example}
   $(\nats, 0, +)$ is a distributed object, $t(x) = 2x$ is a transaction, and
-  $\setst{x \in \nats}{x \equiv 0 \mod 2}$ is an invariant. Here, $I(0)$ and
+  $\setst{x \in \nats}{\text{$x$ is even}}$ is an invariant. Here, $I(0)$ and
   $I(2)$ but $\lnot I(1)$ and $\lnot I(3)$.
 \end{example}
 
 There are three ways to think about state-based \Iconfluence{}: a process-based
-approach, a graph-based approach, and an expression-based approach. All three
-approaches are illustrated in \figref{StateBasedModels} and are described in
-more detail below.
+approach, a graph-based approach, and an expression-based approach. Below, we
+describe the process-based approach and the graph-based approach informally and
+describe the expression-based approach formally. All three approaches are
+illustrated in \figref{StateBasedModels}.
 
 \input{figs/statebased_iconfluence.fig}
 
 \subsubsection{Process-Based}
 The process-based model is most similar to the process model described by
-Shapiro et al.\ in~\cite{shapiro2011conflict}. We are given a set
-$\seq{p}{1}{n}$ of $n$ processors each of which begins with state $s_0$.  A
-processor $p_i$ can perform one of two actions.
+Shapiro et al.\ in~\cite{shapiro2011conflict}. We are given a state-based
+object $O = (S, s_0, \join)$, a set of transactions $T$, an invariant $I$, and
+a set $\seq{p}{1}{n}$ of $n$ processors. Each processor begins with state
+$s_0$. A processor $p_i$ can perform one of two actions.
 
-First, $p_i$ can execute a transaction $t \in T$ to transition from state $s$
-to state $t(s)$, given that $I(t(s))$. If $\lnot I(t(s))$, then $p_i$ will not
-execute $t$ (or it will execute $t$ but then abort it; think of it however you
-like).
+\begin{itemize}
+  \item
+    $p_i$ can execute a transaction $t \in T$ to transition from state $s$ to
+    state $t(s)$, given that $I(t(s))$. If $\lnot I(t(s))$, then $p_i$ will not
+    execute $t$ (or it will execute $t$ but then abort it; think of it however
+    you like).
 
-Second, $p_i$ can send its state $s_i$ to another processor $p_j$ with state
-$s_j$ causing $p_j$ to transition from state $s_j$ to state $s_i \join s_j$ (or
-$s_j \join s_i$; it doesn't really matter). Note that unlike executing a
-transaction, $p_j$ must transition from $s_j$ to $s_i \join s_j$ even if $\lnot
-I(s_i \join s_j)$.
+  \item
+    $p_i$ can send its state $s_i$ to another processor $p_j$ with state $s_j$
+    causing $p_j$ to transition from state $s_j$ to state $s_i \join s_j$ (or
+    $s_j \join s_i$; it doesn't really matter). Note that unlike executing a
+    transaction, $p_j$ must transition from $s_j$ to $s_i \join s_j$ even if
+    $\lnot I(s_i \join s_j)$.
+\end{itemize}
 
-$T$ is invariant-confluent with respect to $I$, abbreviated \Iconfluent{}, if
-every reachable state (including $s_0$) satisfies the invariant. Note that this
-definition of \Iconfluence{} is different from the original definition
+$(O, T)$ is invariant-confluent with respect to $I$ (abbreviated \Iconfluent{})
+if every reachable state (including $s_0$) satisfies the invariant. Note that
+this definition of \Iconfluence{} is different from the original definition
 in~\cite{bailis2014coordination}. Later, we will see that they are equivalent.
 
 \subsubsection{Graph-Based}
@@ -66,14 +76,14 @@ vertices are states, and edges are either labelled with transactions or are
 unlabelled if they correspond to a join. The graph is really just an alternate
 way of representing an execution in the process-based model, but with duplicate
 states collapsed into a single vertex. As with the process-based model, we say
-that $T$ is \Iconfluent{} if every vertex in every graph satisfies the
+that $(O, T)$ is \Iconfluent{} if every vertex in every graph satisfies the
 invariant.
 
 \subsubsection{Expression-Based}
 The expression-based approach formalizes the process-based and graph-based
-approach using expressions. Given a state based object $(S, s_0, \join)$ and a
-set of transactions $T$, we consider expressions generated by the following
-grammar:
+approach using expressions. Given a state based object $O = (S, s_0, \join)$
+and a set of transactions $T$, we consider expressions generated by the
+following grammar:
 \[
   e ::= s_0 \mid t(e) \mid e_1 \join e_2
 \]
@@ -106,8 +116,8 @@ $e$, written $eval(e)$, in the obvious way:
 \end{definition}
 
 \begin{definition}
-  $T$ is \defword{\Iconfluent{}} if $\setst{e}{\reachable{e}} \subseteq I$. In
-  other words, $T$ is \Iconfluent{} if all reachable states satisfy the
+  $(O, T)$ is \defword{\Iconfluent{}} if $\setst{e}{\reachable{e}} \subseteq
+  I$. In other words, $T$ is \Iconfluent{} if all reachable states satisfy the
   invariant.
 \end{definition}
 
@@ -120,17 +130,17 @@ is the same as the definition in~\cite{gotsman2016cause}), but they are
   An expression \defword{recursively satisfies $I$}, denoted $\Irec{e}$, if $e$
   and all of $e$'s children satisfy $I$. That is,
   \begin{mathpar}
-    \Irec{s_0} \defeq I(s_0)
+    \inferrule{I(s_0)}{\Irec{s_0}}
 
-    \Irec{t(e)} \defeq I(t(e)) \land \Irec{e}
+    \inferrule{I(t(e)) \\ \Irec{e}}{\Irec{t(e)}}
 
-    \Irec{e_1 \join e_2}
-    \defeq I(e_1 \join e_2) \land \Irec{e_1} \land \Irec{e_2}
+    \inferrule{I(e_1 \join e_2) \\ \Irec{e_1} \\ \Irec{e_2}}
+              {\Irec{e_1 \join e_2}}
   \end{mathpar}
 \end{definition}
 
 Bailis et al.\ defined \Iconfluence{} to mean that expressions recursively
-satisfying $I$ are closed under join. That is, $T$ is \Iconfluent{} if
+satisfying $I$ are closed under join. That is, $(O, T)$ is \Iconfluent{} if
 \[
   \forall e_1, e_2.\; \Irec{e_1} \land \Irec{e_2} \implies I(e_1 \join e_2)
 \]
@@ -139,9 +149,9 @@ Bailis et al.\ probably ought to have also added the condition $I(s_0)$ to
 their definition of \Iconfluence{}. Doing so, the two definitions become
 equivalent.
 
-\begin{claim}\clmlabel{StateBasedIrecImpliesReachable}
+\begin{lemma}\lemlabel{StateBasedIrecImpliesReachable}
   $\Irec{e} \implies \reachable{e}$
-\end{claim}
+\end{lemma}
 \begin{elidableproof}
   We perform structural induction on $e$.
   \begin{itemize}
@@ -161,8 +171,8 @@ equivalent.
 \end{elidableproof}
 
 \begin{claim}\clmlabel{StateBasedTwoIconfluenceDefs}
-  Consider a state based object $(S, s_0, \join)$, a set of transactions $T$,
-  and an invariant $I$. The following two are equivalent:
+  Consider a state based object $O = (S, s_0, \join)$, a set of transactions
+  $T$, and an invariant $I$. The following two are equivalent:
   \begin{enumerate}[\quad(1)]
     \item
       $\setst{e}{\reachable{e}} \subseteq I$
@@ -174,7 +184,7 @@ equivalent.
 \begin{elidableproof}
   First, we show that (1) implies (2). Axiomatically, $\reachable{s_0}$, so by
   (1), $I(s_0)$. Let $e_1$ and $e_2$ be arbitrary expressions such that
-  $\Irec{e_1}$ and $\Irec{e_2}$. By \clmref{StateBasedIrecImpliesReachable},
+  $\Irec{e_1}$ and $\Irec{e_2}$. By \lemref{StateBasedIrecImpliesReachable},
   $\reachable{e_1}$ and $\reachable{e_2}$. Thus, $\reachable{e_1 \join e_2}$,
   so by (1), $I(e_1 \join e_2)$.
 
@@ -198,8 +208,8 @@ equivalent.
 
 \subsection{Operation-Based}
 \begin{definition}
-  A \defword{distributed operation-based object} is a pair $(S, s_0)$ where $S$
-  is a set of states and $s_0 \in S$ is a designated start state.
+  A \defword{distributed operation-based object} is a pair $O = (S, s_0)$ where
+  $S$ is a set of states and $s_0 \in S$ is a designated start state.
 \end{definition}
 
 Like state-based objects, the notion of operation-based objects is taken
@@ -216,9 +226,10 @@ The definition of an invariant is the same in the state-based and
 operation-based model.
 
 \begin{example}
-  $(\nats, 0)$ is a distributed object. $t(x) = y \mapsto x + y$ is a
-  transaction that given a state $x$ returns a function $y \mapsto x + y$ that
-  adds $x$ to its argument. $\setst{x \geq 0}{x \in \nats}$ is an invariant.
+  $(\nats, 0)$ is a distributed object. $t(x) = \lambda y.\ x + y$ is a
+  transaction that given a state $x$ returns a function $\lambda y.\ x + y$
+  that adds $x$ to its argument. $\setst{x \in \nats}{x \geq 0}$ is an
+  invariant.
 \end{example}
 
 As with state-based objects, there are three ways to think about
@@ -231,31 +242,36 @@ illustrated in \figref{OpBasedModels} and are described in more detail below.
 \subsubsection{Process-Based}
 As with the state-based approach, the process-based model is most similar to
 the process model described by Shapiro et al.\ in~\cite{shapiro2011conflict}.
-We are given a set $\seq{p}{1}{n}$ of $n$ processors each of which begins with
-state $s_0$. A processor $p_i$ can do one of two things.
+We are given an operation-based object $O$, a set of transactions $T$, an
+invariant $I$, and a set $\seq{p}{1}{n}$ of $n$ processors. Each processors
+begins with state $s_0$. A processor $p_i$ can do one of two things.
 
-First, $p_i$ can execute a transaction $t$ on its current state $s$ and then
-transitions from state $s$ to state $t(s)(s)$, given that $I(t(s)(s))$. If
-$\lnot I(t(s)(s))$, then $p_i$ will not perform $t$. If $p_i$ does execute $t$,
-then it broadcasts $t(s)$ to all other processors exactly once.
+\begin{itemize}
+  \item
+    $p_i$ can execute a transaction $t$ on its current state $s$ and then
+    transitions from state $s$ to state $t(s)(s)$, given that $I(t(s)(s))$. If
+    $\lnot I(t(s)(s))$, then $p_i$ will not perform $t$. If $p_i$ does execute
+    $t$, then it broadcasts $t(s)$ to all other processors exactly once.
 
-Second, $p_i$ can receive a broadcasted shadow transaction $t(s_j)$ from some
-other processor $p_j$. When $p_i$ receives $t(s_j)$, it transitions from its
-state $s_i$ to state $t(s_j)(s_i)$. When $p_i$ receives a shadow transaction,
-it must execute it, even if $\lnot I(t(s_j)(s_i))$.
+  \item
+    $p_i$ can receive a broadcasted shadow transaction $t(s_j)$ from some other
+    processor $p_j$. When $p_i$ receives $t(s_j)$, it transitions from its
+    state $s_i$ to state $t(s_j)(s_i)$. When $p_i$ receives a shadow
+    transaction, it must execute it, even if $\lnot I(t(s_j)(s_i))$.
+\end{itemize}
 
-$T$ is \Iconfluent{} if every reachable state (including $s_0$) satisfies the
-invariant.
+$(O, T)$ is \Iconfluent{} if every reachable state (including $s_0$) satisfies
+the invariant.
 
 \subsubsection{Graph-Based}
 In the graph-based model, we are given a directed acyclic graph in which each
 vertex is a state $s$ and each edge is labelled with a shadow operation $t(s)$
-where $s$ is some other vertex in the graph. $T$ is \Iconfluent{} if every
+where $s$ is some other vertex in the graph. $(O, T)$ is \Iconfluent{} if every
 vertex in every graph satisfies $I$.
 
 \subsubsection{Expression-Based}
-Given an operation-based object $(S, s_0)$ and a set of transactions $T$, we
-consider expressions built from the following grammar:
+Given an operation-based object $O = (S, s_0)$ and a set of transactions $T$,
+we consider expressions built from the following grammar:
 \[
   e ::= s_0 \mid t(e_1)(e_2)
 \]
@@ -287,7 +303,8 @@ denoted $eval(e)$, in the obvious way:
 \end{definition}
 
 \begin{definition}
-  $T$ is \Iconfluent{} if $\setst{e}{\reachable{e}} \subseteq I$.
+  $(O, T)$ is \defword{\Iconfluent{}} if $\setst{e}{\reachable{e}} \subseteq
+  I$.
 \end{definition}
 
 As with state-based objects, we have an equivalent definition of \Iconfluence{}
@@ -297,15 +314,15 @@ that deals with the closure of recursively invariant satisfying states.
   An expression \defword{recursively satisfies $I$}, denoted $\Irec{e}$, if $e$
   and all of $e$'s children satisfy $I$. That is,
   \begin{mathpar}
-    \Irec{s_0} \defeq I(s_0)
+    \inferrule{I(s_0)}{\Irec{s_0}}
 
-    \Irec{t(e_1)(e_2)} \defeq I(t(e_1)(e_2)) \land \Irec{e_1} \land \Irec{e_2}
+    \inferrule{I(t(e_1)(e_2)) \\ \Irec{e_1} \\ \Irec{e_2}}{\Irec{t(e_1)(e_2)}}
   \end{mathpar}
 \end{definition}
 
-\begin{claim}\clmlabel{OpBasedIrecImpliesReachable}
+\begin{lemma}\lemlabel{OpBasedIrecImpliesReachable}
   $\Irec{e} \implies \reachable{e}$
-\end{claim}
+\end{lemma}
 \begin{elidableproof}
   We perform a structural induction on $e$.
   \begin{itemize}
@@ -334,7 +351,7 @@ that deals with the closure of recursively invariant satisfying states.
 \begin{elidableproof}
   First, we show that (1) implies (2). $\reachable{s_0}$, so by (1), $I(s_0)$.
   Let $e_1$ and $e_2$ be arbitrary expressions such that $\Irec{e_1}$,
-  $\Irec{e_2}$, and $I(t(e_1)(e_1))$. By \clmref{OpBasedIrecImpliesReachable},
+  $\Irec{e_2}$, and $I(t(e_1)(e_1))$. By \lemref{OpBasedIrecImpliesReachable},
   $\reachable{e_1}$ and $\reachable{e_2}$, so $\reachable{t(e_1)(e_2)}$. By
   (1), $I(t(e_1)(e_2))$.
 

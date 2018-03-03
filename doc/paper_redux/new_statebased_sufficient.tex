@@ -1,10 +1,15 @@
 \section{New Sufficient State-Based Conditions}
-\todo{Motivate these in terms of the interactive decision procedure.}
+\todo{%
+  Revise everything with new notation of $(O, T)$ \Iconfluent{} instead of $T$
+  \Iconfluent{}.
+}
 
-In this section, we outline a new sufficient condition for state-based
-\Iconfluence{} that is more general than the one in
-\clmref{StateBasedSufficient}. To prove that the condition is sufficient, we
-introduce the concepts of \dIconfluence{} and \dIreduction{}.
+\algoref{InteractiveDecisionProcedure} relies on a user to provide information
+about reachable and unreachable states. In this section, we outline a new
+sufficient condition for state-based \Iconfluence{} that does not require user
+interaction and that covers some cases not covered by the sufficient conditions
+in \clmref{StateBasedSufficient}. To prove that the new condition is
+sufficient, we introduce the concepts of \dIconfluence{} and \dIreduction{}.
 
 \begin{definition}
   A \defword{join-free} expression $e = t_1(t_2(\ldots t_n(s_0) \ldots))$ is an

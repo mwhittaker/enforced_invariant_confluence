@@ -115,10 +115,10 @@
 
   \caption{%
     An illustration of \exampleref{StateBasedNotNecessary}. All reachable
-    points satisfy the invariant, so the transactions are \Iconfluent{}.
-    However, not every invariant satisfying point is reachable. $s_2$ is
-    reachable, but $s_1$ is not. Their join, $s_3$ does not satisfy the
-    invariant, so the object is not \Iclosed.
+    points satisfy the invariant, so the object and transactions are
+    \Iconfluent{}. However, not every invariant satisfying point is reachable.
+    $s_2$ is reachable, but $s_1$ is not. Their join, $s_3$, does not satisfy
+    the invariant, so the object is not \Iclosed.
   }
   \figlabel{StateBasedNotNecessary}
 \end{figure}
