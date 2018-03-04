@@ -120,6 +120,6 @@
     \caption{Expression-Based}\figlabel{OpExpressionBased}
   \end{subfigure}
 
-  \caption{Three models of operation-based \Iconfluence.}
+  \caption{Three models of operation-based invariant-confluence.}
   \figlabel{OpBasedModels}
 \end{figure}

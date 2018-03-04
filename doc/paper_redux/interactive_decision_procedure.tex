@@ -1,40 +1,41 @@
-\section{Interactive \Iconfluence{} Decision Procedure}
+\section{Interactive Invariant-Confluence Decision Procedure}
 Imagine we have an \Iclosed{} decision procedure, and let's revisit
-\exampleref{StateBasedNotNecessary}. We have a state-based object $O$, a set of
-transactions $T$, and an invariant $I$. We want to know if $T$ is
-\Iconfluent{}. Assume we have already determined that $I(s_0)$. We can hand $O$
-and $I$ to the \Iclosed{} decision procedure to see if $O$ is \Iclosed{}. If
-the decision procedure says yes, then by \clmref{StateBasedSufficient}, we know
-that $(O, T)$ is \Iconfluent{}.
+\exampleref{StateBasedNotNecessary}. We have a state-based object $O$, a start
+state $s_0$, set of transactions $T$, and an invariant $I$. We want to know if
+$O$ is \sTIconfluent{}. We can hand $O$ and $I$ to the \Iclosed{} decision
+procedure to see if $O$ is \Iclosed{}. If the decision procedure says yes and
+we can conclude that $I(s_0)$, then by \clmref{StateBasedSufficient}, we know
+that $O$ is \sTIconfluent{}.
 
 However, in our example, $O$ is not \Iclosed{}, so the decision procedure will
 say no. \clmref{SufficientAndNecessary} tells us that this means one of two
-things. Either (1) $T$ is not \Iconfluent{} or (2) $(O, T)$ is \Iconfluent{},
-but there are some invariant satisfying states that are not reachable. If we
-think harder about the set of reachable states, we may realize that all
-reachable states have a non-negative value of $x$. Thus, we may modify our
-invariant from $\setst{(x, y)}{xy \leq 0}$ to $\setst{(x, y)}{xy \leq 0 \land x
-\geq 0}$. Now, $O$ is \Iclosed{}! If we hand $O$ and $I$ to the decision
-procedure, it will say yes, and we can conclude that $(O, T)$ is \Iconfluent{}.
+things. Either (1) $O$ is \emph{not} \sTIconfluent{} or (2) $O$ is
+\sTIconfluent{}, but there are some invariant satisfying states that are not
+reachable. If we think harder about the set of reachable states, we may realize
+that all reachable states have a non-negative value of $x$. Thus, we may modify
+our invariant from $\setst{(x, y)}{xy \leq 0}$ to $\setst{(x, y)}{xy \leq 0
+\land x \geq 0}$. Now, $O$ is \Iclosed{}! If we hand $O$ and $I$ to the
+decision procedure, it will say yes. Moreover, $I(s_0)$, so we can conclude
+that $O$ is \sTIconfluent{}.
 
 \newcommand{\comment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
 \begin{algorithm}
-  \caption{Interactive \Iconfluence{} Decision Procedure}%
+  \caption{Interactive Invariant-Confluence Decision Procedure}%
   \algolabel{InteractiveDecisionProcedure}
   \begin{algorithmic}
-    \Function{IsIconfluent}{$O$, $T$, $I$}
-      \If {$\lnot I(s_0)$}
-        \State \Return no
-      \Else
-        \State \Return \Call{Helper}{$O$, $T$, $I$, $\set{s_0}$, $\emptyset$}
-      \EndIf
+    \Function{IsIconfluent}{$O$, $s_0$, $T$, $I$}
+      \State
+        \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $\set{s_0}$, $\emptyset$}
     \EndFunction
 
     \State
 
-    \comment{$R$ is a set of reachable states.}
-    \comment{$NR$ is a set of non-reachable states.}
-    \Function{Helper}{$O$, $T$, $I$, $R$, $NR$}
+    \comment{$R$ is a set of $\sTIreachable{}$ states.}
+    \comment{$NR$ is a set of $\sTIunreachable{}$ states.}
+    \Function{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
+      \If {$\lnot(I - NR)(s_0)$}
+        \State \Return no
+      \EndIf
       \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I - NR$}
       \If {closed $=$ unknown}
         \State \Return unknown
@@ -53,18 +54,20 @@ procedure, it will say yes, and we can conclude that $(O, T)$ is \Iconfluent{}.
   \end{algorithmic}
 \end{algorithm}
 
+\todo{Rename IsIconfluent to IsSTIConfluent}
 \newcommand{\IsIconfluent}{\textsc{IsIconfluent}}
 \newcommand{\IsIclosed}{\textsc{IsIclosed}}
 \newcommand{\Helper}{\textsc{Helper}}
 
 This example motivates \algoref{InteractiveDecisionProcedure}, a general
-purpose interactive \Iconfluence{} decision procedure in which a user
+purpose interactive invariant-confluence decision procedure in which a user
 iteratively refines the invariant until the decision procedure terminates.
-Given an object $O$, a set of transactions $T$, and an invariant $I$, we call
-\IsIconfluent$(O, T, I)$ to determine if $(O, T)$ is \Iconfluent{}. Now, we
-describe \algoref{InteractiveDecisionProcedure}.  An example of how to use
-\algoref{InteractiveDecisionProcedure} on \exampleref{StateBasedNotNecessary}
-is given in \figref{DecisionProcedureExample}.
+Given an object $O$, a start state $s_0$, a set of transactions $T$, and an
+invariant $I$, we call \IsIconfluent$(O, s_0, T, I)$ to determine if $O$ is
+\sTIconfluent{}. Now, we describe \algoref{InteractiveDecisionProcedure}. An
+example of how to use \algoref{InteractiveDecisionProcedure} on
+\exampleref{StateBasedNotNecessary} is given in
+\figref{DecisionProcedureExample}.
 
 \IsIconfluent{} assumes access to an \Iclosed{} decision procedure
 \IsIclosed$(O, I)$ which returns whether $O$ is \Iclosed{} (yes, no, or
@@ -75,53 +78,75 @@ pretty well using an SMT solver like Z3. There is also some existing research
 on how to built smart \Iclosed{} decision procedures that we can
 leverage~\cite{li2014automating}.
 
-\IsIconfluent{} takes in $O$, $T$, and $I$. Formally, $I$ is set of states
-(e.g. $\setst{(x, y)}{x \in \ints, y \in \ints, xy \leq 0}$), but an actual
-implementation of \IsIconfluent{} would likely take in $I$ as a logical formula
-(e.g. $xy \leq 0$). From now on, whenever we mention a (possibly infinite) set
-of states, remember that we can always represent the set as a finite formula.
+\IsIconfluent{} takes in $O$, $s_0$, $T$, and $I$. Formally, $I$ is set of
+states (e.g. $\setst{(x, y)}{x \in \ints, y \in \ints, xy \leq 0}$), but an
+actual implementation of \IsIconfluent{} would likely take in $I$ as a logical
+formula (e.g. $xy \leq 0$). From now on, whenever we mention a (possibly
+infinite) set of states, remember that we can always represent the set as a
+finite formula.
 
 \IsIconfluent{} calls a helper function \Helper{} which---in addition to $O$,
-$T$, and $I$---takes as arguments a set $R$ of reachable states and a set $NR$
-of unreachable states. Like \IsIconfluent, \Helper$(O, T, I, R, NR)$ returns
-whether $T$ is \Iconfluent. Intuitively, $NR$ helps remove unreachable states
-from $I$ moving us closer to the case where $I \subseteq
-\setst{e}{\reachable{e}}$.
+$s_0$, $T$, and $I$---takes as arguments a set $R$ of $\sTIreachable{}$ states
+and a set $NR$ of $\sTIunreachable{}$ states. Like \IsIconfluent, \Helper$(O,
+s_0, T, I, R, NR)$ returns whether $O$ is \sTIconfluent{} (assuming $R$ and
+$NR$ are correct). Intuitively, $NR$ helps remove unreachable states from $I$
+moving us closer to the case where $I \subseteq \setst{s}{\sTIreachable{s}}$.
 
-\Helper{} first checks to see if $O$ is \iclosed{$(I - NR)$}. There are three
+\Helper{} first checks to see if $(I - NR)(s_0)$. If it is not, then \Helper{}
+returns no. If $NR$ only contains unreachable states, then it doesn't contain
+$s_0$, so $s_0 \in I - NR \iff s_0 \in I$. Thus, if $\lnot (I - NR)(s_0)$, then
+$\lnot I(s_0)$, so $O$ is not \sTIconfluent.
+
+Next, \Helper{} checks to see if $O$ is \iclosed{$(I - NR)$}. There are three
 cases to consider.
 \begin{itemize}
   \item
     If \IsIclosed{} gets stuck and doesn't know whether or not $O$ is
     \iclosed{$(I - NR)$}, then \Helper{} is stuck too and is forced to return
     unknown.
+
   \item
     If \IsIclosed{} determines that $O$ is \iclosed{$(I - NR)$}, then by
-    \clmref{StateBasedSufficient}, $T$ is \iconfluent{$(I - NR)$}, so
-    $\setst{e}{\reachable{e}} \subseteq I - NR$. $I - NR \subseteq I$, so $T$
-    is therefore also \Iconfluent{}. Thus, \Helper{} return yes.
+    \clmref{StateBasedSufficient}, $O$ is \sticonfluent{s_0}{T}{(I -
+    NR)}, so
+    $
+      \setst{s}{\stireachable{s_0}{T}{(I-NR)}{s}}
+        \subseteq I - NR
+        \subseteq I
+    $.
+    If $NR$ only contains unreachable states, then
+    $
+      \setst{s}{\sTIreachable{s}} = \setst{s}{\stireachable{s_0}{T}{(I-NR)}{s}}
+    $.
+    Thus,
+    $
+      \setst{s}{\sTIreachable{s}} \subseteq I
+    $.
+    Thus, $O$ \sTIconfluent{}, so \Helper{} return yes.
+
   \item
     If \IsIclosed{} determines that $O$ is not \iclosed{$(I - NR)$}, then we
     have a counterexample $s_1$ and $s_2$. We want to determine whether $s_1$
-    and $s_2$ are reachable or unreachable. We can do so in two ways.
+    and $s_2$ are $\sTIreachable{}$ or $\sTIunreachable{}$. We can do so in two
+    ways.
 
     First, we can randomly generate a set of reachable states and add them to
     $R$.
 
     Second, we can prompt the user to tell us whether or not the states are
-    reachable or unreachable. In addition to labelling $s_1$ and $s_2$ as
-    reachable or not, the user can also refine $I$ by augmenting $NR$. Taking
-    \exampleref{StateBasedNotNecessary} as an example, the user might look
-    through the existing reachable and unreachable states and have an aha
-    moment realizing that every point with a negative $x$-coordinate is
-    unreachable. They can use this knowledge to add all points with negative
-    $x$-coordinates to $NR$.
+    $\sTIreachable{}$ or $\sTIunreachable{}$. In addition to labelling $s_1$
+    and $s_2$ as $\sTIreachable{}$ or not, the user can also refine $I$ by
+    augmenting $NR$. Taking \exampleref{StateBasedNotNecessary} as an example,
+    the user might look through the existing $\sTIreachable{}$ and
+    $\sTIunreachable{}$ states and have an aha moment realizing that every
+    point with a negative $x$-coordinate is $\sTIunreachable{}$. They can use
+    this knowledge to add all points with negative $x$-coordinates to $NR$.
 
-    After $s_1$ and $s_2$ have been labelled reachable or not, we continue. If
-    both $s_1$ and $s_2$ are reachable, then so is $s_1 \join s_2$, but $\lnot
-    I(s_1 \join s_2)$. Thus, $(O, T)$ is not \Iconfluent{}, so \Helper{}
-    returns no.  Otherwise, one of $s_1$ and $s_2$ is unreachable. Now, we
-    recurse.
+    After $s_1$ and $s_2$ have been labelled $\sTIreachable{}$ or not, we
+    continue. If both $s_1$ and $s_2$ are $\sTIreachable{}$, then so is $s_1
+    \join s_2$, but $\lnot I(s_1 \join s_2)$. Thus, $O$ is not \sTIconfluent{},
+    so \Helper{} returns no. Otherwise, one of $s_1$ and $s_2$ is
+    $\sTIunreachable{}$. Now, we recurse.
 \end{itemize}
 
 \input{figs/decision_procedure_example.fig}

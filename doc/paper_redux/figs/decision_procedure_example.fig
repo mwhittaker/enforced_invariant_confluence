@@ -26,7 +26,7 @@
 \begin{figure}[ht]
   \centering
 
-  \newcommand{\subfigwidth}{\textwidth}
+  \newcommand{\subfigwidth}{0.9\textwidth}
   \newcommand{\subfighspace}{1cm}
   \newcommand{\subfigscale}{0.35}
   \newcommand{\xmin}{-3}
@@ -72,13 +72,14 @@
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
     \caption{%
-      \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
-      counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. We take the third
-      branch. We randomly generate some reachable points and add $\set{(1, 0),
-      (0, -1), (1, -1)}$ to $R$. Lucky for us, $s_2 \in R$, so we know it is
-      reachable. We're not sure about $s_1$, so we ask the user.  After some
-      thought, the user tells us that $s_1$ is unreachable, so we update $NR$
-      to $\set{(-1, 1)}$. Then, we recurse.
+      \Helper{} determines $(I-NR)(s_0)$. Then, \Helper{} determines that $O$
+      is not \iclosed{$(I - R)$} with counterexample $s_1 = (-1, 1)$ and $s_2 =
+      (1, -1)$. We take the third branch. We randomly generate some
+      $\sTIreachable{}$ points and add $\set{(1, 0), (0, -1), (1, -1)}$ to $R$.
+      Lucky for us, $s_2 \in R$, so we know it is $\sTIreachable{}$. We're not
+      sure about $s_1$, so we ask the user. After some thought, the user tells
+      us that $s_1$ is $\sTIunreachable{}$, so we update $NR$ to $\set{(-1,
+      1)}$. Then, we recurse.
     }
     \figlabel{DecisionProcedureExampleB}
   \end{subfigure}
@@ -103,12 +104,13 @@
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
     \caption{%
-      \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
-      counterexample $s_1 = (-1, 2)$ and $s_2 = (3, -3)$. We take the third
-      branch. We randomly generate some reachable points and add to $\set{(2,
-      0), (-2, 0), (2, -1), (1, -2), (2, -2)}$ to $R$. $s_1, s_2 \notin R,
-      NR$, so we ask the user to label them. The user puts $s_1$ in $NR$ and
-      $s_2$ in $R$. Then, we recurse.
+      \Helper{} determines $(I-NR)(s_0)$. Then, \Helper{} determines that $O$
+      is not \iclosed{$(I - R)$} with counterexample $s_1 = (-1, 2)$ and $s_2 =
+      (3, -3)$. We take the third branch. We randomly generate some
+      $\sTIreachable{}$ points and add to $\set{(2, 0), (-2, 0), (2, -1), (1,
+      -2), (2, -2)}$ to $R$. $s_1, s_2 \notin R, NR$, so we ask the user to
+      label them. The user puts $s_1$ in $NR$ and $s_2$ in $R$. Then, we
+      recurse.
     }
     \figlabel{DecisionProcedureExampleC}
   \end{subfigure}
@@ -133,14 +135,15 @@
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
     \caption{%
-      \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
-      counterexample $s_1 = (-2, 1)$ and $s_2 = (1, -1)$. We take the third
-      branch.  We randomly generate some more reachable points and update $R$.
-      $s_2 \in R$ but $s_1 \notin R, NR$, so we ask the user to label $s_1$.
-      The user notices a pattern in $R$ and $NR$ and after some thought,
-      concludes that every point with negative $x$-coordinate is unreachable.
-      They update $NR$ to $-\ints \times \ints$. Then, we recurse. \Helper{}
-      determines that $O$ is \iclosed{$(I - R)$} and returns yes!
+      \Helper{} determines $(I-NR)(s_0)$. Then, \Helper{} determines that $O$
+      is not \iclosed{$(I - R)$} with counterexample $s_1 = (-2, 1)$ and $s_2 =
+      (1, -1)$. We take the third branch. We randomly generate some more
+      $\sTIreachable{}$ points and update $R$. $s_2 \in R$ but $s_1 \notin R,
+      NR$, so we ask the user to label $s_1$. The user notices a pattern in $R$
+      and $NR$ and after some thought, concludes that every point with negative
+      $x$-coordinate is $\sTIunreachable{}$. They update $NR$ to $-\ints \times
+      \ints$. Then, we recurse. \Helper{} determines that $O$ is \iclosed{$(I -
+      R)$} and returns yes!
     }
     \figlabel{DecisionProcedureExampleD}
   \end{subfigure}
@@ -148,8 +151,8 @@
   \caption{%
     An example of a user interacting with
     \algoref{InteractiveDecisionProcedure} to determine whether the object and
-    transactions from \exampleref{StateBasedNotNecessary} are \Iconfluent. The
-    visualization shows $R$ (left, green), $NR$ (middle, red), and $I - R$
+    transactions from \exampleref{StateBasedNotNecessary} are \sTIconfluent.
+    The visualization shows $R$ (left, green), $NR$ (middle, red), and $I - R$
     (right, blue) as the algorithm executes.
   }
   \figlabel{DecisionProcedureExample}

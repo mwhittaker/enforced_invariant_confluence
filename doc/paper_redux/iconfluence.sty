@@ -1,28 +1,44 @@
 \usepackage{mathtools}
 \usepackage{tikz}
 
-\newcommand{\iconfluence}[1]{{#1}-confluence}
-\newcommand{\iconfluent}[1]{{#1}-confluent}
-\newcommand{\Iconfluence}{\iconfluence{$I$}}
-\newcommand{\Iconfluent}{\iconfluent{$I$}}
+\newcommand{\sticonfluence}[3]{$(#1, #2, #3)$-confluence}
+\newcommand{\sticonfluent}[3]{$(#1, #2, #3)$-confluent}
+\newcommand{\sTIconfluence}{\sticonfluence{s_0}{T}{I}}
+\newcommand{\sTIconfluent}{\sticonfluent{s_0}{T}{I}}
 
-\newcommand{\diconfluence}[1]{$\Diamond${#1}-confluence}
-\newcommand{\diconfluent}[1]{$\Diamond${#1}-confluent}
-\newcommand{\dIconfluence}{\diconfluence{$I$}}
-\newcommand{\dIconfluent}{\diconfluent{$I$}}
+\newcommand{\dsticonfluence}[3]{$\Diamond(#1, #2, #3)$-confluence}
+\newcommand{\dsticonfluent}[3]{$\Diamond(#1, #2, #3)$-confluent}
+\newcommand{\dsTIconfluence}{\dsticonfluence{s_0}{T}{I}}
+\newcommand{\dsTIconfluent}{\dsticonfluent{s_0}{T}{I}}
 
-\newcommand{\onediconfluence}[1]{1-$\Diamond${#1}-confluence}
-\newcommand{\onediconfluent}[1]{1-$\Diamond${#1}-confluent}
-\newcommand{\onedIconfluence}{\onediconfluence{$I$}}
-\newcommand{\onedIconfluent}{\onediconfluent{$I$}}
+\newcommand{\onedsticonfluence}[3]{1-\dsticonfluence{#1}{#2}{#3}}
+\newcommand{\onedsticonfluent}[3]{1-\dsticonfluent{#1}{#2}{#3}}
+\newcommand{\onedsTIconfluence}{\onedsticonfluence{s_0}{T}{I}}
+\newcommand{\onedsTIconfluent}{\onedsticonfluent{s_0}{T}{I}}
 
-\newcommand{\direduction}[1]{$\Diamond${#1}-reduction}
-\newcommand{\direducible}[1]{$\Diamond${#1}-reducible}
-\newcommand{\dIreduction}{\direduction{$I$}}
-\newcommand{\dIreducible}{\direducible{$I$}}
+\newcommand{\dstireduction}[3]{$\Diamond(#1, #2, #3)$-reduction}
+\newcommand{\dstireducible}[3]{$\Diamond(#1, #2, #3)$-reducible}
+\newcommand{\dsTIreduction}{\dstireduction{s_0}{T}{I}}
+\newcommand{\dsTIreducible}{\dstireducible{s_0}{T}{I}}
 
 \DeclarePairedDelimiter{\Irec}{I^{\text{rec}}(}{)}
-\DeclarePairedDelimiter{\reachable}{\textsf{reachable}(}{)}
+
+\DeclarePairedDelimiterX{\stireachable}[4]
+  {\textsf{$(#1, #2, #3)$-reachable}\ifthenelse{\equal{#4}{}}{}{(}}
+  {\ifthenelse{\equal{#4}{}}{}{)}}
+  {#4}
+\DeclarePairedDelimiterX{\sTIreachable}[1]
+  {\textsf{$(s_0, T, I)$-reachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {\ifthenelse{\equal{#1}{}}{}{)}}
+  {#1}
+\DeclarePairedDelimiterX{\stiunreachable}[4]
+  {\textsf{$(#1, #2, #3)$-unreachable}\ifthenelse{\equal{#4}{}}{}{(}}
+  {\ifthenelse{\equal{#4}{}}{}{)}}
+  {#4}
+\DeclarePairedDelimiterX{\sTIunreachable}[1]
+  {\textsf{$(s_0, T, I)$-unreachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {\ifthenelse{\equal{#1}{}}{}{)}}
+  {#1}
 
 \newcommand{\iclosed}[1]{{#1}-closed}
 \newcommand{\Iclosed}{\iclosed{$I$}}

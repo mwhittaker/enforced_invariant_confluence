@@ -118,6 +118,6 @@
     \end{subfigure}
   }
 
-  \caption{Three models of state-based \Iconfluence{}}
+  \caption{Three models of state-based invariant-confluence}
   \figlabel{StateBasedModels}
 \end{figure}
