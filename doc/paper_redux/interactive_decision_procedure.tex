@@ -121,50 +121,11 @@ cases to consider.
     recurse.
 \end{itemize}
 
-Let's walk through how we might use \IsIconfluent{} on
-\exampleref{StateBasedNotNecessary}.
-\begin{itemize}
-  \item
-    \IsIconfluent{} calls \Helper{} with $R = \set{(0, 0)}, NR = \emptyset{}$.
 
-  \item
-    \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
-    counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. We take the third
-    branch.
+An example of how to use \algoref{InteractiveDecisionProcedure} on
+\exampleref{StateBasedNotNecessary} is given in
+\figref{DecisionProcedureExample}.
 
-  \item
-    We randomly generate some reachable points and update $R$ to $\set{(0, 0),
-    (1, 0), (0, -1), (1, -1)}$. Lucky for us, $s_2 \in R$, so we know it is
-    reachable. We're not sure about $s_1$, so we ask the user. After some
-    thought, the user tells us that $s_1$ is unreachable. We recurse with $R =
-    \set{(0, 0), (1, 0), (0, -1), (1, -1)}$ and $NR = \set{(-1, 1)}$.
+\input{figs/decision_procedure_example.fig}
 
-  \item
-    \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
-    counterexample $s_1 = (-1, 2)$ and $s_2 = (10, -10)$. We take the third
-    branch.
-
-  \item
-    We randomly generate some more reachable points and update $R$ to $\set{(0,
-    0), (1, 0), (0, -1), (1, -1), (2, 0), (0, -2)}$. $s_1, s_2 \notin R, NR$,
-    so we ask the user to label them. The user puts $s_1$ in $NR$ and $s_2$ in
-    $R$. We recurse with $R = \set{(0, 0), (1, 0), (0, -1), (1, -1), (2, 0),
-    (0, -2), (10, -10)}$ and $NR = \set{(-1, 1), (-1, 2)}$.
-
-  \item
-    \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
-    counterexample $s_1 = (-2, 1)$ and $s_2 = (4, -3)$. We take the third
-    branch.
-
-  \item
-    We randomly generate some more reachable points and update $R$. $s_1, s_2
-    \notin R, NR$, so we ask the user to label them. The user notices a pattern
-    in $R$ and $NR$ and after some thought, concludes that every point with
-    negative $x$-coordinate is unreachable. They update $NR$ to $-\ints \times
-    \ints$. We recurse.
-
-  \item
-    \Helper{} determines that $O$ is \iclosed{$(I - R)$} and returns yes!
-\end{itemize}
-
-\todo{What if the user labels things incorrectly?}
+\todo{Describe what happens when user input is incorrect.}

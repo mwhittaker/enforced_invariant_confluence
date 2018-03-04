@@ -1,0 +1,156 @@
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt, draw=black]
+\tikzstyle{reachable}=[fill=flatgreen!50, draw=none]
+\tikzstyle{unreachable}=[fill=flatred!50, draw=none]
+\tikzstyle{invariant}=[fill=flatblue!50, draw=none]
+\tikzstyle{nothing}=[fill=white, draw=none]
+
+\newcommand{\pointgrid}[4]{{
+  \newcommand{\argxmin}{#1}
+  \newcommand{\argxmax}{#2}
+  \newcommand{\argymin}{#3}
+  \newcommand{\argymax}{#4}
+
+  \draw[] (\argxmin, 0) to (\argxmax, 0);
+  \draw[] (0, \argymin) to (0, \argymax);
+  \foreach \x in {\argxmin, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., \argymax} {
+      \node[point] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+\newcommand{\pointrect}[2]{
+  \draw[#1] ($#2 + (-0.51, 0.51)$) rectangle ($#2 + (0.51, -0.51)$);
+}
+
+\begin{figure}[ht]
+  \centering
+
+  \newcommand{\subfigwidth}{\textwidth}
+  \newcommand{\subfighspace}{1cm}
+  \newcommand{\subfigscale}{0.35}
+  \newcommand{\xmin}{-3}
+  \newcommand{\xmax}{3}
+  \newcommand{\ymin}{-3}
+  \newcommand{\ymax}{3}
+
+  \begin{subfigure}[b]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[reachable] (-0.5, 0.5) rectangle (0.5, -0.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{%
+      \IsIconfluent{} calls \Helper{} with $R = \set{(0, 0)}$, $NR =
+      \emptyset{}$, and $I = \setst{(x, y)}{xy \leq 0}$.
+    }
+    \figlabel{DecisionProcedureExampleA}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[reachable] (-0.5, 0.5) rectangle (1.5, -1.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \pointrect{unreachable}{(-1, 1)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointrect{nothing}{(-1, 1)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{%
+      \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
+      counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. We take the third
+      branch. We randomly generate some reachable points and add $\set{(1, 0),
+      (0, -1), (1, -1)}$ to $R$. Lucky for us, $s_2 \in R$, so we know it is
+      reachable. We're not sure about $s_1$, so we ask the user.  After some
+      thought, the user tells us that $s_1$ is unreachable, so we update $NR$
+      to $\set{(-1, 1)}$. Then, we recurse.
+    }
+    \figlabel{DecisionProcedureExampleB}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[reachable] (-0.5, 0.5) rectangle (2.5, -2.5);
+      \pointrect{reachable}{(3, -3)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \pointrect{unreachable}{(-1, 1)}
+      \pointrect{unreachable}{(-1, 2)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointrect{nothing}{(-1, 1)}
+      \pointrect{nothing}{(-1, 2)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{%
+      \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
+      counterexample $s_1 = (-1, 2)$ and $s_2 = (3, -3)$. We take the third
+      branch. We randomly generate some reachable points and add to $\set{(2,
+      0), (-2, 0), (2, -1), (1, -2), (2, -2)}$ to $R$. $s_1, s_2 \notin R,
+      NR$, so we ask the user to label them. The user puts $s_1$ in $NR$ and
+      $s_2$ in $R$. Then, we recurse.
+    }
+    \figlabel{DecisionProcedureExampleC}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[reachable] (-0.5, 0.5) rectangle (2.5, -2.5);
+      \pointrect{reachable}{(3, 0)}
+      \pointrect{reachable}{(3, -1)}
+      \pointrect{reachable}{(0, -3)}
+      \pointrect{reachable}{(2, -3)}
+      \pointrect{reachable}{(3, -3)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[unreachable] (\xmin.5, \ymax.5) rectangle (-0.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\subfighspace}
+    \begin{tikzpicture}[scale=\subfigscale]
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{%
+      \Helper{} determines that $O$ is not \iclosed{$(I - R)$} with
+      counterexample $s_1 = (-2, 1)$ and $s_2 = (1, -1)$. We take the third
+      branch.  We randomly generate some more reachable points and update $R$.
+      $s_2 \in R$ but $s_1 \notin R, NR$, so we ask the user to label $s_1$.
+      The user notices a pattern in $R$ and $NR$ and after some thought,
+      concludes that every point with negative $x$-coordinate is unreachable.
+      They update $NR$ to $-\ints \times \ints$. Then, we recurse. \Helper{}
+      determines that $O$ is \iclosed{$(I - R)$} and returns yes!
+    }
+    \figlabel{DecisionProcedureExampleD}
+  \end{subfigure}
+
+  \caption{%
+    An example of a user interacting with
+    \algoref{InteractiveDecisionProcedure} to determine whether the object and
+    transactions from \exampleref{StateBasedNotNecessary} are \Iconfluent. The
+    visualization shows $R$ (left, green), $NR$ (middle, red), and $I - R$
+    (right, blue) as the algorithm executes.
+  }
+  \figlabel{DecisionProcedureExample}
+\end{figure}
