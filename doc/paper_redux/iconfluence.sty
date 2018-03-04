@@ -24,25 +24,21 @@
 \DeclarePairedDelimiter{\Irec}{I^{\text{rec}}(}{)}
 
 \DeclarePairedDelimiterX{\stireachable}[4]
-  {\textsf{$(#1, #2, #3)$-reachable}\ifthenelse{\equal{#4}{}}{}{(}}
+  {(#1, #2, #3)\text{-reachable}\ifthenelse{\equal{#4}{}}{}{(}}
   {\ifthenelse{\equal{#4}{}}{}{)}}
   {#4}
 \DeclarePairedDelimiterX{\sTIreachable}[1]
-  {\textsf{$(s_0, T, I)$-reachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {(s_0, T, I)\text{-reachable}\ifthenelse{\equal{#1}{}}{}{(}}
   {\ifthenelse{\equal{#1}{}}{}{)}}
   {#1}
 \DeclarePairedDelimiterX{\stiunreachable}[4]
-  {\textsf{$(#1, #2, #3)$-unreachable}\ifthenelse{\equal{#4}{}}{}{(}}
+  {(#1, #2, #3)\text{-unreachable}\ifthenelse{\equal{#4}{}}{}{(}}
   {\ifthenelse{\equal{#4}{}}{}{)}}
   {#4}
 \DeclarePairedDelimiterX{\sTIunreachable}[1]
-  {\textsf{$(s_0, T, I)$-unreachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {(s_0, T, I)\text{-unreachable}\ifthenelse{\equal{#1}{}}{}{(}}
   {\ifthenelse{\equal{#1}{}}{}{)}}
   {#1}
 
 \newcommand{\iclosed}[1]{$#1$-closed}
 \newcommand{\Iclosed}{\iclosed{I}}
-
-\tikzstyle{state}=[shape=circle, fill=black, inner sep=4pt, line width=1.5pt, draw=white]
-\tikzstyle{inv}=[draw=black]
-\tikzstyle{ninv}=[draw=black, dashed]

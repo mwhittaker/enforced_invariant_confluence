@@ -1,6 +1,9 @@
 \begin{figure}[ht]
   \centering
 
+  \tikzstyle{state}=[%
+    shape=circle, fill=black, inner sep=4pt, line width=1.5pt, draw=white]
+  \tikzstyle{inv}=[draw=black]
   \tikzstyle{s0color}=[fill=flatred]
   \tikzstyle{s1color}=[fill=flatgreen]
   \tikzstyle{s2color}=[fill=flatdenim]
