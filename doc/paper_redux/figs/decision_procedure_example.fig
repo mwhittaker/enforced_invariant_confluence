@@ -1,4 +1,4 @@
-\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt, draw=black]
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=1.5pt, draw=black]
 \tikzstyle{reachable}=[fill=flatgreen!50, draw=none]
 \tikzstyle{unreachable}=[fill=flatred!50, draw=none]
 \tikzstyle{invariant}=[fill=flatblue!50, draw=none]
@@ -26,77 +26,76 @@
 \begin{figure}[ht]
   \centering
 
-  \newcommand{\subfigwidth}{0.9\textwidth}
-  \newcommand{\subfighspace}{1cm}
-  \newcommand{\subfigscale}{0.35}
+  \newcommand{\subfigwidth}{0.48\textwidth}
+  \newcommand{\subfighspace}{0.3cm}
+  \newcommand{\tikzhspace}{0.4cm}
+  \newcommand{\tikzscale}{0.32}
   \newcommand{\xmin}{-3}
   \newcommand{\xmax}{3}
   \newcommand{\ymin}{-3}
   \newcommand{\ymax}{3}
 
-  \begin{subfigure}[b]{\subfigwidth}
+  \begin{subfigure}[t]{\subfigwidth}
     \centering
-    \begin{tikzpicture}[scale=\subfigscale]
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[reachable] (-0.5, 0.5) rectangle (0.5, -0.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
       \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
     \caption{%
-      \IsIconfluent{} calls \Helper{} with $R = \set{(0, 0)}$, $NR =
-      \emptyset{}$, and $I = \setst{(x, y)}{xy \leq 0}$.
+      \IsInvConfluent{} determines $I(s_0)$ and then calls \Helper{} with $R =
+      \set{(0, 0)}$, $NR = \emptyset{}$, and $I = \setst{(x, y)}{xy \leq 0}$.
     }
     \figlabel{DecisionProcedureExampleA}
   \end{subfigure}
-
-  \begin{subfigure}[b]{\subfigwidth}
+  \hspace{\subfighspace}
+  \begin{subfigure}[t]{\subfigwidth}
     \centering
-    \begin{tikzpicture}[scale=\subfigscale]
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[reachable] (-0.5, 0.5) rectangle (1.5, -1.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \pointrect{unreachable}{(-1, 1)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
       \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
       \pointrect{nothing}{(-1, 1)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
     \caption{%
-      \Helper{} determines $(I-NR)(s_0)$. Then, \Helper{} determines that $O$
-      is not \iclosed{$(I - R)$} with counterexample $s_1 = (-1, 1)$ and $s_2 =
-      (1, -1)$. We take the third branch. We randomly generate some
-      $\sTIreachable{}$ points and add $\set{(1, 0), (0, -1), (1, -1)}$ to $R$.
-      Lucky for us, $s_2 \in R$, so we know it is $\sTIreachable{}$. We're not
-      sure about $s_1$, so we ask the user. After some thought, the user tells
-      us that $s_1$ is $\sTIunreachable{}$, so we update $NR$ to $\set{(-1,
-      1)}$. Then, we recurse.
+      \Helper{} determines that $O$ is not \iclosed{(I - R)} with
+      counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. We randomly generate
+      some $\sTIreachable{}$ points and add them to $R$. Lucky for us, $s_2 \in
+      R$, so we know it is $\sTIreachable{}$. We're not sure about $s_1$, so we
+      ask the user. After some thought, the user tells us that $s_1$ is
+      $\sTIunreachable{}$, so we add $s_1$ to $NR$ and then recurse.
     }
     \figlabel{DecisionProcedureExampleB}
   \end{subfigure}
 
-  \begin{subfigure}[b]{\subfigwidth}
+  \begin{subfigure}[t]{\subfigwidth}
     \centering
-    \begin{tikzpicture}[scale=\subfigscale]
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[reachable] (-0.5, 0.5) rectangle (2.5, -2.5);
       \pointrect{reachable}{(3, -3)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \pointrect{unreachable}{(-1, 1)}
       \pointrect{unreachable}{(-1, 2)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
       \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
       \pointrect{nothing}{(-1, 1)}
@@ -104,20 +103,18 @@
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
     \caption{%
-      \Helper{} determines $(I-NR)(s_0)$. Then, \Helper{} determines that $O$
-      is not \iclosed{$(I - R)$} with counterexample $s_1 = (-1, 2)$ and $s_2 =
-      (3, -3)$. We take the third branch. We randomly generate some
-      $\sTIreachable{}$ points and add to $\set{(2, 0), (-2, 0), (2, -1), (1,
-      -2), (2, -2)}$ to $R$. $s_1, s_2 \notin R, NR$, so we ask the user to
-      label them. The user puts $s_1$ in $NR$ and $s_2$ in $R$. Then, we
-      recurse.
+      \Helper{} determines that $O$ is not \iclosed{(I - R)} with
+      counterexample $s_1 = (-1, 2)$ and $s_2 = (3, -3)$. We randomly generate
+      some $\sTIreachable{}$ points and add them to $R$. $s_1, s_2 \notin R,
+      NR$, so we ask the user to label them. The user puts $s_1$ in $NR$ and
+      $s_2$ in $R$. Then, we recurse.
     }
     \figlabel{DecisionProcedureExampleC}
   \end{subfigure}
-
-  \begin{subfigure}[b]{\subfigwidth}
+  \hspace{\subfighspace}
+  \begin{subfigure}[t]{\subfigwidth}
     \centering
-    \begin{tikzpicture}[scale=\subfigscale]
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[reachable] (-0.5, 0.5) rectangle (2.5, -2.5);
       \pointrect{reachable}{(3, 0)}
       \pointrect{reachable}{(3, -1)}
@@ -125,25 +122,24 @@
       \pointrect{reachable}{(2, -3)}
       \pointrect{reachable}{(3, -3)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[unreachable] (\xmin.5, \ymax.5) rectangle (-0.5, \ymin.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-    \end{tikzpicture}\hspace{\subfighspace}
-    \begin{tikzpicture}[scale=\subfigscale]
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
     \caption{%
-      \Helper{} determines $(I-NR)(s_0)$. Then, \Helper{} determines that $O$
-      is not \iclosed{$(I - R)$} with counterexample $s_1 = (-2, 1)$ and $s_2 =
-      (1, -1)$. We take the third branch. We randomly generate some more
-      $\sTIreachable{}$ points and update $R$. $s_2 \in R$ but $s_1 \notin R,
-      NR$, so we ask the user to label $s_1$. The user notices a pattern in $R$
-      and $NR$ and after some thought, concludes that every point with negative
-      $x$-coordinate is $\sTIunreachable{}$. They update $NR$ to $-\ints \times
-      \ints$. Then, we recurse. \Helper{} determines that $O$ is \iclosed{$(I -
-      R)$} and returns yes!
+      Then, \Helper{} determines that $O$ is not \iclosed{(I - R)} with
+      counterexample $s_1 = (-2, 1)$ and $s_2 = (1, -1)$. We randomly generate
+      some more $\sTIreachable{}$ points and add them $R$. $s_2 \in R$ but $s_1
+      \notin R, NR$, so we ask the user to label $s_1$. The user notices a
+      pattern in $R$ and $NR$ and after some thought, concludes that every
+      point with negative $x$-coordinate is $\sTIunreachable{}$. They update
+      $NR$ to $-\ints \times \ints$. Then, we recurse. \Helper{} determines
+      that $O$ is \iclosed{(I - R)} and returns yes!
     }
     \figlabel{DecisionProcedureExampleD}
   \end{subfigure}

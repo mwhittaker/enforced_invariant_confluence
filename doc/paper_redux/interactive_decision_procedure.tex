@@ -1,4 +1,8 @@
 \section{Interactive Invariant-Confluence Decision Procedure}
+\newcommand{\IsInvConfluent}{\textsc{IsInvConfluent}}
+\newcommand{\IsIclosed}{\textsc{IsIclosed}}
+\newcommand{\Helper}{\textsc{Helper}}
+
 Imagine we have an \Iclosed{} decision procedure, and let's revisit
 \exampleref{StateBasedNotNecessary}. We have a state-based object $O$, a start
 state $s_0$, set of transactions $T$, and an invariant $I$. We want to know if
@@ -23,90 +27,84 @@ that $O$ is \sTIconfluent{}.
   \caption{Interactive Invariant-Confluence Decision Procedure}%
   \algolabel{InteractiveDecisionProcedure}
   \begin{algorithmic}
-    \Function{IsIconfluent}{$O$, $s_0$, $T$, $I$}
+    \Function{IsInvConfluent}{$O$, $s_0$, $T$, $I$}
       \State
-        \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $\set{s_0}$, $\emptyset$}
+        \Return $I(s_0)$ and
+                \Call{Helper}{$O$, $s_0$, $T$, $I$, $\set{s_0}$, $\emptyset$}
     \EndFunction
 
     \State
 
     \comment{$R$ is a set of $\sTIreachable{}$ states.}
     \comment{$NR$ is a set of $\sTIunreachable{}$ states.}
+    \comment{$I(s_0)$ is a precondition.}
     \Function{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
-      \If {$\lnot(I - NR)(s_0)$}
-        \State \Return no
-      \EndIf
       \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I - NR$}
-      \If {closed $=$ unknown}
-        \State \Return unknown
-      \ElsIf {closed $=$ yes}
-        \State \Return{yes}
+      \If {closed}
+        \State \Return true
       \Else
         \State Augment $R$ and $NR$ with random search and user input
-        \State Make sure $s_1$ and $s_2$ are included in $R$ or $NR$
         \If{$s_1, s_2 \in R$}
-          \State \Return no
+          \State \Return false
         \Else
-          \State \Return \Call{Helper}{$O$, $T$, $I$, $R$, $NR$}
+          \State \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
         \EndIf
       \EndIf
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
-\todo{Rename IsIconfluent to IsSTIConfluent}
-\newcommand{\IsIconfluent}{\textsc{IsIconfluent}}
-\newcommand{\IsIclosed}{\textsc{IsIclosed}}
-\newcommand{\Helper}{\textsc{Helper}}
+\input{figs/decision_procedure_example.fig}
 
 This example motivates \algoref{InteractiveDecisionProcedure}, a general
 purpose interactive invariant-confluence decision procedure in which a user
 iteratively refines the invariant until the decision procedure terminates.
 Given an object $O$, a start state $s_0$, a set of transactions $T$, and an
-invariant $I$, we call \IsIconfluent$(O, s_0, T, I)$ to determine if $O$ is
+invariant $I$\footnote{%
+  Formally, $I$ is set of states (e.g. $\setst{(x, y)}{x \in \ints, y \in
+  \ints, xy \leq 0}$), but an actual implementation of \IsInvConfluent{} would
+  likely take in $I$ as a logical formula (e.g. $xy \leq 0$). From now on,
+  whenever we mention a (possibly infinite) set of states, remember that we can
+  always represent the set as a finite formula.
+}, we call \IsInvConfluent$(O, s_0, T, I)$ to determine if $O$ is
 \sTIconfluent{}. Now, we describe \algoref{InteractiveDecisionProcedure}. An
 example of how to use \algoref{InteractiveDecisionProcedure} on
 \exampleref{StateBasedNotNecessary} is given in
 \figref{DecisionProcedureExample}.
 
-\IsIconfluent{} assumes access to an \Iclosed{} decision procedure
-\IsIclosed$(O, I)$ which returns whether $O$ is \Iclosed{} (yes, no, or
-unknown). If it returns no, it also returns a counterexample $s_1$ and $s_2$
-such that $I(s_1)$ and $I(s_2)$, but $\lnot I(s_1 \join s_2)$. Constructing an
-\Iclosed{} decision procedure is hard (undecidable, I think), but we can do
-pretty well using an SMT solver like Z3. There is also some existing research
-on how to built smart \Iclosed{} decision procedures that we can
-leverage~\cite{li2014automating}.
+\IsInvConfluent{} assumes access to two helper decision procedures:
+\begin{enumerate}
+  \item
+    A decision procedure to determine $I(s_0)$.
 
-\IsIconfluent{} takes in $O$, $s_0$, $T$, and $I$. Formally, $I$ is set of
-states (e.g. $\setst{(x, y)}{x \in \ints, y \in \ints, xy \leq 0}$), but an
-actual implementation of \IsIconfluent{} would likely take in $I$ as a logical
-formula (e.g. $xy \leq 0$). From now on, whenever we mention a (possibly
-infinite) set of states, remember that we can always represent the set as a
-finite formula.
+  \item
+    An \Iclosed{} decision procedure \IsIclosed$(O, I)$ which returns a triple
+    (closed, $s_1$, $s_2$). closed is a boolean indicating whether $O$ is
+    \Iclosed{}. If closed is false, then $s_1$ and $s_2$ are a counterexample
+    such that $I(s_1)$ and $I(s_2)$, but $\lnot I(s_1 \join s_2)$.
+\end{enumerate}
 
-\IsIconfluent{} calls a helper function \Helper{} which---in addition to $O$,
-$s_0$, $T$, and $I$---takes as arguments a set $R$ of $\sTIreachable{}$ states
-and a set $NR$ of $\sTIunreachable{}$ states. Like \IsIconfluent, \Helper$(O,
-s_0, T, I, R, NR)$ returns whether $O$ is \sTIconfluent{} (assuming $R$ and
-$NR$ are correct). Intuitively, $NR$ helps remove unreachable states from $I$
-moving us closer to the case where $I \subseteq \setst{s}{\sTIreachable{s}}$.
+Constructing these two helper decision procedures is hard (undecidable, I
+think), but we can do pretty well using an SMT solver like Z3. There is also
+some existing research on how to built smart \Iclosed{} decision procedures
+that we can leverage~\cite{li2014automating}. In practice either decision an
+return unknown instead of true or false. In this case, \IsInvConfluent{} returns
+unknown.
 
-\Helper{} first checks to see if $(I - NR)(s_0)$. If it is not, then \Helper{}
-returns no. If $NR$ only contains unreachable states, then it doesn't contain
-$s_0$, so $s_0 \in I - NR \iff s_0 \in I$. Thus, if $\lnot (I - NR)(s_0)$, then
-$\lnot I(s_0)$, so $O$ is not \sTIconfluent.
+\IsInvConfluent{} first checks that $s_0$ satisfies $I$. If it doesn't, then
+\IsInvConfluent{} returns false. If it does then, \IsInvConfluent{} calls a
+helper function \Helper{} which---in addition to $O$, $s_0$, $T$, and
+$I$---takes as arguments a set $R$ of $\sTIreachable{}$ states and a set $NR$
+of $\sTIunreachable{}$ states. Like \IsInvConfluent, \Helper$(O, s_0, T, I, R,
+NR)$ returns whether $O$ is \sTIconfluent{} (assuming $R$ and $NR$ are
+correct). Intuitively, $NR$ helps remove unreachable states from $I$ moving us
+closer to the case where $I \subseteq \setst{s}{\sTIreachable{s}}$.
 
-Next, \Helper{} checks to see if $O$ is \iclosed{$(I - NR)$}. There are three
+First, \Helper{} checks to see if $O$ is \iclosed{(I - NR)}. There are two
 cases to consider.
 \begin{itemize}
   \item
-    If \IsIclosed{} gets stuck and doesn't know whether or not $O$ is
-    \iclosed{$(I - NR)$}, then \Helper{} is stuck too and is forced to return
-    unknown.
-
-  \item
-    If \IsIclosed{} determines that $O$ is \iclosed{$(I - NR)$}, then by
+    If \IsIclosed{} determines that $O$ is \iclosed{(I - NR)}, then by
     \clmref{StateBasedSufficient}, $O$ is \sticonfluent{s_0}{T}{(I -
     NR)}, so
     $
@@ -122,41 +120,58 @@ cases to consider.
     $
       \setst{s}{\sTIreachable{s}} \subseteq I
     $.
-    Thus, $O$ \sTIconfluent{}, so \Helper{} return yes.
+    Thus, $O$ \sTIconfluent{}, so \Helper{} return true.
 
   \item
-    If \IsIclosed{} determines that $O$ is not \iclosed{$(I - NR)$}, then we
+    If \IsIclosed{} determines that $O$ is not \iclosed{(I - NR)}, then we
     have a counterexample $s_1$ and $s_2$. We want to determine whether $s_1$
     and $s_2$ are $\sTIreachable{}$ or $\sTIunreachable{}$. We can do so in two
     ways.
 
     First, we can randomly generate a set of reachable states and add them to
     $R$.
-
+    %
     Second, we can prompt the user to tell us whether or not the states are
     $\sTIreachable{}$ or $\sTIunreachable{}$. In addition to labelling $s_1$
     and $s_2$ as $\sTIreachable{}$ or not, the user can also refine $I$ by
-    augmenting $NR$. Taking \exampleref{StateBasedNotNecessary} as an example,
-    the user might look through the existing $\sTIreachable{}$ and
-    $\sTIunreachable{}$ states and have an aha moment realizing that every
-    point with a negative $x$-coordinate is $\sTIunreachable{}$. They can use
-    this knowledge to add all points with negative $x$-coordinates to $NR$.
+    augmenting $R$ and $NR$ arbitrarily (see \figref{DecisionProcedureExample}
+    for an example). In this step, we also make sure that $s_0 \notin NR$ since
+    we know that $s_0$ is $\sTIreachable{}$.
 
     After $s_1$ and $s_2$ have been labelled $\sTIreachable{}$ or not, we
     continue. If both $s_1$ and $s_2$ are $\sTIreachable{}$, then so is $s_1
     \join s_2$, but $\lnot I(s_1 \join s_2)$. Thus, $O$ is not \sTIconfluent{},
-    so \Helper{} returns no. Otherwise, one of $s_1$ and $s_2$ is
-    $\sTIunreachable{}$. Now, we recurse.
+    so \Helper{} returns false. Otherwise, one of $s_1$ and $s_2$ is
+    $\sTIunreachable{}$, so we recurse.
 \end{itemize}
 
-\input{figs/decision_procedure_example.fig}
+\algoref{InteractiveDecisionProcedure} is an \emph{interactive} decision
+procedure. It requires that a user classify states as reachable or unreachable.
+What happens if a user incorrectly classifies a state? There's two possible
+errors that can be made:
+\begin{itemize}
+  \item \textbf{A user can label an unreachable state as reachable.}
+    In this case, the $s_1, s_2 \in R$ check in \Helper{} might be erroneously
+    met. In turn, \IsInvConfluent{} might erroneously return no. This is
+    inconvenient, but not the end of the world. Moreover, we can modify our
+    decision procedure so that \Helper{} requires that whenever a user labels a
+    state $s$ as $\sTIreachable{}$, they must also provide an $\sTIreachable{}$
+    expression $e$ where $eval(e) = s$.
 
-% \algoref{InteractiveDecisionProcedure} is an \emph{interactive} decision
-% procedure. It requires that a user classify states as reachable or unreachable.
-% What happens if a user incorrectly classifies a state? Given a counterexample
-% $s_1, s_2$, if a user incorrectly says that one of the unreachable points is
-% reachable, then the $s_1, s_2 \in R$ check in \Helper{} might be
-% erroneously met. In turn, \IsIconfluent{} might erroneously return no. This is
-% inconvenient, but not the end of the world.
-% Moreover, we can modify our decision procedure so that \Helper{}
-% user provide a \emph{proof} of reachability whenever they label as: a series of transactions and joins that result in the
+  \item \textbf{A user can label a reachable state as unreachable.}
+    In this case, \IsIclosed$(O, I - NR)$ might return true, even though $O$ is
+    not \sTIconfluent. Thus, a user might falsely believe their system to be
+    \sTIconfluent{} even though it isn't, and eventually their system might
+    enter a state which violates the invariant.
+
+    We can mitigate this in two ways. First, we can aggresively expand $R$. If
+    a user ever labels a state $s$ as unreachable, but $s \in R$, we can notify
+    the user of their mistake. Second, \Helper{} returns true when $O$ is
+    \iclosed{(I - NR)} for some $NR$, so $O$ is \sticonfluent{s_0}{T}{(I-R)}
+    (even though it might not be \sTIconfluent{}). Thus, when a user deploys
+    their system, they can deploy with the invariant $I - NR$ instead of $NR$.
+    If $NR$ is correctly populated, then deploying with $I - NR$ has no effect
+    on the system. If $NR$ is incorrectly populated, then some
+    $\sTIreachable{}$ states are artificially made unreachable, but the system
+    is still guaranteed to never enter a state which violates $I$.
+\end{itemize}
