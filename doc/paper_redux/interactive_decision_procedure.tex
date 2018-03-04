@@ -61,7 +61,10 @@ This example motivates \algoref{InteractiveDecisionProcedure}, a general
 purpose interactive \Iconfluence{} decision procedure in which a user
 iteratively refines the invariant until the decision procedure terminates.
 Given an object $O$, a set of transactions $T$, and an invariant $I$, we call
-\IsIconfluent$(O, T, I)$ to determine if $(O, T)$ is \Iconfluent{}.
+\IsIconfluent$(O, T, I)$ to determine if $(O, T)$ is \Iconfluent{}. Now, we
+describe \algoref{InteractiveDecisionProcedure}.  An example of how to use
+\algoref{InteractiveDecisionProcedure} on \exampleref{StateBasedNotNecessary}
+is given in \figref{DecisionProcedureExample}.
 
 \IsIconfluent{} assumes access to an \Iclosed{} decision procedure
 \IsIclosed$(O, I)$ which returns whether $O$ is \Iclosed{} (yes, no, or
@@ -121,11 +124,14 @@ cases to consider.
     recurse.
 \end{itemize}
 
-
-An example of how to use \algoref{InteractiveDecisionProcedure} on
-\exampleref{StateBasedNotNecessary} is given in
-\figref{DecisionProcedureExample}.
-
 \input{figs/decision_procedure_example.fig}
 
-\todo{Describe what happens when user input is incorrect.}
+% \algoref{InteractiveDecisionProcedure} is an \emph{interactive} decision
+% procedure. It requires that a user classify states as reachable or unreachable.
+% What happens if a user incorrectly classifies a state? Given a counterexample
+% $s_1, s_2$, if a user incorrectly says that one of the unreachable points is
+% reachable, then the $s_1, s_2 \in R$ check in \Helper{} might be
+% erroneously met. In turn, \IsIconfluent{} might erroneously return no. This is
+% inconvenient, but not the end of the world.
+% Moreover, we can modify our decision procedure so that \Helper{}
+% user provide a \emph{proof} of reachability whenever they label as: a series of transactions and joins that result in the
