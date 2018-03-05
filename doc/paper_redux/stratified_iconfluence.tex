@@ -100,7 +100,7 @@ perform one of two actions: execute a transaction or perform a merge.
     then the processors remain in state $s$ and continue normal processing.  If
     $t(s)$ does satisfy $I$, then the processors enter state $t(s)$ and choose
     pair $(I_k, T_k)$ to active where $(I_k, T_k)$ is the first pair in $P$
-    where $I_k(t(s))$.
+    where $I_k(t(s))$ (which is guaranteed to exist since $\cup_i I_i = I$).
 \end{itemize}
 
 An example of stratified invariant-confluence for the example discussed above
@@ -108,7 +108,36 @@ is given in \figref{StratifiedIconfluenceExample}.
 
 {\input{figs/stratified_iconfluence_example.fig}}
 
-\todo{Describe why this scheme ensures ``Iconfluence''}.
+Stratified invariant-confluence, like invariant-confluence, guarantees that no
+replica ever enters a state that violates the invariant $I$. How does it
+guarantee this?
+%
+Initially, all processors begin in the same state $s$ and with the same active
+pair $(I_j, T_j)$, and this invariant is maintained whenever a global
+coordination is run. During normal non-coordinated operation, because $O$ is
+\sticonfluent{s}{T_j}{I_j}, $\setst{s'}{\stireachable{s}{T_j}{I_j}{s'}}
+\subseteq I_j \subseteq I$. Thus, processors stay within $I_j$ which itself
+lies within $I$. During a coordinated action, processors transition to state $s
+= s_1 \join \cdots \join s_n \in I_j$ and then possibly transition into a new
+state $t(s)$ with new active pair $(I_k, T_k)$.
+
+A couple things to note:
+\begin{itemize}
+  \item
+    If $O$ is \sTIconfluent{}, then we can let $P = (I, T)$.
+
+  \item
+    Let $P = (I, T')$ where $T' \subseteq T$. This is a special case of the
+    token-based approach in~\cite{gotsman2016cause} where every transaction in
+    $T - T'$ acquires a single token $\tau$ and every transaction in $T$
+    doesn't acquire any token. The token-based approach
+    in~\cite{gotsman2016cause} is not completely subsumed by our stratified
+    invariant-confluence. For example, stratified invariant-confluence cannot
+    emulate multi-token systems. Conversely, stratified invariant-confluence is
+    not subsumed by the token-based approach which cannot stratify $I$. Notably
+    though, the token-based approach can adjust what tokens a transaction
+    acquires based on its state, but this is not used in the paper.
+\end{itemize}
 
 \todo{%
   Give name to things like $P$. Call it something like an $(I, T)$-partition.
