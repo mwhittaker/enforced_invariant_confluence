@@ -1,0 +1,92 @@
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt, draw=black]
+\tikzstyle{reachable}=[rounded corners, fill=flatgreen!50, draw=none]
+\tikzstyle{invariant}=[rounded corners, fill=flatblue!50, draw=none]
+
+\newcommand{\pointgrid}[4]{{
+  \newcommand{\argxmin}{#1}
+  \newcommand{\argxmax}{#2}
+  \newcommand{\argymin}{#3}
+  \newcommand{\argymax}{#4}
+
+  \draw[] (\argxmin, 0) to (\argxmax, 0);
+  \draw[] (0, \argymin) to (0, \argymax);
+  \foreach \x in {\argxmin, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., \argymax} {
+      \node[point] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+\begin{figure}[ht]
+  \centering
+
+  \newcommand{\subfigwidth}{0.31\textwidth}
+  \newcommand{\subfighspace}{0.3cm}
+  \newcommand{\tikzhspace}{0.4cm}
+  \newcommand{\tikzscale}{0.5}
+  \newcommand{\xmin}{-3}
+  \newcommand{\xmax}{3}
+  \newcommand{\ymin}{-3}
+  \newcommand{\ymax}{3}
+
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable] (-2.5, 2.5) rectangle (\xmax.5, -0.5);
+      \draw[reachable] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{%
+      Reachable states when $s_0 = (-2, 2)$, $T = \set{t_{x+1}, t_{y-1}}$, and
+      $I = \setst{(x, y)}{xy \leq 0}$.
+    }
+    \figlabel{FixingIconfluenceReachable}
+  \end{subfigure}
+  \hspace{\subfighspace}
+  \begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{The invariant $I = \setst{(x, y)}{xy \leq 0}$.}
+    \figlabel{FixingIconfluenceInvariant}
+  \end{subfigure}
+
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{Reachable states when $s_0 = (0, 0)$.}
+    \figlabel{FixingIconfluenceS}
+  \end{subfigure}
+  \hspace{\subfighspace}
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable] (-2.5, 2.5) rectangle (0.5, 1.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{Reachable states when $T = \set{t_{x+1}}$.}
+    \figlabel{FixingIconfluenceT}
+  \end{subfigure}
+  \hspace{\subfighspace}
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable] (-2.5, 2.5) rectangle (0.5, -0.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{Reachable states when $I = \setst{(x, y)}{x \leq 0, y \geq 0}$.}
+    \figlabel{FixingIconfluenceI}
+  \end{subfigure}
+
+  \caption{%
+    Adjusting $s_0$, $T$, or $I$ to become invariant-confluent. Reachable
+    states are shown in green, and the invariant is shown in blue.
+  }
+  \figlabel{FixingIconfluence}
+\end{figure}

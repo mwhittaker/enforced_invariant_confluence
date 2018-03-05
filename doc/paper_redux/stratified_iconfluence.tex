@@ -1,0 +1,116 @@
+\section{Stratified Invariant-Confluence}
+The interactive decision procedure in \algoref{InteractiveDecisionProcedure}
+and the sufficient conditions in \clmref{NewStateBasedSufficient} give us two
+ways to detect when an object $O$ is invariant-confluent. But what if it's not?
+%
+Let's revisit \exampleref{StateBasedNotNecessary} but with start state $s_0 =
+(-2, 2)$. Now, $O$ is not \sTIconfluent{}. The set of $\sTIreachable{}$ points
+(illustrated in \figref{FixingIconfluenceReachable}) is not a subset of $I$
+(illustrated in \figref{FixingIconfluenceInvariant}).
+
+This is unfortunate, but if we're determined to make $O$ \sTIconfluent{}? Well,
+then we have to adjust the set of $\sTIreachable{}$ points so that they are a
+subset of $I$. We can go about this in three ways:
+\begin{itemize}
+  \item \textbf{Adjust $s_0$.}
+    $O$ is not \sticonfluent{(-2, 2)}{T}{I}, but it is \sticonfluent{(0,
+    0)}{T}{I}. Thus, we can change our start state to become
+    invariant-confluent. This is illustrated in \figref{FixingIconfluenceS}.
+
+  \item \textbf{Adjust $T$.}
+    $O$ is not \sticonfluent{s_0}{\set{t_{x+1}, t_{y-1}}}{I}, but it is
+    \sticonfluent{s_0}{\set{t_{x+1}}}{I}. Thus, we can remove some transactions
+    to become invariant-confluent. This is illustrated in
+    \figref{FixingIconfluenceT}. Instead of outright forbidding some
+    transactions, we can instead use locking to limit the concurrent execution
+    of certain sets of transactions~\cite{balegas2015putting,
+    gotsman2016cause}.
+
+  \item \textbf{Adjust $I$.}
+    $O$ is not \sticonfluent{s_0}{T}{\setst{(x, y)}{xy \leq 0}} but it is
+    \sticonfluent{s_0}{T}{\setst{(x, y)}{x \leq 0, y \geq 0}}. Thus, we can
+    remove some states from $I$ to become invariant-confluent. This is
+    illustrated in \figref{FixingIconfluenceI}. We could also add some states
+    to $I$ and become invariant-confluent, but it's likely that states are
+    excluded from $I$ for good reason.
+\end{itemize}
+
+{\input{figs/fixing_iconfluence.fig}}
+
+Unfortunately, none of these three adjustments are completely satisfactory.
+There may only be one natural start state, and artificially making some
+invariant-satisfying states unreachable---either by eliminating transactions or
+restricting the invariant---is most likely a bit of a dirty hack. Moreover,
+locking can sometimes be overly restrictive. For example, we can make the
+example above invariant-confluent by requiring that both transactions $t_{x+1}$
+and $t_{y-1}$ acquire a lock. However, once all processors have a state $(x,
+y)$ where $x \geq 0$ and $y \leq 0$, the locks are no longer necessary.
+
+Ideally, we would maintain the same start state, use locking to restrict
+concurrently executing transactions as little as possible, and leave all
+invariant-satisfying reachable states reachable. Can we achieve this?  Yes, at
+least kind of. We'll do so using something we call \defword{stratified
+invariant-confluence}. The main idea is that we'll partition the set of
+invariant-satisfying states. Depending on the state we're in, we'll either
+limit which transactions can execute concurrently, restrict the invariant, or
+both.
+
+Consider a state-based object $O = (S, \join)$, a start state $s_0$, a set of
+transactions $T$, and an invariant $I$ deployed on $n$ processors $p_1, \ldots,
+p_n$. Further assume that $O$ is a semilattice.
+%
+With stratified invariant-confluence, we construct an ordered sequence $P =
+(I_1, T_1), \ldots, (I_n, T_n)$ of $n$ pairs $(I_i, T_i)$ with the following
+properties:
+\begin{itemize}
+  \item
+    $I_i \subseteq I$ for $1 \leq i \leq n$
+
+  \item
+    $T_i \subseteq T$ for $1 \leq i \leq n$
+
+  \item
+    $I = \cup_{i=1}^n I_i$
+
+  \item
+    For all $(I_i, T_i) \in P$ and all states $s \in I_i$, $O$ is
+    \sticonfluent{s}{I_i}{T_i}.
+\end{itemize}
+All processors store a copy of $P$. Moreover, at any given point in time, a
+processor $p_i$ will execute with one pair $(I_j, T_j) \in P$ \defword{active}.
+We'll describe what this means in just a moment. Initially, every processor
+$p_i$ is state $s_0$. $p_i$ finds the first pair $(I_j, T_j) \in P$ such that
+$I_j(s_0)$ and makes this $(I_j, T_j)$ active. As usual, a processor can
+perform one of two actions: execute a transaction or perform a merge.
+\begin{itemize}
+  \item
+    Merging proceeds as usual. When a process $p_i$ with state $s_i$ receives a
+    state $s_j$ from $p_j$, it transitions from $s_i$ to $s_i \join p_j$.
+
+  \item
+    Transaction processing is a bit different. Imagine a processor $p_i$ in
+    state $s_i$ with pair $(I_j, T_j)$ active wants to execute transaction $t$.
+    %
+    If $t \in T_j$, then $p_i$ executes $t_i$ so long as doing so maintains
+    $I_j$.
+    %
+    If $t \notin T_j$, then $p_i$ initiates a round of coordination among the
+    processors. All processors adopt state state $s = s_1 \join \cdots \join
+    s_n$. Then, all processors execute $t$. If $t(s)$ does not satisfy $I$,
+    then the processors remain in state $s$ and continue normal processing.  If
+    $t(s)$ does satisfy $I$, then the processors enter state $t(s)$ and choose
+    pair $(I_k, T_k)$ to active where $(I_k, T_k)$ is the first pair in $P$
+    where $I_k(t(s))$.
+\end{itemize}
+
+An example of stratified invariant-confluence for the example discussed above
+is given in \figref{StratifiedIconfluenceExample}.
+
+{\input{figs/stratified_iconfluence_example.fig}}
+
+\todo{Describe why this scheme ensures ``Iconfluence''}.
+
+\todo{%
+  Give name to things like $P$. Call it something like an $(I, T)$-partition.
+}
+\todo{Can we modify the decision procedure to help build a stratification?}

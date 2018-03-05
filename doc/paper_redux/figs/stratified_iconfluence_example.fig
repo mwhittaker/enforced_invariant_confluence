@@ -1,0 +1,134 @@
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt, draw=black]
+\tikzstyle{region}=[rounded corners, draw=none]
+\tikzstyle{reachable}=[region, fill=flatgreen!50]
+\tikzstyle{invariant}=[region, fill=flatblue!50]
+\tikzstyle{region1}=[region, fill=flatred!50]
+\tikzstyle{region2}=[region, fill=flatorange!50]
+\tikzstyle{region3}=[region, fill=flatpurple!50]
+\tikzstyle{region4}=[region, fill=flatyellowalt!50]
+
+\newcommand{\pointgrid}[4]{{
+  \newcommand{\argxmin}{#1}
+  \newcommand{\argxmax}{#2}
+  \newcommand{\argymin}{#3}
+  \newcommand{\argymax}{#4}
+
+  \draw[] (\argxmin, 0) to (\argxmax, 0);
+  \draw[] (0, \argymin) to (0, \argymax);
+  \foreach \x in {\argxmin, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., \argymax} {
+      \node[point] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+\begin{figure}[ht]
+  \centering
+
+  \newcommand{\subfigwidth}{0.31\textwidth}
+  \newcommand{\subfighspace}{0.3cm}
+  \newcommand{\tikzhspace}{0.4cm}
+  \newcommand{\tikzscale}{0.5}
+  \newcommand{\xmin}{-3}
+  \newcommand{\xmax}{3}
+  \newcommand{\ymin}{-3}
+  \newcommand{\ymax}{3}
+
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable] (-2.5, 2.5) rectangle (\xmax.5, -0.5);
+      \draw[reachable] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{$\sTIreachable{}$ states.}
+    \figlabel{StratifiedIconfluenceReachable}
+  \end{subfigure}
+  %
+  \hspace{\subfighspace}
+  %
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{Invariant $I$.}
+    \figlabel{StratifiedIconfluenceInv}
+  \end{subfigure}
+  %
+  \hspace{\subfighspace}
+  %
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region1] (\xmin.5, \ymax.5) rectangle (-0.5, 0.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{%
+      $(I_1, T_1)$.
+      $I_1 = \setst{(x, y)}{x \leq -1, y \geq 1}$.
+      $T_1 = T$.
+    }
+    \figlabel{StratifiedIconfluenceRegion1}
+  \end{subfigure}
+
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region2] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{%
+      $(I_2, T_2)$.
+      $I_2 = \setst{(x, y)}{x \geq 0, y \leq 0}$.
+      $T_2 = T$.
+    }
+    \figlabel{StratifiedIconfluenceRegion2}
+  \end{subfigure}
+  %
+  \hspace{\subfighspace}
+  %
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region3] (-0.5, \ymax.5) rectangle (0.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{%
+      $(I_3, T_3)$.
+      $I_3 = \setst{(x, y)}{x = 0}$.
+      $T_3 = \set{t_{y-1}}$.
+    }
+    \figlabel{StratifiedIconfluenceRegion3}
+  \end{subfigure}
+  %
+  \hspace{\subfighspace}
+  %
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region4] (\xmin.5, 0.5) rectangle (\xmax.5, -0.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \caption{%
+      $(I_4, T_4)$.
+      $I_4 = \setst{(x, y)}{y = 0}$.
+      $T_4 = \set{t_{x+1}}$.
+    }
+    \figlabel{StratifiedIconfluenceRegion4}
+  \end{subfigure}
+
+  \caption{%
+    An example of stratified invariant-confluence for state based object $O =
+    (\ints, \max) \times (\ints, \max)$, start state $s_0 = (-2, 2)$,
+    transactions $T = \set{t_{x+1}, t_{y-1}}$, and invariant $I = \setst{(x,
+    y)}{xy \leq 0}$. We have sequence $P = (I_1, T_1), (I_2, T_2), (I_3, T_3),
+    (I_4, T_4)$ described in \figref{StratifiedIconfluenceRegion1},
+    \figref{StratifiedIconfluenceRegion2},
+    \figref{StratifiedIconfluenceRegion3}, and
+    \figref{StratifiedIconfluenceRegion4}.
+  }
+  \figlabel{StratifiedIconfluenceExample}
+\end{figure}
