@@ -8,9 +8,9 @@ Let's revisit \exampleref{StateBasedNotNecessary} but with start state $s_0 =
 (illustrated in \figref{FixingIconfluenceReachable}) is not a subset of $I$
 (illustrated in \figref{FixingIconfluenceInvariant}).
 
-This is unfortunate, but if we're determined to make $O$ \sTIconfluent{}? Well,
-then we have to adjust the set of $\sTIreachable{}$ points so that they are a
-subset of $I$. We can go about this in three ways:
+This is unfortunate, but what if we're determined to make $O$ \sTIconfluent{}?
+Well, then we have to adjust the set of $\sTIreachable{}$ points so that they
+are a subset of $I$. We can go about this in three ways:
 \begin{itemize}
   \item \textbf{Adjust $s_0$.}
     $O$ is not \sticonfluent{(-2, 2)}{T}{I}, but it is \sticonfluent{(0,
@@ -59,9 +59,9 @@ Consider a state-based object $O = (S, \join)$, a start state $s_0$, a set of
 transactions $T$, and an invariant $I$ deployed on $n$ processors $p_1, \ldots,
 p_n$. Further assume that $O$ is a semilattice.
 %
-With stratified invariant-confluence, we construct an ordered sequence $P =
-(I_1, T_1), \ldots, (I_n, T_n)$ of $n$ pairs $(I_i, T_i)$ with the following
-properties:
+With stratified invariant-confluence, we construct an \ITpartition{}: an
+ordered sequence $P = (I_1, T_1), \ldots, (I_n, T_n)$ of $n$ pairs $(I_i, T_i)$
+with the following properties:
 \begin{itemize}
   \item
     $I_i \subseteq I$ for $1 \leq i \leq n$
@@ -70,18 +70,19 @@ properties:
     $T_i \subseteq T$ for $1 \leq i \leq n$
 
   \item
-    $I = \cup_{i=1}^n I_i$
+    $I = \cup_{i=1}^n I_i$ (note that the $I_i$'s don't have to be disjoint)
 
   \item
     For all $(I_i, T_i) \in P$ and all states $s \in I_i$, $O$ is
     \sticonfluent{s}{I_i}{T_i}.
 \end{itemize}
-All processors store a copy of $P$. Moreover, at any given point in time, a
-processor $p_i$ will execute with one pair $(I_j, T_j) \in P$ \defword{active}.
-We'll describe what this means in just a moment. Initially, every processor
-$p_i$ is state $s_0$. $p_i$ finds the first pair $(I_j, T_j) \in P$ such that
-$I_j(s_0)$ and makes this $(I_j, T_j)$ active. As usual, a processor can
-perform one of two actions: execute a transaction or perform a merge.
+All processors store a copy of the \ITpartition{} $P$. Moreover, at any given
+point in time, a processor $p_i$ will execute with one pair $(I_j, T_j) \in P$
+\defword{active}. We'll describe what this means in just a moment. Initially,
+every processor $p_i$ is state $s_0$. $p_i$ finds the first pair $(I_j, T_j)
+\in P$ such that $I_j(s_0)$ and makes this $(I_j, T_j)$ active. As usual, a
+processor can perform one of two actions: execute a transaction or perform a
+merge.
 \begin{itemize}
   \item
     Merging proceeds as usual. When a process $p_i$ with state $s_i$ receives a
@@ -90,17 +91,22 @@ perform one of two actions: execute a transaction or perform a merge.
   \item
     Transaction processing is a bit different. Imagine a processor $p_i$ in
     state $s_i$ with pair $(I_j, T_j)$ active wants to execute transaction $t$.
-    %
-    If $t \in T_j$, then $p_i$ executes $t_i$ so long as doing so maintains
-    $I_j$.
-    %
-    If $t \notin T_j$, then $p_i$ initiates a round of coordination among the
-    processors. All processors adopt state state $s = s_1 \join \cdots \join
-    s_n$. Then, all processors execute $t$. If $t(s)$ does not satisfy $I$,
-    then the processors remain in state $s$ and continue normal processing.  If
-    $t(s)$ does satisfy $I$, then the processors enter state $t(s)$ and choose
-    pair $(I_k, T_k)$ to active where $(I_k, T_k)$ is the first pair in $P$
-    where $I_k(t(s))$ (which is guaranteed to exist since $\cup_i I_i = I$).
+
+    If $t \in T_j$, then $p_i$ executes $t$ to transition from state $s_i$ to
+    state $t(s_i)$. If $I_j(t(s_i))$, then $p_i$ returns to the client
+    immediately. If $\lnot I(t(s_i))$, then $p_i$ aborts the transaction and
+    returns to the client immediately. If $\lnot I_j(t(s_i))$ and $I(t(s_i))$,
+    then $p_i$ initiates a round of global coordination among the processors,
+    as described below.  If $t \notin T_j$, then $p_i$ also initiates a round
+    of coordination.
+
+    During a global coordination, all processors adopt state state $s = s_1
+    \join \cdots \join s_n$. Then, all processors execute $t$. If $t(s)$ does
+    not satisfy $I$, then the processors remain in state $s$ and continue
+    normal processing.  If $t(s)$ does satisfy $I$, then the processors enter
+    state $t(s)$ and choose pair $(I_k, T_k)$ to be active where $(I_k, T_k)$
+    is the first pair in $P$ where $I_k(t(s))$ (which is guaranteed to exist
+    since $\cup_i I_i = I$).
 \end{itemize}
 
 An example of stratified invariant-confluence for the example discussed above
