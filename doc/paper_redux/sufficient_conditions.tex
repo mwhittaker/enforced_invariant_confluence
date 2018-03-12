@@ -133,13 +133,33 @@ Here are some more examples of transactions $T$ and invariants $I$ that are
 \todo{Think of more compelling examples.}
 
 \begin{example}
-  \todo{Write this up in full.}
-  Imagine we are building a system to group students together. We have a relation
-  of (student id, grade) and a map (group id -> set of student ids). We want to
-  enforce the invariant that every student in every group is in the same grade
-  and that all groups are non-empty. If we start off with an initially empty
-  mapping, then there are conflicts. If we start off with at least one student
-  mapped into each group, then there are not any conflicts.
+  Imagine that we have a set $P$ of students ($P$ is for pupils) and that we
+  are trying to assign students into groups. We have a state based object $O =
+  (S, \join)$ where each state $s \in S$ in a dictionary mapping a group id $1,
+  \ldots, n$ to some subset of $P$. For example, if $P = \set{a, b, c}$, then
+  $s$ might be $\set{1 \mapsto \set{a, b}, 2 \mapsto \set{c}}$. We join two
+  dictionaries by taking a group-wise union. That is, $(s_1 \join s_2)(i) =
+  s_1(i) \cup s_2(i)$.
+
+  Furthermore assume each student $p$ has a year $year(p)$ (e.g. 5th grade, 4th
+  grade). Our invariant $I$ is that every group of students is in the same
+  year. That is, for every state $s$ and every $1 \leq i \leq n$, every student
+  in $s(i)$ belongs to the same year.
+  %
+  Our set $T$ of transactions includes transactions which allow us to add any
+  number of students to any number of groups.
+  %
+  Let $P = \set{a, b, \ldots, z}$ and $n = 3$. Our start state is $s_0 = \set{1
+  \mapsto \set{a}, 2 \mapsto \set{b}, 3 \mapsto \set{c}}$.
+
+  Some thought shows that O is \sTIconfluent{}. However, $O$ is not \Iclosed{}. Let
+  \[
+    s_1 = \set{1 \mapsto \set{x}, 2 \mapsto \emptyset, 3 \mapsto \emptyset}
+    \qquad
+    s_2 = \set{1 \mapsto \set{y}, 2 \mapsto \emptyset, 3 \mapsto \emptyset}
+  \]
+  where $year(x) \neq year(y)$. $I(s_1)$ and $I(s_2)$, but $\lnot I(s_1 \join
+  s_2)$.
 \end{example}
 
 \begin{example}
