@@ -127,10 +127,7 @@ $I$ is a subset of reachable points, then being \sTIconfluent{} and being
   $O$ is \Iclosed.
 \end{elidableproof}
 
-Here are some more examples of transactions $T$ and invariants $I$ that are
-\sTIconfluent{} but not \Iclosed{}.
-
-\todo{Think of more compelling examples.}
+Here are some more examples. \todo{Think of more compelling examples.}
 
 \begin{example}
   Imagine that we have a set $P$ of students ($P$ is for pupils) and that we
@@ -152,7 +149,8 @@ Here are some more examples of transactions $T$ and invariants $I$ that are
   Let $P = \set{a, b, \ldots, z}$ and $n = 3$. Our start state is $s_0 = \set{1
   \mapsto \set{a}, 2 \mapsto \set{b}, 3 \mapsto \set{c}}$.
 
-  Some thought shows that O is \sTIconfluent{}. However, $O$ is not \Iclosed{}. Let
+  Some thought shows that O is \sTIconfluent{}. However, $O$ is not \Iclosed{}.
+  Let
   \[
     s_1 = \set{1 \mapsto \set{x}, 2 \mapsto \emptyset, 3 \mapsto \emptyset}
     \qquad
@@ -185,4 +183,91 @@ Here are some more examples of transactions $T$ and invariants $I$ that are
   \set{2})$ and $s_2 = (\set{2}, \set{1}, \set{2}, \set{1})$. $I(s_1)$ and
   $I(s_2)$, but $s_1 \cup s_2 = (\set{1, 2}, \set{1, 2}, \set{1, 2}, \set{1,
   2})$ which does not satisfy $I$.
+\end{example}
+
+\begin{example}
+  Here are some of the example objects and invariants
+  in~\cite{bailis2014coordination}. We begin with invariants over G-Sets $A$
+  and $B$. Fortunately, a good number of invariants are \Iclosed{}.
+
+  \begin{center}
+    \begin{tabular}{|l|l|p{3in}|}
+      \hline
+      $I$ & \Iclosed{} & Description \\\hline\hline
+      %
+      $\forall x \in A.\ \phi(x)$ &
+      yes &
+        Invariants of this form include things like attribute equality and
+        attribute inequality.
+        \\\hline
+      $\exists x \in A.\ \phi(x)$ &
+      yes &
+        Invariants of this form include things like non-emptiness constraints.
+        \\\hline
+      $\forall x \in A.\ \forall y \in A.\ \phi(x, y)$ &
+      no &
+        Invariants of this form include things like uniqueness constraints
+        (e.g. $\forall x \in A.\ \forall y \in A.\ x \neq y \implies key(x)
+        \neq key(y)$).
+        \\\hline
+      $\forall x \in A.\ \forall y \in B.\ \phi(x, y)$ &
+      no &
+        Invariants of this form include things like disjointness (e.g. $\forall
+        x \in A. \forall y \in B.\ x \neq y$).
+        \\\hline
+      $\forall x \in A.\ \exists y \in A.\ \phi(x, y)$ &
+      yes &
+        Invariants of this form include things like foreign key constraints
+        into a single relation. For example, if we have an \texttt{Employee(id,
+        bossid)} relation, we might want the invariant $\forall (i_1, b_1) \in
+        E.\ \exists (i_2, b_2) \in E.\ b_1 \neq \bot \implies b_1 = i_2$.
+        \\\hline
+      $\forall x \in A.\ \exists y \in B.\ \phi(x, y)$ &
+      yes &
+        Invariants of this form include things like foreign key constraints.
+        \\\hline
+      $\exists x \in A.\ \forall y \in A.\ \phi(x, y)$ &
+      no &
+        \todo{Figure out useful interpretation of these formula.}
+        \\\hline
+      $\exists x \in A.\ \forall y \in B.\ \phi(x, y)$ &
+      no &
+        \todo{Figure out useful interpretation of these formula.}
+        \\\hline
+      $\exists x \in A.\ \exists y \in A.\ \phi(x, y)$ &
+      yes &
+        \todo{Figure out useful interpretation of these formula.}
+        \\\hline
+      $\exists x \in A.\ \exists y \in B.\ \phi(x, y)$ &
+      yes &
+        \todo{Figure out useful interpretation of these formula.}
+        \\\hline
+    \end{tabular}
+  \end{center}
+
+  For 2P-Sets $A$ and $B$, we see that things get a bit more grim.
+  \begin{center}
+    \begin{tabular}{|l|l|}
+      \hline
+      $I$ & \Iclosed{} \\\hline\hline
+      %
+      $\forall x \in A.\ \phi(x)$ & yes \\\hline
+      $\exists x \in A.\ \phi(x)$ & no \\\hline
+      $\forall x \in A.\ \forall y \in A.\ \phi(x, y)$ & no \\\hline
+      $\forall x \in A.\ \forall y \in B.\ \phi(x, y)$ & no \\\hline
+      $\forall x \in A.\ \exists y \in A.\ \phi(x, y)$ & no \\\hline
+      $\forall x \in A.\ \exists y \in B.\ \phi(x, y)$ & no \\\hline
+      $\exists x \in A.\ \forall y \in A.\ \phi(x, y)$ & no \\\hline
+      $\exists x \in A.\ \forall y \in B.\ \phi(x, y)$ & no \\\hline
+      $\exists x \in A.\ \exists y \in A.\ \phi(x, y)$ & no \\\hline
+      $\exists x \in A.\ \exists y \in B.\ \phi(x, y)$ & no \\\hline
+    \end{tabular}
+  \end{center}
+  \note{%
+    This would be a good table to demonstrate that \Iclosure{} is not only
+    unnecessary, but also uncommon. In practice, not a lot of things are going
+    to be \Iclosed{}. This would motivate our push beyond these simple checks.
+    But then again, not a lot of things are going to be invariant-confluent
+    either, so it's not a super strong argument.
+  }
 \end{example}
