@@ -152,3 +152,42 @@ A couple things to note:
   Give name to things like $P$. Call it something like an $(I, T)$-partition.
 }
 \todo{Can we modify the decision procedure to help build a stratification?}
+
+\begin{example}
+  \todo{%
+    Bank account example from~\cite{gotsman2016cause}. This might be hard to
+    actually implement since the bank account merge is hard to do with a
+    state-based object. This example only acquires a single lock.
+  }
+\end{example}
+
+\begin{example}
+  \todo{%
+    Auction example from~\cite{gotsman2016cause}. I think we could automate
+    this one. This one acquires a single lock. We don't need the lock once
+    we're finalized.
+  }
+\end{example}
+
+\begin{example}
+  \todo{%
+    Courseware application from~\cite{gotsman2016cause}. When course is
+    non-empty, we can allow any operations at all. When a course is empty, we
+    cannot allow concurrent operations on it. This one should hopefully be easy
+    to automate.
+  }
+\end{example}
+
+\begin{example}
+  \todo{%
+    Ad counter from~\cite{balegas2015putting}. This might be hard like the bank
+    account balance. Adding numbers might be tricky in a state-based approach.
+  }
+\end{example}
+
+\begin{example}
+  \todo{%
+    Tournament from~\cite{balegas2015putting}. This might be hard. Pretty
+    complicated example with set cardinality constraints.
+  }
+\end{example}
