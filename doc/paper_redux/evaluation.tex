@@ -1,2 +1,22 @@
 \section{Evaluation}
-\todo{Describe what we would evaluate.}
+\begin{itemize}
+  \item
+    How good is the interactive decision procedure? How good are the new
+    sufficient conditions? For this, we'll need a set of case studies to run
+    our algorithms on. We can borrow case studies from related works.
+  \item
+    How fast is the interactive decision procedure? How fast are the new
+    sufficient conditions? We can use the same case studies.
+  \item
+    How good is stratified invariant confluence? Find another set of case
+    studies.
+  \item
+    How fast is Lucy for normal invariant confluence? Choose an application and
+    measure the throughput or latency. There's not too many knobs to tune.
+  \item
+    How fast is Lucy for stratified invariant confluence? Choose an application
+    and measure the throughput or latency. Vary the number of transactions that
+    take us out of the region, the number of transactions outside the region,
+    etc. Compare this to something like a primary-backup system where
+    operations are all run one at a time.
+\end{itemize}
