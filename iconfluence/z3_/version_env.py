@@ -5,6 +5,9 @@ import z3
 Version = Tuple[str, int]
 
 class VersionEnv:
+    """
+    """
+
     def __init__(self, vs: FrozenSet[str], suffix: str = '') -> None:
         self.vs = vs
         self.suffix = suffix
@@ -40,3 +43,7 @@ class VersionEnv:
         env = self._copy()
         env.versions[v] = new_version
         return env
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
