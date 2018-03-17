@@ -435,6 +435,9 @@ class SAssign(Stmt):
         self.x = x
         self.e = coerce(e)
 
+    def __str__(self) -> str:
+        return f'{self.x} := {self.e}'
+
 # Transactions #################################################################
 Transaction = List[Stmt]
 
