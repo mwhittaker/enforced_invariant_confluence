@@ -10,7 +10,7 @@ from .. import checker
 from .. import typecheck
 from .fresh_name import FreshName
 from .version_env import VersionEnv
-from .z3util import scoped
+from .z3_util import scoped
 
 CrdtEnv = Dict[str, ast.Crdt]
 TypeEnv = Dict[str, ast.Type]

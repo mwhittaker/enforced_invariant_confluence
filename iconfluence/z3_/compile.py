@@ -2,7 +2,6 @@ from typing import cast, Any, Callable, Dict, List, Optional, Union, Tuple
 from functools import lru_cache
 
 from orderedset import OrderedSet
-from termcolor import colored
 import z3
 
 from .. import ast
@@ -11,7 +10,7 @@ from .. import typecheck
 from ..envs import TypeEnv
 from .fresh_name import FreshName
 from .version_env import VersionEnv
-from .z3util import scoped
+from .z3_util import scoped
 
 @lru_cache()
 def compile_type(typ: ast.Type) -> z3.SortRef:

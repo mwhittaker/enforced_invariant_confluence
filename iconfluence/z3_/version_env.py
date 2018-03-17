@@ -6,12 +6,12 @@ Version = Tuple[str, int]
 
 class VersionEnv:
     """
+    TODO(mwhittaker): Document.
     """
 
-    def __init__(self, vs: FrozenSet[str], suffix: str = '') -> None:
-        self.vs = vs
+    def __init__(self, suffix: str = '') -> None:
         self.suffix = suffix
-        self.versions: Dict[str, Version] = {v: ('', 0) for v in self.vs}
+        self.versions: Dict[str, Version] = dict()
 
     def __str__(self) -> str:
         return str(self.versions)
@@ -21,17 +21,18 @@ class VersionEnv:
 
     def _copy(self) -> 'VersionEnv':
         versions_copy = self.versions.copy()
-        env = VersionEnv(self.vs, self.suffix)
+        env = VersionEnv(self.suffix)
         env.versions = versions_copy
         return env
 
     def get_version(self, v: str) -> Version:
-        assert v in self.versions, (v, self.versions)
+        if v not in self.versions:
+            self.versions[v] = (self.suffix, 0)
         return self.versions[v]
 
     def get_name(self, v: str) -> str:
         (s, i) = self.get_version(v)
-        i_str = f'_{i}' if i != 0 else ''
+        i_str = f'_{i}'
         s_str = f'_{s}' if s else ''
         return f'{v}{s_str}{i_str}'
 
