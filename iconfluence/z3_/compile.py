@@ -152,6 +152,33 @@ def compile_expr(e: ast.Expr,
                  tenv: TypeEnv,
                  fresh: FreshName) \
                  -> Tuple[OrderedSet, z3.ExprRef]:
+    """
+    Consider the expression `EInt(1) + EInt(2)`. This expressions compiles
+    quite naturally to the z3 expression `IntVal(1) + IntVal(2)`. However, this
+    is not the only way to compile the expression. We could also generate the
+    following code:
+
+        (declare-const lhs Int)
+        (declare-const rhs Int)
+        (assert (= lhs 1))
+        (assert (= rhs 2))
+
+    and return the expression `Int('lhs') + Int('rhs')`. compile_expr compiles
+    an expression into a pair (ss, e) where ss is an ordered set of boolean
+    expressions (e.g. `(= lhs 1)`) and e is the compiled expressions (e.g.
+    `Int('lhs') + Int('rhs')`).
+
+    >>> venv = VersionEnv({})
+    >>> tenv = {}
+    >>> fresh = FreshName()
+    >>> e = ast.EInt(1) + ast.EInt(2)
+    >>> e = typecheck.typecheck_expr(e, tenv)
+    >>> ss, e = compile_expr(e, venv, tenv, fresh)
+    >>> ss
+    OrderedSet()
+    >>> e
+    1 + 2
+    """
     def compile_expr_(e: ast.Expr) -> Tuple[OrderedSet, z3.ExprRef]:
         return compile_expr(e, venv, tenv, fresh)
 
@@ -295,3 +322,56 @@ def compile_expr(e: ast.Expr,
         return map3(e.a, e.b, e.c, z3.If)
     else:
         raise ValueError(f'Unkown expression {e}.')
+
+def compile_stmt(stmt: ast.Stmt,
+                 venv: VersionEnv,
+                 tenv: TypeEnv,
+                 fresh: FreshName) \
+                 -> Tuple[OrderedSet, VersionEnv]:
+    """
+    TODO(mwhittaker): Document.
+    """
+    if isinstance(stmt, ast.SAssign):
+        zss, ze = compile_expr(stmt.e, venv, tenv, fresh)
+        venv = venv.assign(stmt.x.x)
+        x = compile_var(stmt.x, venv, tenv)
+        return zss | OrderedSet([x == ze]), venv
+    else:
+        raise ValueError(f'Unkown statement {stmt}.')
+
+def compile_txn(txn: ast.Transaction,
+                venv: VersionEnv,
+                tenv: TypeEnv,
+                fresh: FreshName) \
+                -> Tuple[OrderedSet, VersionEnv]:
+    """
+    compile_txn compiles a transaction into a series of z3 boolean expressions
+    and an updated version environment. It's best explained through an example.
+
+    >>> x = ast.EVar('x')
+    >>> y = ast.EVar('y')
+    >>> z = ast.EVar('z')
+    >>> txn = [
+    ...     x.assign(1),
+    ...     y.assign(x + 2),
+    ...     z.assign(y * 2),
+    ...     x.assign(z + z),
+    ... ]
+    >>> tenv = {v: ast.TInt() for v in ['x', 'y', 'z']}
+    >>> venv = VersionEnv({'x', 'y', 'z'})
+    >>> fresh = FreshName()
+    >>> txn = [typecheck.typecheck_stmt(s, tenv) for s in txn]
+    >>> ss, _ = compile_txn(txn, venv, tenv, fresh)
+    >>> for s in ss:
+    ...     print(s)
+    1 == x_1
+    y_1 == x_1 + 2
+    z_1 == y_1*2
+    x_2 == z_1 + z_1
+    """
+    zss: OrderedSet = OrderedSet([])
+    for s in txn:
+        s_zss, venv = compile_stmt(s, venv, tenv, fresh)
+        zss |= s_zss
+    return zss, venv
+

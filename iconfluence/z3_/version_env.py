@@ -16,6 +16,9 @@ class VersionEnv:
     def __str__(self) -> str:
         return str(self.versions)
 
+    def __repr__(self) -> str:
+        return repr(self.versions)
+
     def _copy(self) -> 'VersionEnv':
         versions_copy = self.versions.copy()
         env = VersionEnv(self.vs, self.suffix)
