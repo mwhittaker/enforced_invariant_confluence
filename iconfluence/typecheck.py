@@ -95,7 +95,9 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         e.typ = cast(ast.TOption, typ).a
     elif (isinstance(e, ast.EIntAdd) or
           isinstance(e, ast.EIntSub) or
-          isinstance(e, ast.EIntMul)):
+          isinstance(e, ast.EIntMul) or
+          isinstance(e, ast.EIntMin) or
+          isinstance(e, ast.EIntMax)):
         assert_type_eq(_typecheck_expr(e.lhs, env).typ, ast.TInt(), e.lhs, e)
         assert_type_eq(_typecheck_expr(e.rhs, env).typ, ast.TInt(), e.rhs, e)
         e.typ = ast.TInt()

@@ -44,6 +44,10 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return eval_expr(e.lhs, env) - eval_expr(e.rhs, env)
     elif isinstance(e, ast.EIntMul):
         return eval_expr(e.lhs, env) * eval_expr(e.rhs, env)
+    elif isinstance(e, ast.EIntMin):
+        return min(eval_expr(e.lhs, env), eval_expr(e.rhs, env))
+    elif isinstance(e, ast.EIntMax):
+        return max(eval_expr(e.lhs, env), eval_expr(e.rhs, env))
     elif isinstance(e, ast.EBoolOr):
         return eval_expr(e.lhs, env) or eval_expr(e.rhs, env)
     elif isinstance(e, ast.EBoolAnd):

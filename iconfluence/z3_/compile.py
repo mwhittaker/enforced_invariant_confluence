@@ -269,6 +269,10 @@ def compile_expr(e: ast.Expr,
         return map2(e.lhs, e.rhs, lambda l, r: l - r)
     elif isinstance(e, ast.EIntMul):
         return map2(e.lhs, e.rhs, lambda l, r: l * r)
+    elif isinstance(e, ast.EIntMin):
+        return compile_expr_(ast.EIf(e.lhs <= e.rhs, e.lhs, e.rhs))
+    elif isinstance(e, ast.EIntMax):
+        return compile_expr_(ast.EIf(e.lhs >= e.rhs, e.lhs, e.rhs))
     elif isinstance(e, ast.EBoolOr):
         return map2(e.lhs, e.rhs, z3.Or)
     elif isinstance(e, ast.EBoolAnd):

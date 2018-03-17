@@ -348,6 +348,14 @@ class EIntMul(EBinaryOp):
     def __str__(self) -> str:
         return f'({self.lhs} * {self.rhs})'
 
+class EIntMin(EBinaryOp):
+    def __str__(self) -> str:
+        return f'min({self.lhs}, {self.rhs})'
+
+class EIntMax(EBinaryOp):
+    def __str__(self) -> str:
+        return f'max({self.lhs}, {self.rhs})'
+
 class EBoolAnd(EBinaryOp):
     def __str__(self) -> str:
         return f'({self.lhs} & {self.rhs})'
