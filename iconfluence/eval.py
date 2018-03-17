@@ -2,8 +2,7 @@ from copy import deepcopy
 from typing import Any, Dict
 
 from . import ast
-
-ValEnv = Dict[str, Any]
+from .envs import CrdtEnv, ValEnv
 
 def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     if isinstance(e, ast.EVar):
@@ -14,7 +13,7 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     elif isinstance(e, ast.EBool):
         return e.x
     elif isinstance(e, ast.ETuple2):
-        return (e.a, e.b)
+        return (eval_expr(e.a, env), eval_expr(e.b, env))
     elif isinstance(e, ast.EEmptySet):
         return set()
     elif isinstance(e, ast.ESet):
@@ -28,9 +27,9 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     elif isinstance(e, ast.ESome):
         return eval_expr(e.x, env)
     elif isinstance(e, ast.ETuple2First):
-        return eval_expr(e, env)[0]
+        return eval_expr(e.x, env)[0]
     elif isinstance(e, ast.ETuple2Second):
-        return eval_expr(e, env)[1]
+        return eval_expr(e.x, env)[1]
     elif isinstance(e, ast.EOptionIsNone):
         return eval_expr(e.x, env) is None
     elif isinstance(e, ast.EOptionIsSome):
@@ -110,3 +109,45 @@ def eval_txn(txn: ast.Transaction, env: ValEnv) -> ValEnv:
 
 def eval_invariant(inv: ast.Invariant, env: ValEnv) -> ValEnv:
     return eval_expr(inv, env)
+
+def _eval_join_vals(lhs: Any, rhs: Any, crdt: ast.Crdt) -> Any:
+    if isinstance(crdt, ast.CIntMax):
+        return max(lhs, rhs)
+    elif isinstance(crdt, ast.CIntMin):
+        return min(lhs, rhs)
+    elif isinstance(crdt, ast.CBoolOr):
+        return lhs or rhs
+    elif isinstance(crdt, ast.CBoolAnd):
+        return lhs and rhs
+    elif isinstance(crdt, ast.CTuple2):
+        a = _eval_join_vals(lhs[0], rhs[0], crdt.a)
+        b = _eval_join_vals(lhs[1], rhs[1], crdt.b)
+        return (a, b)
+    elif isinstance(crdt, ast.CSetUnion):
+        return lhs.union(rhs)
+    elif isinstance(crdt, ast.CSetIntersect):
+        return lhs.intersect(rhs)
+    elif isinstance(crdt, ast.CMap):
+        joined = lhs.copy()
+        for k in rhs:
+            if k in joined:
+                joined[k] = _eval_join_vals(lhs[k], rhs[k], crdt.b)
+            else:
+                joined[k] = rhs[k]
+        return joined
+    elif isinstance(crdt, ast.COption):
+        if lhs is None:
+            return rhs
+        if rhs is None:
+            return lhs
+        else:
+            return _eval_join_vals(lhs, rhs, crdt.a)
+    else:
+        raise ValueError(f'Unrecognized CRDT {crdt}.')
+
+def eval_join(lhs: ValEnv, rhs: ValEnv, cenv: CrdtEnv) -> ValEnv:
+    assert lhs.keys() == rhs.keys() == cenv.keys(), (lhs, rhs, cenv)
+    joined_env: ValEnv = dict()
+    for v in lhs:
+        joined_env[v] = _eval_join_vals(lhs[v], rhs[v], cenv[v])
+    return joined_env
