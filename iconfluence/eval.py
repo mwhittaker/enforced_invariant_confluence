@@ -5,6 +5,18 @@ from . import ast
 from .envs import CrdtEnv, ValEnv
 
 def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
+    """
+    >>> from .typecheck import typecheck_expr
+    >>> from .ast import *
+    >>> tenv = {'x': TInt()}
+    >>> venv = {'x': 2}
+    >>> e = EIntAdd(EInt(1), EVar('x'))
+    >>> e = typecheck_expr(e, tenv)
+    >>> print(e)
+    (1 + x)
+    >>> eval_expr(e, venv)
+    3
+    """
     if isinstance(e, ast.EVar):
         assert e.x in env, (e.x, env)
         return env[e.x]

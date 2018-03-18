@@ -1,18 +1,18 @@
 from enum import Enum
 from typing import List, Optional, Tuple
 
-import z3
 from orderedset import OrderedSet
+import z3
 
 from ..ast import EVar, Expr, Invariant
 from ..checker import Checker, Decision
-from ..typecheck import typecheck_invariant
 from ..envs import ValEnv, TypeEnv, Z3ExprEnv
 from ..eval import eval_invariant
-from ..z3_.z3_util import result_to_decision, scoped
-from ..z3_.version_env import VersionEnv
-from ..z3_.fresh_name import FreshName
+from ..typecheck import typecheck_invariant
 from ..z3_ import compile
+from ..z3_.fresh_name import FreshName
+from ..z3_.version_env import VersionEnv
+from ..z3_.z3_util import scoped
 
 class Label(Enum):
     REACHABLE = "reachable"
@@ -20,9 +20,46 @@ class Label(Enum):
 
 class InteractiveChecker(Checker):
     """
-    MISSING features
-        - state xploration + labelling
-        - integrating negative examples into invarinatn
+    An interactive invariant-confluence decision procedure.
+
+    Recall that a state based object O is (s0, T, I)-confluent if every (s0, T,
+    I)-reachable state satisfies the invariant. O is I-closed if
+    invariant-satisfying states are closed under join. I-closure always implies
+    (s0, T, I)-confluence, but the converse is not always true. However, if set
+    of invariant-satisfying points is a subset of the set of reachable points,
+    then invariant-confluence and invariant-closure are equivalent. This
+    interactive decision procedure relies on the user to iteratively refine the
+    invariant until it is a subset of the set of reachable points.  It then
+    uses Z3 to check for invariant-closure.
+
+    >>> from .. import *
+    >>> checker = InteractiveChecker()
+    >>> x = checker.int_max('x', 0)
+    >>> y = checker.int_max('y', 0)
+    >>> checker.add_invariant('xy_leq_0', x * y <= 0)
+    >>> checker.add_transaction('x_inc', [x.assign(x + 1)])
+    >>> checker.add_transaction('y_dec', [y.assign(y - 1)])
+    >>> checker.check_iconfluence()
+    Counterexample found.
+    counterexample1 = {'x': 0, 'y': 1}.
+    counterexample2 = {'x': 1, 'y': 0}.
+    <Decision.UNKNOWN: 'unknown'>
+    >>> checker.counterexample1_unreachable()
+    >>> checker.counterexample2_reachable()
+    >>> checker.refine_invariant(y <= 0)
+    >>> checker.check_iconfluence()
+    <Decision.YES: 'yes'>
+
+    TODO:
+        - Currently, we do not randomly explore states to label counterexamples
+          as reachable. It turns out to be a bit harder than possible because
+          our state explorations generates sets of values, but Z3
+          counterexamples include things like Z3 function interpretations.
+          We'll have to either reachable states as Z3 function interpretations
+          or translate Z3 models into Python values.
+        - After a user labels a counterexample as unreachable, we do not
+          automatically refine the invariant to exclude this point. Again, the
+          difficulty comes from the mismatch between Invariants and Z3 models.
     """
     def __init__(self, verbose: bool = False) -> None:
         Checker.__init__(self)

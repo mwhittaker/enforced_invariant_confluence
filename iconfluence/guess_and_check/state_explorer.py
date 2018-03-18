@@ -9,6 +9,11 @@ class NothingFoundException(Exception):
     pass
 
 class StateExplorer:
+    """
+    Given a start state, a set of transactions, and an invariant, a
+    StateExplorer will randomly explore the set of states reachable from the
+    start state.
+    """
     def __init__(self,
                  crdt_env: CrdtEnv,
                  s0: ValEnv,
