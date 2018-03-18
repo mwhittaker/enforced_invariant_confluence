@@ -65,18 +65,30 @@ class Crdt(AstNode):
         raise NotImplementedError()
 
 class CIntMax(Crdt):
+    def __str__(self) -> str:
+        return 'IntMax'
+
     def to_type(self) -> Type:
         return TInt()
 
 class CIntMin(Crdt):
+    def __str__(self) -> str:
+        return 'IntMin'
+
     def to_type(self) -> Type:
         return TInt()
 
 class CBoolOr(Crdt):
+    def __str__(self) -> str:
+        return 'BoolOr'
+
     def to_type(self) -> Type:
         return TBool()
 
 class CBoolAnd(Crdt):
+    def __str__(self) -> str:
+        return 'BoolAnd'
+
     def to_type(self) -> Type:
         return TBool()
 
@@ -85,12 +97,18 @@ class CTuple2(Crdt):
         self.a = a
         self.b = b
 
+    def __str__(self) -> str:
+        return f'Tuple2[{self.a}, {self.b}]'
+
     def to_type(self) -> Type:
         return TTuple2(self.a.to_type(), self.b.to_type())
 
 class CSetUnion(Crdt):
     def __init__(self, a: Type) -> None:
         self.a = a
+
+    def __str__(self) -> str:
+        return f'SetUnion[{self.a}]'
 
     def to_type(self) -> Type:
         return TSet(self.a)
@@ -99,12 +117,18 @@ class CSetIntersect(Crdt):
     def __init__(self, a: Type) -> None:
         self.a = a
 
+    def __str__(self) -> str:
+        return f'SetIntersect[{self.a}]'
+
     def to_type(self) -> Type:
         return TSet(self.a)
 
 class COption(Crdt):
     def __init__(self, a: Crdt) -> None:
         self.a = a
+
+    def __str__(self) -> str:
+        return f'Option[{self.a}]'
 
     def to_type(self) -> Type:
         return TOption(self.a.to_type())
@@ -113,6 +137,9 @@ class CMap(Crdt):
     def __init__(self, a: Type, b: Crdt) -> None:
         self.a = a
         self.b = b
+
+    def __str__(self) -> str:
+        return f'Map[{self.a}, {self.b}]'
 
     def to_type(self) -> Type:
         return TMap(self.a, self.b.to_type())
