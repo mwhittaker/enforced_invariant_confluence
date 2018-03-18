@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple
 
 import z3
 from orderedset import OrderedSet
+from colored import attr, fg
 
 from ..ast import EVar, Expr, Invariant
 from ..checker import Checker, Decision
@@ -24,9 +25,10 @@ class InteractiveChecker(Checker):
         - state xploration + labelling
         - integrating negative examples into invarinatn
     """
-    def __init__(self) -> None:
+    def __init__(self, verbose: bool = False) -> None:
         Checker.__init__(self)
 
+        self.verbose = verbose
         self.solver = z3.Solver()
         self.fresh = FreshName()
         self.invariant_refinements: List[Invariant] = []
@@ -69,6 +71,10 @@ class InteractiveChecker(Checker):
             strings.append(f'  counterexample 2 == {c2}{l2_str}')
 
         return '\n'.join([Checker.__str__(self)] + strings)
+
+    def _debug(self, s: str) -> None:
+        if self.verbose:
+            print(s)
 
     # TODO compile start state to z3 expression and check it agains invs.
     def _state_satisfies_invs(self, state: ValEnv) -> bool:
@@ -135,6 +141,9 @@ class InteractiveChecker(Checker):
 
             # Assert join satisfies invariant.
             self.solver.add(z3.Not(self._venv_satisfies_refined_i(join_env)))
+
+            # Display generated code.
+            self._debug(f'{fg(219)}{self.solver.sexpr()}{attr(0)}')
 
             # Check if we're I - NR closed.
             result = self.solver.check()

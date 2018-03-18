@@ -1,6 +1,6 @@
 from iconfluence import *
 
-checker = InteractiveChecker()
+checker = InteractiveChecker(verbose=True)
 x = checker.int_max('x', 0)
 y = checker.int_max('y', 0)
 checker.add_invariant('xy_leq_0', x * y <= 0)
