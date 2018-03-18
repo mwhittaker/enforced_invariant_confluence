@@ -34,6 +34,8 @@ class InteractiveChecker(Checker):
         self.counterexample1_label: Optional[Label] = None
         self.counterexample2: Optional[Z3ExprEnv] = None
         self.counterexample2_label: Optional[Label] = None
+        self.unreachable_counter_examples: List[Z3ExprEnv] = []
+        self.reachable_counter_examples: List[Z3ExprEnv] = []
 
     def __str__(self):
         strings = []
@@ -43,9 +45,19 @@ class InteractiveChecker(Checker):
             for inv in self.invariant_refinements:
                 strings.append(f'  {inv}')
 
+        if (len(self.reachable_counter_examples) > 0):
+            strings += ['Reachable Counter Examples']
+            for c in self.reachable_counter_examples:
+                strings += [f'  {c}']
+
+        if (len(self.unreachable_counter_examples) > 0):
+            strings += ['Unreachable Counter Examples']
+            for c in self.unreachable_counter_examples:
+                strings += [f'  {c}']
+
         if (self.counterexample1 is not None and
             self.counterexample2 is not None):
-            strings += ['Counter Examples']
+            strings += ['Pending Counter Examples']
             c1 = self.counterexample1
             l1 = self.counterexample1_label
             c2 = self.counterexample2
@@ -93,6 +105,16 @@ class InteractiveChecker(Checker):
             zx = compile.compile_var(x, venv, tenv)
             z3_expr_env[v] = model[zx]
         return z3_expr_env
+
+    def _record_counterexample(self, \
+                               counterexample: Z3ExprEnv, \
+                               label: Label) \
+                               -> None:
+        if label == Label.REACHABLE:
+            self.reachable_counter_examples.append(counterexample)
+        else:
+            assert label == Label.UNREACHABLE, label
+            self.unreachable_counter_examples.append(counterexample)
 
     def _is_refined_i_closed(self) -> Decision:
         with scoped(self.solver):
@@ -145,20 +167,23 @@ class InteractiveChecker(Checker):
                '`counterexample{0}_reachable()` to label the counterexample ' +
                'as reachable or `counterexample{0}_unreachable()` to label ' +
                'the counterexample as unreachable.')
-        if (self.counterexample1 is not None and
-            self.counterexample1_label is None):
+        c1 = self.counterexample1
+        l1 = self.counterexample1_label
+        c2 = self.counterexample2
+        l2 = self.counterexample2_label
+
+        if (c1 is not None and l1 is None):
             print(msg.format(1))
             return Decision.UNKNOWN
 
-        if (self.counterexample2 is not None and
-            self.counterexample2_label is None):
+        if (c2 is not None and l2 is None):
             print(msg.format(2))
             return Decision.UNKNOWN
 
-        if (self.counterexample1 is not None and
-            self.counterexample2 is not None):
-            if (self.counterexample1_label == Label.REACHABLE and
-                self.counterexample2_label == Label.REACHABLE):
+        if (c1 is not None and c2 is not None):
+            self._record_counterexample(c1, l1)
+            self._record_counterexample(c2, l2)
+            if (l1 == Label.REACHABLE and l2 == Label.REACHABLE):
                 return Decision.NO
             else:
                 self.counterexample1 = None
