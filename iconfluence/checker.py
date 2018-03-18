@@ -65,7 +65,10 @@ class Checker:
         self.type_env[name] = typ
         self.s0_exprs[name] = e
         self.s0_vals[name] = eval_expr(e, {})
-        return ast.EVar(name)
+
+        var = ast.EVar(name)
+        var.typ = typ
+        return var
 
     # TODO(mwhittaker): Right now, temporary variables are joined together and
     # included when checking for properties like commutativity. Think about

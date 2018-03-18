@@ -3,7 +3,6 @@ from typing import List, Optional, Tuple
 
 import z3
 from orderedset import OrderedSet
-from colored import attr, fg
 
 from ..ast import EVar, Expr, Invariant
 from ..checker import Checker, Decision
@@ -32,6 +31,8 @@ class InteractiveChecker(Checker):
         self.solver = z3.Solver()
         self.fresh = FreshName()
         self.invariant_refinements: List[Invariant] = []
+
+        # Counterexamples.
         self.counterexample1: Optional[Z3ExprEnv] = None
         self.counterexample1_label: Optional[Label] = None
         self.counterexample2: Optional[Z3ExprEnv] = None
@@ -72,13 +73,10 @@ class InteractiveChecker(Checker):
 
         return '\n'.join([Checker.__str__(self)] + strings)
 
-    def _debug(self, s: str) -> None:
-        if self.verbose:
-            print(s)
-
-    # TODO compile start state to z3 expression and check it agains invs.
-    def _state_satisfies_invs(self, state: ValEnv) -> bool:
-        invs = self.invariants.values()
+    def _state_satisfies_invs(self, \
+                              state: ValEnv, \
+                              invs: List[Invariant]) \
+                              -> bool:
         return all(eval_invariant(inv, state) for inv in invs)
 
     def _compile_expr(self,
@@ -143,7 +141,8 @@ class InteractiveChecker(Checker):
             self.solver.add(z3.Not(self._venv_satisfies_refined_i(join_env)))
 
             # Display generated code.
-            self._debug(f'{fg(219)}{self.solver.sexpr()}{attr(0)}')
+            if self.verbose:
+                print(self.solver.sexpr())
 
             # Check if we're I - NR closed.
             result = self.solver.check()
@@ -200,8 +199,8 @@ class InteractiveChecker(Checker):
                 self.counterexample1_label = None
                 self.counterexample2_label = None
 
-        # TODO: Fix start state check.
-        if not self._state_satisfies_invs(self.s0_vals):
+        invs = list(self.invariants.values())
+        if not self._state_satisfies_invs(self.s0_vals, invs):
             return Decision.NO
         else:
             return self._is_refined_i_closed()
@@ -220,4 +219,16 @@ class InteractiveChecker(Checker):
 
     def refine_invariant(self, inv: Invariant):
         inv = typecheck_invariant(inv, self.type_env)
+
+        # Ensure that the start state satisfies the invariant, unless it
+        # doesn't satisfy the original invariant to begin with.
+        invs = list(self.invariants.values())
+        if self._state_satisfies_invs(self.s0_vals, invs):
+            msg = (f'The initial state {self.s0_vals} satisfies the ' +
+                   f'invariant, but does not satisfy the refined invariant ' +
+                   f'{inv}. This means that you\'ve incorrectly refined the ' +
+                   f'invariant. Double check your refinements and try again.')
+            invs = self.invariant_refinements + [inv]
+            assert self._state_satisfies_invs(self.s0_vals, invs), msg
+
         self.invariant_refinements.append(inv)
