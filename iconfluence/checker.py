@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Set
 from . import ast
 from . import typecheck
 from .ast import Coercible, Crdt, Expr, Invariant, Transaction, Type
-from .envs import CrdtEnv, TypeEnv, ValEnv
+from .envs import CrdtEnv, ExprEnv, TypeEnv, ValEnv
 from .eval import eval_expr
 
 class Decision(Enum):
@@ -16,7 +16,8 @@ class Checker:
     def __init__(self):
         self.crdt_env: CrdtEnv = dict()
         self.type_env: TypeEnv = dict()
-        self.start_state: ValEnv = dict()
+        self.s0_exprs: ExprEnv = dict()
+        self.s0_vals: ValEnv = dict()
         self.transactions: Dict[str, Transaction] = dict()
         self.invariants: Dict[str, Invariant] = dict()
 
@@ -25,7 +26,7 @@ class Checker:
 
        strings.append('State')
        for name in self.crdt_env:
-           e = self.start_state[name]
+           e = self.s0_exprs[name]
            strings.append(f'  {name}: {self.crdt_env[name]} = {e}')
 
        strings += ['Invariants']
@@ -51,7 +52,8 @@ class Checker:
         # Ensure that variable names are unique.
         assert name not in self.crdt_env, (name, self.crdt_env)
         assert name not in self.type_env, (name, self.type_env)
-        assert name not in self.start_state, (name, self.start_state)
+        assert name not in self.s0_exprs, (name, self.s0_exprs)
+        assert name not in self.s0_vals, (name, self.s0_vals)
 
         # Ensure that our initial start state is well-typed.
         typ = crdt.to_type()
@@ -61,7 +63,8 @@ class Checker:
 
         self.crdt_env[name] = crdt
         self.type_env[name] = typ
-        self.start_state[name] = eval_expr(e, {})
+        self.s0_exprs[name] = e
+        self.s0_vals[name] = eval_expr(e, {})
         return ast.EVar(name)
 
     # TODO(mwhittaker): Right now, temporary variables are joined together and

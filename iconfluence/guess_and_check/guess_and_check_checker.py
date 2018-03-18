@@ -12,7 +12,7 @@ class GuessAndCheckChecker(checker.Checker):
     def __init__(self, max_iterations: int = 100) -> None:
         checker.Checker.__init__(self)
         self.max_iterations = max_iterations
-        self.state_explorer = StateExplorer(self.crdt_env, self.start_state,
+        self.state_explorer = StateExplorer(self.crdt_env, self.s0_vals,
                                             self.invariants, self.transactions)
 
     def _env_satisfies_invs(self, s: ValEnv) -> bool:

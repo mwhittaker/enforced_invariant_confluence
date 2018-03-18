@@ -9,7 +9,6 @@ from ..checker import Checker, Decision
 from ..typecheck import typecheck_invariant
 from ..envs import ValEnv, TypeEnv, Z3ExprEnv
 from ..eval import eval_invariant
-from ..guess_and_check import NothingFoundException, StateExplorer
 from ..z3_.z3_util import result_to_decision, scoped
 from ..z3_.version_env import VersionEnv
 from ..z3_.fresh_name import FreshName
@@ -19,26 +18,25 @@ class Label(Enum):
     REACHABLE = "reachable"
     UNREACHABLE = "unreachable"
 
+
 class InteractiveChecker(Checker):
+    """
+    MISSING features
+        - state xploration + labelling
+        - integrating negative examples into invarinatn
+    """
     def __init__(self) -> None:
         Checker.__init__(self)
 
         self.solver = z3.Solver()
         self.fresh = FreshName()
         self.invariant_refinements: List[Invariant] = []
-        self.unreachable: List[z3.ExprRef] = []
-        # TODO(mwhittaker): Use reachable states to label counterexamples. It's
-        # a little challening because Z3 counterexamples involve Z3
-        # expressions, not values. We could evaluate a Z3 expression into a
-        # value.
-        self.reachable = StateExplorer(self.crdt_env, self.start_state,
-                                       self.invariants, self.transactions)
-
         self.counterexample1: Optional[Z3ExprEnv] = None
         self.counterexample1_label: Optional[Label] = None
         self.counterexample2: Optional[Z3ExprEnv] = None
         self.counterexample2_label: Optional[Label] = None
 
+    # TODO compile start state to z3 expression and check it agains invs.
     def _state_satisfies_invs(self, state: ValEnv) -> bool:
         invs = self.invariants.values()
         return all(eval_invariant(inv, state) for inv in invs)
@@ -47,14 +45,6 @@ class InteractiveChecker(Checker):
                       e: Expr,
                       venv: VersionEnv) -> Tuple[OrderedSet, z3.ExprRef]:
         return compile.compile_expr(e, venv, self.type_env, self.fresh)
-
-    def _venv_satisfies_inv(self,
-                            venv: VersionEnv,
-                            inv: z3.ExprRef) \
-                            -> OrderedSet:
-        zss, ze = self._compile_expr(inv, venv)
-        zss.add(ze)
-        return zss
 
     def _venv_satisfies_refined_i(self, venv: VersionEnv) -> z3.ExprRef:
         zss = OrderedSet()
@@ -102,13 +92,12 @@ class InteractiveChecker(Checker):
             # Assert join satisfies invariant.
             self.solver.add(z3.Not(self._venv_satisfies_refined_i(join_env)))
 
-            print(self.solver.sexpr())
-
             # Check if we're I - NR closed.
             result = self.solver.check()
 
             # If z3 is stuck, we're stuck.
             if result == z3.unknown:
+                print('Z3 got stuck!')
                 return Decision.UNKNOWN
 
             # If there are no counterexamples, then we are invariant-closed.
@@ -123,25 +112,40 @@ class InteractiveChecker(Checker):
             self.counterexample2 = self._extract_counterexample_from_model(
                 model, rhs_venv, self.type_env)
 
+            print('Counterexample found.')
+            print(f'counterexample1 = {self.counterexample1}.')
+            print(f'counterexample2 = {self.counterexample2}.')
+
             return Decision.UNKNOWN
 
     def check_iconfluence(self) -> Decision:
+        msg = ('Counterexample {0} is unlabelled. Call ' +
+               '`counterexample{0}_reachable()` to label the counterexample ' +
+               'as reachable or `counterexample{0}_unreachable()` to label ' +
+               'the counterexample as unreachable.')
         if (self.counterexample1 is not None and
             self.counterexample1_label is None):
-            print("Counterexample 1 is unlabelled.")
+            print(msg.format(1))
             return Decision.UNKNOWN
 
         if (self.counterexample2 is not None and
             self.counterexample2_label is None):
-            print("Counterexample 2 is unlabelled.")
+            print(msg.format(2))
             return Decision.UNKNOWN
 
         if (self.counterexample1 is not None and
             self.counterexample2 is not None):
-            pass
+            if (self.counterexample1_label == Label.REACHABLE and
+                self.counterexample2_label == Label.REACHABLE):
+                return Decision.NO
+            else:
+                self.counterexample1 = None
+                self.counterexample2 = None
+                self.counterexample1_label = None
+                self.counterexample2_label = None
 
-
-        if not self._state_satisfies_invs(self.start_state):
+        # TODO: Fix start state check.
+        if not self._state_satisfies_invs(self.s0_vals):
             return Decision.NO
         else:
             return self._is_refined_i_closed()
