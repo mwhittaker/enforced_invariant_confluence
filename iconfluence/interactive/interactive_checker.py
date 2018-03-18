@@ -16,8 +16,10 @@ from ..z3_ import compile
 
 class InteractiveChecker(Checker):
     def __init__(self) -> None:
+        Checker.__init__(self)
+
         self.solver = z3.Solver()
-        self.fresh = z3.Solver()
+        self.fresh = FreshName()
 
         self.reachable_refinements: List[Invariant] = []
         self.unreachable_refinements: List[Invariant] = []
@@ -65,20 +67,35 @@ class InteractiveChecker(Checker):
 
     def _is_refined_i_closed(self) -> Decision:
         with scoped(self.solver):
+            # Assert rhs satisfies invariant.
             lhs_venv = VersionEnv('lhs')
             self.solver.add(self._venv_satisfies_refined_i(lhs_venv))
+
+            # Assert lhs satisfies invariant.
             rhs_venv = VersionEnv('rhs')
             self.solver.add(self._venv_satisfies_refined_i(rhs_venv))
-            join_env = None
+
+            # Compute join.
+            join_venv = VersionEnv('joined')
+            zss, join_env = compile.compile_join(lhs_venv, rhs_venv, join_venv,
+                                                 self.crdt_env, self.type_env,
+                                                 self.fresh)
+            self.solver.add(list(zss))
+
+            # Assert join satisfies invariant.
             self.solver.add(z3.Not(self._venv_satisfies_refined_i(join_env)))
-            decision = result_to_decision(self.solver.check())
+
+            print(self.solver.sexpr())
+
+            # Check if we're I - NR closed.
+            result = self.solver.check()
 
             # If z3 is stuck, we're stuck.
-            if decision == Decision.UNKNOWN:
+            if result == z3.unknown:
                 return Decision.UNKNOWN
 
             # If there are no counterexamples, then we are invariant-closed.
-            if decision == Decision.NO:
+            if result == z3.unsat:
                 return Decision.YES
 
             # Otherwise, we are are not invariant-closed, and we have a

@@ -7,7 +7,7 @@ import z3
 from .. import ast
 from .. import checker
 from .. import typecheck
-from ..envs import TypeEnv
+from ..envs import CrdtEnv, TypeEnv
 from .fresh_name import FreshName
 from .version_env import VersionEnv
 from .z3_util import scoped
@@ -167,7 +167,7 @@ def compile_expr(e: ast.Expr,
     expressions (e.g. `(= lhs 1)`) and e is the compiled expressions (e.g.
     `Int('lhs') + Int('rhs')`).
 
-    >>> venv = VersionEnv({})
+    >>> venv = VersionEnv()
     >>> tenv = {}
     >>> fresh = FreshName()
     >>> e = ast.EInt(1) + ast.EInt(2)
@@ -361,7 +361,7 @@ def compile_txn(txn: ast.Transaction,
     ...     x.assign(z + z),
     ... ]
     >>> tenv = {v: ast.TInt() for v in ['x', 'y', 'z']}
-    >>> venv = VersionEnv({'x', 'y', 'z'})
+    >>> venv = VersionEnv()
     >>> fresh = FreshName()
     >>> txn = [typecheck.typecheck_stmt(s, tenv) for s in txn]
     >>> ss, _ = compile_txn(txn, venv, tenv, fresh)
@@ -378,3 +378,167 @@ def compile_txn(txn: ast.Transaction,
         zss |= s_zss
     return zss, venv
 
+def _compile_z3_join(lhs: z3.ExprRef,
+                     rhs: z3.ExprRef,
+                     crdt: ast.Crdt,
+                     fresh: FreshName) \
+                     -> Tuple[OrderedSet, z3.ExprRef]:
+    """
+    TODO(mwhittaker): Document.
+    """
+    if isinstance(crdt, ast.CIntMax):
+        return OrderedSet(), z3.If(lhs >= rhs, lhs, rhs)
+    elif isinstance(crdt, ast.CIntMin):
+        return OrderedSet(), z3.If(lhs <= rhs, lhs, rhs)
+    elif isinstance(crdt, ast.CBoolOr):
+        return OrderedSet(), z3.Or(lhs, rhs)
+    elif isinstance(crdt, ast.CBoolAnd):
+        return OrderedSet(), z3.And(lhs, rhs)
+    elif isinstance(crdt, ast.CTuple2):
+        Tuple2 = Tuple2Sort(compile_type(crdt.to_type()))
+        a = Tuple2.a
+        b = Tuple2.b
+        a_zss, a_ze = _compile_z3_join(a(lhs), a(rhs), crdt.a, fresh)
+        b_zss, b_ze = _compile_z3_join(b(lhs), b(rhs), crdt.b, fresh)
+        return a_zss | b_zss, Tuple2.tuple2(a_ze, b_ze)
+    elif isinstance(crdt, ast.CSetUnion):
+        or_ = z3.Or(z3.BoolVal(True), z3.BoolVal(True)).decl()
+        return OrderedSet(), z3.Map(or_, lhs, rhs)
+    elif isinstance(crdt, ast.CSetIntersect):
+        and_ = z3.And(z3.BoolVal(True), z3.BoolVal(True)).decl()
+        return OrderedSet(), z3.Map(and_, lhs, rhs)
+    elif isinstance(crdt, ast.CMap):
+        typ = cast(ast.TMap, crdt.to_type())
+        Option = compile_type(ast.TOption(typ.b))
+
+        # TODO(mwhittaker): This function only has to be declared and foralled
+        # once per type, not once per join.
+        x = z3.Const(fresh.get(), Option)
+        y = z3.Const(fresh.get(), Option)
+        j_zss, j_ze = _compile_z3_join(x, y, ast.COption(crdt.b), fresh)
+        f = z3.Function(fresh.get(), Option, Option, Option)
+        forall = z3.ForAll([x, y], z3.And(*j_zss, f(x, y) == j_ze))
+        return OrderedSet([forall]), z3.Map(f, lhs, rhs)
+    elif isinstance(crdt, ast.COption):
+        Option = OptionSort(compile_type(crdt.to_type()))
+        x = Option.x
+        j_zss, j_ze = _compile_z3_join(x(lhs), x(rhs), crdt.a, fresh)
+        return (j_zss,
+                z3.If(Option.is_none(lhs), rhs,
+                z3.If(Option.is_none(rhs), lhs,
+                Option.some(j_ze))))
+    else:
+        raise ValueError(f'Unkown CRDT {crdt}.')
+
+
+
+
+# def _compile_join_expr(lhs: ast.Expr,
+#                        rhs: ast.Expr,
+#                        crdt: ast.Crdt,
+#                        venv: VersionEnv,
+#                        tenv: TypeEnv,
+#                        fresh: FreshName) \
+#                        -> Tuple[OrderedSet, z3.ExprRef]:
+#     def _cje(lhs: ast.Expr,
+#              rhs: ast.Expr,
+#              crdt: ast.Crdt) \
+#              -> Tuple[OrderedSet, z3.ExprRef]:
+#         return _compile_join_expr(lhs, rhs, crdt, venv, tenv, fresh)
+#
+#     if isinstance(crdt, ast.CIntMax):
+#         e: ast.Expr = ast.EIntMax(lhs, rhs)
+#         e = typecheck.typecheck_expr(e, tenv)
+#         return compile_expr(e, venv, tenv, fresh)
+#     elif isinstance(crdt, ast.CIntMin):
+#         e = typecheck.typecheck_expr(ast.EIntMin(lhs, rhs), tenv)
+#         return compile_expr(e, venv, tenv, fresh)
+#     elif isinstance(crdt, ast.CBoolOr):
+#         e = typecheck.typecheck_expr(ast.EBoolOr(lhs, rhs), tenv)
+#         return compile_expr(e, venv, tenv, fresh)
+#     elif isinstance(crdt, ast.CBoolAnd):
+#         e = typecheck.typecheck_expr(ast.EBoolAnd(lhs, rhs), tenv)
+#         e = typecheck.typecheck_expr(e, tenv)
+#         return compile_expr(e, venv, tenv, fresh)
+#     elif isinstance(crdt, ast.CTuple2):
+#         lhs_a = typecheck.typecheck_expr(lhs.first(), tenv)
+#         lhs_b = typecheck.typecheck_expr(lhs.second(), tenv)
+#         rhs_a = typecheck.typecheck_expr(rhs.first(), tenv)
+#         rhs_b = typecheck.typecheck_expr(rhs.second(), tenv)
+#         a_zss, a_ze = _cje(lhs_a, rhs_a, crdt.a)
+#         b_zss, b_ze = _cje(lhs_b, rhs_b, crdt.b)
+#
+#         Tuple2 = Tuple2Sort(crdt.to_type())
+#         return a_zss | b_zss, Tuple2.tuple2(a_ze, b_ze)
+#     elif isinstance(crdt, ast.CSetUnion):
+#         e = typecheck.typecheck_expr(lhs.union(rhs), tenv)
+#         return compile_expr(e, venv, tenv, fresh)
+#     elif isinstance(crdt, ast.CSetIntersect):
+#         e = typecheck.typecheck_expr(lhs.intersect(rhs), tenv)
+#         return compile_expr(e, venv, tenv, fresh)
+#     elif isinstance(crdt, ast.CMap):
+#
+#         # Compile lhs and rhs.
+#         lhs_zss, lhs_ze = compile_expr(lhs, venv, tenv, fresh)
+#         rhs_zss, rhs_ze = compile_expr(rhs, venv, tenv, fresh)
+#
+#         # TODO(mwhittaker): This function only has to be declared and foralled
+#         # once per type, not once per join.
+#         typ = cast(ast.TMap, crdt.to_type())
+#         Option = compile_type(ast.TOption(typ.b))
+#         f = z3.Function(fresh.get(), Option, Option, Option)
+#         x = z3.Const(fresh.get(), Option)
+#         y = z3.Const(fresh.get(), Option)
+#
+#         _cje
+#         zss, ze = _cje(x, y, crdt.a)
+#
+#         j_es, j = _compile_z3_join(ast.COption(crdt.b), x, y, fresh)
+#
+#         forall = z3.ForAll([x, y], z3.And(*j_es, f(x, y) == j))
+#
+#         return OrderedSet([forall]), z3.Map(f, lhs, rhs)
+#     elif isinstance(crdt, ast.COption):
+#         # Compile lhs and rhs.
+#         lhs_zss, lhs_ze = compile_expr(lhs, venv, tenv, fresh)
+#         rhs_zss, rhs_ze = compile_expr(rhs, venv, tenv, fresh)
+#
+#         # Compile lhs.unwrap() join rhs.unwrap().
+#         lhs_e = typecheck.typecheck_expr(lhs.unwrap(), tenv)
+#         rhs_e = typecheck.typecheck_expr(rhs.unwrap(), tenv)
+#         zss, ze = _cje(lhs_e, rhs_e, crdt.a)
+#
+#         # Glue everything together.
+#         Option = OptionSort(crdt.to_type())
+#         ze = z3.If(Option.is_none(lhs_ze), rhs_ze,
+#              z3.If(Option.is_none(rhs_ze), lhs_ze,
+#              Option.some(ze)))
+#         return lhs_zss | rhs_zss | zss, ze
+#     else:
+#         raise ValueError(f'Unkown CRDT {crdt}.')
+
+def compile_join(lhs_venv: VersionEnv,
+                 rhs_venv: VersionEnv,
+                 joined_venv: VersionEnv,
+                 cenv: CrdtEnv,
+                 tenv: TypeEnv,
+                 fresh: FreshName) \
+                 -> Tuple[OrderedSet, VersionEnv]:
+    """
+    """
+    assert cenv.keys() == tenv.keys(), (cenv, tenv)
+
+    zss = OrderedSet()
+    for (v, crdt) in cenv.items():
+        x = typecheck.typecheck_expr(ast.EVar(v), tenv)
+        x = cast(ast.EVar, x)
+
+        lhs_ze = compile_var(x, lhs_venv, tenv)
+        rhs_ze = compile_var(x, rhs_venv, tenv)
+        v_zss, v_ze = _compile_z3_join(lhs_ze, rhs_ze, crdt, fresh)
+
+        joined_venv = joined_venv.assign(v)
+        zss |= v_zss
+        zss.add(compile_var(x, joined_venv, tenv) == v_ze)
+
+    return zss, joined_venv
