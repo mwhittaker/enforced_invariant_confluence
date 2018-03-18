@@ -22,24 +22,24 @@ class Checker:
         self.invariants: Dict[str, Invariant] = dict()
 
     def __str__(self):
-       strings = []
+        strings = []
 
-       strings.append('State')
-       for name in self.crdt_env:
-           e = self.s0_exprs[name]
-           strings.append(f'  {name}: {self.crdt_env[name]} = {e}')
+        strings.append('State')
+        for name in self.crdt_env:
+            e = self.s0_exprs[name]
+            strings.append(f'  {name}: {self.crdt_env[name]} = {e}')
 
-       strings += ['Invariants']
-       for (name, inv) in self.invariants.items():
-           strings.append(f'  {name} == {inv}')
+        strings += ['Invariants']
+        for (name, inv) in self.invariants.items():
+            strings.append(f'  {name} == {inv}')
 
-       strings += ['Transactions']
-       for (name, txn) in self.transactions.items():
-           strings.append(f'  def {name}():')
-           for s in txn:
-               strings.append(f'    {s}')
+        strings += ['Transactions']
+        for (name, txn) in self.transactions.items():
+            strings.append(f'  def {name}():')
+            for s in txn:
+                strings.append(f'    {s}')
 
-       return '\n'.join(strings)
+        return '\n'.join(strings)
 
     def __repr__(self):
         return str(self)

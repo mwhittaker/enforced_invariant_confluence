@@ -18,7 +18,6 @@ class Label(Enum):
     REACHABLE = "reachable"
     UNREACHABLE = "unreachable"
 
-
 class InteractiveChecker(Checker):
     """
     MISSING features
@@ -35,6 +34,29 @@ class InteractiveChecker(Checker):
         self.counterexample1_label: Optional[Label] = None
         self.counterexample2: Optional[Z3ExprEnv] = None
         self.counterexample2_label: Optional[Label] = None
+
+    def __str__(self):
+        strings = []
+
+        if len(self.invariant_refinements) > 0:
+            strings += ['Invariant Refinements']
+            for inv in self.invariant_refinements:
+                strings.append(f'  {inv}')
+
+        if (self.counterexample1 is not None and
+            self.counterexample2 is not None):
+            strings += ['Counter Examples']
+            c1 = self.counterexample1
+            l1 = self.counterexample1_label
+            c2 = self.counterexample2
+            l2 = self.counterexample2_label
+
+            l1_str = f' [{l1}]' if l1 is not None else ''
+            l2_str = f' [{l2}]' if l2 is not None else ''
+            strings.append(f'  counterexample 1 == {c1}{l1_str}')
+            strings.append(f'  counterexample 2 == {c2}{l2_str}')
+
+        return '\n'.join([Checker.__str__(self)] + strings)
 
     # TODO compile start state to z3 expression and check it agains invs.
     def _state_satisfies_invs(self, state: ValEnv) -> bool:
