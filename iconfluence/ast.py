@@ -214,6 +214,9 @@ class Expr(AstNode):
     def __rrshift__(self, lhs: Coercible) -> 'Expr':
         return coerce(lhs) | self
 
+    def finite(self) -> 'Expr':
+        return ESetFinite(self)
+
     def first(self) -> 'Expr':
         return ETuple2First(self)
 
@@ -341,6 +344,10 @@ class EUnaryOp(Expr):
 class EBoolNot(EUnaryOp):
     def __str__(self) -> str:
         return f'(!{self.x})'
+
+class ESetFinite(EUnaryOp):
+    def __str__(self) -> str:
+        return f'({self.x}.finite())'
 
 class ETuple2First(EUnaryOp):
     def __str__(self) -> str:

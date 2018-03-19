@@ -257,6 +257,16 @@ def compile_expr(e: ast.Expr,
         return map1(e.x, Option.some)
     elif isinstance(e, ast.EBoolNot):
         return map1(e.x, z3.Not)
+    elif isinstance(e, ast.ESetFinite):
+        # A set X is finite if there exists some x such that for all y > x, x
+        # not in X.
+        zss, ze = compile_expr_(e.x)
+        x = z3.Int(fresh.get('x_set_finite'))
+        y = z3.Int(fresh.get('y_set_finite'))
+        ze = z3.Exists(x,
+             z3.ForAll(y,
+             z3.Implies(y > x, z3.Select(ze, y) == z3.BoolVal(False))))
+        return zss, ze
     elif isinstance(e, ast.ETuple2First):
         Tuple2 = Tuple2Sort(compile_type(e.x.typ))
         return map1(e.x, Tuple2.a)

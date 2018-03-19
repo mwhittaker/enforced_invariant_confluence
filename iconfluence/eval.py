@@ -40,6 +40,8 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return eval_expr(e.x, env)
     elif isinstance(e, ast.EBoolNot):
         return not eval_expr(e.x, env)
+    elif isinstance(e, ast.ESetFinite):
+        return True
     elif isinstance(e, ast.ETuple2First):
         return eval_expr(e.x, env)[0]
     elif isinstance(e, ast.ETuple2Second):

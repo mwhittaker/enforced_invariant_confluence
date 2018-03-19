@@ -21,6 +21,7 @@ class TestEval(unittest.TestCase):
             (ENone(TInt()), None),
             (ESome(1), 1),
             (EBoolNot(False), True),
+            (coerce({1, 2}).finite(), True),
             (coerce((1, True)).first(), 1),
             (coerce((1, True)).second(), True),
             (ESome(1).is_none(), False),
