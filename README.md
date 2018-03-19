@@ -28,3 +28,9 @@ First, install z3 and z3py. Then, pip install the dependencies in
 $ PYTHONPATH=. python -i examples/two_ints.py
 $ PYTHONPATH=. python -i examples/two_sets.py
 ```
+
+## TODO
+- Remove the `ocaml/` directory. It's a cute first implementation, but it's
+  obsolete.
+- If this work gets published, include a link to the paper in this README.
+- Implement and mention Lucy.
