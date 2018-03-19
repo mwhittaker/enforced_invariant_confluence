@@ -48,7 +48,7 @@ class TestCompile(unittest.TestCase):
         venv = VersionEnv()
         tenv: TypeEnv = {'x': TInt()}
         fresh = FreshName()
-        var_free_exprs: List[Expr] = [
+        exprs: List[Expr] = [
             EVar('x'),
             coerce(1),
             coerce(True),
@@ -88,7 +88,7 @@ class TestCompile(unittest.TestCase):
             EMapSet({1: True}, 1, False),
             EIf(True, 1, 2),
         ]
-        for e in var_free_exprs:
+        for e in exprs:
             e = typecheck_expr(e, tenv)
             compile_expr(e, venv, tenv, fresh)
 

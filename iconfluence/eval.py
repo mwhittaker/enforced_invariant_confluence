@@ -81,7 +81,7 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     elif isinstance(e, ast.EMapContainsKey):
         return eval_expr(e.rhs, env) in eval_expr(e.lhs, env)
     elif isinstance(e, ast.EMapGet):
-        return eval_expr(e.lhs, env)[eval_expr]
+        return eval_expr(e.lhs, env)[eval_expr(e.rhs, env)]
     elif isinstance(e, ast.EEq):
         return eval_expr(e.lhs, env) == (eval_expr(e.rhs, env))
     elif isinstance(e, ast.ENe):
