@@ -338,6 +338,10 @@ class EUnaryOp(Expr):
     def __init__(self, x: Coercible) -> None:
         self.x = coerce(x)
 
+class EBoolNot(EUnaryOp):
+    def __str__(self) -> str:
+        return f'(!{self.x})'
+
 class ETuple2First(EUnaryOp):
     def __str__(self) -> str:
         return f'({self.x}).first()'

@@ -76,6 +76,10 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
     elif isinstance(e, ast.ESome):
         typ = _typecheck_expr(e.x, env).typ
         e.typ = ast.TOption(typ)
+    elif isinstance(e, ast.EBoolNot):
+        typ = _typecheck_expr(e.x, env).typ
+        assert_type_eq(typ, ast.TBool(), e.x, e)
+        e.typ = ast.TBool()
     elif isinstance(e, ast.ETuple2First):
         typ = _typecheck_expr(e.x, env).typ
         assert_type_instance(typ, ast.TTuple2, e.x, e)

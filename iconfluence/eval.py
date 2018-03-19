@@ -38,6 +38,8 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return None
     elif isinstance(e, ast.ESome):
         return eval_expr(e.x, env)
+    elif isinstance(e, ast.EBoolNot):
+        return not eval_expr(e.x, env)
     elif isinstance(e, ast.ETuple2First):
         return eval_expr(e.x, env)[0]
     elif isinstance(e, ast.ETuple2Second):
@@ -64,8 +66,6 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
         return eval_expr(e.lhs, env) or eval_expr(e.rhs, env)
     elif isinstance(e, ast.EBoolAnd):
         return eval_expr(e.lhs, env) and eval_expr(e.rhs, env)
-    elif isinstance(e, ast.EBoolImpl):
-        return not eval_expr(e.lhs, env) or eval_expr(e.rhs, env)
     elif isinstance(e, ast.EBoolImpl):
         return not eval_expr(e.lhs, env) or eval_expr(e.rhs, env)
     elif isinstance(e, ast.ESetUnion):

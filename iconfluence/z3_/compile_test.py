@@ -58,6 +58,7 @@ class TestCompile(unittest.TestCase):
             coerce({1: True}),
             ENone(TInt()),
             ESome(1),
+            EBoolNot(False),
             coerce((1, True)).first(),
             coerce((1, True)).second(),
             ESome(1).is_none(),

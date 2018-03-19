@@ -255,6 +255,8 @@ def compile_expr(e: ast.Expr,
     elif isinstance(e, ast.ESome):
         Option = OptionSort(compile_type(e.typ))
         return map1(e.x, Option.some)
+    elif isinstance(e, ast.EBoolNot):
+        return map1(e.x, z3.Not)
     elif isinstance(e, ast.ETuple2First):
         Tuple2 = Tuple2Sort(compile_type(e.x.typ))
         return map1(e.x, Tuple2.a)
