@@ -114,7 +114,14 @@ class OptionSort:
 
 def compile_var(x: ast.EVar, venv: VersionEnv, tenv: TypeEnv) -> z3.ExprRef:
     """
-    TODO: Document.
+    Compiles an EVar into a z3 variable.
+
+    >>> from ..ast import *
+    >>> v = compile_var(EVar('x'), VersionEnv('foo'), {'x': TInt()})
+    >>> v
+    x_foo_0
+    >>> v.sort()
+    Int
     """
     assert x.x in tenv, (x.x, tenv)
     return z3.Const(venv.get_name(x.x), compile_type(tenv[x.x]))
@@ -332,7 +339,22 @@ def compile_stmt(stmt: ast.Stmt,
                  fresh: FreshName) \
                  -> Tuple[OrderedSet, VersionEnv]:
     """
-    TODO(mwhittaker): Document.
+    compile_stmt compiles a statement into a series of Z3 assertions. Every
+    assignment in the transaction is compiled into an assertion in Z3. For
+    example, the statement `x := 2` is compiled to the assertion `(assert (= x
+    2))`. In order to simulate mutability, compile_stmt uses venv to assign a
+    unique name to a variable for every distinct assingment. For example, the
+    transaction:
+
+        x := 1
+        x := x + x
+        x := x * x
+
+    with venv VersionEnv('foo') is compiled into the following z3 assertions:
+
+        (assert (= x_foo_0 1))
+        (assert (= x_foo_1 (+ x_foo_0 x_foo_0)))
+        (assert (= x_foo_2 (+ x_foo_1 x_foo_1)))
     """
     if isinstance(stmt, ast.SAssign):
         zss, ze = compile_expr(stmt.e, venv, tenv, fresh)
@@ -384,7 +406,10 @@ def _compile_z3_join(lhs: z3.ExprRef,
                      fresh: FreshName) \
                      -> Tuple[OrderedSet, z3.ExprRef]:
     """
-    TODO(mwhittaker): Document.
+    _compile_z3_join produces an expression that joins two z3 expressions. Note
+    that this function is pretty tricky to implement and duplicates some code
+    from compile_expr. Trying to avoid this redudancy by taking in ast
+    expressions (or something similar) doesn't work out so nicely.
     """
     if isinstance(crdt, ast.CIntMax):
         return OrderedSet(), z3.If(lhs >= rhs, lhs, rhs)
@@ -430,93 +455,6 @@ def _compile_z3_join(lhs: z3.ExprRef,
     else:
         raise ValueError(f'Unkown CRDT {crdt}.')
 
-
-
-
-# def _compile_join_expr(lhs: ast.Expr,
-#                        rhs: ast.Expr,
-#                        crdt: ast.Crdt,
-#                        venv: VersionEnv,
-#                        tenv: TypeEnv,
-#                        fresh: FreshName) \
-#                        -> Tuple[OrderedSet, z3.ExprRef]:
-#     def _cje(lhs: ast.Expr,
-#              rhs: ast.Expr,
-#              crdt: ast.Crdt) \
-#              -> Tuple[OrderedSet, z3.ExprRef]:
-#         return _compile_join_expr(lhs, rhs, crdt, venv, tenv, fresh)
-#
-#     if isinstance(crdt, ast.CIntMax):
-#         e: ast.Expr = ast.EIntMax(lhs, rhs)
-#         e = typecheck.typecheck_expr(e, tenv)
-#         return compile_expr(e, venv, tenv, fresh)
-#     elif isinstance(crdt, ast.CIntMin):
-#         e = typecheck.typecheck_expr(ast.EIntMin(lhs, rhs), tenv)
-#         return compile_expr(e, venv, tenv, fresh)
-#     elif isinstance(crdt, ast.CBoolOr):
-#         e = typecheck.typecheck_expr(ast.EBoolOr(lhs, rhs), tenv)
-#         return compile_expr(e, venv, tenv, fresh)
-#     elif isinstance(crdt, ast.CBoolAnd):
-#         e = typecheck.typecheck_expr(ast.EBoolAnd(lhs, rhs), tenv)
-#         e = typecheck.typecheck_expr(e, tenv)
-#         return compile_expr(e, venv, tenv, fresh)
-#     elif isinstance(crdt, ast.CTuple2):
-#         lhs_a = typecheck.typecheck_expr(lhs.first(), tenv)
-#         lhs_b = typecheck.typecheck_expr(lhs.second(), tenv)
-#         rhs_a = typecheck.typecheck_expr(rhs.first(), tenv)
-#         rhs_b = typecheck.typecheck_expr(rhs.second(), tenv)
-#         a_zss, a_ze = _cje(lhs_a, rhs_a, crdt.a)
-#         b_zss, b_ze = _cje(lhs_b, rhs_b, crdt.b)
-#
-#         Tuple2 = Tuple2Sort(crdt.to_type())
-#         return a_zss | b_zss, Tuple2.tuple2(a_ze, b_ze)
-#     elif isinstance(crdt, ast.CSetUnion):
-#         e = typecheck.typecheck_expr(lhs.union(rhs), tenv)
-#         return compile_expr(e, venv, tenv, fresh)
-#     elif isinstance(crdt, ast.CSetIntersect):
-#         e = typecheck.typecheck_expr(lhs.intersect(rhs), tenv)
-#         return compile_expr(e, venv, tenv, fresh)
-#     elif isinstance(crdt, ast.CMap):
-#
-#         # Compile lhs and rhs.
-#         lhs_zss, lhs_ze = compile_expr(lhs, venv, tenv, fresh)
-#         rhs_zss, rhs_ze = compile_expr(rhs, venv, tenv, fresh)
-#
-#         # TODO(mwhittaker): This function only has to be declared and foralled
-#         # once per type, not once per join.
-#         typ = cast(ast.TMap, crdt.to_type())
-#         Option = compile_type(ast.TOption(typ.b))
-#         f = z3.Function(fresh.get(), Option, Option, Option)
-#         x = z3.Const(fresh.get(), Option)
-#         y = z3.Const(fresh.get(), Option)
-#
-#         _cje
-#         zss, ze = _cje(x, y, crdt.a)
-#
-#         j_es, j = _compile_z3_join(ast.COption(crdt.b), x, y, fresh)
-#
-#         forall = z3.ForAll([x, y], z3.And(*j_es, f(x, y) == j))
-#
-#         return OrderedSet([forall]), z3.Map(f, lhs, rhs)
-#     elif isinstance(crdt, ast.COption):
-#         # Compile lhs and rhs.
-#         lhs_zss, lhs_ze = compile_expr(lhs, venv, tenv, fresh)
-#         rhs_zss, rhs_ze = compile_expr(rhs, venv, tenv, fresh)
-#
-#         # Compile lhs.unwrap() join rhs.unwrap().
-#         lhs_e = typecheck.typecheck_expr(lhs.unwrap(), tenv)
-#         rhs_e = typecheck.typecheck_expr(rhs.unwrap(), tenv)
-#         zss, ze = _cje(lhs_e, rhs_e, crdt.a)
-#
-#         # Glue everything together.
-#         Option = OptionSort(crdt.to_type())
-#         ze = z3.If(Option.is_none(lhs_ze), rhs_ze,
-#              z3.If(Option.is_none(rhs_ze), lhs_ze,
-#              Option.some(ze)))
-#         return lhs_zss | rhs_zss | zss, ze
-#     else:
-#         raise ValueError(f'Unkown CRDT {crdt}.')
-
 def compile_join(lhs_venv: VersionEnv,
                  rhs_venv: VersionEnv,
                  joined_venv: VersionEnv,
@@ -525,6 +463,14 @@ def compile_join(lhs_venv: VersionEnv,
                  fresh: FreshName) \
                  -> Tuple[OrderedSet, VersionEnv]:
     """
+    compile_join produces a series of Z3 assertions that join lhs_venv with
+    rhs_venv producing variables versioned with joined_venv. For example,
+    imagine we have two int maxes `x` and `y`. lhs_venv is VersionEnv('lhs'),
+    rhs_venv is VersionEnv('rhs'), and joined_env is VersionEnv('joined'). The
+    compiled assertions look something like this:
+
+        (assert (= x_joined_0 ((ite (>= x_lhs_0 x_rhs_0) x_lhs_0 x_rhs_0))))
+        (assert (= y_joined_0 ((ite (>= y_lhs_0 y_rhs_0) y_lhs_0 y_rhs_0))))
     """
     assert cenv.keys() == tenv.keys(), (cenv, tenv)
 
