@@ -4,11 +4,11 @@ from iconfluence import *
 Our state based object is a G-Counter x = (x0, x1, x2) (representing a bank
 balance) replicated across three replicas.Our start state is x = (0, 0, 0).
 Our transactions can only add to x. Our invariant is that x is non-negative.
-This object is invariant-confluent.
+This object is invariant-closed and invariant-confluent.
 
 Run with
 
-    PYTHONPATH=. python -i examples/bank_deposit_and_withdraw.py
+    PYTHONPATH=. python -i examples/bank_deposit_only.py
 """
 
 checker = InteractiveChecker(verbose=False)
