@@ -22,6 +22,8 @@ class TestEval(unittest.TestCase):
             (ESome(1), 1),
             (EBoolNot(False), True),
             (coerce({1, 2}).finite(), True),
+            (ESetMin({1, 2, 3, 4}), 1),
+            (ESetMax({1, 2, 3, 4}), 4),
             (coerce((1, True)).first(), 1),
             (coerce((1, True)).second(), True),
             (ESome(1).is_none(), False),

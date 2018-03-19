@@ -86,6 +86,13 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         set_typ = cast(ast.TSet, typ)
         _assert(set_typ.a == ast.TInt(), str(set_typ.a))
         e.typ = ast.TBool()
+    elif (isinstance(e, ast.ESetMin) or
+          isinstance(e, ast.ESetMax)):
+        typ = _typecheck_expr(e.x, env).typ
+        assert_type_instance(typ, ast.TSet, e.x, e)
+        set_typ = cast(ast.TSet, typ)
+        _assert(set_typ.a == ast.TInt(), str(set_typ.a))
+        e.typ = ast.TInt()
     elif isinstance(e, ast.ETuple2First):
         typ = _typecheck_expr(e.x, env).typ
         assert_type_instance(typ, ast.TTuple2, e.x, e)

@@ -60,6 +60,8 @@ class TestCompile(unittest.TestCase):
             ESome(1),
             EBoolNot(False),
             coerce({1, 2}).finite(),
+            ESetMin({1, 2}),
+            ESetMax({1, 2}),
             coerce((1, True)).first(),
             coerce((1, True)).second(),
             ESome(1).is_none(),

@@ -267,6 +267,26 @@ def compile_expr(e: ast.Expr,
              z3.ForAll(y,
              z3.Implies(y > x, z3.Select(ze, y) == z3.BoolVal(False))))
         return zss, ze
+    elif isinstance(e, ast.ESetMin):
+        zss, ze = compile_expr_(e.x)
+        m = z3.Int(fresh.get('m_set_min'))
+        x = z3.Int(fresh.get('x_set_min'))
+        zs = z3.And(
+            z3.Select(ze, m),
+            z3.ForAll(x, z3.Implies(x < m, z3.Not(z3.Select(ze, x))))
+        )
+        zss.add(zs)
+        return zss, m
+    elif isinstance(e, ast.ESetMax):
+        zss, ze = compile_expr_(e.x)
+        m = z3.Int(fresh.get('m_set_max'))
+        x = z3.Int(fresh.get('x_set_max'))
+        zs = z3.And(
+            z3.Select(ze, m),
+            z3.ForAll(x, z3.Implies(x > m, z3.Not(z3.Select(ze, x))))
+        )
+        zss.add(zs)
+        return zss, m
     elif isinstance(e, ast.ETuple2First):
         Tuple2 = Tuple2Sort(compile_type(e.x.typ))
         return map1(e.x, Tuple2.a)

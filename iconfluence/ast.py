@@ -349,6 +349,14 @@ class ESetFinite(EUnaryOp):
     def __str__(self) -> str:
         return f'({self.x}.finite())'
 
+class ESetMax(EUnaryOp):
+    def __str__(self) -> str:
+        return f'(max({self.x}))'
+
+class ESetMin(EUnaryOp):
+    def __str__(self) -> str:
+        return f'(min({self.x}))'
+
 class ETuple2First(EUnaryOp):
     def __str__(self) -> str:
         return f'({self.x}).first()'
