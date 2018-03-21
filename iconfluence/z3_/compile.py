@@ -1,4 +1,4 @@
-from typing import cast, Any, Callable, Dict, List, Optional, Union, Tuple
+from typing import cast, Any, Callable, Dict, List, Optional, Tuple
 from functools import lru_cache
 
 from orderedset import OrderedSet
@@ -7,10 +7,15 @@ import z3
 from .. import ast
 from .. import checker
 from .. import typecheck
-from ..envs import CrdtEnv, TypeEnv
+from ..envs import CrdtEnv, TypeEnv, ValEnv
 from .fresh_name import FreshName
 from .version_env import VersionEnv
 from .z3_util import scoped
+
+_ID_TO_TYPE: Dict[int, ast.Type] = {}
+
+def sort_to_type(sort: z3.SortRef) -> ast.Type:
+    return _ID_TO_TYPE[sort.get_id()]
 
 @lru_cache()
 def compile_type(typ: ast.Type) -> z3.SortRef:
@@ -28,29 +33,34 @@ def compile_type(typ: ast.Type) -> z3.SortRef:
     Note that this function is memoized to avoid redundantly registering the
     same datatype with z3 multiple times.
     """
+    sort: z3.SortRef = None
     if isinstance(typ, ast.TInt):
-        return z3.IntSort()
+        sort = z3.IntSort()
     elif isinstance(typ, ast.TBool):
-        return z3.BoolSort()
+        sort = z3.BoolSort()
     elif isinstance(typ, ast.TTuple2):
         a = compile_type(typ.a)
         b = compile_type(typ.b)
         Tuple2 = z3.Datatype(str(typ))
         Tuple2.declare(f'{typ}.tuple2', (f'{typ}.a', a), (f'{typ}.b', b))
-        return Tuple2.create()
+        sort = Tuple2.create()
     elif isinstance(typ, ast.TSet):
-        return z3.ArraySort(compile_type(typ.a), z3.BoolSort())
+        sort = z3.ArraySort(compile_type(typ.a), z3.BoolSort())
     elif isinstance(typ, ast.TMap):
         key_sort = compile_type(typ.a)
         val_sort = compile_type(ast.TOption(typ.b))
-        return z3.ArraySort(key_sort, val_sort)
+        sort = z3.ArraySort(key_sort, val_sort)
     elif isinstance(typ, ast.TOption):
         Option = z3.Datatype(str(typ))
         Option.declare(f'{typ}.none')
         Option.declare(f'{typ}.some', (f'{typ}.x',  compile_type(typ.a)))
-        return Option.create()
+        sort = Option.create()
     else:
         raise ValueError(f'Unkown type {typ}.')
+
+    # Cache sort.
+    _ID_TO_TYPE[sort.get_id()] = typ
+    return sort
 
 class Tuple2Sort:
     """

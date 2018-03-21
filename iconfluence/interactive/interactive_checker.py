@@ -11,6 +11,7 @@ from ..eval import eval_invariant
 from ..typecheck import typecheck_invariant
 from ..z3_ import compile
 from ..z3_.fresh_name import FreshName
+from ..z3_.model import model_to_state
 from ..z3_.version_env import VersionEnv
 from ..z3_.z3_util import scoped
 
@@ -200,6 +201,13 @@ class InteractiveChecker(Checker):
                 model, lhs_venv, self.type_env)
             self.counterexample2 = self._extract_counterexample_from_model(
                 model, rhs_venv, self.type_env)
+
+            lhs_vars = {lhs_venv.get_name(x) for x in self.type_env}
+            rhs_vars = {rhs_venv.get_name(x) for x in self.type_env}
+            join_vars = {join_venv.get_name(x) for x in self.type_env}
+            print(model_to_state(model, lhs_vars))
+            print(model_to_state(model, rhs_vars))
+            print(model_to_state(model, join_vars))
 
             print('Counterexample found.')
             print(f'counterexample1 = {self.counterexample1}.')
