@@ -70,11 +70,32 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
                 f'Illegal map with multiple key types: {key_types}.')
         _assert(len(value_types) == 1,
                 f'Illegal map with multiple value types: {value_types}.')
-        e.typ = ast.TMap(list(key_types)[0], list(value_types)[0])
+
+        # TODO(mwhittaker): See note on ENone.
+        key_typ = list(key_types)[0]
+        value_typ = list(value_types)[0]
+        _assert(not isinstance(value_typ, ast.TOption),
+                f'{e} has type Map[{key_typ}, {value_typ}]. Currently, we ' +
+                'do not support options as values in a map.')
+
+        e.typ = ast.TMap(key_typ, value_typ)
     elif isinstance(e, ast.ENone):
+        # TODO(mwhittaker): In Python, we represent an Option[T] as either a
+        # value of type T or None. This is convenient, but the value Some(None)
+        # of type Option[Option[int]] would be represented as None. This is
+        # indistinguishable fro the value None of type Option[Option[int]]. We
+        # have to represent options in Python in a slightly less idiomatic way
+        # to encode nested options.
+        _assert(not isinstance(e.t, ast.TOption),
+                f'{e} has type Option[{e.t}]. Currently, we do not support ' +
+                f'nested options.')
         e.typ = ast.TOption(e.t)
     elif isinstance(e, ast.ESome):
         typ = _typecheck_expr(e.x, env).typ
+        # TODO(mwhittaker): See note on ENone.
+        _assert(not isinstance(typ, ast.TOption),
+                f'{e} has type Option[{typ}]. Currently, we do not support ' +
+                f'nested options.')
         e.typ = ast.TOption(typ)
     elif isinstance(e, ast.EBoolNot):
         typ = _typecheck_expr(e.x, env).typ
