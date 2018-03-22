@@ -1,7 +1,7 @@
 # Invariant Confluence
-*Strong consistency* allows programmers to ignore many of the complexities of a
+_Strong consistency_ allows programmers to ignore many of the complexities of a
 distributed system, treating it as if it were running on a single machine.
-However, enforcing strong consistency requires *coordination*, and coordination
+However, enforcing strong consistency requires _coordination_, and coordination
 leads to unavailability (at worst) or increased latency (at best). However,
 coordination cannot always be avoided. Certain application invariants require
 coordination in order to be globally enforced. Bailis et al. developed the
@@ -17,16 +17,21 @@ procedure to algorithmically determine when an object is invariant-confluent.
 
 This repository contains some [theoretical pencil-and-paper work](doc), [an
 early prototype](ocaml) of a decision procedure, and [a more fleshed out
-prototype](iconfluence) which implement the decision procedures that have been
-outlined with pencil-and-paper.
+prototype](iconfluence) which implements the decision procedures that have been
+outlined with pencil and paper.
 
 ## Getting Started
 First, install z3 and z3py. Then, pip install the dependencies in
 `requirements.txt`. Then, play with the examples in [`examples/`](examples/).
 
 ```bash
-$ PYTHONPATH=. python -i examples/two_ints.py
-$ PYTHONPATH=. python -i examples/two_sets.py
+$ PYTHONPATH=. python -i -m examples.all_datatypes
+$ PYTHONPATH=. python -i -m examples.auction
+$ PYTHONPATH=. python -i -m examples.bank_deposit_and_withdraw
+$ PYTHONPATH=. python -i -m examples.bank_deposit_only
+$ PYTHONPATH=. python -i -m examples.foreign_key
+$ PYTHONPATH=. python -i -m examples.subsets
+$ PYTHONPATH=. python -i -m examples.two_ints
 ```
 
 ## TODO
