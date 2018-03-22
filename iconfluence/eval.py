@@ -148,7 +148,7 @@ def _eval_join_vals(lhs: Any, rhs: Any, crdt: ast.Crdt) -> Any:
     elif isinstance(crdt, ast.CSetUnion):
         return lhs.union(rhs)
     elif isinstance(crdt, ast.CSetIntersect):
-        return lhs.intersect(rhs)
+        return lhs.intersection(rhs)
     elif isinstance(crdt, ast.CMap):
         joined = lhs.copy()
         for k in rhs:

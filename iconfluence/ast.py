@@ -148,6 +148,20 @@ class CMap(Crdt):
 Coercible = Union[bool, int, tuple, set, dict, 'Expr']
 
 def coerce(x: Coercible) -> 'Expr':
+    """
+    >>> repr(coerce(True))
+    'EBool(x=True)'
+    >>> repr(coerce(1))
+    'EInt(x=1)'
+    >>> repr(coerce((1, True)))
+    'ETuple2(a=EInt(x=1), b=EBool(x=True))'
+    >>> repr(coerce({1, 2}))
+    'ESet(xs={EInt(x=1), EInt(x=2)})'
+    >>> repr(coerce({1: 2}))
+    'EMap(kvs={EInt(x=1): EInt(x=2)})'
+    >>> repr(coerce(EInt(1)))
+    'EInt(x=1)'
+    """
     # Note that isinstance(True, int) is true, so we have to check for
     # bools before we check for ints.
     if isinstance(x, bool):
@@ -157,13 +171,57 @@ def coerce(x: Coercible) -> 'Expr':
     elif isinstance(x, tuple) and len(x) == 2:
         return ETuple2(coerce(x[0]), coerce(x[1]))
     elif isinstance(x, set):
+        if len(x) == 0:
+            msg = ('Cannot coerce an empty set because the type of the set ' +
+                   'cannot be inferred. Construct an empty set using ' +
+                   'EEmptySet manually.')
+            raise ValueError(msg)
         return ESet({coerce(e) for e in x})
     elif isinstance(x, dict):
+        if len(x) == 0:
+            msg = ('Cannot coerce an empty map because the type of the map ' +
+                   'cannot be inferred. Construct an empty map using ' +
+                   'EEmptyMap manually.')
+            raise ValueError(msg)
         return EMap({coerce(k): coerce(v) for k, v in x.items()})
     elif isinstance(x, Expr):
         return x
     else:
-        raise ValueError(f'Unrecognized expression {x}.')
+        raise ValueError(f'Uncoercible expression {x}.')
+
+def typed_coerce(x: Coercible, typ: Type) -> 'Expr':
+    if isinstance(typ, TInt):
+        assert isinstance(x, int), (x, type(x))
+        return EInt(x)
+    elif isinstance(typ, TBool):
+        assert isinstance(x, bool), (x, type(x))
+        return EBool(x)
+    elif isinstance(typ, TTuple2):
+        assert isinstance(x, tuple), (x, type(x))
+        assert len(x) == 2
+        a = typed_coerce(x[0], typ.a)
+        b = typed_coerce(x[0], typ.b)
+        return ETuple2(a, b)
+    elif isinstance(typ, TSet):
+        assert isinstance(x, set), (x, type(x))
+        if len(x) == 0:
+            return EEmptySet(typ.a)
+        else:
+            return ESet({typed_coerce(y, typ.a) for y in x})
+    elif isinstance(typ, TOption):
+        if x is None:
+            return ENone(typ.a)
+        else:
+            return typed_coerce(x, typ.a)
+    elif isinstance(typ, TMap):
+        assert isinstance(x, dict), (x, type(x))
+        if len(x) == 0:
+            return EEmptyMap(typ.a, typ.b)
+        else:
+            return EMap({typed_coerce(k, typ.a) : typed_coerce(v, typ.b)
+                         for k, v in x})
+    else:
+        raise ValueError(f'Unrecognized type {typ}.')
 
 class Expr(AstNode):
     def __init__(self) -> None:

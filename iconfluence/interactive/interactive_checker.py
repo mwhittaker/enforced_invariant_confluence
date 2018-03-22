@@ -1,15 +1,18 @@
 from enum import Enum
+from textwrap import wrap
 from typing import List, Optional, Tuple
 
+from colored import attr, fg
 from orderedset import OrderedSet
 import z3
 
-from ..ast import EVar, Expr, Invariant
+from ..ast import (EVar, EBool, EBoolAnd, EBoolNot, Expr, Invariant,
+                   typed_coerce)
 from ..checker import Checker, Decision
-from ..envs import ValEnv, TypeEnv, Z3ExprEnv
+from ..envs import ExprEnv, ValEnv, TypeEnv, Z3ExprEnv
 from ..eval import eval_invariant
 from ..state_explorer import StateExplorer
-from ..typecheck import typecheck_invariant
+from ..typecheck import typecheck_expr, typecheck_invariant
 from ..z3_ import compile
 from ..z3_.fresh_name import FreshName
 from ..z3_.model import InfiniteMap, InfiniteSet, model_to_state
@@ -51,17 +54,6 @@ class InteractiveChecker(Checker):
     >>> checker.refine_invariant(y <= 0)
     >>> checker.check_iconfluence()
     <Decision.YES: 'yes'>
-
-    TODO:
-        - Currently, we do not randomly explore states to label counterexamples
-          as reachable. It turns out to be a bit harder than possible because
-          our state explorations generates sets of values, but Z3
-          counterexamples include things like Z3 function interpretations.
-          We'll have to either reachable states as Z3 function interpretations
-          or translate Z3 models into Python values.
-        - After a user labels a counterexample as unreachable, we do not
-          automatically refine the invariant to exclude this point. Again, the
-          difficulty comes from the mismatch between Invariants and Z3 models.
     """
     def __init__(self,
                  num_explored_states_per_step: int = 100,
@@ -84,7 +76,6 @@ class InteractiveChecker(Checker):
         self.lhs_label: Optional[Label] = None
         self.rhs: Optional[ValEnv] = None
         self.rhs_label: Optional[Label] = None
-        self.unreachable_z3: List[Z3ExprEnv] = []
         self.unreachable: List[ValEnv] = []
 
     def __str__(self):
@@ -113,19 +104,15 @@ class InteractiveChecker(Checker):
             self.rhs = self.rhs
             self.rhs_label = self.rhs_label
 
-            l1_str = f' [{self.lhs_label}]' if self.lhs_label is not None else ''
-            l2_str = f' [{self.rhs_label}]' if self.rhs_label is not None else ''
-            strings.append(f'  counterexample 1 == {self.lhs}{l1_str}')
-            strings.append(f'  counterexample 2 == {self.rhs}{l2_str}')
+            lstr = f' [{self.lhs_label}]' if self.lhs_label is not None else ''
+            rstr = f' [{self.rhs_label}]' if self.rhs_label is not None else ''
+            strings.append(f'  lhs == {self.lhs}{lstr}')
+            strings.append(f'  rhs == {self.rhs}{rstr}')
 
         return '\n'.join([Checker.__str__(self)] + strings)
 
-    def _record_if_unreachable(self, \
-                               counterexample: Z3ExprEnv, \
-                               label: Label) \
-                               -> None:
-        if label == Label.UNREACHABLE:
-            self.unreachable_z3.append(counterexample)
+    def _wrap_print(self, s: str) -> None:
+        print('\n'.join(wrap(s, 80)))
 
     def _compile_expr(self,
                       e: Expr,
@@ -185,6 +172,16 @@ class InteractiveChecker(Checker):
                 finite_state[k] = v
         return finite_state
 
+    def _model_to_exprs(self,
+                        state: ValEnv,
+                        tenv: TypeEnv) \
+                        -> Optional[ExprEnv]:
+        finite_state = self._uninfinite_state(state)
+        if finite_state is None:
+            return None
+        return {name: typed_coerce(x, tenv[name])
+                for name, x in finite_state.items()}
+
     def _known_reachable(self, state: ValEnv) -> bool:
         """
         Returns whether we know that state is reachable. Note that if
@@ -194,6 +191,22 @@ class InteractiveChecker(Checker):
         finite_state = self._uninfinite_state(state)
         return (finite_state is not None and
                 finite_state in self.state_explorer.states)
+
+    def _record_state(self, state: ValEnv, label: Label) -> None:
+        if label == Label.UNREACHABLE:
+            self.unreachable.append(state)
+
+            exprs = self._model_to_exprs(state, self.type_env)
+            if exprs:
+                inv: Expr = EBool(True)
+                for name, e in exprs.items():
+                    inv = EBoolAnd(inv, EVar(name).eq(e))
+                self.refine_invariant(EBoolNot(inv))
+        else:
+            assert label == Label.REACHABLE, label
+            finite_state = self._uninfinite_state(state)
+            if finite_state:
+                self.state_explorer.add(finite_state)
 
     def _is_refined_i_closed(self) -> Decision:
         with scoped(self.solver):
@@ -220,7 +233,7 @@ class InteractiveChecker(Checker):
 
             # Display generated code.
             if self.verbose:
-                print(self.solver.sexpr())
+                print(f'{fg(206)}{self.solver.sexpr()}{attr(0)}')
 
             # Check if we're I - NR closed.
             result = self.solver.check()
@@ -252,14 +265,18 @@ class InteractiveChecker(Checker):
                 return Decision.NO
 
             # TODO(mwhittaker): Improve printing.
-            print('The following two states (i.e. lhs and rhs) satisfy the ' +
-                  '(refined) invariant, but their join does not. Please use ' +
-                  'the lhs_reachable(), lhs_unreachable(), rhs_reachable(), ' +
-                  'and rhs_unreachable() methods to label the states as ' +
-                  'reachable or unreachable.')
-            print(f'lhs [{self.lhs_label}] = {self.lhs}.')
-            print(f'rhs [{self.rhs_label}] = {self.rhs}.')
-            print(f'lhs join rhs = {join}.')
+            m = ('The following two states (i.e. lhs and rhs) satisfy the ' +
+                 '(refined) invariant, but their join does not. Please use ' +
+                 'the lhs_reachable(), lhs_unreachable(), rhs_reachable(), ' +
+                 'and rhs_unreachable() methods to label the states as ' +
+                 'reachable or unreachable.')
+            lstr = f' [{self.lhs_label}]' if self.lhs_label is not None else ''
+            rstr = f' [{self.rhs_label}]' if self.rhs_label is not None else ''
+            self._wrap_print(m)
+            print('')
+            print(f'  lhs{lstr} = {self.lhs}.')
+            print(f'  rhs{rstr} = {self.rhs}.')
+            print(f'  lhs join rhs = {join}.')
 
             return Decision.UNKNOWN
 
@@ -269,10 +286,10 @@ class InteractiveChecker(Checker):
                 'the state as reachable or `{0}_unreachable()` to label the ' +
                 'state as unreachable.')
         if (self.lhs is not None and self.lhs_label is None):
-            print(msg.format('lhs'))
+            self._wrap_print(msg.format('lhs'))
             return Decision.UNKNOWN
         if (self.rhs is not None and self.rhs_label is None):
-            print(msg.format('rhs'))
+            self._wrap_print(msg.format('rhs'))
             return Decision.UNKNOWN
 
         if (self.lhs is not None):
@@ -284,8 +301,8 @@ class InteractiveChecker(Checker):
             # unreachable counterexamples to try and figure out how to refine
             # the invariant. Reachable counterexamples are stored in
             # self.state_explorer.
-            self._record_if_unreachable(self.lhs, self.lhs_label)
-            self._record_if_unreachable(self.rhs, self.rhs_label)
+            self._record_state(self.lhs, self.lhs_label)
+            self._record_state(self.rhs, self.rhs_label)
 
             # If lhs and rhs are both reachable, then so is `lhs join rhs`.
             # `lhs join rhs` does not satisfy the (refined) invariant, so if it
@@ -304,31 +321,23 @@ class InteractiveChecker(Checker):
             return Decision.NO
         else:
             if self.verbose:
-                print(f'Exploring {self.num_explored_states_per_step} states.')
+                n = self.num_explored_states_per_step
+                print(f'Exploring {n} states...')
+                print('')
             self.state_explorer.explore(self.num_explored_states_per_step)
             return self._is_refined_i_closed()
 
     def lhs_reachable(self):
         self.lhs_label = Label.REACHABLE
-        # TODO(mwhittaker): Update in check_invariant_confluence.
-        finite_state = self._uninfinite_state(self.lhs)
-        if finite_state:
-            self.state_explorer.add(finite_state)
 
     def lhs_unreachable(self):
         self.lhs_label = Label.UNREACHABLE
-        # TODO(mwhittaker): Refine invariant.
 
     def rhs_reachable(self):
         self.rhs_label = Label.REACHABLE
-        # TODO(mwhittaker): Remove boilerplate.
-        finite_state = self._uninfinite_state(self.rhs)
-        if finite_state:
-            self.state_explorer.add(finite_state)
 
     def rhs_unreachable(self):
         self.rhs_label = Label.UNREACHABLE
-        # TODO(mwhittaker): Refine invariant.
 
     def refine_invariant(self, inv: Invariant):
         inv = typecheck_invariant(inv, self.type_env)
