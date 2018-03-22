@@ -55,7 +55,12 @@ class InfiniteSet:
         self.else_ = else_
 
     def __str__(self) -> str:
-        return f'InfiniteSet({self.in_}, {self.not_in_}, {self.else_}))'
+        if self.finite():
+            return str(self.get())
+        elif len(self.not_in_) == 0:
+            return f'All'
+        else:
+            return f'All - {self.not_in_}'
 
     def __repr__(self) -> str:
         return str(self)
