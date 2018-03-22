@@ -45,9 +45,14 @@ class InteractiveChecker(Checker):
     >>> checker.add_transaction('x_inc', [x.assign(x + 1)])
     >>> checker.add_transaction('y_dec', [y.assign(y - 1)])
     >>> checker.check_iconfluence()
-    Counterexample found.
-    lhs = {'x': 0, 'y': 1}.
-    rhs = {'x': 1, 'y': 0}.
+    The following two states (i.e. lhs and rhs) satisfy the (refined) invariant, but
+    their join does not. Please use the lhs_reachable(), lhs_unreachable(),
+    rhs_reachable(), and rhs_unreachable() methods to label the states as reachable
+    or unreachable.
+    <BLANKLINE>
+      lhs = {'x': 0, 'y': 1}.
+      rhs [Label.REACHABLE] = {'x': 1, 'y': 0}.
+      lhs join rhs = {'x': 1, 'y': 1}.
     <Decision.UNKNOWN: 'unknown'>
     >>> checker.lhs_unreachable()
     >>> checker.rhs_reachable()

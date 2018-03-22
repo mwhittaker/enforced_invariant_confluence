@@ -59,7 +59,7 @@ class StateExplorer:
             s = self._random_state()
             states: List[ValEnv] = []
             for txn in self.transactions.values():
-                s_new = eval_txn(txn, s)
+                s_new = eval_txn(txn, s, self.crdt_env)
                 if self._state_satisfies_invs(s_new):
                     states.append(s_new)
             return states

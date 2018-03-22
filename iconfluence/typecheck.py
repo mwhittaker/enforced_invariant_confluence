@@ -220,15 +220,13 @@ def typecheck_expr(e: ast.Expr, env: TypeEnv) -> ast.Expr:
     return _typecheck_expr(e_copy, env)
 
 def _typecheck_stmt(s: ast.Stmt, env: TypeEnv) -> ast.Stmt:
-    if isinstance(s, ast.SAssign):
+    if isinstance(s, ast.SAssign) or isinstance(s, ast.SJoinAssign):
         _assert(s.x.x in env, f'Unbound variable {s.x}.')
         _typecheck_expr(s.e, env)
         assert_type_eq(s.e.typ, env[s.x.x], s.e, s)
         return s
     else:
         raise ValueError(f'Unkown statement {s}.')
-
-    return s
 
 def typecheck_stmt(s: ast.Stmt, env: TypeEnv) -> ast.Stmt:
     s_copy = deepcopy(s)

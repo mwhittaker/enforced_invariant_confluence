@@ -378,6 +378,7 @@ def compile_expr(e: ast.Expr,
 def compile_stmt(stmt: ast.Stmt,
                  venv: VersionEnv,
                  tenv: TypeEnv,
+                 cenv: CrdtEnv,
                  fresh: FreshName) \
                  -> Tuple[OrderedSet, VersionEnv]:
     """
@@ -403,12 +404,19 @@ def compile_stmt(stmt: ast.Stmt,
         venv = venv.assign(stmt.x.x)
         x = compile_var(stmt.x, venv, tenv)
         return zss | OrderedSet([x == ze]), venv
+    if isinstance(stmt, ast.SAssign):
+        x = compile_var(stmt.x, venv, tenv)
+        e_zss, e_ze = compile_expr(stmt.e, venv, tenv, fresh)
+        join_zss, join_ze = _compile_z3_join(x, e_ze, cenv[stmt.x.x], fresh)
+        venv = venv.assign(stmt.x.x)
+        return e_zss | join_zss | OrderedSet([x == join_ze]), venv
     else:
         raise ValueError(f'Unkown statement {stmt}.')
 
 def compile_txn(txn: ast.Transaction,
                 venv: VersionEnv,
                 tenv: TypeEnv,
+                cenv: CrdtEnv,
                 fresh: FreshName) \
                 -> Tuple[OrderedSet, VersionEnv]:
     """
@@ -426,9 +434,10 @@ def compile_txn(txn: ast.Transaction,
     ... ]
     >>> tenv = {v: ast.TInt() for v in ['x', 'y', 'z']}
     >>> venv = VersionEnv()
+    >>> cenv = {v: ast.CIntMax() for v in ['x', 'y', 'z']}
     >>> fresh = FreshName()
     >>> txn = [typecheck.typecheck_stmt(s, tenv) for s in txn]
-    >>> ss, _ = compile_txn(txn, venv, tenv, fresh)
+    >>> ss, _ = compile_txn(txn, venv, tenv, cenv, fresh)
     >>> for s in ss:
     ...     print(s)
     1 == x_1
@@ -438,7 +447,7 @@ def compile_txn(txn: ast.Transaction,
     """
     zss: OrderedSet = OrderedSet([])
     for s in txn:
-        s_zss, venv = compile_stmt(s, venv, tenv, fresh)
+        s_zss, venv = compile_stmt(s, venv, tenv, cenv, fresh)
         zss |= s_zss
     return zss, venv
 

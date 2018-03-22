@@ -115,18 +115,23 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     else:
         raise ValueError(f'Unkown expression {e}.')
 
-def eval_stmt(s: ast.Stmt, env: ValEnv) -> ValEnv:
+def eval_stmt(s: ast.Stmt, env: ValEnv, cenv: CrdtEnv) -> ValEnv:
+    new_env = deepcopy(env)
     if (isinstance(s, ast.SAssign)):
         assert s.x.x in env, (s.x, env)
-        new_env = deepcopy(env)
         new_env[s.x.x] = eval_expr(s.e, env)
+        return new_env
+    if (isinstance(s, ast.SJoinAssign)):
+        assert s.x.x in env, (s.x, env)
+        v = eval_expr(s.e, env)
+        new_env[s.x.x] = _eval_join_vals(new_env[s.x.x], v, cenv[s.x.x])
         return new_env
     else:
         raise ValueError(f'Unkown statement {s}.')
 
-def eval_txn(txn: ast.Transaction, env: ValEnv) -> ValEnv:
+def eval_txn(txn: ast.Transaction, env: ValEnv, cenv: CrdtEnv) -> ValEnv:
     for s in txn:
-        env = eval_stmt(s, env)
+        env = eval_stmt(s, env, cenv)
     return env
 
 def eval_invariant(inv: ast.Invariant, env: ValEnv) -> ValEnv:

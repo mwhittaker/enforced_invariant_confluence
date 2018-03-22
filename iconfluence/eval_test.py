@@ -4,7 +4,7 @@ import unittest
 from .ast import *
 from .envs import TypeEnv, ValEnv
 from .eval import *
-from .typecheck import typecheck_expr
+from .typecheck import typecheck_expr, typecheck_stmt
 
 class TestEval(unittest.TestCase):
     def test_eval_expr(self) -> None:
@@ -56,6 +56,24 @@ class TestEval(unittest.TestCase):
         for e, expected in tests:
             e = typecheck_expr(e, tenv)
             self.assertEqual(eval_expr(e, venv), expected, e)
+
+    def test_eval_stmt(self) -> None:
+        state: ValEnv = {'x': 1, 'y': 2}
+        tenv: TypeEnv = {'x': TInt(), 'y': TInt()}
+        cenv: CrdtEnv = {'x': CIntMax(), 'y': CIntMax()}
+
+        x = EVar('x')
+        y = EVar('y')
+        tests: List[Tuple[Stmt, ValEnv]] = [
+            (typecheck_stmt(SAssign(x, 2), tenv), {'x': 2, 'y': 2}),
+            (typecheck_stmt(SJoinAssign(x, 2), tenv), {'x': 2, 'y': 2}),
+            (typecheck_stmt(SAssign(y, 1), tenv), {'x': 1, 'y': 1}),
+            (typecheck_stmt(SJoinAssign(y, 1), tenv), {'x': 1, 'y': 2}),
+        ]
+
+        for s, expected in tests:
+            env = eval_stmt(s, state, cenv)
+            self.assertEqual(env, expected, s)
 
     #  TODO(mwhittaker): Unit test other eval functions.
 

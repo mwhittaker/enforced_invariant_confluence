@@ -155,8 +155,8 @@ def coerce(x: Coercible) -> 'Expr':
     'EInt(x=1)'
     >>> repr(coerce((1, True)))
     'ETuple2(a=EInt(x=1), b=EBool(x=True))'
-    >>> repr(coerce({1, 2}))
-    'ESet(xs={EInt(x=1), EInt(x=2)})'
+    >>> repr(coerce({1}))
+    'ESet(xs={EInt(x=1)})'
     >>> repr(coerce({1: 2}))
     'EMap(kvs={EInt(x=1): EInt(x=2)})'
     >>> repr(coerce(EInt(1)))
@@ -329,6 +329,9 @@ class EVar(Expr):
 
     def assign(self, e: Coercible) -> 'SAssign':
         return SAssign(self, coerce(e))
+
+    def join_assign(self, e: Coercible) -> 'SJoinAssign':
+        return SJoinAssign(self, coerce(e))
 
     def __str__(self) -> str:
         return self.x
@@ -549,6 +552,14 @@ class SAssign(Stmt):
 
     def __str__(self) -> str:
         return f'{self.x} := {self.e}'
+
+class SJoinAssign(Stmt):
+    def __init__(self, x: EVar, e: Coercible) -> None:
+        self.x = x
+        self.e = coerce(e)
+
+    def __str__(self) -> str:
+        return f'{self.x} := {self.x} join {self.e}'
 
 # Transactions #################################################################
 Transaction = List[Stmt]
