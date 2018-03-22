@@ -1,5 +1,6 @@
-
 from iconfluence import *
+
+from .parser import get_checker
 
 """
 Auction example from [1]. Our object is a pair (bids, winning_bid) of a set bid
@@ -15,7 +16,7 @@ Run with
 [1]: https://scholar.google.com/scholar?cluster=16043456868654348168
 """
 
-checker = InteractiveChecker(verbose=False)
+checker = get_checker()
 bids = checker.set_union('bids', TInt(), EEmptySet(TInt()))
 winning_bid = checker.option('winning_bid', CIntMax(), ENone(TInt()))
 checker.add_invariant(

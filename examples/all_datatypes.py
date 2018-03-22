@@ -1,5 +1,7 @@
 from iconfluence import *
 
+from .parser import get_checker
+
 """
 This example doesn't have any significance except for the fact that it uses
 every datatype. This is useful to debug the Z3 code generation and model
@@ -8,7 +10,7 @@ extraction.
     PYTHONPATH=. python -i examples/all_datatypes.py
 """
 
-checker = InteractiveChecker(verbose=True)
+checker = get_checker()
 int_max = checker.int_max('int_max', 0)
 int_min = checker.int_min('int_min', 0)
 bool_or = checker.bool_or('bool_or', False)

@@ -1,5 +1,7 @@
 from iconfluence import *
 
+from .parser import get_checker
+
 """
 Our state based object is a pair (x, y) of two int maxes. We have one
 transaction that increments x and one that decrements y. We start off in state
@@ -11,7 +13,7 @@ Run with
     PYTHONPATH=. python -i examples/two_ints.py
 """
 
-checker = InteractiveChecker(verbose=False)
+checker = get_checker()
 x = checker.int_max('x', 0)
 y = checker.int_max('y', 0)
 checker.add_invariant('xy_leq_0', x * y <= 0)

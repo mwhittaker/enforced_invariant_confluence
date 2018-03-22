@@ -1,5 +1,7 @@
 from iconfluence import *
 
+from .parser import get_checker
+
 """
 Our state based object is a PN-Counter x (representing a bank balance)
 replicated across three replicas. x is implemented as two G-Counters p = (p0,
@@ -12,7 +14,7 @@ Run with
     PYTHONPATH=. python -i examples/bank_deposit_and_withdraw.py
 """
 
-checker = InteractiveChecker(verbose=False)
+checker = get_checker()
 p0 = checker.int_max('p0', 0)
 p1 = checker.int_max('p1', 0)
 p2 = checker.int_max('p2', 0)

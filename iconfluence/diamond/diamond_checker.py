@@ -20,6 +20,10 @@ class DiamondChecker(Checker):
     The DiamondChecker checks if these criteria are met. The third criterion is
     called diamond-invariant-confluence, hence the name DiamondChecker.
     """
+    def __init__(self, verbose: bool = False) -> None:
+        Checker.__init__(self)
+        self.verbose = verbose
+
     def _check_state_satisfies_invs(self, state: ValEnv) -> bool:
         invs = self.invariants.values()
         return all(eval_invariant(inv, state) for inv in invs)
