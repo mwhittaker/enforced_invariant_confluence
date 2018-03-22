@@ -111,5 +111,5 @@ class Checker:
         inv = typecheck.typecheck_invariant(inv, self.type_env)
         self.invariants[name] = inv
 
-    def check_iconfluence(self) -> Decision:
+    def check(self) -> Decision:
         raise NotImplementedError()

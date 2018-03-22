@@ -44,7 +44,7 @@ class InteractiveChecker(Checker):
     >>> checker.add_invariant('xy_leq_0', x * y <= 0)
     >>> checker.add_transaction('x_inc', [x.assign(x + 1)])
     >>> checker.add_transaction('y_dec', [y.assign(y - 1)])
-    >>> checker.check_iconfluence()
+    >>> checker.check()
     The following two states (i.e. lhs and rhs) satisfy the (refined) invariant, but
     their join does not. Please use the lhs_reachable(), lhs_unreachable(),
     rhs_reachable(), and rhs_unreachable() methods to label the states as reachable
@@ -57,7 +57,7 @@ class InteractiveChecker(Checker):
     >>> checker.lhs_unreachable()
     >>> checker.rhs_reachable()
     >>> checker.refine_invariant(y <= 0)
-    >>> checker.check_iconfluence()
+    >>> checker.check()
     <Decision.YES: 'yes'>
     """
     def __init__(self,
@@ -285,7 +285,7 @@ class InteractiveChecker(Checker):
 
             return Decision.UNKNOWN
 
-    def check_iconfluence(self) -> Decision:
+    def check(self) -> Decision:
         # Make sure that both counterexamples are labelled, if they exist.
         msg = ('State {0} is unlabelled. Call `{0}_reachable()` to label ' +
                 'the state as reachable or `{0}_unreachable()` to label the ' +
