@@ -21,7 +21,7 @@ class StateExplorer:
                  s0: ValEnv,
                  invariants: Dict[str, Invariant],
                  transactions: Dict[str, Transaction],
-                 max_iters_per_state: int = 100) \
+                 max_iters_per_state: int = 10) \
                  -> None:
         self.crdt_env = crdt_env
         self.invariants = invariants

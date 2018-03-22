@@ -11,7 +11,7 @@ bids. This example is NOT invariant-confluent.
 
 Run with
 
-    PYTHONPATH=. python -i examples/auction.py
+    PYTHONPATH=. python -i -m examples.auction
 
 [1]: https://scholar.google.com/scholar?cluster=16043456868654348168
 """

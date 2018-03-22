@@ -10,7 +10,7 @@ This object is invariant-closed and invariant-confluent.
 
 Run with
 
-    PYTHONPATH=. python -i examples/bank_deposit_only.py
+    PYTHONPATH=. python -i -m examples.bank_deposit_only
 """
 
 checker = get_checker()

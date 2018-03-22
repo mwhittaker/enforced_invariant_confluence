@@ -404,11 +404,12 @@ def compile_stmt(stmt: ast.Stmt,
         venv = venv.assign(stmt.x.x)
         x = compile_var(stmt.x, venv, tenv)
         return zss | OrderedSet([x == ze]), venv
-    if isinstance(stmt, ast.SAssign):
+    if isinstance(stmt, ast.SJoinAssign):
         x = compile_var(stmt.x, venv, tenv)
         e_zss, e_ze = compile_expr(stmt.e, venv, tenv, fresh)
         join_zss, join_ze = _compile_z3_join(x, e_ze, cenv[stmt.x.x], fresh)
         venv = venv.assign(stmt.x.x)
+        x = compile_var(stmt.x, venv, tenv)
         return e_zss | join_zss | OrderedSet([x == join_ze]), venv
     else:
         raise ValueError(f'Unkown statement {stmt}.')

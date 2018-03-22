@@ -7,7 +7,7 @@ This example doesn't have any significance except for the fact that it uses
 every datatype. This is useful to debug the Z3 code generation and model
 extraction.
 
-    PYTHONPATH=. python -i examples/all_datatypes.py
+    PYTHONPATH=. python -i -m examples.all_datatypes
 """
 
 checker = get_checker()

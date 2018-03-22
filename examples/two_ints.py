@@ -10,7 +10,7 @@ invariant-closed.
 
 Run with
 
-    PYTHONPATH=. python -i examples/two_ints.py
+    PYTHONPATH=. python -i -m examples.two_ints
 """
 
 checker = get_checker()

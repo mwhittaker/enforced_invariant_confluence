@@ -11,7 +11,7 @@ non-negative. This object is NOT invariant-confluent.
 
 Run with
 
-    PYTHONPATH=. python -i examples/bank_deposit_and_withdraw.py
+    PYTHONPATH=. python -i -m examples.bank_deposit_and_withdraw
 """
 
 checker = get_checker()

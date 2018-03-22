@@ -10,7 +10,7 @@ is that X is a subset of Y. O is invariant-confluent but not I-closed.
 
 Run with
 
-    PYTHONPATH=. python -i examples/two_sets.py
+    PYTHONPATH=. python -i -m examples.foreign_key
 """
 
 checker = get_checker()

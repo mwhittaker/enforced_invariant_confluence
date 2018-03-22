@@ -1,10 +1,19 @@
-from typing import Set, cast
+from typing import Set, Tuple, cast
+
+from colored import attr, fg
+from orderedset import OrderedSet
+import z3
 
 from .. import ast
 from ..ast import Crdt, Expr, Stmt, SJoinAssign, Transaction
 from ..checker import Checker, Decision
 from ..envs import ValEnv
 from ..eval import eval_invariant
+from ..z3_.compile import compile_expr, compile_join, compile_txn
+from ..z3_.fresh_name import FreshName
+from ..z3_.model import model_to_state
+from ..z3_.version_env import VersionEnv
+from ..z3_.z3_util import scoped
 
 class DiamondChecker(Checker):
     """
@@ -25,6 +34,7 @@ class DiamondChecker(Checker):
     def __init__(self, verbose: bool = False) -> None:
         Checker.__init__(self)
         self.verbose = verbose
+        self.fresh = FreshName()
 
     def _debug(self, s: str) -> None:
         if self.verbose:
@@ -126,6 +136,89 @@ class DiamondChecker(Checker):
 
         return True
 
+    def _compile_expr(self,
+                      e: Expr,
+                      venv: VersionEnv) -> Tuple[OrderedSet, z3.ExprRef]:
+        return compile_expr(e, venv, self.type_env, self.fresh)
+
+    def _venv_satisfies_inv(self, venv: VersionEnv) -> OrderedSet:
+        zss = OrderedSet()
+        for inv in self.invariants.values():
+            inv_zss, inv_ze = self._compile_expr(inv, venv)
+            zss |= inv_zss
+            zss.add(inv_ze)
+        return zss
+
+    def _venv_doesnt_satisfy_inv(self, venv: VersionEnv) -> OrderedSet:
+        zss = OrderedSet()
+        zes = OrderedSet()
+        for inv in self.invariants.values():
+            inv_zss, inv_ze = self._compile_expr(inv, venv)
+            zss |= inv_zss
+            zes.add(inv_ze)
+        zss.add(z3.Not(z3.And(list(zes))))
+        return zss
+
+    def _model_to_state(self, model: z3.ModelRef, venv: VersionEnv) -> ValEnv:
+        names = {venv.get_name(name): name for name in self.type_env}
+        state = model_to_state(model, set(names.keys()))
+        for versioned_name, name in names.items():
+            state[name] = state[versioned_name]
+            del state[versioned_name]
+        return state
+
+    def _diamond_iconfluent(self) -> bool:
+        solver = z3.Solver()
+        tenv = self.type_env
+        cenv = self.crdt_env
+        fresh = self.fresh
+
+        txns = list(self.transactions.items())
+        for i, (t_name, t) in enumerate(txns):
+            for (u_name, u) in txns[i + 1:]:
+                with scoped(solver):
+                    s_venv = VersionEnv('s')
+                    s_zss = self._venv_satisfies_inv(s_venv)
+
+                    t_venv = s_venv.with_suffix('t')
+                    t_zss, t_venv = compile_txn(t, t_venv, tenv, cenv, fresh)
+                    t_zss |= self._venv_satisfies_inv(t_venv)
+
+                    u_venv = s_venv.with_suffix('u')
+                    u_zss, u_venv = compile_txn(u, u_venv, tenv, cenv, fresh)
+                    u_zss |= self._venv_satisfies_inv(u_venv)
+
+                    join_venv = VersionEnv('join')
+                    join_zss, join_venv = compile_join(
+                        t_venv, u_venv, join_venv, cenv, tenv, fresh)
+                    join_zss |= self._venv_doesnt_satisfy_inv(join_venv)
+
+                    solver.add(list(s_zss | t_zss | u_zss | join_zss))
+                    s = f'{t_name} join {u_name}'
+                    self._debug(s)
+                    self._debug('=' * len(s))
+                    self._debug(f'{fg(206)}{solver.sexpr()}{attr(0)}')
+
+                    result = solver.check()
+                    if result == z3.unknown:
+                        self._debug("Z3 got stuck!")
+                        return False
+                    elif result == z3.sat:
+                        if self.verbose:
+                            model = solver.model()
+                            s_state = self._model_to_state(model, s_venv)
+                            t_state = self._model_to_state(model, t_venv)
+                            u_state = self._model_to_state(model, u_venv)
+                            join_state = self._model_to_state(model, join_venv)
+                            self._debug('Counterexample found.')
+                            self._debug('')
+                            self._debug(f'  s    = {s_state}')
+                            self._debug(f'  t    = {t_state}')
+                            self._debug(f'  u    = {u_state}')
+                            self._debug(f'  join = {join_state}')
+                        return False
+        return True
+
     def check_iconfluence(self) -> Decision:
         # Criterion 1 is enforced automatically because the only available
         # datatypes are CRDTs.
@@ -143,6 +236,7 @@ class DiamondChecker(Checker):
                 return Decision.UNKNOWN
 
         # Check criterion 3.
-        # TODO: Check one i confluence
+        if self._diamond_iconfluent():
+            return Decision.YES
 
         return Decision.UNKNOWN
