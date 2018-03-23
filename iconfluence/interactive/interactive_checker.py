@@ -83,8 +83,8 @@ class InteractiveChecker(Checker):
         self.rhs_label: Optional[Label] = None
         self.unreachable: List[ValEnv] = []
 
-    def __str__(self):
-        strings = []
+    def __str__(self) -> str:
+        strings: List[str] = []
 
         if len(self.invariant_refinements) > 0:
             strings += ['Invariant Refinements']
@@ -104,15 +104,10 @@ class InteractiveChecker(Checker):
         if (self.lhs is not None and
             self.rhs is not None):
             strings += ['Pending States']
-            self.lhs = self.lhs
-            self.lhs_label = self.lhs_label
-            self.rhs = self.rhs
-            self.rhs_label = self.rhs_label
-
             lstr = f' [{self.lhs_label}]' if self.lhs_label is not None else ''
             rstr = f' [{self.rhs_label}]' if self.rhs_label is not None else ''
-            strings.append(f'  lhs == {self.lhs}{lstr}')
-            strings.append(f'  rhs == {self.rhs}{rstr}')
+            strings.append(f'  lhs = {self.lhs}{lstr}')
+            strings.append(f'  rhs = {self.rhs}{rstr}')
 
         return '\n'.join([Checker.__str__(self)] + strings)
 
@@ -269,7 +264,6 @@ class InteractiveChecker(Checker):
                 self.rhs_label == Label.REACHABLE):
                 return Decision.NO
 
-            # TODO(mwhittaker): Improve printing.
             m = ('The following two states (i.e. lhs and rhs) satisfy the ' +
                  '(refined) invariant, but their join does not. Please use ' +
                  'the lhs_reachable(), lhs_unreachable(), rhs_reachable(), ' +

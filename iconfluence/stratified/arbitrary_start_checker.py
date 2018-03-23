@@ -1,98 +1,20 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Set
+from textwrap import wrap
 
 from .. import ast
 from .. import typecheck
-from ..ast import Coercible, Crdt, Invariant, Transaction, Type
-from ..checker import Decision
+from ..ast import Coercible, Crdt, EVar, Invariant, Transaction, Type
+from ..checker import Checker, Decision
 from ..envs import CrdtEnv, ExprEnv, TypeEnv, ValEnv
 from ..eval import eval_expr
 
-VarTriple = Tuple[ast.EVar, ast.EVar, ast.EVar]
+def _wrap_print(s: str) -> None:
+    print('\n'.join(wrap(s, 80)))
 
-def _wrap_string_lhs(s: str) -> str:
-    """
-    >>> _wrap_string_lhs('foo')
-    'foo_lhs'
-    """
-    return s + '_lhs'
-
-def _wrap_string_rhs(s: str) -> str:
-    """
-    >>> _wrap_string_rhs('foo')
-    'foo_rhs'
-    """
-    return s + '_rhs'
-
-def _unwrap_string_lhs(s: str) -> str:
-    """
-    >>> _unwrap_string_lhs('foo_lhs')
-    'foo'
-    """
-    assert s[-4:] == '_lhs', s
-    return s[:-4]
-
-def _unwrap_string_rhs(s: str) -> str:
-    """
-    >>> _unwrap_string_rhs('foo_rhs')
-    'foo'
-    """
-    assert s[-4:] == '_rhs', s
-    return s[:-4]
-
-def _wrap_var_lhs(v: ast.EVar) -> ast.EVar:
-    """
-    >>> x = ast.EVar('x')
-    >>> x.typ = ast.TInt()
-    >>> repr(_wrap_var_lhs(x))
-    "EVar(typ=TInt(), x='x_lhs')"
-    """
-    v_wrapped = ast.EVar(_wrap_string_lhs(v.x))
-    v_wrapped.typ = v.typ
-    return v_wrapped
-
-def _wrap_var_rhs(v: ast.EVar) -> ast.EVar:
-    """
-    >>> x = ast.EVar('x')
-    >>> x.typ = ast.TInt()
-    >>> repr(_wrap_var_rhs(x))
-    "EVar(typ=TInt(), x='x_rhs')"
-    """
-    v_wrapped = ast.EVar(_wrap_string_rhs(v.x))
-    v_wrapped.typ = v.typ
-    return v_wrapped
-
-def _unwrap_var_lhs(v: ast.EVar) -> ast.EVar:
-    """
-    >>> x = ast.EVar('x_lhs')
-    >>> x.typ = ast.TInt()
-    >>> repr(_unwrap_var_lhs(x))
-    "EVar(typ=TInt(), x='x')"
-    """
-    v_unwrapped = ast.EVar(_unwrap_string_lhs(v.x))
-    v_unwrapped.typ = v.typ
-    return v_unwrapped
-
-def _unwrap_var_rhs(v: ast.EVar) -> ast.EVar:
-    """
-    >>> x = ast.EVar('x_rhs')
-    >>> x.typ = ast.TInt()
-    >>> repr(_unwrap_var_rhs(x))
-    "EVar(typ=TInt(), x='x')"
-    """
-    v_unwrapped = ast.EVar(_unwrap_string_rhs(v.x))
-    v_unwrapped.typ = v.typ
-    return v_unwrapped
-
-class ArbitraryStartChecker:
+class ArbitraryStartChecker(Checker):
     """
     TODO(mwhittaker): Document.
     """
-    def __init__(self):
-        self.crdt_env: CrdtEnv = dict()
-        self.type_env: TypeEnv = dict()
-        self.transactions: Dict[str, Transaction] = dict()
-        self.invariants: Dict[str, Invariant] = dict()
-
     def __str__(self):
         strings = []
 
@@ -115,7 +37,14 @@ class ArbitraryStartChecker:
     def __repr__(self):
         return str(self)
 
-    def _register_var(self, name: str, crdt: Crdt) -> VarTriple:
+    def _warn_if_not_none(self, val: Coercible) -> None:
+        if val is not None:
+            _wrap_print(f'WARNING: You have provided a start value {val} to ' +
+                        f'an ArbitraryStartChecker, but an ' +
+                        f'ArbitraryStartChecker does not use a start value; ' +
+                        f'it considers an arbitrary start state.')
+
+    def _register_var_no_start_state(self, name: str, crdt: Crdt) -> EVar:
         # Ensure that variable names are unique.
         assert name not in self.crdt_env, (name, self.crdt_env)
         assert name not in self.type_env, (name, self.type_env)
@@ -126,38 +55,43 @@ class ArbitraryStartChecker:
 
         var = ast.EVar(name)
         var.typ = typ
-        return var, _wrap_var_lhs(var), _wrap_var_rhs(var)
+        return var
 
-    # TODO(mwhittaker): Right now, temporary variables are joined together and
-    # included when checking for properties like commutativity. Think about
-    # whether this is right.
+    def int_max(self, name: str, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CIntMax())
 
-    def int_max(self, name: str) -> VarTriple:
-        return self._register_var(name, ast.CIntMax())
+    def int_min(self, name: str, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CIntMin())
 
-    def int_min(self, name: str) -> VarTriple:
-        return self._register_var(name, ast.CIntMin())
+    def bool_or(self, name: str, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CBoolOr())
 
-    def bool_or(self, name: str) -> VarTriple:
-        return self._register_var(name, ast.CBoolOr())
+    def bool_and(self, name: str, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CBoolAnd())
 
-    def bool_and(self, name: str) -> VarTriple:
-        return self._register_var(name, ast.CBoolAnd())
+    def tuple2(self, name: str, a: Crdt, b: Crdt, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CTuple2(a, b))
 
-    def tuple2(self, name: str, a: Crdt, b: Crdt) -> VarTriple:
-        return self._register_var(name, ast.CTuple2(a, b))
+    def set_union(self, name: str, a: Type, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CSetUnion(a))
 
-    def set_union(self, name: str, a: Type) -> VarTriple:
-        return self._register_var(name, ast.CSetUnion(a))
+    def set_intersect(self, name: str, a: Type, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CSetIntersect(a))
 
-    def set_intersect(self, name: str, a: Type) -> VarTriple:
-        return self._register_var(name, ast.CSetIntersect(a))
+    def map(self, name: str, a: Type, b: Crdt, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CMap(a, b))
 
-    def map(self, name: str, a: Type, b: Crdt) -> VarTriple:
-        return self._register_var(name, ast.CMap(a, b))
-
-    def option(self, name: str, a: Crdt) -> VarTriple:
-        return self._register_var(name, ast.COption(a))
+    def option(self, name: str, a: Crdt, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.COption(a))
 
     def add_transaction(self, name: str, txn: Transaction) -> None:
         assert name not in self.transactions, (name, self.transactions)
@@ -168,6 +102,3 @@ class ArbitraryStartChecker:
         assert name not in self.invariants, (name, self.invariants)
         inv = typecheck.typecheck_invariant(inv, self.type_env)
         self.invariants[name] = inv
-
-    def check(self) -> Decision:
-        raise NotImplementedError()

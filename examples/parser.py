@@ -4,9 +4,10 @@ from iconfluence import *
 
 def _get_parser() -> ArgumentParser:
     checkers = [
-        'interactive',
-        'guess_and_check',
+        'arbitrary_start_interactive',
         'diamond',
+        'guess_and_check',
+        'interactive',
         'stratified',
     ]
 
@@ -25,6 +26,8 @@ def get_checker() -> Checker:
         return GuessAndCheckChecker(verbose=args.verbose)
     elif args.checker == 'diamond':
         return DiamondChecker(verbose=args.verbose)
+    elif args.checker == 'arbitrary_start_interactive':
+        return ArbitraryStartInteractiveChecker(verbose=args.verbose)
     elif args.checker == 'stratified':
         return StratifiedChecker(verbose=args.verbose)
     else:
