@@ -7,6 +7,7 @@ def _get_parser() -> ArgumentParser:
         'interactive',
         'guess_and_check',
         'diamond',
+        'stratified',
     ]
 
     parser = ArgumentParser()
@@ -24,5 +25,7 @@ def get_checker() -> Checker:
         return GuessAndCheckChecker(verbose=args.verbose)
     elif args.checker == 'diamond':
         return DiamondChecker(verbose=args.verbose)
+    elif args.checker == 'stratified':
+        return StratifiedChecker(verbose=args.verbose)
     else:
         raise ValueError(f'Unrecognized checker {args.checker}.')
