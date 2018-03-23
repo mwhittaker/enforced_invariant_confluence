@@ -73,6 +73,8 @@ class ArbitraryStartInteractiveChecker(ArbitraryStartChecker):
         zss.add(z3.Not(z3.And(list(zes))))
         return zss
 
+    def _assign_vars
+
     def counreachable(self) -> None:
         self.label = Label.COUNREACHABLE
 
