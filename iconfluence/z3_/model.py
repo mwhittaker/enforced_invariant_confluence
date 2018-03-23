@@ -5,6 +5,7 @@ import z3
 from .. import ast
 from ..envs import ValEnv
 from .compile import sort_to_type
+from .version_env import VersionEnv
 
 A = TypeVar('A')
 B = TypeVar('B')
@@ -211,9 +212,43 @@ def _translate_model_value(v: ModelValue, model: z3.ModelRef) -> Any:
         raise ValueError(f'Unknown model value {v} of type {type(v)}.')
 
 def model_to_state(m: z3.ModelRef, vs: Set[str]) -> ValEnv:
+    """
+    >>> solver = z3.Solver()
+    >>> solver.add(z3.Int('x') == 1)
+    >>> solver.add(z3.Int('y') == 2)
+    >>> solver.check()
+    sat
+    >>> m = solver.model()
+    >>> state = model_to_state(m, {'x', 'y'})
+    >>> list(sorted(state.items()))
+    [('x', 1), ('y', 2)]
+    """
     state: ValEnv = dict()
     for x in m:
         if x.name() in vs:
             assert x.name() not in state, (x, state)
             state[x.name()] = _translate_model_value(m[x], m)
+    return state
+
+def model_and_venv_to_state(model: z3.ModelRef,
+                            vs: Set[str],
+                            venv: VersionEnv) \
+                            -> ValEnv:
+    """
+    >>> solver = z3.Solver()
+    >>> solver.add(z3.Int('x_foo_0') == 1)
+    >>> solver.add(z3.Int('y_foo_0') == 2)
+    >>> solver.check()
+    sat
+    >>> m = solver.model()
+    >>> venv = VersionEnv('foo')
+    >>> state = model_and_venv_to_state(m, {'x', 'y'}, venv)
+    >>> list(sorted(state.items()))
+    [('x', 1), ('y', 2)]
+    """
+    names = {venv.get_name(v): v for v in vs}
+    state = model_to_state(model, set(names.keys()))
+    for versioned_name, name in names.items():
+        state[name] = state[versioned_name]
+        del state[versioned_name]
     return state

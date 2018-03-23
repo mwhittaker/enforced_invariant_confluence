@@ -215,11 +215,11 @@ class InteractiveChecker(Checker):
 
     def _is_refined_i_closed(self) -> Decision:
         with scoped(self.solver):
-            # Assert rhs satisfies invariant.
+            # Assert lhs satisfies invariant.
             lhs_venv = VersionEnv('lhs')
             zss = self._venv_satisfies_refined_i(lhs_venv)
 
-            # Assert lhs satisfies invariant.
+            # Assert rhs satisfies invariant.
             rhs_venv = VersionEnv('rhs')
             zss |= self._venv_satisfies_refined_i(rhs_venv)
 

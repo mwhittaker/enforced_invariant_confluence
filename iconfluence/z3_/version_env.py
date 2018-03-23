@@ -1,4 +1,4 @@
-from typing import Dict, FrozenSet, Tuple
+from typing import Callable, Dict, FrozenSet, Tuple
 
 import z3
 
@@ -46,6 +46,26 @@ class VersionEnv:
         new_version = (self.suffix, i + 1)
         env = self._copy()
         env.versions[v] = new_version
+        return env
+
+    def rename(self, f: Callable[[str], str]) -> 'VersionEnv':
+        env = self._copy()
+        names = list(env.versions.keys())
+        for name in names:
+            new_name = f(name)
+            assert new_name not in names, (new_name, names)
+            env.versions[new_name] = env.versions[name]
+            del env.versions[name]
+        return env
+
+    def update(self, other: 'VersionEnv') -> 'VersionEnv':
+        # Assert that variable names are disjoint.
+        my_keys = set(self.versions.keys())
+        other_keys = set(other.versions.keys())
+        assert my_keys.isdisjoint(other_keys), (my_keys, other_keys)
+
+        env = self._copy()
+        env.versions.update(other.versions)
         return env
 
 if __name__ == '__main__':
