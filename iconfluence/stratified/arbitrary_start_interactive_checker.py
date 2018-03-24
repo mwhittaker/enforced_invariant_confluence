@@ -85,6 +85,7 @@ class ArbitraryStartInteractiveChecker(ArbitraryStartChecker):
 
         return '\n'.join([ArbitraryStartChecker.__str__(self)] + strings)
 
+    # TODO(mwhittaker): Replace with implementation in compile.
     def _venv_satisfies_invs(self,
                              venv: VersionEnv,
                              tenv: TypeEnv,
@@ -97,6 +98,7 @@ class ArbitraryStartInteractiveChecker(ArbitraryStartChecker):
             zss.add(inv_ze)
         return zss
 
+    # TODO(mwhittaker): Replace with implementation in compile.
     def _venv_doesnt_satisfy_invs(self,
                                   venv: VersionEnv,
                                   tenv: TypeEnv,

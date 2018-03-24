@@ -540,3 +540,29 @@ def compile_join(lhs_venv: VersionEnv,
         zss.add(compile_var(x, joined_venv, tenv) == v_ze)
 
     return zss, joined_venv
+
+def compile_venv_satisfies_invs(invs: List[ast.Invariant],
+                                venv: VersionEnv,
+                                tenv: TypeEnv,
+                                fresh: FreshName) \
+                                -> OrderedSet:
+    zss = OrderedSet()
+    for inv in invs:
+        inv_zss, inv_ze = compile_expr(inv, venv, tenv, fresh)
+        zss |= inv_zss
+        zss.add(inv_ze)
+    return zss
+
+def compile_venv_doesnt_satisfy_invs(invs: List[ast.Invariant],
+                                     venv: VersionEnv,
+                                     tenv: TypeEnv,
+                                     fresh: FreshName) \
+                                     -> OrderedSet:
+    zss = OrderedSet()
+    zes = OrderedSet()
+    for inv in invs:
+        inv_zss, inv_ze = compile_expr(inv, venv, tenv, fresh)
+        zss |= inv_zss
+        zes.add(inv_ze)
+    zss.add(z3.Not(z3.And(list(zes))))
+    return zss

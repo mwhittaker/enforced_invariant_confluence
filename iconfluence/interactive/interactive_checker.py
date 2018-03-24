@@ -125,6 +125,7 @@ class InteractiveChecker(Checker):
                               -> bool:
         return all(eval_invariant(inv, state) for inv in invs)
 
+    # TODO(mwhittaker): Replace with implementation in compile.
     def _venv_satisfies_refined_i(self, venv: VersionEnv) -> OrderedSet:
         zss = OrderedSet()
 
@@ -135,6 +136,7 @@ class InteractiveChecker(Checker):
 
         return zss
 
+    # TODO(mwhittaker): Replace with implementation in compile.
     def _venv_doesnt_satisfy_refined_i(self, venv: VersionEnv) -> OrderedSet:
         zss = OrderedSet()
         zes = OrderedSet()

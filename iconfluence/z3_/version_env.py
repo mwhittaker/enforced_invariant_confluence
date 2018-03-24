@@ -78,42 +78,6 @@ class VersionEnv:
         env.versions[v] = new_version
         return env
 
-    # def rename(self, f: Callable[[str], str]) -> 'VersionEnv':
-    #     """
-    #     `venv.rename(f)` renames every variable x in venv to f(x).
-    #
-    #     >>> venv = VirtualEnv()
-    #     >>> venv.assign('x')
-    #     >>> venv.assign('y')
-    #     >>> venv.get_name('x')
-    #     'x_1'
-    #     >>> venv.get_name('y')
-    #     'y_1'
-    #     >>> venv = venv.rename(lambda x: x + '_renamed')
-    #     >>> venv.get_name('x')
-    #     'x_renamed_0'
-    #     >>> venv.get_name('y')
-    #     'y_renamed_0'
-    #     """
-    #     env = self._copy()
-    #     names = list(env.versions.keys())
-    #     for name in names:
-    #         new_name = f(name)
-    #         assert new_name not in names, (new_name, names)
-    #         env.versions[new_name] = env.versions[name]
-    #         del env.versions[name]
-    #     return env
-
-    def update(self, other: 'VersionEnv') -> 'VersionEnv':
-        # Assert that variable names are disjoint.
-        my_keys = set(self.versions.keys())
-        other_keys = set(other.versions.keys())
-        assert my_keys.isdisjoint(other_keys), (my_keys, other_keys)
-
-        env = self._copy()
-        env.versions.update(other.versions)
-        return env
-
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

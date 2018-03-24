@@ -15,28 +15,6 @@ class ArbitraryStartChecker(Checker):
     """
     TODO(mwhittaker): Document.
     """
-    def __str__(self):
-        strings = []
-
-        strings.append('State')
-        for name in self.crdt_env:
-            strings.append(f'  {name}: {self.crdt_env[name]}')
-
-        strings += ['Invariants']
-        for (name, inv) in self.invariants.items():
-            strings.append(f'  {name} == {inv}')
-
-        strings += ['Transactions']
-        for (name, txn) in self.transactions.items():
-            strings.append(f'  def {name}():')
-            for s in txn:
-                strings.append(f'    {s}')
-
-        return '\n'.join(strings)
-
-    def __repr__(self):
-        return str(self)
-
     def _warn_if_not_none(self, val: Coercible) -> None:
         if val is not None:
             _wrap_print(f'WARNING: You have provided a start value {val} to ' +
@@ -92,13 +70,3 @@ class ArbitraryStartChecker(Checker):
     def option(self, name: str, a: Crdt, val: Coercible) -> EVar:
         self._warn_if_not_none(val)
         return self._register_var_no_start_state(name, ast.COption(a))
-
-    def add_transaction(self, name: str, txn: Transaction) -> None:
-        assert name not in self.transactions, (name, self.transactions)
-        txn = typecheck.typecheck_txn(txn, self.type_env)
-        self.transactions[name] = txn
-
-    def add_invariant(self, name: str, inv: Invariant) -> None:
-        assert name not in self.invariants, (name, self.invariants)
-        inv = typecheck.typecheck_invariant(inv, self.type_env)
-        self.invariants[name] = inv

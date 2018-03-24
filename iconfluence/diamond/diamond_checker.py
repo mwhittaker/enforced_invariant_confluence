@@ -141,6 +141,7 @@ class DiamondChecker(Checker):
                       venv: VersionEnv) -> Tuple[OrderedSet, z3.ExprRef]:
         return compile_expr(e, venv, self.type_env, self.fresh)
 
+    # TODO(mwhittaker): Replace with implementation in compile.
     def _venv_satisfies_inv(self, venv: VersionEnv) -> OrderedSet:
         zss = OrderedSet()
         for inv in self.invariants.values():
@@ -149,6 +150,7 @@ class DiamondChecker(Checker):
             zss.add(inv_ze)
         return zss
 
+    # TODO(mwhittaker): Replace with implementation in compile.
     def _venv_doesnt_satisfy_inv(self, venv: VersionEnv) -> OrderedSet:
         zss = OrderedSet()
         zes = OrderedSet()
