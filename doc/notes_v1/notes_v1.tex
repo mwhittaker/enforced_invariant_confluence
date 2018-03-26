@@ -4,7 +4,6 @@
 
 \usepackage[hidelinks]{hyperref}
 \usepackage[leqno]{amsmath}
-\usepackage{../common/python}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -14,6 +13,7 @@
 \usepackage{fancyvrb}
 \usepackage{mathtools}
 \usepackage{paralist}
+\usepackage{python}
 \usepackage{stmaryrd}
 \usepackage{subcaption}
 \usepackage{tikz}
@@ -24,9 +24,9 @@
 \usetikzlibrary{decorations.pathmorphing}
 \usetikzlibrary{positioning}
 
+\input{diagrams.tex}
+\input{notation.tex}
 \input{pervasives.tex}
-\input{../common/notation.tex}
-\input{../common/diagrams.tex}
 
 \tikzstyle{point}=[shape=circle, fill=blue, opacity=0.75]
 \tikzstyle{vec}=[->, ultra thick, red, shorten >=0.1cm]
