@@ -57,7 +57,7 @@ class Checker:
 
         # Ensure that our initial start state is well-typed.
         typ = crdt.to_type()
-        e = ast.typed_coerce(coercible, typ)
+        e = ast.coerce(coercible)
         e = typecheck.typecheck_expr(e, {})
         typecheck.assert_type_eq(e.typ, typ, e, e)
 
