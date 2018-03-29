@@ -1,6 +1,11 @@
 \documentclass[sigconf, review]{acmart}
 
-\usepackage{booktabs}
+\usepackage[outline]{contour}
+\usepackage{invariantconfluence}
+\usepackage{pervasives}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
 
 % Copyright
 %\setcopyright{none}
@@ -28,7 +33,7 @@
 \acmPrice{15.00}
 
 \begin{document}
-\title{SIG Proceedings Paper in LaTeX Format}
+\title{TODO}
 
 \author{Michael Whittaker}
 \affiliation{%
@@ -81,7 +86,10 @@
 \maketitle
 {\input{sections/introduction}}
 {\input{sections/invariant_confluence}}
+{\input{sections/invariant_closure}}
+{\input{sections/interactive_decision_procedure}}
 % TODO
+{\input{sections/segmented_invariant_confluence.tex}}
 {\input{sections/evaluation}}
 {\input{sections/related_work}}
 {\input{sections/conclusion}}
