@@ -1,6 +1,26 @@
+\usepackage{ifthen}
+\usepackage{mathtools}
+
 \newcommand{\join}{\sqcup}
 
 \newcommand{\sticonfluence}[3]{$(#1, #2, #3)$-confluence}
 \newcommand{\sticonfluent}[3]{$(#1, #2, #3)$-confluent}
 \newcommand{\sTIconfluence}{\sticonfluence{s_0}{T}{I}}
 \newcommand{\sTIconfluent}{\sticonfluent{s_0}{T}{I}}
+
+\DeclarePairedDelimiterX{\stireachable}[4]
+  {(#1, #2, #3)\text{-reachable}\ifthenelse{\equal{#4}{}}{}{(}}
+  {\ifthenelse{\equal{#4}{}}{}{)}}
+  {#4}
+\DeclarePairedDelimiterX{\sTIreachable}[1]
+  {(s_0, T, I)\text{-reachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {\ifthenelse{\equal{#1}{}}{}{)}}
+  {#1}
+\DeclarePairedDelimiterX{\stiunreachable}[4]
+  {(#1, #2, #3)\text{-unreachable}\ifthenelse{\equal{#4}{}}{}{(}}
+  {\ifthenelse{\equal{#4}{}}{}{)}}
+  {#4}
+\DeclarePairedDelimiterX{\sTIunreachable}[1]
+  {(s_0, T, I)\text{-unreachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {\ifthenelse{\equal{#1}{}}{}{)}}
+  {#1}

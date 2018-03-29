@@ -66,10 +66,23 @@ tree of the corresponding expression.
 
 {\input{figures/invariant_confluence_definitions}}
 
-% - define invariant confluence
-%   - define system model
-%   - define expression based system model
-%   - define invariant confluence
-%   - Give example with two integers
+We say an expression $e$ is \defword{$\sTIreachable{}$} if it corresponds to a
+valid execution of our system model. Formally, we define $\sTIreachable{e}$ to
+be the smallest predicate that satisfies the following equations:
+\begin{itemize}
+  \item
+    $\sTIreachable{s_0}$.
+  \item
+    For all expressions $e$ and for all transactions $t$ in the set $T$ of
+    transactions, if $\sTIreachable{e}$ and $I(t(e))$, then
+    $\sTIreachable{t(e)}$.
+  \item
+    For all expressions $e_1$ and $e_2$, if $\sTIreachable{e_1}$ and
+    $\sTIreachable{e_2}$, then $\sTIreachable{e_1 \join e_2}$.
+\end{itemize}
+Similarly, we say a state $s \in S$ is $\sTIreachable{}$ if there exists a
+$\sTIreachable{}$ expression $e$ that evaluates to $s$.
 
-% TODO: Give a footnote about the difference between this definition and the original definition.
+Finally, we say $O$ is \defword{invariant-confluent with respect to $s_0$, $T$,
+and $I$}, abbreviated \defword{\sTIconfluent{}}, if all reachable states
+satisfy the invariant: $\setst{s \in S}{\sTIreachable{s}} \subseteq I$.
