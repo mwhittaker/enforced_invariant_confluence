@@ -1,4 +1,18 @@
-\section{Invariant-Closure}
+\section{Invariant-Closure}\seclabel{InvariantClosure}
+Our ultimate goal is to write a program that can automatically decide whether a
+given distributed object $O$ is \sTIconfluent{}. Such a program has to
+automatically prove or disprove that every reachable state satisfies the
+invariant. However, automatically reasoning about the possibly infinite set of
+reachable states is challenging, especially because transactions and merge
+functions can be complex and can be interleaved arbitrarily in an execution.
+Due to this complexity, existing systems that aim to automatically decide
+invariant-confluence instead focus on deciding a sufficient condition for
+invariant-confluence---dubbed \defword{invariant-closure}---that is simpler to
+reason about~\cite{li2012making, li2014automating}. In this section, we define
+invariant-closure and study why the sufficient condition is not necessary.
+Armed with this understanding, we present conditions under which it is both
+sufficient and necessary.
+
 % - define invariant-closure and introduce it as a sufficient condition
 % - cite existing work to show that people have used invariant closure to
 %   reason about invariant-confluence
