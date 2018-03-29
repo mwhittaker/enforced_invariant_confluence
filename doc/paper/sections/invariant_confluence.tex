@@ -27,7 +27,7 @@ fixed set $T$ of transactions, and an invariant $I$. Servers can perform one of
 two actions.
 
 First, a client can contact a server $p_i$ and request that it execute a
-transaction $t \in T$. $p_i$ speculatively executes $t$ transitioning from
+transaction $t \in T$. $p_i$ speculatively executes $t$, transitioning from
 state $s_i$ to state $t(s_i)$. If $t(s_i)$ satisfies the invariant---i.e.
 $I(t(s_i))$---then $p_i$ commits the transaction and remains in state $t(s_i)$.
 Otherwise, $p_i$ aborts the transaction and reverts to state $s_i$.
