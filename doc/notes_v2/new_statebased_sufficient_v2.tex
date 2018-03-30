@@ -1,0 +1,132 @@
+\section{New Sufficient State-Based Conditions}
+\newcommand{\stimergereduction}[3]{$\Diamond(#1, #2, #3)$-merge-reduction}
+\newcommand{\stimergereducible}[3]{$\Diamond(#1, #2, #3)$-merge-reducible}
+\newcommand{\stimergereducibility}[3]{$\Diamond(#1, #2, #3)$-merge-reducibility}
+\newcommand{\sTImergereduction}{\stimergereduction{s_0}{T}{I}}
+\newcommand{\sTImergereducible}{\stimergereducible{s_0}{T}{I}}
+\newcommand{\sTImergereducibility}{\stimergereducibility{s_0}{T}{I}}
+
+\begin{definition}
+  A \defword{join-free} expression $e = t_1(t_2(\ldots t_n(s) \ldots))$ is an
+  expression that does not contain a join.
+\end{definition}
+
+\begin{definition}
+  $O$ is \defword{merge-reducible with respect to $s_0$, $T$, and $I$},
+  abbreviated \defword{\sTImergereducible{}}, if for every pair $e_1$ and $e_2$
+  of join-free $\sTIreachable{}$ expressions, there exists some join-free
+  $\sTIreachable{}$ expression $e_3$ such that $eval(e_3) = eval(e1 \join
+  e_2)$.
+\end{definition}
+
+\begin{claim}\clmlabel{ReducibleImpliesIconfluent}
+  If $I(s_0)$ and $O$ is \sTImergereducible, then $O$ is \sTIconfluent.
+\end{claim}
+\begin{elidableproof}
+  Assume that $I(s_0)$ and that $O$ is \sTImergereducible{}. We prove by structural
+  induction on $e$, that for all $\sTIreachable{}$ expressions $e$, there
+  exists a join-free $\sTIreachable{}$ expression $e'$ such that $eval(e) =
+  eval(e')$.
+  \begin{itemize}
+    \item \textbf{Case 1: $e = s_0$.}
+      Trivially, $e' = s_0$.
+
+    \item \textbf{Case 2: $e = t(e_1)$.}
+      $e_1$ is $\sTIreachable{}$, so by the inductive hypothesis, there exists
+      a join-free $\sTIreachable{}$ expression $e_1'$ such that $eval(e_1) =
+      eval(e_1')$. $t(e_1)$ is $\sTIreachable{}$, so $I(t(e_1))$. $eval(e_1) =
+      eval(e_1')$, so $I(t(e_1'))$. Thus, $t(e_1')$ is $\sTIreachable{}$ (and join
+      free), so we can let $e' = t(e_1')$.
+
+    \item \textbf{Case 3: $e = e_1 \join e_2$.}
+      $e_1$ and $e_2$ are $\sTIreachable{}$, so by the inductive hypothesis,
+      there exists equivalent join-free $\sTIreachable{}$ expressions $e_1'$
+      and $e_2'$. $O$ is \sTImergereducible{}, so it's immediate that there exists
+      an $e'$.
+  \end{itemize}
+
+  Consider an arbitrary $\sTIreachable{}$ expression $e$ and it's equivalent
+  join-free $\sTIreachable{}$ counterpart $e'$. $e'$ is either $s_0$ or
+  $t(e'')$.  In either case, it satisfies the invariant, so $O$ is
+  \sTIconfluent{}.
+\end{elidableproof}
+
+\begin{claim}\clmlabel{NewStateBasedSufficient}
+  Consider a state-based object $O = (S, \join)$, a start state $s_0$, a set of
+  transactions $T$, and an invariant $I$. $T$ is \sTIconfluent{} if the
+  following criteria are met:
+  \begin{enumerate}
+    \item
+      $O$ is a semilattice.
+
+    \item
+      For every $t \in T$, there exists some $s_t \in S$ such that $t(s) = s
+      \join s_t$.
+
+    \item
+      For every pair of transactions $t_1, t_2 \in T$ and for all states $s \in
+      S$, if $I(s)$, $I(t_1(s))$, and $I(t_2(s))$, then $I(t_1(s) \join
+      t_2(s))$.
+
+    \item
+      $I(s_0)$
+  \end{enumerate}
+\end{claim}
+\begin{elidableproof}
+  \newcommand{\bart}[1]{\overline{t_{#1}}}
+  \newcommand{\baru}[1]{\overline{u_{#1}}}
+  \newcommand{\bartu}[2]{\bart{#1}(\baru{#2}(s_0))}
+
+  To show that $T$ is \sTIconfluent{}, it suffices to show that $T$ is
+  \sTImergereducible{} (by \clmref{ReducibleImpliesIconfluent}).  Let
+  \[
+    e_1 = t_n(t_{n-1}(\ldots (t_1(s_0))\ldots))
+    \quad \text{and} \quad
+    e_2 = u_n(u_{m-1}(\ldots (u_1(s_0))\ldots))
+  \]
+  be two arbitrary join-free $\sTIreachable{}$ expressions that recursively.
+  For ease of notation, let
+  \[
+    \bart{i} = t_i(\ldots(t_1(s_0))\ldots)
+    \quad\text{and}\quad
+    \baru{j} = u_j(\ldots(u_1(s_0))\ldots)
+  \]
+  We prove by strong induction on $k \in \nats$ that if $k = i + j$ where $0
+  \leq i \leq n$ and $0 \leq j \leq m$, $\bartu{i}{j}$ is $\sTIreachable{}$ and
+  $eval(\bartu{i}{j}) = eval(\bart{i}(s_0) \join \bart{j}(s_0))$.
+  \begin{itemize}
+    \item \textbf{Case $k = 0$.}
+      $i = j = 0$, so $\bartu{0}{0} = s_0$ which is trivially $\sTIreachable{}$
+      and equivalent to $\bart{0}(s_0) \join \baru{0}(s_0) = s_0 \join s_0$
+      which evaluates to $s_0$.
+
+    \item \textbf{Case $k = 1$.}
+      Without loss of generality, assume $i = 1$ and $j = 0$. Then,
+      $
+        \bartu{1}{0} = t_1(s_0)
+      $ which is $\sTIreachable{}$ because it is a subexpression of $\bart{n}$
+      which is $\sTIreachable{}$. Moreover, it is equivalent to $\bart{1}(s_0)
+      \join \baru{0}(s_0) = t_1(s_0) \join s_0$ which evaluates to $s_{t_1}
+      \join s_0 \join s_0 = s_{t_1} \join s_0 = t_1(s_0)$.
+
+    \item \textbf{Case $k \geq 2$.}
+      If $i = 0$, then $j = k$ and $\baru{k}(s_0)$ is $\sTIreachable{}$ because
+      it is a subexpression of $\baru{m}(s_0)$. Also, it is equivalent to
+      $\bart{0}(s_0) \join \baru{k}(s_0)$ which evaluates to $\baru{k}(s_0)$.
+      %
+      If $j = 0$, then $i = k$ and $\bart{k}(s_0)$ is $\sTIreachable{}$ because
+      it is a subexpression of $\bart{n}(s_0)$. Also, it is equivalent to
+      $\bart{k}(s_0) \join \baru{0}(s_0)$ which evaluates to $\bart{k}(s_0)$.
+
+      Otherwise, $i, j > 1$. Let
+      \begin{align*}
+        e_{i-1,j-1} &= \bartu{i-1}{j-1} \\
+        e_{i,j-1} &= \bartu{i}{j-1} \\
+        e_{i-1,j} &= \bartu{i-1}{j}
+      \end{align*}
+      By the inductive hypothesis, $e_{i-1,j-1}$, $e_{i,j-1}$, and $e_{i-1,j}$
+      are all $\sTIreachable{}$. By condition 3 (with $s = eval(e_{i-1,j-1})$,
+      $t_1$ = $t_i$, and $t_2 = u_j$), $I(e_{i,j-1} \join e_{i-1,j})$. Thus,
+      $I(\bartu{i}{j})$, so $\bartu{i}{j}$ is $\sTIreachable{}$.
+  \end{itemize}
+\end{elidableproof}
