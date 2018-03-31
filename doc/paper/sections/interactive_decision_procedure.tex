@@ -128,6 +128,8 @@ invariant. Once $NR$ has been sufficiently augmented to the point that $I - NR$
 is a subset of the reachable states, \thmref{IclosureEquivalentIconfluence}
 guarantees that the algorithm will terminate after one more call to \IsIclosed.
 
+{\input{figures/decision_procedure_example}}
+
 \subsection{Tolerating User Error}
 \algoref{InteractiveDecisionProcedure} is an \emph{interactive} decision
 procedure. It requires that a user classify states as reachable or unreachable.
@@ -162,5 +164,3 @@ states, then deploying with $I - NR$ is equivalent to deploying with $I$. If
 $NR$ is incorrect and contains some $\sTIreachable{}$ states, then some of
 these states are artificially made unreachable, but the system is still
 guaranteed to never produce a state which violates $I$.
-
-{\input{figures/decision_procedure_example}}
