@@ -44,8 +44,8 @@ Note that unlike with transactions, servers \emph{cannot} abort a merge; server
 $p_j$ must transition from $s_j$ to $s_i \join s_j$ whether or not $s_i \join
 s_j$ satisfies the invariant.
 
-Informally, $O$ is \defword{invariant-confluent with respect to $s_0$, $T$, and
-$I$}, abbreviated \defword{\sTIconfluent{}} if every replica $s_1, \ldots, s_n$
+Informally, $O$ is \defword{invariant-confluent} with respect to $s_0$, $T$, and
+$I$, abbreviated \defword{\sTIconfluent{}}, if every replica $s_1, \ldots, s_n$
 is guaranteed to always satisfy the invariant $I$ in every possible execution
 of the system.
 
@@ -62,7 +62,7 @@ transaction $u$, transitions to state $s_5$ by executing transaction $w$, and
 then transitions to state $s_7$ by merging with server $p_1$. Similarly, server
 $p_1$ ends up with state $s_6$ after executing transactions $t$ and $v$ and
 merging with server $p_2$. In \figref{Expression}, we see the abstract syntax
-tree of the corresponding expression.
+tree of the corresponding expression for state $s_7$.
 
 {\input{figures/invariant_confluence_definitions}}
 
@@ -83,8 +83,8 @@ be the smallest predicate that satisfies the following equations:
 Similarly, we say a state $s \in S$ is $\sTIreachable{}$ if there exists a
 $\sTIreachable{}$ expression $e$ that evaluates to $s$.
 
-Finally, we say $O$ is \defword{invariant-confluent with respect to $s_0$, $T$,
-and $I$}, abbreviated \defword{\sTIconfluent{}}, if all reachable states
+Finally, we say $O$ is \defword{invariant-confluent} with respect to $s_0$,
+$T$, and $I$, abbreviated \defword{\sTIconfluent{}}, if all reachable states
 satisfy the invariant: $\setst{s \in S}{\sTIreachable{s}} \subseteq I$.
 % TODO: Make a note that this definition is different than the original, and
 % reference the appendix where we include the proof that the two definitions
