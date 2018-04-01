@@ -8,6 +8,11 @@
 \newcommand{\sTIconfluence}{\sticonfluence{s_0}{T}{I}}
 \newcommand{\sTIconfluent}{\sticonfluent{s_0}{T}{I}}
 
+\newcommand{\stipconfluence}[4]{$(#1, #2, #3, #4)$-confluence}
+\newcommand{\stipconfluent}[4]{$(#1, #2, #3, #4)$-confluent}
+\newcommand{\sTISconfluence}{\stipconfluence{s_0}{T}{I}{\Sigma}}
+\newcommand{\sTISconfluent}{\stipconfluent{s_0}{T}{I}{\Sigma}}
+
 \DeclarePairedDelimiterX{\stireachable}[4]
   {(#1, #2, #3)\text{-reachable}\ifthenelse{\equal{#4}{}}{}{(}}
   {\ifthenelse{\equal{#4}{}}{}{)}}

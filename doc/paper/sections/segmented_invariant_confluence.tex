@@ -1,1 +1,156 @@
 \section{Segmented Invariant-Confluence}\seclabel{SegmentedInvariantConfluence}
+If a distributed object is invariant-confluent, then the object can be
+replicated without the need for any form of coordination to maintain the
+object's invariant. But what if the object is \emph{not} invariant-confluent?
+In this section, we present a generalization of invariant-confluence called
+\defword{segmented invariant-confluence} that can be used to maintain the
+invariants of non-invariant-confluent objects, requiring only a small amount of
+coordination.
+
+The main idea behind segmented invariant-confluence is to segment the state
+space into a number of segments and restrict the set of allowable transactions
+within each segment in such a way that the object is invariant-confluent
+\emph{within each segment} (even though it may not be globally
+invariant-confluent). Then, servers can run coordination-free within a segment
+and need only coordinate when transitioning from one segment to another. We now
+formalize this idea by defining segmented invariant-confluence and a new system
+model to execute segmented invariant-confluent objects.
+
+\subsection{Formalism}
+Consider a distributed object $O = (S, \join)$, a start state $s_0 \in S$, a
+set of transitions $T$, and an invariant $I$. A segmentation $\Sigma = (I_1,
+T_1), \ldots, (I_n, T_n)$ is a sequence (not a set) of $n$ segments$(I_i, T_i)$
+where every $T_i$ is a subset of $T$. $O$ is \defword{segmented
+invariant-confluent} with respect to $s_0$, $T$, $I$, and $\Sigma$, abbreviated
+\defword{\sTISconfluent}, if the following conditions hold:
+\begin{itemize}
+  \item
+    The start state satisfies the invariant (i.e. $I(s_0)$).
+
+  \item
+    $I$ is covered by the invariants in $\Sigma$ (i.e. $I = \cup_{i=1}^n I_i$).
+    Note that invariants in $\Sigma$ do \emph{not} have to be disjoint. Thus,
+    they do not have to partition $I$; they just have to cover $I$.
+
+  \item
+    For every $(I_i, T_i) \in \Sigma$ and for every state $s \in I_i$, $O$ is
+    \sticonfluent{s}{T_i}{I_i}.
+\end{itemize}
+
+{\input{figures/segmented_z2}}
+
+\begin{example}\examplelabel{SegmentedZ2}
+  Consider again the object $O = (\ints \times \ints, \join)$, transactions $T
+  = \set{t_{x+1}, t_{y-1}}$, and invariant $I = \setst{(x, y)}{xy \leq 0}$ from
+  \exampleref{Z2}, but now let the start state $s_0$ be $(-42, 42)$. $O$ is
+  \emph{not} \sTISconfluent{} because the points $(0, 42)$ and $(42, 0)$ are
+  reachable, and merging these points yields $(42, 42)$ which violates the
+  invariant. However, $O$ is \sTISconfluent{} for $\Sigma = (I_1, T_1)$, $(I_2,
+  T_2)$, $(I_3, T_3)$, $(I_4, T_4)$ where
+  \begin{align*}
+    I_1 &= \setst{(x, y)}{x < 0, y > 0}       &T_1 &= \set{t_{x+1}, t_{y-1}} \\
+    I_2 &= \setst{(x, y)}{x \geq 0, y \leq 0} &T_2 &= \set{t_{x+1}, t_{y-1}} \\
+    I_3 &= \setst{(x, y)}{x = 0}              &T_3 &= \set{t_{y-1}} \\
+    I_4 &= \setst{(x, y)}{y = 0}              &T_4 &= \set{t_{x+1}}
+  \end{align*}
+  $\Sigma$ is illustrated in \figref{SegmentedZ2}. Clearly, $s_0$ satisfies the
+  invariant, and $I_1, I_2, I_3, I_4$ cover $I$. Moreover, for every $(I_i,
+  T_i) \in \Sigma$, we see that $O$ is \iclosed{I_i}, so $O$ is
+  \sticonfluent{s}{T_i}{I_I} for every $s \in I_i$. Thus, $O$ is
+  \sTISconfluent{}.
+\end{example}
+
+\subsection{System Model}
+Now, we describe a new system model used to replicate a segmented
+invariant-confluent object with coordination-free execution within a segment
+and a small amount of coordination to transition between segments. As before,
+we replicate an object $O$ across a set $p_1, \ldots, p_n$ of $n$ servers each
+of which manages a replica $s_i \in S$ of the object. Every server begins with
+$s_0$, $T$, $I$, and $\Sigma$. Moreover, at any given point in time, a server
+designates one of the segments in $\Sigma$ as its \defword{active segment}.
+Initially, every server chooses the first segment $(I_i, T_i) \in \Sigma$ such
+that $I_i(s_0)$ to be its active segment. We'll see momentarily the
+significance of the active segment.
+
+As before, servers repeatedly perform one of two actions: execute a transaction
+or merge states with another server. Merging states in the new system model is
+identical to merging states in the old system model. A server $p_i$ sends its
+state $s_i$ to another server $p_j$ which \emph{must} merge $s_i$ into its
+state $s_j$.
+%
+Transaction execution in the new system model, on the other hand, is a bit more
+involved. Consider a server $s_i$ with active segment $(I_i, T_i)$. A client
+can request that $p_i$ execute a transaction $t \in T$. We consider what
+happens when $t \in T_i$ and $t \notin T_i$ separately.
+
+If $t \notin T_i$, then $p_i$ initiates a round of global coordination to
+execute $t$. During global coordination, every server temporarily stops
+processing and transitions to state $s = s_1 \join \ldots \join s_n$, the join
+of every server's state. Then, every server speculatively executes $t$
+transitioning to state $t(s)$. If $t(s)$ violates the invariant (i.e.  $\lnot
+I(t(s))$), then every server aborts $t$ and reverts to state $s$.  Then, $p_i$
+replies to the client. If $t(s)$ satisfies the invariant (i.e. $I(t(s))$), then
+every server commits $t$ and remains in state $t(s)$. Every server then chooses
+the first segment $(I_i, T_i) \in \Sigma$ such that $I_i(t(s))$ to be the new
+active segment. Note that such a segment is guaranteed to exist because the
+segment invariants cover $I$. Moreover, $\Sigma$ is ordered, so every server
+will deterministically pick the same active segment. In fact, an invariant of
+the system model is that at any given point of normal processing, every server
+has the same active segment.
+
+$t \in T_i$, then $p_i$ executes $t$ immediately and without coordination. If
+$t(s_i)$ satisfies the \emph{active} invariant (i.e. $I_i(t(s_i))$), then $p_i$
+commits $t$, stays in state $t(s_0)$, and replies to the client. If $t(s_i)$
+violates the invariant (i.e.  $i.e. \lnot I(t(s_i))$), then $p_i$ aborts $t$,
+reverts to state $s_i$, and replies to the client. If $t(s_i)$ satisfies the
+invariant but violates the active invariant (i.e. $I(t(s_i))$ but $\lnot
+I_i(t(s_i))$), then $p_i$ reverts to state $s_i$ and initiates a round of
+global coordination to execute $t$, as described in the previous paragraph.
+Transaction execution is summarized in \algoref{TxnExecution}.
+
+\begin{algorithm}[t]
+  \caption{Transaction execution in new system model}%
+  \algolabel{TxnExecution}
+  \begin{algorithmic}
+    \If{$t \notin T_i$}
+      \State Execute $t$ with global coordination
+    \Else{}
+      \If{$I_i(t(s_i))$} Commit $t$
+      \ElsIf{$\lnot I(t(s_i))$} Abort $t$
+      \Else{} Execute $t$ with global coordination
+      \EndIf{}
+    \EndIf{}
+  \end{algorithmic}
+\end{algorithm}
+
+% why does this work
+
+\subsection{Discussion}
+% generalizes locking
+% contiuous generalization of invariant-confluence
+
+% The motivate the main idea behind segmented invariant-confluence, let's revisit
+% \exampleref{Z2} but with a different start state.
+%
+% \begin{example}
+%   Consider again the object $O = (\ints \times \ints, \join)$, transactions $T
+%   = \set{t_{x+1}, t_{y-1}}$, and invariant $I = \setst{(x, y)}{xy \leq 0}$ from
+%   \exampleref{Z2}, but now let our start state $s_0$ be $(-10, 10)$. Now, $O$
+%   is \emph{not} \sTIconfluent{}. From $(-10, 10)$, we can reach the points $(0,
+%   10)$ and $(10, 0)$, and merging these together we reach $(10, 10)$ which
+%   violates the invariant.
+%   %
+%   However, all is not lost. If we're determined to make $O$
+%   invariant-confluent, we can do so in one of two ways.
+%   \begin{enumerate}
+%     \item
+%       We can modify the invariant. $O$ may not be \sTIconfluent, but it is
+%       \sticonfluent{s_0}{T}{\setst{(x, y)}{x \leq 0, y \geq 0}}. If we eliminate
+%       the fourth quadrant from the invariant, $O$ becomes invariant-confluent.
+%     \item
+%       We can disallow some transactions. $O$ may not be \sTIconfluent, but
+%       it is \sticonfluent{s_0}{\set{t_{x+1}}}{I}. If we disallow the $t_{y-1}$
+%       transaction, $O$ becomes invariant-confluent.
+%   \end{enumerate}
+%   While these two modifications are possible, neither is desirable. Artificially making some invariant-satisfying states unreachable---either by restricting the invariant or disallowing some transactions---is most likely a bit of a hack. Plus,
+% \end{example}
