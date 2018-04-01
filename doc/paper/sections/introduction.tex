@@ -67,15 +67,14 @@ invariant-confluence to that of determining invariant-closure.
 
 Then, we use these conditions to design a general-purpose interactive
 invariant-confluence decision procedure. Users iteratively interact with the
-decision procedure, eliminating unreachable states from the invariant and
-moving towards the conditions under which invariant-closure and
-invariant-confluence are equivalent. Meanwhile, the decision-procedure
-generates example reachable and unreachable states which help the user
-recognize patterns that describe reachability. We also leverage our intuitions
-about reachability to develop a new sufficient condition for
-invariant-confluence, dubbed merge-reducibility. Merge-reducibility covers some
-cases that are not covered by invariant-closure, and it can be automatically
-checked without any user interaction.
+decision procedure, eliminating unreachable states from the invariant, moving
+towards the conditions under which invariant-closure and invariant-confluence
+are equivalent. Meanwhile, the decision-procedure generates example reachable
+and unreachable states which help the user recognize patterns that describe
+reachability. We also leverage our intuitions about reachability to develop a
+new sufficient condition for invariant-confluence, dubbed merge-reducibility.
+Merge-reducibility covers some cases that are not covered by invariant-closure,
+and it can be automatically checked without any user interaction.
 
 % Then, we use our insight to develop a general purpose interactive invariant-confluence decision procedure. Users continuously interact with the decision procedure to eleiminate unreachabel states from the invariant. Meanwhile, the decision procedure provides examples to the user that they can use to identify which points are reachable and which are not. This decision procedure can be used to show lots of things are invariant-confluent, and is also robust to user error.
 
