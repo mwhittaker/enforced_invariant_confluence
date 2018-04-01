@@ -36,9 +36,9 @@ object actually is invariant-confluent remain a challenge. Bailis et al.\
 manually categorized a set of common objects, transactions, and invariants
 (e.g.\ foreign key constraints on relations, linear constraints on integers) as
 invariant-confluent or not, but ideally we would have a general purpose program
-that can automatically determine invariant-confluence for us. \textbf{The main
-thrust of this paper is to make progress towards a general-purpose
-invariant-confluence decision procedure.}
+that can automatically determine invariant-confluence for us. The main thrust
+of this paper is to make progress towards a general-purpose
+invariant-confluence decision procedure.
 
 % Is it possible to have our cake and eat it to? Can we maintain invariants without coordination? For some applications, yes. Invariant confluence (cite bailis) introduced a necessary and sufficient condition for when its possible to have coordination free replication while maintiang invariants. If somethign is iconfluent, it can be replicated wihtout coordination. However, determining whethere something is invariant-confluent is a very challening task. Bailis recognized some patterns of things which are invariant confluent, but ideally we would have a general purpose program to automatically determine it for us. The ultimate goal of this paper is to... In this paper, we make progress towards a more-general purpose iconfluence decision procedure, improving on the current state-of-the-art approaches.
 
