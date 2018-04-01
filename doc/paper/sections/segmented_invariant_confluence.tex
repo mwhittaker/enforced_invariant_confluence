@@ -123,34 +123,61 @@ Transaction execution is summarized in \algoref{TxnExecution}.
   \end{algorithmic}
 \end{algorithm}
 
-% why does this work
+This system model guarantees that all replicas of a segmented
+invariant-confluent object always satisfy the invariant. All servers begin in
+the same initial state and with the same active segment. Thus, because $O$ is
+invariant-confluent with respect to every segment, servers can execute
+transactions within the active segment without any coordination and guarantee
+that the invariant is never violated. Any operation that would violate the
+assumptions of invariant-confluence system model (e.g.\ executing a transaction
+that's not permitted in the active segment or executing a permitted transaction
+that leads to a state outside the active segment) triggers a global
+coordination. Globally coordinated transactions are only executed if they
+maintain the invariant. Moreover, if a globally coordinated transaction leads
+to another segment, the coordination ensures that all servers begin in the same
+start state and with the same active replica, reestablishing the assumptions of
+the invariant-confluence system model.
 
 \subsection{Discussion}
-% generalizes locking
-% contiuous generalization of invariant-confluence
+There are a couple of things worth noting about segmented invariant-confluence
+and its system model. First, invariant-confluence is a very coarse-grained
+property. If an object is invariant-confluent, then we can replicate it with no
+coordination. If it is not invariant-confluent, then we have no guarantees.
+There's no in-between. Segmented invariant-confluence, on the other hand, is a
+much more fine-grained property that can be applied to applications with
+varying degrees of complexity.  Segmented invariant-confluence provides
+guarantees to complex applications that require a large number of segments and
+to simple applications with a smaller number of segments, whereas
+invariant-confluence only provides guarantees to applications that can be
+segmented into a single segment.
 
-% The motivate the main idea behind segmented invariant-confluence, let's revisit
-% \exampleref{Z2} but with a different start state.
-%
-% \begin{example}
-%   Consider again the object $O = (\ints \times \ints, \join)$, transactions $T
-%   = \set{t_{x+1}, t_{y-1}}$, and invariant $I = \setst{(x, y)}{xy \leq 0}$ from
-%   \exampleref{Z2}, but now let our start state $s_0$ be $(-10, 10)$. Now, $O$
-%   is \emph{not} \sTIconfluent{}. From $(-10, 10)$, we can reach the points $(0,
-%   10)$ and $(10, 0)$, and merging these together we reach $(10, 10)$ which
-%   violates the invariant.
-%   %
-%   However, all is not lost. If we're determined to make $O$
-%   invariant-confluent, we can do so in one of two ways.
-%   \begin{enumerate}
-%     \item
-%       We can modify the invariant. $O$ may not be \sTIconfluent, but it is
-%       \sticonfluent{s_0}{T}{\setst{(x, y)}{x \leq 0, y \geq 0}}. If we eliminate
-%       the fourth quadrant from the invariant, $O$ becomes invariant-confluent.
-%     \item
-%       We can disallow some transactions. $O$ may not be \sTIconfluent, but
-%       it is \sticonfluent{s_0}{\set{t_{x+1}}}{I}. If we disallow the $t_{y-1}$
-%       transaction, $O$ becomes invariant-confluent.
-%   \end{enumerate}
-%   While these two modifications are possible, neither is desirable. Artificially making some invariant-satisfying states unreachable---either by restricting the invariant or disallowing some transactions---is most likely a bit of a hack. Plus,
-% \end{example}
+Second, segmented invariant-confluence can naturally model distributed locking.
+One approach to replicating non-invariant-confluent objects is to recognize
+which transactions cannot be safely executed concurrently and then require them
+to acquire a distributed lock before executing~\cite{balegas2015putting,
+gotsman2016cause}. For example, in a banking application with the invariant
+that all balances remain positive, concurrent deposits are permitted, but
+concurrent withdrawals can lead to invariant violations, thus forcing
+withdrawals to first acquire a distributed lock before executing. To model this
+locking with segmented invariant-confluence, we simply remove lock-acquiring
+transactions from every segment's set of transactions. Consequently, executing
+these transactions are executed with global coordination, achieving the same
+effect as acquiring a distributed lock. In fact, segmented invariant-confluence
+can be used to model more fine-grained locking. Omitting a transaction from
+only certain segments is analogous to requiring a transaction to acquire a
+distributed lock only when certain conditions are met.
+
+% TODO: Forward reference examples in the evaluation section.
+
+Third, we can integrate a couple of optimizations into our system model to
+further reduce the amount of coordination required. First, if a server with
+state $s_i$ and active segment $(I_i, T_i)$ receives a transaction $t \in I_i$
+to execute, and $t(s_i)$ violates the active invariant but not the global
+invariant, instead of initiating a round of global coordination, $p_i$ can
+simply buffer $t$ for re-execution at a later time. While this increases the
+latency required to execute $t$, it's possible that after other transactions
+are executed, re-executing $t$ may lead to a state that either satisfies the
+active invariant or violates the global invariant. In either case, a round of
+global coordination is avoided. Similarly, servers can buffer transactions that
+require global coordination, executing an entire batch of these transactions
+during a single round of global coordination.
