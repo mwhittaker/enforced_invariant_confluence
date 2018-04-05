@@ -30,6 +30,23 @@
   {\ifthenelse{\equal{#1}{}}{}{)}}
   {#1}
 
+\DeclarePairedDelimiterX{\ticoreachable}[3]
+  {(#1, #2)\text{-coreachable}\ifthenelse{\equal{#3}{}}{}{(}}
+  {\ifthenelse{\equal{#3}{}}{}{)}}
+  {#3}
+\DeclarePairedDelimiterX{\TIcoreachable}[1]
+  {(T, I)\text{-coreachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {\ifthenelse{\equal{#1}{}}{}{)}}
+  {#1}
+\DeclarePairedDelimiterX{\ticounreachable}[3]
+  {(#1, #2)\text{-counreachable}\ifthenelse{\equal{#3}{}}{}{(}}
+  {\ifthenelse{\equal{#3}{}}{}{)}}
+  {#3}
+\DeclarePairedDelimiterX{\TIcounreachable}[1]
+  {(T, I)\text{-counreachable}\ifthenelse{\equal{#1}{}}{}{(}}
+  {\ifthenelse{\equal{#1}{}}{}{)}}
+  {#1}
+
 \newcommand{\iclosed}[1]{$#1$-closed}
 \newcommand{\Iclosed}{\iclosed{I}}
 \newcommand{\iclosure}[1]{$#1$-closure}

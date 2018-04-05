@@ -5,13 +5,14 @@
 
 \newcommand{\algocomment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
 \begin{algorithm}[t]
-  \caption{Interactive Invariant-Confluence Decision Procedure}%
+  \caption{Interactive invariant-confluence decision procedure}%
   \algolabel{InteractiveDecisionProcedure}
   \begin{algorithmic}
+    \algocomment{Return if $O$ is \sTIconfluent{}.}
     \Function{IsInvConfluent}{$O$, $s_0$, $T$, $I$}
-    \State
-    \Return $I(s_0)$ and
-    \Call{Helper}{$O$, $s_0$, $T$, $I$, $\set{s_0}$, $\emptyset$}
+      \State
+        \Return $I(s_0)$ and
+        \Call{Helper}{$O$, $s_0$, $T$, $I$, $\set{s_0}$, $\emptyset$}
     \EndFunction
 
     \State
@@ -20,16 +21,16 @@
     \algocomment{$NR$ is a set of $\sTIunreachable{}$ states.}
     \algocomment{$I(s_0)$ is a precondition.}
     \Function{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
-    \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I - NR$}
-    \If {closed}
-      \State \Return true
-    \EndIf
-    \State Augment $R$ and $NR$ with random search and user input
-    \If{$s_1, s_2 \in R$}
-    \Return false
-    \Else\
-    \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
-    \EndIf
+      \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I - NR$}
+      \If {closed}
+        \State \Return true
+      \EndIf
+      \State Augment $R$ and $NR$ with random search and user input
+      \If{$s_1, s_2 \in R$}
+        \Return false
+      \Else\
+        \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
+      \EndIf
     \EndFunction
   \end{algorithmic}
 \end{algorithm}

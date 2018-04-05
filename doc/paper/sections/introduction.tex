@@ -36,9 +36,9 @@ object actually is invariant-confluent remain a challenge. Bailis et al.\
 manually categorized a set of common objects, transactions, and invariants
 (e.g.\ foreign key constraints on relations, linear constraints on integers) as
 invariant-confluent or not, but ideally we would have a general purpose program
-that can automatically determine invariant-confluence for us. The main thrust
-of this paper is to make progress towards a general-purpose
-invariant-confluence decision procedure.
+that can automatically determine invariant-confluence for us. \textbf{The first
+main thrust of this paper is to make progress towards a general-purpose
+invariant-confluence decision procedure.}
 
 % Is it possible to have our cake and eat it to? Can we maintain invariants without coordination? For some applications, yes. Invariant confluence (cite bailis) introduced a necessary and sufficient condition for when its possible to have coordination free replication while maintiang invariants. If somethign is iconfluent, it can be replicated wihtout coordination. However, determining whethere something is invariant-confluent is a very challening task. Bailis recognized some patterns of things which are invariant confluent, but ideally we would have a general purpose program to automatically determine it for us. The ultimate goal of this paper is to... In this paper, we make progress towards a more-general purpose iconfluence decision procedure, improving on the current state-of-the-art approaches.
 
@@ -80,18 +80,18 @@ and it can be automatically checked without any user interaction.
 
 % While the general purpose interaactive dp is good, it does rely on user input. We additionally invent a new sufficient condition for invariant-confluence known as merge-reducbility which exploits the insigths from the previous theory. This new sufficient condition can handle cases that invariant-closure cannot and doesn't require user feedback.
 
-Next, we take a step beyond invariant-confluence and develop a generalization
-of invariant-confluence called segmented invariant-confluence. While
-invariant-confluence characterizes objects which can be replicated
-\emph{without any} coordination, segmented invariant-confluence allows us to
-replicate non-invariant-confluent objects with \emph{minimal coordination}. The
-main idea is that invariant-satisfying states are divided into a number of
-segments, and the set of allowable of transactions within each segment is
-restricted. Within a segment, servers act without any coordination,
-synchronizing only to transition across segment boundaries. This design
-highlights the trade-off between application complexity and
-coordination-freedom; more complex applications require more segments which
-require more coordination, and vice-versa.
+\textbf{The second main thrust of this paper is to take a step beyond
+invariant-confluence and develop a generalization of invariant-confluence
+called segmented invariant-confluence.} While invariant-confluence
+characterizes objects which can be replicated \emph{without any} coordination,
+segmented invariant-confluence allows us to replicate non-invariant-confluent
+objects with \emph{minimal coordination}. The main idea is that
+invariant-satisfying states are divided into a number of segments, and the set
+of allowable of transactions within each segment is restricted. Within a
+segment, servers act without any coordination, synchronizing only to transition
+across segment boundaries. This design highlights the trade-off between
+application complexity and coordination-freedom; more complex applications
+require more segments which require more coordination, and vice-versa.
 
 % Finally, we address the elephant in the room and ask the question, what if something is not invariant-confluent though? We develop a generalization of invariant-confluence called segmented invariant-confluence. While invariant-confluence only characterizes objects which can be replicated without any coordination, segmented invariant-confluence allows us to replicate objects with minimal coordination. This approach also generalizes existing lock based approaches to handling non-invariant-confluent stuff.
 
