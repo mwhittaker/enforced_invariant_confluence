@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
   }
 
   const std::string cluster_filename = argv[0];
-  const int index = std::stoi(argv[1]);
+  const int index = std::atoi(argv[1]);
   const std::string mode = argv[2];
   (void)cluster_filename;
   (void)index;

@@ -14,6 +14,8 @@ class HostPort : public ComparableByKey<HostPort, HostPortKey> {
  public:
   HostPort(std::string host, std::uint16_t port);
   HostPort(const HostPortProto& proto);
+  const std::string& Host() const;
+  std::uint16_t Port() const;
 
   friend std::ostream& operator<<(std::ostream& out,
                                   const HostPort& host_port) {
