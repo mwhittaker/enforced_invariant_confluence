@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package two_ints;
+
+enum TransactionType {
+  INCREMENT_X = 0;
+  DECREMENT_Y = 1;
+}
+
+message Transaction {
+  required TransactionType type = 1;
+}

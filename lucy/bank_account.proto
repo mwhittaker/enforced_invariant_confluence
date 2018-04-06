@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package bank_account;
+
+enum TransactionType {
+  DEPOSIT = 0;
+  WITHDRAW = 1;
+}
+
+message Transaction {
+  required TransactionType type = 1;
+  required int64 amount = 2;
+}
