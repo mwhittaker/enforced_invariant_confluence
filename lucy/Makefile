@@ -15,13 +15,20 @@ PROTO_OBJECTS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.o))
 BINARIES = two_ints_main \
 		   echo_client \
 		   echo_server \
-		   bank_account_client_main
+		   bank_account_client_main \
+		   server_main
 BINARY_SOURCES = $(addsuffix .cc, $(BINARIES))
-SOURCES = $(filter-out $(BINARY_SOURCES), $(wildcard *.cc))
-OBJECTS = $(addprefix $(BIN)/, $(SOURCES:%.cc=%.o)) $(PROTO_OBJECTS)
+BINARY_OBJECTS = $(addprefix $(BIN)/, $(addsuffix .o, $(BINARIES)))
+SOURCES = $(wildcard *.cc)
+OBJECTS = $(addprefix $(BIN)/, $(SOURCES:%.cc=%.o))
+NON_BINARY_OBJECTS = $(filter-out $(BINARY_OBJECTS), $(OBJECTS))
 
 default: all
-all: $(BIN) $(PROTO_HEADERS) $(OBJECTS) $(BINARIES)
+all: $(BIN) $(PROTO_HEADERS) $(PROTO_OBJECTS) $(OBJECTS) $(BINARIES)
+
+# See http://scottmcpeak.com/autodepend/autodepend.html.
+-include $(PROTO_OBJECTS:.o=.d)
+-include $(OBJECTS:.o=.d)
 
 $(BIN):
 	mkdir -p $(BIN)
@@ -29,12 +36,15 @@ $(BIN):
 $(BIN)/%.pb.h: %.proto
 	protoc --cpp_out=$(BIN) $<
 
-$(BIN)/%.h: %.cc
-
-$(BIN)/%.o: %.cc %.h
+$(PROTO_OBJECTS): $(BIN)/%.o: $(BIN)/%.cc
 	$(CXX) $(CXXFLAGS) $< -c -o $@
+	$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
 
-$(BINARIES): %: %.cc $(OBJECTS)
+$(OBJECTS): $(BIN)/%.o: %.cc
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+	$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
+
+$(BINARIES): %: $(BIN)/%.o $(PROTO_OBJECTS) $(NON_BINARY_OBJECTS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 .PHONY: clean
