@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+message MergeRequest {
+  required bytes object = 1;
+}
+
+message TxnRequest {
+  required bytes txn = 1;
+}
+
+message TxnReply {
+  required bytes reply = 1;
+}
+
+message ServerMessage {
+  enum Type {
+    MERGE_REQUEST = 0;
+    TXN_REQUEST = 1;
+    TXN_REPLY = 2;
+  }
+
+  required Type type = 1;
+  optional MergeRequest merge_request = 2;
+  optional TxnRequest txn_request = 3;
+  optional TxnReply txn_reply = 4;
+}

@@ -1,13 +1,59 @@
 syntax = "proto2";
 
-package bank_account;
-
-enum TransactionType {
-  DEPOSIT = 0;
-  WITHDRAW = 1;
+message BankAccountProto {
+  repeated int64 p = 1;
+  repeated int64 n = 2;
 }
 
-message Transaction {
-  required TransactionType type = 1;
-  required int64 amount = 2;
+// Deposit.
+message BankAccountDepositRequest {
+  required int64 amount = 1;
+}
+
+message BankAccountDepositReply {
+  enum Result {
+    COMMITTED = 0;
+    ABORTED = 1;
+  }
+  required Result result = 1;
+}
+
+// Withdraw.
+message BankAccountWithdrawRequest {
+  required int64 amount = 1;
+}
+
+message BankAccountWithdrawReply {
+  enum Result {
+    COMMITTED = 0;
+    ABORTED = 1;
+  }
+  required Result result = 1;
+}
+
+// Get.
+message BankAccountGetRequest {
+}
+
+message BankAccountGetReply {
+  required int64 value = 1;
+}
+
+// Request and reply.
+message BankAccountTxnRequest {
+  enum Type {
+    DEPOSIT = 0;
+    WITHDRAW = 1;
+    GET = 2;
+  }
+  required Type type = 1;
+  optional BankAccountDepositRequest deposit_request = 2;
+  optional BankAccountWithdrawRequest withdraw_request = 3;
+  optional BankAccountGetRequest get_request = 4;
+}
+
+message BankAccountTxnReply {
+  optional BankAccountDepositReply deposit_reply = 1;
+  optional BankAccountWithdrawReply withdraw_reply = 2;
+  optional BankAccountGetReply get_reply = 3;
 }

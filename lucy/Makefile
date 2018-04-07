@@ -12,7 +12,10 @@ PROTO_HEADERS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.h))
 PROTO_SOURCES = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.cc))
 PROTO_OBJECTS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.o))
 
-BINARIES = two_ints_main echo_client echo_server
+BINARIES = two_ints_main \
+		   echo_client \
+		   echo_server \
+		   bank_account_client_main
 BINARY_SOURCES = $(addsuffix .cc, $(BINARIES))
 SOURCES = $(filter-out $(BINARY_SOURCES), $(wildcard *.cc))
 OBJECTS = $(addprefix $(BIN)/, $(SOURCES:%.cc=%.o)) $(PROTO_OBJECTS)

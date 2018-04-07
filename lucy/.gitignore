@@ -1,4 +1,6 @@
 bin/
+
+bank_account_client_main
 echo_client
 echo_server
 two_ints_main

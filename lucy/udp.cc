@@ -75,5 +75,7 @@ void UdpSocket::RecvFrom(std::string* msg, UdpAddress* addr) {
                reinterpret_cast<struct sockaddr*>(&src_addr), &addrlen);
   CHECK_NE(num_recv, -1) << std::strerror(num_recv);
   *msg = std::string(buf, num_recv);
-  *addr = UdpAddress(src_addr);
+  if (addr != nullptr) {
+    *addr = UdpAddress(src_addr);
+  }
 }

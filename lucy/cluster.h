@@ -6,16 +6,23 @@
 
 #include "cluster.pb.h"
 #include "host_port.h"
+#include "udp.h"
 
 class Cluster {
  public:
   Cluster(const std::string& filename);
   Cluster(const ClusterProto& proto);
-  Cluster(std::vector<HostPort> servers);
-  const std::vector<HostPort>& Servers() const;
+  Cluster(std::vector<HostPort> host_ports);
+
+  std::size_t Size() const;
+  const std::vector<HostPort>& HostPorts() const;
+  const std::vector<UdpAddress>& UdpAddrs() const;
 
  private:
-  std::vector<HostPort> servers_;
+  void InitFromProto(const ClusterProto& proto);
+
+  std::vector<HostPort> host_ports_;
+  std::vector<UdpAddress> udp_addrs_;
 };
 
 #endif  //  CLUSTER_H_

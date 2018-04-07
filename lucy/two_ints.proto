@@ -1,12 +1,22 @@
 syntax = "proto2";
 
-package two_ints;
-
-enum TransactionType {
-  INCREMENT_X = 0;
-  DECREMENT_Y = 1;
+message TwoIntsProto {
+  required int64 x = 1;
+  required int64 y = 2;
 }
 
-message Transaction {
-  required TransactionType type = 1;
+message TwoIntsTxnRequest {
+  enum Type {
+    INCREMENT_X = 0;
+    DECREMENT_Y = 1;
+  }
+  required Type type = 1;
+}
+
+message TwoIntsTxnReply {
+  enum Result {
+    COMMITTED = 0;
+    ABORTED = 1;
+  }
+  required Result result = 1;
 }
