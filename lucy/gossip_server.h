@@ -7,9 +7,8 @@
 
 class GossipServer : public Server {
  public:
-  GossipServer(Cluster cluster, int index, Object* object)
-      : Server(std::move(cluster), index, object),
-        socket_(cluster_.UdpAddrs()[index]) {}
+  GossipServer(const Cluster& cluster, int index, Object* object)
+      : Server(cluster, index, object), socket_(cluster.UdpAddrs()[index]) {}
 
   void Run() override;
 

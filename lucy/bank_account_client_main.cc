@@ -20,6 +20,17 @@ void ReplUsage() {
   std::cout << "get | deposit <n> | withdraw <n>" << std::endl;
 }
 
+std::string ResultToString(BankAccountClient::Result result) {
+  switch (result) {
+    case BankAccountClient::COMMITTED:
+      return "committed";
+    case BankAccountClient::ABORTED:
+      return "aborted";
+    default:
+      LOG(FATAL) << "Unexpected BankAccountClient::Result.";
+  }
+}
+
 }  // namespace
 
 int main(int argc, char* argv[]) {
@@ -43,9 +54,13 @@ int main(int argc, char* argv[]) {
     if (words.size() == 1 && words[0] == "get") {
       std::cout << client.Get(dst_addr) << std::endl;
     } else if (words.size() == 2 && words[0] == "deposit") {
-      client.Deposit(std::stoi(words[1]), dst_addr);
+      BankAccountClient::Result result =
+          client.Deposit(std::stoi(words[1]), dst_addr);
+      std::cout << ResultToString(result) << std::endl;
     } else if (words.size() == 2 && words[0] == "withdraw") {
-      client.Withdraw(std::stoi(words[1]), dst_addr);
+      BankAccountClient::Result result =
+          client.Withdraw(std::stoi(words[1]), dst_addr);
+      std::cout << ResultToString(result) << std::endl;
     } else {
       ReplUsage();
     }

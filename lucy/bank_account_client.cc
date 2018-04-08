@@ -7,6 +7,7 @@
 std::int64_t BankAccountClient::Get(const UdpAddress& dst_addr) {
   BankAccountTxnRequest request;
   request.set_type(BankAccountTxnRequest::GET);
+  request.mutable_get_request();
   std::string request_str;
   request.SerializeToString(&request_str);
 

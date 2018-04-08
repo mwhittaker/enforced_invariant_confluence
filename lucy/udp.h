@@ -22,7 +22,7 @@ class UdpAddress {
   friend std::ostream& operator<<(std::ostream& out, const UdpAddress& addr) {
     char s[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(addr.addr_.sin_addr), s, INET_ADDRSTRLEN);
-    out << s << ":" << addr.addr_.sin_port;
+    out << s << ":" << ntohs(addr.addr_.sin_port);
     return out;
   }
 

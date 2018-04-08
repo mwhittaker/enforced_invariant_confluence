@@ -5,6 +5,8 @@
 #include "rand_util.h"
 
 void GossipServer::Run() {
+  LOG(INFO) << "GossipServer running on " << cluster_.UdpAddrs()[index_] << ".";
+
   while (true) {
     std::string msg;
     UdpAddress src_addr;
@@ -16,10 +18,12 @@ void GossipServer::Run() {
       case ServerMessage::MERGE_REQUEST: {
         CHECK(proto.has_merge_request());
         HandleMergeRequest(proto.merge_request(), src_addr);
+        break;
       }
       case ServerMessage::TXN_REQUEST: {
         CHECK(proto.has_txn_request());
         HandleTxnRequest(proto.txn_request(), src_addr);
+        break;
       }
       default: { LOG(FATAL) << "Unexpected server message type"; }
     }
@@ -43,14 +47,16 @@ void GossipServer::Run() {
 
 void GossipServer::HandleMergeRequest(const MergeRequest& merge_request,
                                       const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received MergeRequest from " << src_addr << ".";
+  DLOG(INFO) << "[" << num_requests_serviced_ << "] Received MergeRequest from "
+             << src_addr << ".";
   (void)src_addr;
   object_->Merge(merge_request.object());
 }
 
 void GossipServer::HandleTxnRequest(const TxnRequest& txn_request,
                                     const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received TxnRequest from " << src_addr << ".";
+  DLOG(INFO) << "[" << num_requests_serviced_ << "] Received TxnRequest from "
+             << src_addr << ".";
   ServerMessage msg;
   msg.set_type(ServerMessage::TXN_REPLY);
   msg.mutable_txn_reply()->set_reply(object_->Run(txn_request.txn()));

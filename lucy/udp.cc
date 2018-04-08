@@ -22,6 +22,7 @@ UdpAddress::UdpAddress(const HostPort& host_port) {
   hints.ai_flags = 0;
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_protocol = 0;
   addr_ = GetAddrInfo(node.c_str(), service.c_str(), &hints);
 }
 
@@ -46,23 +47,23 @@ struct sockaddr_in UdpAddress::GetAddrInfo(const char* node,
 
 UdpSocket::UdpSocket() {
   socket_ = socket(AF_INET, SOCK_DGRAM, /*protocol=*/0);
-  CHECK_NE(socket_, -1) << std::strerror(socket_);
+  CHECK_NE(socket_, -1) << std::strerror(errno);
   int n = 1;
   int status = setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR,
                           reinterpret_cast<char*>(&n), sizeof(n));
-  CHECK_NE(status, -1) << std::strerror(status);
+  CHECK_NE(status, -1) << std::strerror(errno);
 }
 
 UdpSocket::UdpSocket(const UdpAddress& addr) : UdpSocket() {
   int status = bind(socket_, addr.SockAddr(), addr.SockAddrLen());
-  CHECK_NE(status, -1) << std::strerror(status);
+  CHECK_NE(status, -1) << std::strerror(errno);
 }
 
 void UdpSocket::SendTo(const std::string& msg, const UdpAddress& addr) {
   CHECK_LE(msg.size(), MAX_MESSAGE_SIZE) << msg.size();
   int num_sent = sendto(socket_, msg.c_str(), msg.size(), /*flags=*/0,
                         addr.SockAddr(), sizeof(struct sockaddr_in));
-  CHECK_NE(num_sent, -1) << std::strerror(num_sent);
+  CHECK_NE(num_sent, -1) << std::strerror(errno);
   CHECK_EQ(num_sent, msg.size()) << num_sent << ", " << msg.size();
 }
 
@@ -73,7 +74,7 @@ void UdpSocket::RecvFrom(std::string* msg, UdpAddress* addr) {
   int num_recv =
       recvfrom(socket_, buf, MAX_MESSAGE_SIZE, /*flags=*/0,
                reinterpret_cast<struct sockaddr*>(&src_addr), &addrlen);
-  CHECK_NE(num_recv, -1) << std::strerror(num_recv);
+  CHECK_NE(num_recv, -1) << std::strerror(errno);
   *msg = std::string(buf, num_recv);
   if (addr != nullptr) {
     *addr = UdpAddress(src_addr);

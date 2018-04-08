@@ -6,7 +6,7 @@
 
 class Server {
  public:
-  Server(Cluster cluster, int index, Object* object);
+  Server(const Cluster& cluster, int index, Object* object);
   virtual void Run() = 0;
 
  protected:
