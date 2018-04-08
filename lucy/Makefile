@@ -20,11 +20,18 @@ BINARIES = two_ints_main \
 BINARY_SOURCES = $(addsuffix .cc, $(BINARIES))
 BINARY_OBJECTS = $(addprefix $(BIN)/, $(addsuffix .o, $(BINARIES)))
 SOURCES = $(wildcard *.cc)
+HEADERS = $(wildcard *.h)
 OBJECTS = $(addprefix $(BIN)/, $(SOURCES:%.cc=%.o))
 NON_BINARY_OBJECTS = $(filter-out $(BINARY_OBJECTS), $(OBJECTS))
 
 default: all
-all: $(BIN) $(PROTO_HEADERS) $(PROTO_OBJECTS) $(OBJECTS) $(BINARIES)
+all: $(BIN) \
+	 $(PROTO_HEADERS) \
+	 $(PROTO_OBJECTS) \
+	 $(OBJECTS) \
+	 $(BINARIES) \
+	 tags \
+	 .syntastic_cpp_config
 
 # See http://scottmcpeak.com/autodepend/autodepend.html.
 -include $(PROTO_OBJECTS:.o=.d)
@@ -46,6 +53,15 @@ $(OBJECTS): $(BIN)/%.o: %.cc
 
 $(BINARIES): %: $(BIN)/%.o $(PROTO_OBJECTS) $(NON_BINARY_OBJECTS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+
+tags: $(PROTOS) $(HEADERS) $(SOURCES)
+	ctags --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ -R .
+
+.syntastic_cpp_config: Makefile
+	echo "" > $@
+	for flag in $(CXXFLAGS); do \
+		echo "$$flag" >> $@; \
+	done
 
 .PHONY: clean
 clean:
