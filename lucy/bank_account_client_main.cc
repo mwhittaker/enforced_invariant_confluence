@@ -11,14 +11,11 @@
 
 namespace {
 
-void Usage() {
-  std::cerr << "./bank_account_client_main <cluster_file>" << std::endl;
-  ;
+std::string Usage() {
+  return "./bank_account_client_main <cluster_file> <paxos|segmented|gossip>";
 }
 
-void ReplUsage() {
-  std::cout << "get | deposit <n> | withdraw <n>" << std::endl;
-}
+std::string ReplUsage() { return "get | deposit <n> | withdraw <n>"; }
 
 std::string ResultToString(BankAccountClient::Result result) {
   switch (result) {
@@ -36,12 +33,18 @@ std::string ResultToString(BankAccountClient::Result result) {
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
-  if (argc != 2) {
-    Usage();
+  if (argc != 3) {
+    std::cerr << Usage() << std::endl;
+    return EXIT_FAILURE;
+  }
+  const std::string cluster_filename = argv[1];
+  const std::string server_mode = argv[2];
+  if (!(server_mode == "paxos" || server_mode == "segmented" ||
+        server_mode == "gossip")) {
+    std::cerr << Usage() << std::endl;
     return EXIT_FAILURE;
   }
 
-  const std::string cluster_filename = argv[1];
   Cluster cluster(cluster_filename);
   BankAccountClient client;
 
@@ -62,10 +65,12 @@ int main(int argc, char* argv[]) {
           client.Withdraw(std::stoi(words[1]), dst_addr);
       std::cout << ResultToString(result) << std::endl;
     } else {
-      ReplUsage();
+      std::cout << ReplUsage() << std::endl;
     }
 
-    replica_ = (replica_ + 1) % cluster.Size();
+    if (server_mode != "paxos") {
+      replica_ = (replica_ + 1) % cluster.Size();
+    }
     std::cout << "> " << std::flush;
   }
 }

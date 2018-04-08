@@ -1,5 +1,5 @@
-#ifndef PAXOS_SERVER_H_
-#define PAXOS_SERVER_H_
+#ifndef GOSSIP_SERVER_H_
+#define GOSSIP_SERVER_H_
 
 #include "server.h"
 #include "server.pb.h"
@@ -23,4 +23,4 @@ class GossipServer : public Server {
   UdpSocket socket_;
 };
 
-#endif  // PAXOS_SERVER_H_
+#endif  // GOSSIP_SERVER_H_

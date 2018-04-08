@@ -1,5 +1,5 @@
-#ifndef PAXOS_SERVER_H_
-#define PAXOS_SERVER_H_
+#ifndef SEGMENTED_SERVER_H_
+#define SEGMENTED_SERVER_H_
 
 #include "server.h"
 
@@ -11,4 +11,4 @@ class SegmentedServer : public Server {
   void Run() override;
 };
 
-#endif  // PAXOS_SERVER_H_
+#endif  // SEGMENTED_SERVER_H_

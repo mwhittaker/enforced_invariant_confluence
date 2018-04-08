@@ -12,15 +12,30 @@ message TxnReply {
   required bytes reply = 1;
 }
 
+message Prepare {
+  required int64 txn_index = 1;
+  required bytes txn = 2;
+  required int64 num_committed = 3;
+}
+
+message PrepareOk {
+  required int64 txn_index = 1;
+  required int64 replica_index = 2;
+}
+
 message ServerMessage {
   enum Type {
     MERGE_REQUEST = 0;
     TXN_REQUEST = 1;
     TXN_REPLY = 2;
+    PREPARE = 3;
+    PREPARE_OK = 4;
   }
 
   required Type type = 1;
   optional MergeRequest merge_request = 2;
   optional TxnRequest txn_request = 3;
   optional TxnReply txn_reply = 4;
+  optional Prepare prepare = 5;
+  optional PrepareOk prepare_ok = 6;
 }
