@@ -70,7 +70,15 @@ SyncStatus BankAccount::RunSegmented(const std::string& txn,
       return SyncStatus::EXECUTED_LOCALLY;
     }
     case BankAccountTxnRequest::WITHDRAW: {
+      CHECK(txn_request.has_withdraw_request());
       return SyncStatus::REQUIRES_SYNC;
+    }
+    case BankAccountTxnRequest::GET: {
+      CHECK(txn_request.has_get_request());
+      BankAccountTxnReply txn_reply;
+      txn_reply.mutable_get_reply()->set_value(Value());
+      txn_reply.SerializeToString(reply);
+      return SyncStatus::EXECUTED_LOCALLY;
     }
     default:
       LOG(FATAL) << "Unrecognized transaction type.";

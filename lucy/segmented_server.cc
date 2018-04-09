@@ -89,21 +89,27 @@ void SegmentedServer::HandleMergeRequest(const MergeRequest& merge_request,
 
 void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
                                         const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received SyncRequest from " << src_addr << ".";
-
-  // Ignoring SyncRequests with older epochs accomplishes a couple of things:
-  //
-  //   (1) If this node is in normal mode, then this ignores old SyncRequests
-  //       that were reordered or duplicated in the network.
-  //   (2) If this node is in syncing follower or leader mode, then this
-  //       ignores SyncRequests from a competing leader with a lower replica
-  //       index.
   Epoch sync_epoch(sync_request.epoch());
-  if (sync_epoch < epoch_) {
+  DLOG(INFO) << "Received SyncRequest from " << src_addr << " with epoch "
+             << sync_epoch << ".";
+
+  // Ignoring SyncRequests with older epoch counters ignores old SyncRequests
+  // that were reordered or duplicated in the network.
+  if (sync_epoch.Counter() < epoch_.Counter()) {
     LOG(INFO) << "SegmentedServer received a SyncRequest for epoch "
               << sync_epoch << " but it is in epoch " << epoch_
               << ", so it ignoring the request.";
     return;
+  }
+
+  if (mode_ == SYNCING_LEADER) {
+    CHECK(sync_epoch.Counter() == epoch_.Counter());
+    if (sync_epoch.ReplicaIndex() < replica_index_) {
+      DLOG(INFO) << "SegmentedServer sync leader received a SyncRequest for "
+                    "the same epoch counter, but we have a higher index, so we "
+                    "ignore the request.";
+      return;
+    }
   }
 
   // If the epoch is more up-to-date, then we transition to being a follower.
@@ -117,7 +123,7 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
   }
 
   mode_ = SYNCING_FOLLOWER;
-  epoch_ = sync_epoch;
+  epoch_ = epoch_.WithCounter(sync_epoch.Counter());
 
   ServerMessage msg;
   msg.set_type(ServerMessage::SYNC_REPLY);
@@ -131,12 +137,12 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
 
 void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
                                       const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received SyncReply from " << src_addr << ".";
-
   // We cannot receive a sync reply for a sync request with an epoch higher
   // than our own because if we ever sent such a request, we would have updated
   // our epoch.
   Epoch sync_epoch(sync_reply.epoch());
+  DLOG(INFO) << "Received SyncReply from " << src_addr << " with epoch "
+             << sync_epoch << ".";
   CHECK(sync_epoch <= epoch_);
 
   if (mode_ != SYNCING_LEADER) {
@@ -161,6 +167,9 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
     return;
   }
 
+  DLOG(INFO) << "SegmentedServer sync leader received sync replies from all "
+                "other replicas.";
+
   // Merge the objects from all the other replicas.
   for (const std::pair<const replica_index_t, SyncReply>& p :
        pending_sync_replies_[epoch_]) {
@@ -171,20 +180,22 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
   // Execute the pending sync transaction and reply to the client.
   CHECK(pending_sync_txn_);
   std::string reply = object_->Run(pending_sync_txn_->txn.txn());
-  ServerMessage msg;
-  msg.set_type(ServerMessage::TXN_REPLY);
-  msg.mutable_txn_reply()->set_reply(reply);
-  std::string reply_s;
-  msg.SerializeToString(&reply_s);
-  socket_.SendTo(reply_s, pending_sync_txn_->src_addr);
+  ServerMessage txn_reply;
+  txn_reply.set_type(ServerMessage::TXN_REPLY);
+  txn_reply.mutable_txn_reply()->set_reply(reply);
+  std::string txn_reply_s;
+  txn_reply.SerializeToString(&txn_reply_s);
+  socket_.SendTo(txn_reply_s, pending_sync_txn_->src_addr);
 
   // Send Start messages to the other replicas.
+  DLOG(INFO)
+      << "SegmentedServer sync leader sending start to all other replicas.";
   ServerMessage start;
   start.set_type(ServerMessage::START);
   start.mutable_start()->set_object(object_->Get());
   *start.mutable_start()->mutable_epoch() = epoch_.ToProto();
   std::string start_s;
-  msg.SerializeToString(&start_s);
+  start.SerializeToString(&start_s);
   for (replica_index_t i = 0; i < cluster_.Size(); ++i) {
     if (i != replica_index_) {
       socket_.SendTo(start_s, cluster_.UdpAddrs()[i]);
@@ -200,14 +211,14 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
 
 void SegmentedServer::HandleStart(const Start& start,
                                   const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received Start from " << src_addr << ".";
-
   // This start has to be a lingering start from the past. If it were from the
   // present or the future, the replica that sent it would have to have
   // received a StartReply from us which means that we would have updated our
   // epoch to be at least as big as it, if not bigger.
   Epoch start_epoch(start.epoch());
-  CHECK(start_epoch <= epoch_) << start_epoch;
+  DLOG(INFO) << "Received Start from " << src_addr << " with epoch "
+             << start_epoch << ".";
+  CHECK(start_epoch.Counter() <= epoch_.Counter()) << epoch_;
 
   if (mode_ == NORMAL) {
     LOG(INFO) << "SegmentedServer received a Start with epoch " << start_epoch
@@ -265,7 +276,6 @@ void SegmentedServer::ProcessBufferedTxns() {
       it = pending_txn_requests_.erase(it);
     } else {
       CHECK(status == SyncStatus::REQUIRES_SYNC);
-
       // Transition to sync mode and save the transaction for later execution.
       // TODO(mwhittaker): Avoid redundant copies of pending_sync_txn_.
       mode_ = SYNCING_LEADER;
@@ -275,6 +285,9 @@ void SegmentedServer::ProcessBufferedTxns() {
 
       // Increment the epoch and send SyncRequests to other replicas.
       epoch_ = epoch_.Increment();
+      DLOG(INFO) << "Transaction requires global sync. Sending SyncRequest "
+                    "messages to other replicas with epoch "
+                 << epoch_ << ".";
       ServerMessage msg;
       msg.set_type(ServerMessage::SYNC_REQUEST);
       msg.mutable_sync_request()->set_replica_index(replica_index_);

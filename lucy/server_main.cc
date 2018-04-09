@@ -57,7 +57,8 @@ int main(int argc, char* argv[]) {
     server = std::unique_ptr<Server>(
         new PaxosServer(cluster, replica_index, object.get()));
   } else if (server_mode == "segmented") {
-    LOG(FATAL) << "TODO: Implement";
+    server = std::unique_ptr<Server>(
+        new SegmentedServer(cluster, replica_index, object.get()));
   } else if (server_mode == "gossip") {
     server = std::unique_ptr<Server>(
         new GossipServer(cluster, replica_index, object.get()));
