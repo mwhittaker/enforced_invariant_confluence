@@ -7,15 +7,16 @@
 #include <memory>
 #include <set>
 
-#include "epoch.h"
 #include "server.h"
 #include "server.pb.h"
+
+using epoch_t = std::uint64_t;
 
 class SegmentedServer : public Server {
  public:
   SegmentedServer(const Cluster& cluster, replica_index_t replica_index,
                   Object* object)
-      : Server(cluster, replica_index, object), epoch_(0, replica_index) {}
+      : Server(cluster, replica_index, object) {}
 
   void Run() override;
 
@@ -39,9 +40,9 @@ class SegmentedServer : public Server {
   void SendMergeRequest();
 
   Mode mode_ = NORMAL;
-  Epoch epoch_;
+  epoch_t epoch_ = 0;
   std::unique_ptr<PendingTxn> pending_sync_txn_;
-  std::map<Epoch, std::map<replica_index_t, SyncReply>> pending_sync_replies_;
+  std::map<replica_index_t, SyncReply> pending_sync_replies_;
   std::deque<PendingTxn> pending_txn_requests_;
   int num_requests_serviced_ = 0;
   const int num_requests_per_gossip_ = 10;

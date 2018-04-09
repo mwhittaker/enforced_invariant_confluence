@@ -1,13 +1,8 @@
 syntax = "proto2";
 
-message EpochProto {
-  required uint64 counter = 1;
-  required uint64 replica_index = 2;
-}
-
 message MergeRequest {
   required bytes object = 1;
-  optional EpochProto epoch = 2;
+  optional uint64 epoch = 2;
 }
 
 message TxnRequest {
@@ -31,18 +26,18 @@ message PrepareOk {
 
 message SyncRequest {
   required uint64 replica_index = 1;
-  required EpochProto epoch = 2;
+  required uint64 epoch = 2;
 }
 
 message SyncReply {
   required uint64 replica_index = 1;
-  required EpochProto epoch = 2;
+  required uint64 epoch = 2;
   required bytes object = 3;
 }
 
 message Start {
   required bytes object = 1;
-  required EpochProto epoch = 2;
+  required uint64 epoch = 2;
 }
 
 message ServerMessage {
