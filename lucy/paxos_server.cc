@@ -11,11 +11,11 @@ void PaxosServer::Run() {
   // TODO: Implement.
 }
 
-bool PaxosServer::AmLeader() const { return index_ == 0; }
+bool PaxosServer::AmLeader() const { return replica_index_ == 0; }
 
 void PaxosServer::RunLeader() {
-  LOG(INFO) << "PaxosServer leader listening on " << cluster_.UdpAddrs()[index_]
-            << ".";
+  LOG(INFO) << "PaxosServer leader listening on "
+            << cluster_.UdpAddrs()[replica_index_] << ".";
 
   while (true) {
     std::string msg;
@@ -42,7 +42,7 @@ void PaxosServer::RunLeader() {
 
 void PaxosServer::RunFollower() {
   LOG(INFO) << "PaxosServer follower listening on "
-            << cluster_.UdpAddrs()[index_] << ".";
+            << cluster_.UdpAddrs()[replica_index_] << ".";
 
   while (true) {
     std::string msg;
@@ -67,7 +67,7 @@ void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
   DLOG(INFO) << "PaxosServer received TxnRequest from " << src_addr << ".";
 
   // Assign this transaction a new transaction index.
-  const std::int64_t txn_index = txn_index_;
+  const txn_index_t txn_index = txn_index_;
   txn_index_++;
 
   // Store the transaction for later. Once we have PrepareOk messages from all
@@ -93,8 +93,8 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
   DLOG(INFO) << "PaxosServer received PrepareOk from " << src_addr << ".";
 
   // Save ourselves some typing.
-  const std::int64_t txn_index = prepare_ok.txn_index();
-  const std::int64_t replica_index = prepare_ok.replica_index();
+  const txn_index_t txn_index = prepare_ok.txn_index();
+  const replica_index_t replica_index = prepare_ok.replica_index();
 
   // Make sure we're expecting a PrepareOk message.
   if (waiting_for_prepare_oks_.find(txn_index) ==
@@ -132,7 +132,7 @@ void PaxosServer::HandlePrepare(const Prepare& prepare,
   ServerMessage msg;
   msg.set_type(ServerMessage::PREPARE_OK);
   msg.mutable_prepare_ok()->set_txn_index(prepare.txn_index());
-  msg.mutable_prepare_ok()->set_replica_index(index_);
+  msg.mutable_prepare_ok()->set_replica_index(replica_index_);
   std::string s;
   msg.SerializeToString(&s);
   socket_.SendTo(s, src_addr);

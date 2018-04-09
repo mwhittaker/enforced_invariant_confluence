@@ -7,8 +7,9 @@
 
 class GossipServer : public Server {
  public:
-  GossipServer(const Cluster& cluster, int index, Object* object)
-      : Server(cluster, index, object), socket_(cluster.UdpAddrs()[index]) {}
+  GossipServer(const Cluster& cluster, replica_index_t replica_index,
+               Object* object)
+      : Server(cluster, replica_index, object) {}
 
   void Run() override;
 
@@ -18,9 +19,8 @@ class GossipServer : public Server {
   void HandleTxnRequest(const TxnRequest& txn_request,
                         const UdpAddress& src_addr);
 
-  int num_requests_serviced_ = 0;
-  const int num_requests_per_gossip_ = 10;
-  UdpSocket socket_;
+  std::size_t num_requests_serviced_ = 0;
+  const std::size_t num_requests_per_gossip_ = 10;
 };
 
 #endif  // GOSSIP_SERVER_H_

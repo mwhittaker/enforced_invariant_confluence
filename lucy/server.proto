@@ -1,7 +1,13 @@
 syntax = "proto2";
 
+message EpochProto {
+  required uint64 counter = 1;
+  required uint64 replica_index = 2;
+}
+
 message MergeRequest {
   required bytes object = 1;
+  optional EpochProto epoch = 2;
 }
 
 message TxnRequest {
@@ -13,14 +19,30 @@ message TxnReply {
 }
 
 message Prepare {
-  required int64 txn_index = 1;
+  required uint64 txn_index = 1;
   required bytes txn = 2;
-  required int64 num_committed = 3;
+  required uint64 num_committed = 3;
 }
 
 message PrepareOk {
-  required int64 txn_index = 1;
-  required int64 replica_index = 2;
+  required uint64 txn_index = 1;
+  required uint64 replica_index = 2;
+}
+
+message SyncRequest {
+  required uint64 replica_index = 1;
+  required EpochProto epoch = 2;
+}
+
+message SyncReply {
+  required uint64 replica_index = 1;
+  required EpochProto epoch = 2;
+  required bytes object = 3;
+}
+
+message Start {
+  required bytes object = 1;
+  required EpochProto epoch = 2;
 }
 
 message ServerMessage {
@@ -30,6 +52,9 @@ message ServerMessage {
     TXN_REPLY = 2;
     PREPARE = 3;
     PREPARE_OK = 4;
+    SYNC_REQUEST = 5;
+    SYNC_REPLY = 6;
+    START = 7;
   }
 
   required Type type = 1;
@@ -38,4 +63,7 @@ message ServerMessage {
   optional TxnReply txn_reply = 4;
   optional Prepare prepare = 5;
   optional PrepareOk prepare_ok = 6;
+  optional SyncRequest sync_request = 7;
+  optional SyncReply sync_reply = 8;
+  optional Start start = 9;
 }

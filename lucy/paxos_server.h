@@ -10,8 +10,9 @@
 
 class PaxosServer : public Server {
  public:
-  PaxosServer(const Cluster& cluster, int index, Object* object)
-      : Server(cluster, index, object), socket_(cluster.UdpAddrs()[index]) {}
+  PaxosServer(const Cluster& cluster, replica_index_t replica_index,
+              Object* object)
+      : Server(cluster, replica_index, object) {}
 
   void Run() override;
 
@@ -26,24 +27,21 @@ class PaxosServer : public Server {
   void LeaderCommitReadyTransactions();
   void FollowerCommitReadyTransactions();
 
-  // Both.
-  UdpSocket socket_;
-
   // Leader.
   struct PendingTxn {
     TxnRequest txn_request;
     UdpAddress src_addr;
   };
-  std::int64_t txn_index_ = 0;
-  std::int64_t num_committed_ = 0;
-  std::map<std::int64_t, PendingTxn> waiting_for_prepare_oks_;
-  std::map<std::int64_t, std::set<int>> prepare_ok_replies_;
-  std::map<std::int64_t, PendingTxn> waiting_for_commit_;
+  txn_index_t txn_index_ = 0;
+  std::size_t num_committed_ = 0;
+  std::map<txn_index_t, PendingTxn> waiting_for_prepare_oks_;
+  std::map<txn_index_t, std::set<replica_index_t>> prepare_ok_replies_;
+  std::map<txn_index_t, PendingTxn> waiting_for_commit_;
 
   // Follower.
-  std::map<std::int64_t, std::string> pending_txns_;
-  std::int64_t num_committed_by_leader_ = 0;
-  std::int64_t num_committed_by_follower_ = 0;
+  std::map<txn_index_t, std::string> pending_txns_;
+  std::size_t num_committed_by_leader_ = 0;
+  std::size_t num_committed_by_follower_ = 0;
 };
 
 #endif  // PAXOS_SERVER_H_
