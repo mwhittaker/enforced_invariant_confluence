@@ -12,13 +12,15 @@ PROTO_HEADERS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.h))
 PROTO_SOURCES = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.cc))
 PROTO_OBJECTS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.o))
 
-BINARIES = two_ints_main \
-		   echo_client \
-		   echo_server \
-		   bank_account_client_main \
-		   server_main \
-		   benchmark_server_main \
-		   benchmark_master_repl
+BINARIES = \
+	bank_account_client_main \
+	benchmark_client_main \
+	benchmark_master_repl \
+	benchmark_server_main \
+	echo_client \
+	echo_server \
+	server_main \
+	two_ints_main
 BINARY_SOURCES = $(addsuffix .cc, $(BINARIES))
 BINARY_OBJECTS = $(addprefix $(BIN)/, $(addsuffix .o, $(BINARIES)))
 SOURCES = $(wildcard *.cc)

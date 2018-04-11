@@ -2,6 +2,7 @@ bin/
 *.txt
 
 bank_account_client_main
+benchmark_client_main
 benchmark_master_repl
 benchmark_server_main
 echo_client
