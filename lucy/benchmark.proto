@@ -50,3 +50,57 @@ message BenchmarkServerReply {
   optional BenchmarkServerStartReply start_reply = 2;
   optional BenchmarkServerKillReply kill_reply = 3;
 }
+
+// Client.
+message BenchmarkClientVaryWithdrawsRequest {
+  required uint64 num_servers = 1;
+  required double fraction_withdraw = 2;
+  required uint64 duration_in_milliseconds = 3;
+}
+
+message BenchmarkClientVaryWithdrawsReply {
+  required uint64 index = 1;
+  required double txns_per_second = 2;
+}
+
+message BenchmarkClientVarySegmentsRequest {
+}
+
+message BenchmarkClientVarySegmentsReply {
+  required uint64 index = 1;
+  required double txns_per_second = 2;
+}
+
+message BenchmarkClientVaryNodesRequest {
+}
+
+message BenchmarkClientVaryNodesReply {
+  required uint64 index = 1;
+  required double txns_per_second = 2;
+}
+
+message BenchmarkClientRequest {
+  enum Type {
+    VARY_WITHDRAWS = 0;
+    VARY_SEGMENTS = 1;
+    VARY_NODES = 2;
+  }
+
+  required Type type = 1;
+  optional BenchmarkClientVaryWithdrawsRequest vary_withdraws = 2;
+  optional BenchmarkClientVarySegmentsRequest vary_segments = 3;
+  optional BenchmarkClientVaryNodesRequest vary_nodes = 4;
+}
+
+message BenchmarkClientReply {
+  enum Type {
+    VARY_WITHDRAWS = 0;
+    VARY_SEGMENTS = 1;
+    VARY_NODES = 2;
+  }
+
+  required Type type = 1;
+  optional BenchmarkClientVaryWithdrawsReply vary_withdraws = 2;
+  optional BenchmarkClientVarySegmentsReply vary_segments = 3;
+  optional BenchmarkClientVaryNodesReply vary_nodes = 4;
+}

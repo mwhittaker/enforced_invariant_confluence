@@ -83,7 +83,7 @@ void BenchmarkServer::StartServer(
   const std::vector<HostPort> all_host_ports = server_cluster_.HostPorts();
   auto begin = all_host_ports.begin();
   auto end = all_host_ports.begin() + start_request.num_servers();
-  std::vector<HostPort> host_ports(begin, end);
+  const std::vector<HostPort> host_ports(begin, end);
   Cluster cluster(host_ports);
 
   // Create the object.
