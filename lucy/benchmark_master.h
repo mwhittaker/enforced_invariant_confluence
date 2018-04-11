@@ -10,10 +10,10 @@
 
 class BenchmarkMaster {
  public:
-  BenchmarkMaster(const Cluster& benchmark_servers_cluster,
-                  const Cluster& benchmark_clients_cluster)
-      : benchmark_servers_cluster_(benchmark_servers_cluster),
-        benchmark_clients_cluster_(benchmark_clients_cluster) {}
+  BenchmarkMaster(const Cluster& benchmark_server_cluster,
+                  const Cluster& benchmark_client_cluster)
+      : benchmark_server_cluster_(benchmark_server_cluster),
+        benchmark_client_cluster_(benchmark_client_cluster) {}
 
   void ServersStart(const BenchmarkServerStartRequest& start);
   void ServersKill(const BenchmarkServerKillRequest& kill);
@@ -28,8 +28,8 @@ class BenchmarkMaster {
   void WaitForNReplies(std::size_t n, const reply_to_index_t& f);
 
   UdpSocket socket_;
-  const Cluster benchmark_servers_cluster_;
-  const Cluster benchmark_clients_cluster_;
+  const Cluster benchmark_server_cluster_;
+  const Cluster benchmark_client_cluster_;
 };
 
 #endif  // BENCHMARK_MASTER_H_

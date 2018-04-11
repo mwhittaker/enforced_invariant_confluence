@@ -68,7 +68,7 @@ void PaxosServer::RunFollower() {
 
 void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
                                    const UdpAddress& src_addr) {
-  DLOG(INFO) << "PaxosServer received TxnRequest from " << src_addr << ".";
+  VLOG(1) << "PaxosServer received TxnRequest from " << src_addr << ".";
 
   // Assign this transaction a new transaction index.
   const txn_index_t txn_index = txn_index_;
@@ -94,7 +94,7 @@ void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
 
 void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
                                   const UdpAddress& src_addr) {
-  DLOG(INFO) << "PaxosServer received PrepareOk from " << src_addr << ".";
+  VLOG(1) << "PaxosServer received PrepareOk from " << src_addr << ".";
 
   // Save ourselves some typing.
   const txn_index_t txn_index = prepare_ok.txn_index();
@@ -129,7 +129,7 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
 
 void PaxosServer::HandlePrepare(const Prepare& prepare,
                                 const UdpAddress& src_addr) {
-  DLOG(INFO) << "PaxosServer received Prepare from " << src_addr << ".";
+  VLOG(1) << "PaxosServer received Prepare from " << src_addr << ".";
 
   // Record the transaction and reply to the leader.
   pending_txns_[prepare.txn_index()] = prepare.txn();

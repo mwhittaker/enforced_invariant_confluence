@@ -7,10 +7,13 @@
 
 void BenchmarkMaster::ServersStart(const BenchmarkServerStartRequest& start) {
   // Send requests.
-  std::string start_str;
-  start.SerializeToString(&start_str);
+  BenchmarkServerRequest request;
+  request.set_type(BenchmarkServerRequest::START_REQUEST);
+  *request.mutable_start_request() = start;
+  std::string request_str;
+  request.SerializeToString(&request_str);
   for (std::size_t i = 0; i < start.num_servers(); ++i) {
-    socket_.SendTo(start_str, benchmark_servers_cluster_.UdpAddrs()[i]);
+    socket_.SendTo(request_str, benchmark_server_cluster_.UdpAddrs()[i]);
   }
 
   // Wait for replies.
@@ -24,13 +27,16 @@ void BenchmarkMaster::ServersStart(const BenchmarkServerStartRequest& start) {
 }
 
 void BenchmarkMaster::ServersKill(const BenchmarkServerKillRequest& kill) {
-  const std::size_t n = benchmark_servers_cluster_.Size();
+  const std::size_t n = benchmark_server_cluster_.Size();
 
   // Send requests.
-  std::string kill_str;
-  kill.SerializeToString(&kill_str);
+  BenchmarkServerRequest request;
+  request.set_type(BenchmarkServerRequest::KILL_REQUEST);
+  *request.mutable_kill_request() = kill;
+  std::string request_str;
+  request.SerializeToString(&request_str);
   for (std::size_t i = 0; i < n; ++i) {
-    socket_.SendTo(kill_str, benchmark_servers_cluster_.UdpAddrs()[i]);
+    socket_.SendTo(request_str, benchmark_server_cluster_.UdpAddrs()[i]);
   }
 
   // Wait for replies.
@@ -45,14 +51,16 @@ void BenchmarkMaster::ServersKill(const BenchmarkServerKillRequest& kill) {
 
 void BenchmarkMaster::ClientsVaryWithdraws(
     const BenchmarkClientVaryWithdrawsRequest& vary_withdraws) {
-  const std::size_t n = benchmark_clients_cluster_.Size();
+  const std::size_t n = benchmark_client_cluster_.Size();
 
   // Send requests.
-  std::string vary_withdraws_str;
-  vary_withdraws.SerializeToString(&vary_withdraws_str);
+  BenchmarkClientRequest request;
+  request.set_type(BenchmarkClientRequest::VARY_WITHDRAWS);
+  *request.mutable_vary_withdraws() = vary_withdraws;
+  std::string request_str;
+  request.SerializeToString(&request_str);
   for (std::size_t i = 0; i < n; ++i) {
-    socket_.SendTo(vary_withdraws_str,
-                   benchmark_servers_cluster_.UdpAddrs()[i]);
+    socket_.SendTo(request_str, benchmark_client_cluster_.UdpAddrs()[i]);
   }
 
   // Wait for replies.
@@ -67,13 +75,16 @@ void BenchmarkMaster::ClientsVaryWithdraws(
 
 void BenchmarkMaster::ClientsVarySegments(
     const BenchmarkClientVarySegmentsRequest& vary_segments) {
-  const std::size_t n = benchmark_clients_cluster_.Size();
+  const std::size_t n = benchmark_client_cluster_.Size();
 
   // Send requests.
-  std::string vary_segments_str;
-  vary_segments.SerializeToString(&vary_segments_str);
+  BenchmarkClientRequest request;
+  request.set_type(BenchmarkClientRequest::VARY_SEGMENTS);
+  *request.mutable_vary_segments() = vary_segments;
+  std::string request_str;
+  request.SerializeToString(&request_str);
   for (std::size_t i = 0; i < n; ++i) {
-    socket_.SendTo(vary_segments_str, benchmark_servers_cluster_.UdpAddrs()[i]);
+    socket_.SendTo(request_str, benchmark_client_cluster_.UdpAddrs()[i]);
   }
 
   // Wait for replies.
@@ -87,13 +98,16 @@ void BenchmarkMaster::ClientsVarySegments(
 }
 void BenchmarkMaster::ClientsVaryNodes(
     const BenchmarkClientVaryNodesRequest& vary_nodes) {
-  const std::size_t n = benchmark_clients_cluster_.Size();
+  const std::size_t n = benchmark_client_cluster_.Size();
 
   // Send requests.
-  std::string vary_nodes_str;
-  vary_nodes.SerializeToString(&vary_nodes_str);
+  BenchmarkClientRequest request;
+  request.set_type(BenchmarkClientRequest::VARY_NODES);
+  *request.mutable_vary_nodes() = vary_nodes;
+  std::string request_str;
+  request.SerializeToString(&request_str);
   for (std::size_t i = 0; i < n; ++i) {
-    socket_.SendTo(vary_nodes_str, benchmark_servers_cluster_.UdpAddrs()[i]);
+    socket_.SendTo(request_str, benchmark_client_cluster_.UdpAddrs()[i]);
   }
 
   // Wait for replies.

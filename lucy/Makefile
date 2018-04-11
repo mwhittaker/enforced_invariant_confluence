@@ -1,7 +1,8 @@
 CC = clang
 CXX = clang++
 BIN = bin
-CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -g -I$(BIN) \
+DEBUG=1
+CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -I$(BIN) \
 		   $(shell pkg-config protobuf) \
 		   $(shell pkg-config libglog)
 LDFLAGS = $(shell pkg-config --libs protobuf) \
@@ -27,6 +28,12 @@ SOURCES = $(wildcard *.cc)
 HEADERS = $(wildcard *.h)
 OBJECTS = $(addprefix $(BIN)/, $(SOURCES:%.cc=%.o))
 NON_BINARY_OBJECTS = $(filter-out $(BINARY_OBJECTS), $(OBJECTS))
+
+ifeq ($(DEBUG), 1)
+	CXXFLAGS += -g -O0
+else
+	CXXFLAGS += -O3
+endif
 
 default: all
 all: $(BIN) \

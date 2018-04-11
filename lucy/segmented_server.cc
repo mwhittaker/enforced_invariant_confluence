@@ -53,7 +53,7 @@ void SegmentedServer::Run() {
 
 void SegmentedServer::HandleTxnRequest(const TxnRequest& txn_request,
                                        const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received TxnRequest from " << src_addr << ".";
+  VLOG(1) << "Received TxnRequest from " << src_addr << ".";
 
   // Buffer the request in pending_txn_requests_. If we're in normal mode,
   // we'll execute it right away. If we're in sync mode, we'll process requests
@@ -61,8 +61,8 @@ void SegmentedServer::HandleTxnRequest(const TxnRequest& txn_request,
   pending_txn_requests_.push_back(PendingTxn{txn_request, src_addr});
 
   if (mode_ != NORMAL) {
-    LOG(INFO) << "SegmentedServer received a transaction request during a "
-                 "sync. The request is begin buffered for later execution.";
+    VLOG(1) << "SegmentedServer received a transaction request during a "
+               "sync. The request is begin buffered for later execution.";
   } else {
     ProcessBufferedTxns();
   }
@@ -71,12 +71,12 @@ void SegmentedServer::HandleTxnRequest(const TxnRequest& txn_request,
 void SegmentedServer::HandleMergeRequest(const MergeRequest& merge_request,
                                          const UdpAddress& src_addr) {
   CHECK(merge_request.has_epoch());
-  DLOG(INFO) << "Received MergeRequest from " << src_addr << " with epoch "
-             << merge_request.epoch() << ".";
+  VLOG(1) << "Received MergeRequest from " << src_addr << " with epoch "
+          << merge_request.epoch() << ".";
 
   if (mode_ != NORMAL) {
-    DLOG(INFO) << "SegmentedServer received a MergeRequest during a sync, so "
-                  "the SegmentedServer is ignoring the MergeRequest.";
+    VLOG(1) << "SegmentedServer received a MergeRequest during a sync, so "
+               "the SegmentedServer is ignoring the MergeRequest.";
     return;
   }
 
@@ -84,28 +84,28 @@ void SegmentedServer::HandleMergeRequest(const MergeRequest& merge_request,
   if (merge_request.epoch() == epoch_) {
     object_->Merge(merge_request.object());
   } else {
-    LOG(INFO) << "SegmentedServer received a MergeRequest for epoch "
-              << merge_request.epoch()
-              << " which is earlier than the current epoch " << epoch_
-              << ", so the SegmentedServer is ignoring this MergeRequest";
+    VLOG(1) << "SegmentedServer received a MergeRequest for epoch "
+            << merge_request.epoch()
+            << " which is earlier than the current epoch " << epoch_
+            << ", so the SegmentedServer is ignoring this MergeRequest";
   }
 }
 
 void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
                                         const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received SyncRequest from " << src_addr << " with epoch "
-             << sync_request.epoch() << ".";
+  VLOG(1) << "Received SyncRequest from " << src_addr << " with epoch "
+          << sync_request.epoch() << ".";
 
   if (sync_request.epoch() < epoch_) {
-    LOG(INFO) << "SegmentedServer received a SyncRequest for epoch "
-              << sync_request.epoch()
-              << " which is earlier than the current epoch " << epoch_
-              << ", so the SegmentedServer is ignoring this SyncRequest";
+    VLOG(1) << "SegmentedServer received a SyncRequest for epoch "
+            << sync_request.epoch()
+            << " which is earlier than the current epoch " << epoch_
+            << ", so the SegmentedServer is ignoring this SyncRequest";
   }
 
   if (mode_ == NORMAL) {
     if (sync_request.epoch() == epoch_) {
-      LOG(INFO)
+      VLOG(1)
           << "SegmentedServer in normal mode received a SyncRequest for epoch "
           << sync_request.epoch() << " which is equal to the current epoch "
           << epoch_ << ", so the SegmentedServer is ignoring this SyncRequest";
@@ -122,12 +122,12 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
     CHECK(sync_request.epoch() == epoch_);
 
     if (replica_index_ > sync_request.replica_index()) {
-      LOG(INFO) << "SegmentedServer in syncing leader mode received a "
-                   "SyncRequest from replica "
-                << sync_request.replica_index()
-                << " which is less that the SegmentedServer's index  "
-                << replica_index_
-                << ", so the SegmentedServer is ignoring this SyncRequest";
+      VLOG(1) << "SegmentedServer in syncing leader mode received a "
+                 "SyncRequest from replica "
+              << sync_request.replica_index()
+              << " which is less that the SegmentedServer's index  "
+              << replica_index_
+              << ", so the SegmentedServer is ignoring this SyncRequest";
       return;
     }
 
@@ -155,8 +155,8 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
 
 void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
                                       const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received SyncReply from " << src_addr << " with epoch "
-             << sync_reply.epoch() << ".";
+  VLOG(1) << "Received SyncReply from " << src_addr << " with epoch "
+          << sync_reply.epoch() << ".";
 
   // We cannot receive a sync reply for a sync request with an epoch higher
   // than our own because if we ever sent such a request, we would have updated
@@ -165,15 +165,14 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
 
   // Ignore old SyncReplies.
   if (sync_reply.epoch() < epoch_) {
-    LOG(INFO) << "SegmentedServer received a SyncReply for epoch "
-              << sync_reply.epoch()
-              << " which is earlier than the current epoch " << epoch_
-              << ", so the SegmentedServer is ignoring this SyncReply";
+    VLOG(1) << "SegmentedServer received a SyncReply for epoch "
+            << sync_reply.epoch() << " which is earlier than the current epoch "
+            << epoch_ << ", so the SegmentedServer is ignoring this SyncReply";
   }
 
   if (mode_ != SYNCING_LEADER) {
-    LOG(INFO) << "SegmentedServer received a SyncReply but it is not a syncing "
-                 "leader, so it is ignoring the SyncReply.";
+    VLOG(1) << "SegmentedServer received a SyncReply but it is not a syncing "
+               "leader, so it is ignoring the SyncReply.";
     return;
   }
 
@@ -184,8 +183,8 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
     return;
   }
 
-  DLOG(INFO) << "SegmentedServer sync leader received sync replies from all "
-                "other replicas.";
+  VLOG(1) << "SegmentedServer sync leader received sync replies from all "
+             "other replicas.";
 
   // Merge the objects from all the other replicas.
   for (const std::pair<const replica_index_t, SyncReply>& p :
@@ -205,8 +204,7 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
   socket_.SendTo(txn_reply_s, pending_sync_txn_->src_addr);
 
   // Send Start messages to the other replicas.
-  DLOG(INFO)
-      << "SegmentedServer sync leader sending start to all other replicas.";
+  VLOG(1) << "SegmentedServer sync leader sending start to all other replicas.";
   ServerMessage start;
   start.set_type(ServerMessage::START);
   start.mutable_start()->set_object(object_->Get());
@@ -228,8 +226,8 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
 
 void SegmentedServer::HandleStart(const Start& start,
                                   const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received Start from " << src_addr << " with epoch "
-             << start.epoch() << ".";
+  VLOG(1) << "Received Start from " << src_addr << " with epoch "
+          << start.epoch() << ".";
 
   // This start has to be a lingering start from the past. If it were from the
   // present or the future, the replica that sent it would have to have
@@ -240,16 +238,16 @@ void SegmentedServer::HandleStart(const Start& start,
   // If the start.epoch() is from the past, then we just ignore it. It is a
   // duplicated or re-ordered message.
   if (start.epoch() < epoch_) {
-    LOG(INFO) << "SegmentedServer received a Start for epoch " << start.epoch()
-              << " which is earlier than the current epoch " << epoch_
-              << ", so the SegmentedServer is ignoring this Start";
+    VLOG(1) << "SegmentedServer received a Start for epoch " << start.epoch()
+            << " which is earlier than the current epoch " << epoch_
+            << ", so the SegmentedServer is ignoring this Start";
     return;
   }
 
   if (mode_ == NORMAL) {
-    LOG(INFO) << "SegmentedServer received a Start with epoch " << start.epoch()
-              << " but is in normal mode in epoch " << epoch_
-              << " so it ignoring the message.";
+    VLOG(1) << "SegmentedServer received a Start with epoch " << start.epoch()
+            << " but is in normal mode in epoch " << epoch_
+            << " so it ignoring the message.";
     return;
   }
 
@@ -303,9 +301,9 @@ void SegmentedServer::ProcessBufferedTxns() {
 
       // Increment the epoch and send SyncRequests to other replicas.
       epoch_++;
-      DLOG(INFO) << "Transaction requires global sync. Sending SyncRequest "
-                    "messages to other replicas with epoch "
-                 << epoch_ << ".";
+      VLOG(1) << "Transaction requires global sync. Sending SyncRequest "
+                 "messages to other replicas with epoch "
+              << epoch_ << ".";
       ServerMessage msg;
       msg.set_type(ServerMessage::SYNC_REQUEST);
       msg.mutable_sync_request()->set_replica_index(replica_index_);

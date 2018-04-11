@@ -1,5 +1,11 @@
 syntax = "proto2";
 
+enum ServerType {
+  GOSSIP = 0;
+  SEGMENTED = 1;
+  PAXOS = 2;
+}
+
 // Server.
 message BenchmarkServerStartRequest {
   enum Object {
@@ -7,15 +13,9 @@ message BenchmarkServerStartRequest {
     BANK_ACCOUNT = 1;
   }
 
-  enum Server {
-    GOSSIP = 0;
-    SEGMENTED = 1;
-    PAXOS = 2;
-  }
-
   required uint64 num_servers = 1;
   required Object object = 2;
-  required Server server = 3;
+  required ServerType server_type = 3;
 }
 
 message BenchmarkServerStartReply {
@@ -56,6 +56,7 @@ message BenchmarkClientVaryWithdrawsRequest {
   required uint64 num_servers = 1;
   required double fraction_withdraw = 2;
   required uint64 duration_in_milliseconds = 3;
+  required ServerType server_type = 4;
 }
 
 message BenchmarkClientVaryWithdrawsReply {

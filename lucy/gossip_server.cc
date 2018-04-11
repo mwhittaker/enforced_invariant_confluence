@@ -37,14 +37,14 @@ void GossipServer::Run() {
 
 void GossipServer::HandleMergeRequest(const MergeRequest& merge_request,
                                       const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received MergeRequest from " << src_addr << ".";
+  VLOG(1) << "Received MergeRequest from " << src_addr << ".";
   (void)src_addr;
   object_->Merge(merge_request.object());
 }
 
 void GossipServer::HandleTxnRequest(const TxnRequest& txn_request,
                                     const UdpAddress& src_addr) {
-  DLOG(INFO) << "Received TxnRequest from " << src_addr << ".";
+  VLOG(1) << "Received TxnRequest from " << src_addr << ".";
   ServerMessage msg;
   msg.set_type(ServerMessage::TXN_REPLY);
   msg.mutable_txn_reply()->set_reply(object_->Run(txn_request.txn()));

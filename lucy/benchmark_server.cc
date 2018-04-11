@@ -48,6 +48,7 @@ void BenchmarkServer::HandleStartRequest(
   // Sanity check start_request.
   CHECK(start_request.num_servers() >= 1) << start_request.num_servers();
   CHECK(index_ < start_request.num_servers()) << start_request.num_servers();
+  CHECK(!server_thread_.joinable());
 
   // Start the server.
   CHECK(!server_thread_.joinable());
@@ -116,18 +117,18 @@ void BenchmarkServer::StartServer(
 
   // Create the server.
   std::unique_ptr<Server> server;
-  switch (start_request.server()) {
-    case BenchmarkServerStartRequest::PAXOS: {
+  switch (start_request.server_type()) {
+    case PAXOS: {
       server = std::unique_ptr<Server>(
           new PaxosServer(cluster, index_, object.get()));
       break;
     }
-    case BenchmarkServerStartRequest::SEGMENTED: {
+    case SEGMENTED: {
       server = std::unique_ptr<Server>(
           new SegmentedServer(cluster, index_, object.get()));
       break;
     }
-    case BenchmarkServerStartRequest::GOSSIP: {
+    case GOSSIP: {
       server = std::unique_ptr<Server>(
           new GossipServer(cluster, index_, object.get()));
       break;

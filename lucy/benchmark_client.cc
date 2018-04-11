@@ -69,7 +69,10 @@ void BenchmarkClient::HandleVaryWithdraws(
     constexpr std::size_t num_txns_per_iteration = 10;
     for (std::size_t i = 0; i < num_txns_per_iteration; ++i) {
       bool deposit = RandomBool(vary_withdraws.fraction_withdraw());
-      int dst_index = RandomInt(0, vary_withdraws.num_servers());
+      int dst_index = vary_withdraws.server_type() == PAXOS
+                          ? 0
+                          : RandomInt(0, vary_withdraws.num_servers());
+
       const UdpAddress& dst_addr = server_cluster_.UdpAddrs()[dst_index];
       if (deposit) {
         client.Deposit(/*amount=*/1, dst_addr);

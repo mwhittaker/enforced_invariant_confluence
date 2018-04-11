@@ -3,5 +3,5 @@
 -Wall
 -Wextra
 -Werror
--g
 -Ibin
+-O3
