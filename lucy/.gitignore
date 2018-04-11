@@ -1,6 +1,8 @@
 bin/
+*.txt
 
 bank_account_client_main
+benchmark_server_main
 echo_client
 echo_server
 server_main

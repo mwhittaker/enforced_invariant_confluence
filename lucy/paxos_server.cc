@@ -35,6 +35,10 @@ void PaxosServer::RunLeader() {
         HandlePrepareOk(proto.prepare_ok(), src_addr);
         break;
       }
+      case ServerMessage::DIE: {
+        CHECK(proto.has_die());
+        return;
+      }
       default: { LOG(FATAL) << "Unexpected server message type"; }
     }
   }

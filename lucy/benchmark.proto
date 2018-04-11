@@ -1,0 +1,52 @@
+syntax = "proto2";
+
+// Server.
+message BenchmarkServerStartRequest {
+  enum Object {
+    TWO_INTS = 0;
+    BANK_ACCOUNT = 1;
+  }
+
+  enum Server {
+    GOSSIP = 0;
+    SEGMENTED = 1;
+    PAXOS = 2;
+  }
+
+  required uint64 num_servers = 1;
+  required Object object = 2;
+  required Server server = 3;
+}
+
+message BenchmarkServerStartReply {
+  required uint64 replica_index = 1;
+}
+
+message BenchmarkServerKillRequest {
+}
+
+message BenchmarkServerKillReply {
+  required uint64 replica_index = 1;
+}
+
+message BenchmarkServerRequest {
+  enum Type {
+    START_REQUEST = 0;
+    KILL_REQUEST = 1;
+  }
+
+  required Type type = 1;
+  optional BenchmarkServerStartRequest start_request = 2;
+  optional BenchmarkServerKillRequest kill_request = 3;
+}
+
+message BenchmarkServerReply {
+  enum Type {
+    START_REPLY = 0;
+    KILL_REPLY = 1;
+  }
+
+  required Type type = 1;
+  optional BenchmarkServerStartReply start_reply = 2;
+  optional BenchmarkServerKillReply kill_reply = 3;
+}

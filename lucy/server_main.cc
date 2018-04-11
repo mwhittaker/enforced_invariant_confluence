@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
   // Object.
   std::unique_ptr<Object> object;
   if (object_name == "two_ints") {
-    // TODO: Implement.
+    LOG(FATAL) << "Unimplemented";
   } else if (object_name == "bank_account") {
     object =
         std::unique_ptr<Object>(new BankAccount(cluster.Size(), replica_index));

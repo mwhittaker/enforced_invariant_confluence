@@ -40,6 +40,9 @@ message Start {
   required uint64 epoch = 2;
 }
 
+message Die {
+}
+
 message ServerMessage {
   enum Type {
     MERGE_REQUEST = 0;
@@ -50,6 +53,7 @@ message ServerMessage {
     SYNC_REQUEST = 5;
     SYNC_REPLY = 6;
     START = 7;
+    DIE = 8;
   }
 
   required Type type = 1;
@@ -61,4 +65,5 @@ message ServerMessage {
   optional SyncRequest sync_request = 7;
   optional SyncReply sync_reply = 8;
   optional Start start = 9;
+  optional Die die = 10;
 }

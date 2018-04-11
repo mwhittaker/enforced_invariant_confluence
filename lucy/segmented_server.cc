@@ -42,6 +42,10 @@ void SegmentedServer::Run() {
         HandleStart(proto.start(), src_addr);
         break;
       }
+      case ServerMessage::DIE: {
+        CHECK(proto.has_die());
+        return;
+      }
       default: { LOG(FATAL) << "Unexpected server message type"; }
     }
   }
