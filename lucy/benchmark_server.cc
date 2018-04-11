@@ -45,6 +45,10 @@ void BenchmarkServer::HandleStartRequest(
     const UdpAddress& src_addr) {
   DLOG(INFO) << "Received StartRequest from " << src_addr << ".";
 
+  // Sanity check start_request.
+  CHECK(start_request.num_servers() >= 1) << start_request.num_servers();
+  CHECK(index_ < start_request.num_servers()) << start_request.num_servers();
+
   // Start the server.
   CHECK(!server_thread_.joinable());
   server_thread_ =
@@ -53,7 +57,7 @@ void BenchmarkServer::HandleStartRequest(
   // Send an ack.
   BenchmarkServerReply reply;
   reply.set_type(BenchmarkServerReply::START_REPLY);
-  reply.mutable_start_reply()->set_replica_index(index_);
+  reply.mutable_start_reply()->set_index(index_);
   std::string reply_str;
   reply.SerializeToString(&reply_str);
   socket_.SendTo(reply_str, src_addr);
@@ -65,16 +69,26 @@ void BenchmarkServer::HandleKillRequest(
   DLOG(INFO) << "Received KillRequest from " << src_addr << ".";
   (void)kill_request;
 
-  // Send kill message to server.
-  ServerMessage msg;
-  msg.set_type(ServerMessage::DIE);
-  msg.mutable_die();
-  std::string msg_str;
-  msg.SerializeToString(&msg_str);
-  socket_.SendTo(msg_str, server_cluster_.UdpAddrs()[index_]);
+  if (server_thread_.joinable()) {
+    // Send kill message to server.
+    ServerMessage msg;
+    msg.set_type(ServerMessage::DIE);
+    msg.mutable_die();
+    std::string msg_str;
+    msg.SerializeToString(&msg_str);
+    socket_.SendTo(msg_str, server_cluster_.UdpAddrs()[index_]);
 
-  // Join the thread.
-  server_thread_.join();
+    // Join the thread.
+    server_thread_.join();
+  }
+
+  // Send an ack.
+  BenchmarkServerReply reply;
+  reply.set_type(BenchmarkServerReply::KILL_REPLY);
+  reply.mutable_kill_reply()->set_index(index_);
+  std::string reply_str;
+  reply.SerializeToString(&reply_str);
+  socket_.SendTo(reply_str, src_addr);
 }
 
 void BenchmarkServer::StartServer(

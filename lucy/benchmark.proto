@@ -19,14 +19,14 @@ message BenchmarkServerStartRequest {
 }
 
 message BenchmarkServerStartReply {
-  required uint64 replica_index = 1;
+  required uint64 index = 1;
 }
 
 message BenchmarkServerKillRequest {
 }
 
 message BenchmarkServerKillReply {
-  required uint64 replica_index = 1;
+  required uint64 index = 1;
 }
 
 message BenchmarkServerRequest {
