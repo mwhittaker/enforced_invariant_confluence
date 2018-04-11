@@ -86,8 +86,8 @@ void BenchmarkClient::HandleVaryWithdraws(
 
   // Calculate the throughput.
   auto actual_stop = clock.now();
-  auto duration = duration_cast<nanoseconds>(actual_stop - planned_stop);
-  double txns_per_ns = num_transactions / duration.count();
+  auto duration = duration_cast<nanoseconds>(actual_stop - start);
+  double txns_per_ns = static_cast<double>(num_transactions) / duration.count();
   double txns_per_s = txns_per_ns * 1e9;
 
   // Respond to the master.

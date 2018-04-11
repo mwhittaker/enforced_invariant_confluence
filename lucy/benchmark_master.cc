@@ -2,7 +2,6 @@
 
 #include <set>
 
-#include "glog/logging.h"
 #include "google/protobuf/message.h"
 
 void BenchmarkMaster::ServersStart(const BenchmarkServerStartRequest& start) {
@@ -49,7 +48,7 @@ void BenchmarkMaster::ServersKill(const BenchmarkServerKillRequest& kill) {
   });
 }
 
-void BenchmarkMaster::ClientsVaryWithdraws(
+double BenchmarkMaster::ClientsVaryWithdraws(
     const BenchmarkClientVaryWithdrawsRequest& vary_withdraws) {
   const std::size_t n = benchmark_client_cluster_.Size();
 
@@ -64,16 +63,25 @@ void BenchmarkMaster::ClientsVaryWithdraws(
   }
 
   // Wait for replies.
-  WaitForNReplies(n, [](const std::string& reply_str) {
-    BenchmarkClientReply reply;
-    reply.ParseFromString(reply_str);
-    CHECK(reply.type() == BenchmarkClientReply::VARY_WITHDRAWS);
-    CHECK(reply.has_vary_withdraws());
-    return reply.vary_withdraws().index();
-  });
+  using Reply = BenchmarkClientVaryWithdrawsReply;
+  const std::map<replica_index_t, Reply> replies =
+      CollectNReplies<Reply>(n, [](const std::string& reply_str) -> Reply {
+        BenchmarkClientReply reply;
+        reply.ParseFromString(reply_str);
+        CHECK(reply.type() == BenchmarkClientReply::VARY_WITHDRAWS);
+        CHECK(reply.has_vary_withdraws());
+        return reply.vary_withdraws();
+      });
+
+  // Compute total throughput.
+  double total_throughput = 0;
+  for (const auto& p : replies) {
+    total_throughput += p.second.txns_per_second();
+  }
+  return total_throughput;
 }
 
-void BenchmarkMaster::ClientsVarySegments(
+double BenchmarkMaster::ClientsVarySegments(
     const BenchmarkClientVarySegmentsRequest& vary_segments) {
   const std::size_t n = benchmark_client_cluster_.Size();
 
@@ -88,15 +96,25 @@ void BenchmarkMaster::ClientsVarySegments(
   }
 
   // Wait for replies.
-  WaitForNReplies(n, [](const std::string& reply_str) {
-    BenchmarkClientReply reply;
-    reply.ParseFromString(reply_str);
-    CHECK(reply.type() == BenchmarkClientReply::VARY_WITHDRAWS);
-    CHECK(reply.has_vary_segments());
-    return reply.vary_segments().index();
-  });
+  using Reply = BenchmarkClientVarySegmentsReply;
+  const std::map<replica_index_t, Reply> replies =
+      CollectNReplies<Reply>(n, [](const std::string& reply_str) -> Reply {
+        BenchmarkClientReply reply;
+        reply.ParseFromString(reply_str);
+        CHECK(reply.type() == BenchmarkClientReply::VARY_WITHDRAWS);
+        CHECK(reply.has_vary_segments());
+        return reply.vary_segments();
+      });
+
+  // Compute total throughput.
+  double total_throughput = 0;
+  for (const auto& p : replies) {
+    total_throughput += p.second.txns_per_second();
+  }
+  return total_throughput;
 }
-void BenchmarkMaster::ClientsVaryNodes(
+
+double BenchmarkMaster::ClientsVaryNodes(
     const BenchmarkClientVaryNodesRequest& vary_nodes) {
   const std::size_t n = benchmark_client_cluster_.Size();
 
@@ -111,13 +129,22 @@ void BenchmarkMaster::ClientsVaryNodes(
   }
 
   // Wait for replies.
-  WaitForNReplies(n, [](const std::string& reply_str) {
-    BenchmarkClientReply reply;
-    reply.ParseFromString(reply_str);
-    CHECK(reply.type() == BenchmarkClientReply::VARY_NODES);
-    CHECK(reply.has_vary_nodes());
-    return reply.vary_nodes().index();
-  });
+  using Reply = BenchmarkClientVaryNodesReply;
+  const std::map<replica_index_t, Reply> replies =
+      CollectNReplies<Reply>(n, [](const std::string& reply_str) -> Reply {
+        BenchmarkClientReply reply;
+        reply.ParseFromString(reply_str);
+        CHECK(reply.type() == BenchmarkClientReply::VARY_NODES);
+        CHECK(reply.has_vary_nodes());
+        return reply.vary_nodes();
+      });
+
+  // Compute total throughput.
+  double total_throughput = 0;
+  for (const auto& p : replies) {
+    total_throughput += p.second.txns_per_second();
+  }
+  return total_throughput;
 }
 
 void BenchmarkMaster::WaitForNReplies(std::size_t n,

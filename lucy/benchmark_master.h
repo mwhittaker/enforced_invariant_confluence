@@ -2,6 +2,9 @@
 #define BENCHMARK_MASTER_H_
 
 #include <functional>
+#include <map>
+
+#include "glog/logging.h"
 
 #include "benchmark.pb.h"
 #include "cluster.h"
@@ -17,15 +20,36 @@ class BenchmarkMaster {
 
   void ServersStart(const BenchmarkServerStartRequest& start);
   void ServersKill(const BenchmarkServerKillRequest& kill);
-  void ClientsVaryWithdraws(
+  double ClientsVaryWithdraws(
       const BenchmarkClientVaryWithdrawsRequest& vary_withdraws);
-  void ClientsVarySegments(
+  double ClientsVarySegments(
       const BenchmarkClientVarySegmentsRequest& vary_segments);
-  void ClientsVaryNodes(const BenchmarkClientVaryNodesRequest& vary_nodes);
+  double ClientsVaryNodes(const BenchmarkClientVaryNodesRequest& vary_nodes);
 
  private:
   using reply_to_index_t = std::function<replica_index_t(const std::string&)>;
   void WaitForNReplies(std::size_t n, const reply_to_index_t& f);
+
+  template <typename T>
+  using reply_to_t = std::function<T(const std::string&)>;
+
+  template <typename T>
+  std::map<replica_index_t, T> CollectNReplies(std::size_t n,
+                                               const reply_to_t<T>& f) {
+    // Wait for replies.
+    std::map<replica_index_t, T> replies;
+    while (replies.size() < n) {
+      std::string reply_str;
+      socket_.RecvFrom(&reply_str, nullptr);
+      T x = f(reply_str);
+      replica_index_t index = x.index();
+      using value_type = typename std::map<replica_index_t, T>::value_type;
+      replies.insert(value_type{index, std::move(x)});
+      LOG(INFO) << replies.size() << " / " << n << ": Received reply from "
+                << index << ".";
+    }
+    return replies;
+  }
 
   UdpSocket socket_;
   const Cluster benchmark_server_cluster_;

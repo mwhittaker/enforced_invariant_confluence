@@ -98,7 +98,8 @@ int main(int argc, char* argv[]) {
       vary_withdraws.set_fraction_withdraw(fraction_withdraw);
       vary_withdraws.set_duration_in_milliseconds(duration_in_milliseconds);
       vary_withdraws.set_server_type(server_type);
-      master.ClientsVaryWithdraws(vary_withdraws);
+      double txns_per_s = master.ClientsVaryWithdraws(vary_withdraws);
+      std::cout << txns_per_s << " txns per second." << std::endl;
     } else {
       std::cerr << ReplUsage() << std::endl;
     }
