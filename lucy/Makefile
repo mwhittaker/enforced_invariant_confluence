@@ -17,7 +17,8 @@ BINARIES = two_ints_main \
 		   echo_server \
 		   bank_account_client_main \
 		   server_main \
-		   benchmark_server_main
+		   benchmark_server_main \
+		   benchmark_master_repl
 BINARY_SOURCES = $(addsuffix .cc, $(BINARIES))
 BINARY_OBJECTS = $(addprefix $(BIN)/, $(addsuffix .o, $(BINARIES)))
 SOURCES = $(wildcard *.cc)
