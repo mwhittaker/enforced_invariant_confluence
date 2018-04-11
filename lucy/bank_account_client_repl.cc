@@ -12,7 +12,7 @@
 namespace {
 
 std::string Usage() {
-  return "./bank_account_client_main <cluster_file> <paxos|segmented|gossip>";
+  return "./bank_account_client_repl <cluster_file> <paxos|segmented|gossip>";
 }
 
 std::string ReplUsage() { return "get | deposit <n> | withdraw <n>"; }

@@ -14,7 +14,7 @@ PROTO_SOURCES = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.cc))
 PROTO_OBJECTS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.o))
 
 BINARIES = \
-	bank_account_client_main \
+	bank_account_client_repl \
 	benchmark_client_main \
 	benchmark_master_repl \
 	benchmark_server_main \
