@@ -5,12 +5,40 @@ message TwoIntsProto {
   required int64 y = 2;
 }
 
+// Increment x.
+message TwoIntsIncrementXRequest {
+}
+
+message TwoIntsIncrementXReply {
+}
+
+// Decrement y.
+message TwoIntsDecrementYRequest {
+}
+
+message TwoIntsDecrementYReply {
+}
+
+// Get.
+message TwoIntsGetRequest {
+}
+
+message TwoIntsGetReply {
+  required int64 x = 1;
+  required int64 y = 2;
+}
+
+// Request and reply.
 message TwoIntsTxnRequest {
   enum Type {
     INCREMENT_X = 0;
     DECREMENT_Y = 1;
+    GET = 2;
   }
   required Type type = 1;
+  optional TwoIntsIncrementXRequest increment_x = 2;
+  optional TwoIntsDecrementYRequest decrement_y = 3;
+  optional TwoIntsGetRequest get = 4;
 }
 
 message TwoIntsTxnReply {
@@ -19,4 +47,7 @@ message TwoIntsTxnReply {
     ABORTED = 1;
   }
   required Result result = 1;
+  optional TwoIntsIncrementXReply increment_x = 2;
+  optional TwoIntsDecrementYReply decrement_y = 3;
+  optional TwoIntsGetReply get = 4;
 }

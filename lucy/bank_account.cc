@@ -94,6 +94,7 @@ void BankAccount::Merge(const std::string& o) {
     p_[i] = std::max(p_[i], proto.p(i));
     n_[i] = std::max(n_[i], proto.n(i));
   }
+  CHECK_GE(Value(), 0);
 }
 
 void BankAccount::Set(const std::string& o) {
@@ -105,6 +106,7 @@ void BankAccount::Set(const std::string& o) {
     p_[i] = proto.p(i);
     n_[i] = proto.n(i);
   }
+  CHECK_GE(Value(), 0);
 }
 
 std::string BankAccount::Get() {
