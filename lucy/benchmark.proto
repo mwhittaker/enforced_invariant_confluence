@@ -65,6 +65,7 @@ message BenchmarkClientVaryWithdrawsReply {
 }
 
 message BenchmarkClientVarySegmentsRequest {
+  // TODO: Implement.
 }
 
 message BenchmarkClientVarySegmentsReply {
@@ -73,6 +74,7 @@ message BenchmarkClientVarySegmentsReply {
 }
 
 message BenchmarkClientVaryNodesRequest {
+  // TODO: Implement.
 }
 
 message BenchmarkClientVaryNodesReply {

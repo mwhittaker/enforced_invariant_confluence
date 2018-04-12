@@ -104,7 +104,7 @@ void BenchmarkClient::HandleVarySegments(
     const BenchmarkClientVarySegmentsRequest& vary_segments,
     const UdpAddress& src_addr) {
   LOG(INFO) << "Received VarySegments request from " << src_addr << ".";
-  LOG(FATAL) << "Not implemented.";
+  LOG(FATAL) << "TODO: Implement.";
   (void)vary_segments;
 }
 
@@ -112,6 +112,6 @@ void BenchmarkClient::HandleVaryNodes(
     const BenchmarkClientVaryNodesRequest& vary_nodes,
     const UdpAddress& src_addr) {
   LOG(INFO) << "Received VaryNodes request from " << src_addr << ".";
-  LOG(FATAL) << "Not implemented.";
+  LOG(FATAL) << "TODO: Implement.";
   (void)vary_nodes;
 }
