@@ -46,7 +46,7 @@ TwoIntsClient::Result TwoIntsClient::DecrementY(const UdpAddress& dst_addr) {
   TwoIntsTxnReply reply;
   reply.ParseFromString(ExecTxn(request_str, dst_addr));
   if (reply.result() == TwoIntsTxnReply::COMMITTED) {
-    CHECK(reply.has_increment_x());
+    CHECK(reply.has_decrement_y());
     return COMMITTED;
   } else {
     return ABORTED;

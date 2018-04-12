@@ -8,6 +8,7 @@ benchmark_server_main
 echo_client
 echo_server
 server_main
+two_ints_client_repl
 two_ints_main
 
 ################################################################################

@@ -21,6 +21,7 @@ BINARIES = \
 	echo_client \
 	echo_server \
 	server_main \
+	two_ints_client_repl \
 	two_ints_main
 BINARY_SOURCES = $(addsuffix .cc, $(BINARIES))
 BINARY_OBJECTS = $(addprefix $(BIN)/, $(addsuffix .o, $(BINARIES)))
