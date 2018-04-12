@@ -5,10 +5,11 @@
 #include <vector>
 
 #include "object.h"
+#include "server.h"
 
 class BankAccount : public Object {
  public:
-  BankAccount(int num_replicas, int replica);
+  BankAccount(std::size_t num_replicas, replica_index_t replica);
 
   std::string Run(const std::string& txn) override;
   SyncStatus RunSegmented(const std::string& txn, std::string* reply) override;
@@ -19,10 +20,10 @@ class BankAccount : public Object {
  private:
   std::int64_t Value() const;
 
-  int num_replicas_;
-  int replica_;
-  std::vector<std::int64_t> p_;
-  std::vector<std::int64_t> n_;
+  std::size_t num_replicas_;
+  replica_index_t replica_;
+  std::vector<std::uint64_t> p_;
+  std::vector<std::uint64_t> n_;
 };
 
 #endif  // BANK_ACCOUNT_H_

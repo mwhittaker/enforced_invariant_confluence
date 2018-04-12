@@ -1,8 +1,8 @@
 syntax = "proto2";
 
 message BankAccountProto {
-  repeated int64 p = 1;
-  repeated int64 n = 2;
+  repeated uint64 p = 1;
+  repeated uint64 n = 2;
 }
 
 // Deposit.
@@ -11,11 +11,6 @@ message BankAccountDepositRequest {
 }
 
 message BankAccountDepositReply {
-  enum Result {
-    COMMITTED = 0;
-    ABORTED = 1;
-  }
-  required Result result = 1;
 }
 
 // Withdraw.
@@ -24,11 +19,6 @@ message BankAccountWithdrawRequest {
 }
 
 message BankAccountWithdrawReply {
-  enum Result {
-    COMMITTED = 0;
-    ABORTED = 1;
-  }
-  required Result result = 1;
 }
 
 // Get.
@@ -47,13 +37,18 @@ message BankAccountTxnRequest {
     GET = 2;
   }
   required Type type = 1;
-  optional BankAccountDepositRequest deposit_request = 2;
-  optional BankAccountWithdrawRequest withdraw_request = 3;
-  optional BankAccountGetRequest get_request = 4;
+  optional BankAccountDepositRequest deposit = 2;
+  optional BankAccountWithdrawRequest withdraw = 3;
+  optional BankAccountGetRequest get = 4;
 }
 
 message BankAccountTxnReply {
-  optional BankAccountDepositReply deposit_reply = 1;
-  optional BankAccountWithdrawReply withdraw_reply = 2;
-  optional BankAccountGetReply get_reply = 3;
+  enum Result {
+    COMMITTED = 0;
+    ABORTED = 1;
+  }
+  required Result result = 1;
+  optional BankAccountDepositReply deposit = 2;
+  optional BankAccountWithdrawReply withdraw = 3;
+  optional BankAccountGetReply get = 4;
 }

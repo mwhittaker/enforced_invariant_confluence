@@ -7,46 +7,44 @@
 std::int64_t BankAccountClient::Get(const UdpAddress& dst_addr) {
   BankAccountTxnRequest request;
   request.set_type(BankAccountTxnRequest::GET);
-  request.mutable_get_request();
+  request.mutable_get();
   std::string request_str;
   request.SerializeToString(&request_str);
 
   BankAccountTxnReply reply;
   reply.ParseFromString(Run(request_str, dst_addr));
-  CHECK(reply.has_get_reply());
-  return reply.get_reply().value();
+  CHECK(reply.has_get());
+  CHECK_EQ(reply.result(), BankAccountTxnReply::COMMITTED);
+  return reply.get().value();
 }
 
 BankAccountClient::Result BankAccountClient::Deposit(
     std::int64_t amount, const UdpAddress& dst_addr) {
   BankAccountTxnRequest request;
   request.set_type(BankAccountTxnRequest::DEPOSIT);
-  request.mutable_deposit_request()->set_amount(amount);
+  request.mutable_deposit()->set_amount(amount);
   std::string request_str;
   request.SerializeToString(&request_str);
 
   BankAccountTxnReply reply;
   reply.ParseFromString(Run(request_str, dst_addr));
-  CHECK(reply.has_deposit_reply());
-  if (reply.deposit_reply().result() == BankAccountDepositReply::COMMITTED) {
-    return COMMITTED;
-  } else {
-    return ABORTED;
-  }
+  CHECK(reply.has_deposit());
+  CHECK_EQ(reply.result(), BankAccountTxnReply::COMMITTED);
+  return COMMITTED;
 }
 
 BankAccountClient::Result BankAccountClient::Withdraw(
     std::int64_t amount, const UdpAddress& dst_addr) {
   BankAccountTxnRequest request;
   request.set_type(BankAccountTxnRequest::WITHDRAW);
-  request.mutable_withdraw_request()->set_amount(amount);
+  request.mutable_withdraw()->set_amount(amount);
   std::string request_str;
   request.SerializeToString(&request_str);
 
   BankAccountTxnReply reply;
   reply.ParseFromString(Run(request_str, dst_addr));
-  CHECK(reply.has_withdraw_reply());
-  if (reply.withdraw_reply().result() == BankAccountWithdrawReply::COMMITTED) {
+  CHECK(reply.has_withdraw());
+  if (reply.result() == BankAccountTxnReply::COMMITTED) {
     return COMMITTED;
   } else {
     return ABORTED;
