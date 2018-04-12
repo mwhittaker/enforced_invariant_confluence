@@ -9,7 +9,6 @@ void PaxosServer::Run() {
   } else {
     RunFollower();
   }
-  // TODO: Implement.
 }
 
 bool PaxosServer::AmLeader() const { return replica_index_ == 0; }
