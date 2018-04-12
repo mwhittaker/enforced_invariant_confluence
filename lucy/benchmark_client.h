@@ -1,6 +1,9 @@
 #ifndef BENCHMARK_CLIENT_H_
 #define BENCHMARK_CLIENT_H_
 
+#include <chrono>
+#include <functional>
+
 #include "benchmark.pb.h"
 #include "cluster.h"
 #include "server.h"
@@ -18,10 +21,19 @@ class BenchmarkClient {
   void Run();
 
  private:
+  struct WorkloadResult {
+    const std::uint64_t num_txns;
+    const std::chrono::nanoseconds duration;
+    const double txns_per_second;
+  };
+
   void HandleBankAccount(const BenchmarkClientBankAccountRequest& bank_account,
                          const UdpAddress& src_addr);
   void HandleTwoInts(const BenchmarkClientTwoIntsRequest& two_ints,
                      const UdpAddress& src_addr);
+  WorkloadResult ExecWorkloadFor(std::chrono::milliseconds duration,
+
+                                 std::function<void(void)> f) const;
 
   UdpSocket socket_;
   const Cluster benchmark_client_cluster_;

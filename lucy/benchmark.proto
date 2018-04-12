@@ -68,9 +68,8 @@ message BenchmarkClientBankAccountReply {
 
 message BenchmarkClientTwoIntsRequest {
   required uint64 num_servers = 1;
-  required uint64 segment_side_length = 2;
-  required uint64 duration_in_milliseconds = 3;
-  required ServerType server_type = 4;
+  required uint64 duration_in_milliseconds = 2;
+  required ServerType server_type = 3;
 }
 
 message BenchmarkClientTwoIntsReply {
