@@ -3,6 +3,7 @@
 #include "glog/logging.h"
 
 #include "bank_account.pb.h"
+#include "proto_util.h"
 
 BankAccount::BankAccount(std::size_t num_replicas, replica_index_t replica)
     : num_replicas_(num_replicas),
@@ -15,73 +16,51 @@ BankAccount::BankAccount(std::size_t num_replicas, replica_index_t replica)
 }
 
 std::string BankAccount::Run(const std::string& txn) {
-  BankAccountTxnRequest request;
-  request.ParseFromString(txn);
+  const auto request = ProtoFromString<BankAccountTxnRequest>(txn);
   BankAccountTxnReply reply;
 
-  switch (request.type()) {
-    case BankAccountTxnRequest::DEPOSIT: {
-      CHECK(request.has_deposit());
-      p_[replica_] += request.deposit().amount();
+  if (request.has_deposit()) {
+    p_[replica_] += request.deposit().amount();
+    reply.set_result(BankAccountTxnReply::COMMITTED);
+    reply.mutable_deposit();
+  } else if (request.has_withdraw()) {
+    if (Value() - request.withdraw().amount() >= 0) {
+      n_[replica_] += request.withdraw().amount();
+      reply.mutable_withdraw();
       reply.set_result(BankAccountTxnReply::COMMITTED);
-      reply.mutable_deposit();
-      break;
+    } else {
+      reply.set_result(BankAccountTxnReply::ABORTED);
     }
-    case BankAccountTxnRequest::WITHDRAW: {
-      CHECK(request.has_withdraw());
-      if (Value() - request.withdraw().amount() >= 0) {
-        n_[replica_] += request.withdraw().amount();
-        reply.mutable_withdraw();
-        reply.set_result(BankAccountTxnReply::COMMITTED);
-      } else {
-        reply.set_result(BankAccountTxnReply::ABORTED);
-      }
-      break;
-    }
-    case BankAccountTxnRequest::GET: {
-      CHECK(request.has_get());
-      reply.set_result(BankAccountTxnReply::COMMITTED);
-      reply.mutable_get()->set_value(Value());
-      break;
-    }
-    default:
-      LOG(FATAL) << "Unrecognized transaction type.";
+  } else if (request.has_get()) {
+    reply.set_result(BankAccountTxnReply::COMMITTED);
+    reply.mutable_get()->set_value(Value());
+  } else {
+    LOG(FATAL) << "Unrecognized transaction type.";
   }
 
-  std::string s;
-  reply.SerializeToString(&s);
-  return s;
+  return ProtoToString(reply);
 }
 
 SyncStatus BankAccount::RunSegmented(const std::string& txn,
                                      std::string* reply) {
-  BankAccountTxnRequest txn_request;
-  txn_request.ParseFromString(txn);
-
-  switch (txn_request.type()) {
-    case BankAccountTxnRequest::DEPOSIT: {
-      CHECK(txn_request.has_deposit());
-      p_[replica_] += txn_request.deposit().amount();
-      BankAccountTxnReply txn_reply;
-      txn_reply.set_result(BankAccountTxnReply::COMMITTED);
-      txn_reply.mutable_deposit();
-      txn_reply.SerializeToString(reply);
-      return SyncStatus::EXECUTED_LOCALLY;
-    }
-    case BankAccountTxnRequest::WITHDRAW: {
-      CHECK(txn_request.has_withdraw());
-      return SyncStatus::REQUIRES_SYNC;
-    }
-    case BankAccountTxnRequest::GET: {
-      CHECK(txn_request.has_get());
-      BankAccountTxnReply txn_reply;
-      txn_reply.set_result(BankAccountTxnReply::COMMITTED);
-      txn_reply.mutable_get()->set_value(Value());
-      txn_reply.SerializeToString(reply);
-      return SyncStatus::EXECUTED_LOCALLY;
-    }
-    default:
-      LOG(FATAL) << "Unrecognized transaction type.";
+  const auto request = ProtoFromString<BankAccountTxnRequest>(txn);
+  if (request.has_deposit()) {
+    p_[replica_] += request.deposit().amount();
+    BankAccountTxnReply txn_reply;
+    txn_reply.set_result(BankAccountTxnReply::COMMITTED);
+    txn_reply.mutable_deposit();
+    txn_reply.SerializeToString(reply);
+    return SyncStatus::EXECUTED_LOCALLY;
+  } else if (request.has_withdraw()) {
+    return SyncStatus::REQUIRES_SYNC;
+  } else if (request.has_get()) {
+    BankAccountTxnReply txn_reply;
+    txn_reply.set_result(BankAccountTxnReply::COMMITTED);
+    txn_reply.mutable_get()->set_value(Value());
+    txn_reply.SerializeToString(reply);
+    return SyncStatus::EXECUTED_LOCALLY;
+  } else {
+    LOG(FATAL) << "Unrecognized transaction type.";
   }
 }
 

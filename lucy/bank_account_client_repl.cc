@@ -6,6 +6,7 @@
 #include "glog/logging.h"
 
 #include "bank_account_client.h"
+#include "benchmark.pb.h"
 #include "cluster.h"
 #include "string_util.h"
 
@@ -16,6 +17,18 @@ std::string Usage() {
 }
 
 std::string ReplUsage() { return "get | deposit <n> | withdraw <n>"; }
+
+ServerType StringToServerType(const std::string& s) {
+  if (s == "paxos") {
+    return PAXOS;
+  } else if (s == "segmented") {
+    return SEGMENTED;
+  } else if (s == "gossip") {
+    return GOSSIP;
+  } else {
+    LOG(FATAL) << "Unexpected server type.";
+  }
+}
 
 std::string ResultToString(BankAccountClient::Result result) {
   switch (result) {
@@ -38,38 +51,25 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
   const std::string cluster_filename = argv[1];
-  const std::string server_mode = argv[2];
-  if (!(server_mode == "paxos" || server_mode == "segmented" ||
-        server_mode == "gossip")) {
-    std::cerr << Usage() << std::endl;
-    return EXIT_FAILURE;
-  }
+  const ServerType server_type = StringToServerType(argv[2]);
 
   Cluster cluster(cluster_filename);
-  BankAccountClient client;
+  BankAccountClient client(server_type, cluster);
 
   std::string line;
   std::cout << "> " << std::flush;
-  std::size_t replica_ = 0;
   while (std::getline(std::cin, line)) {
     std::vector<std::string> words = Split(line);
-    const UdpAddress& dst_addr = cluster.UdpAddrs()[replica_];
     if (words.size() == 1 && words[0] == "get") {
-      std::cout << client.Get(dst_addr) << std::endl;
+      std::cout << client.Get() << std::endl;
     } else if (words.size() == 2 && words[0] == "deposit") {
-      BankAccountClient::Result result =
-          client.Deposit(std::stoi(words[1]), dst_addr);
+      BankAccountClient::Result result = client.Deposit(std::stoi(words[1]));
       std::cout << ResultToString(result) << std::endl;
     } else if (words.size() == 2 && words[0] == "withdraw") {
-      BankAccountClient::Result result =
-          client.Withdraw(std::stoi(words[1]), dst_addr);
+      BankAccountClient::Result result = client.Withdraw(std::stoi(words[1]));
       std::cout << ResultToString(result) << std::endl;
     } else {
       std::cout << ReplUsage() << std::endl;
-    }
-
-    if (server_mode != "paxos") {
-      replica_ = (replica_ + 1) % cluster.Size();
     }
     std::cout << "> " << std::flush;
   }

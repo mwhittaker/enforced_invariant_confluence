@@ -2,18 +2,28 @@
 
 #include "glog/logging.h"
 
+#include "proto_util.h"
 #include "two_ints.pb.h"
+
+std::pair<std::int64_t, std::int64_t> TwoIntsClient::Get() {
+  return Get(GetServerAddress());
+}
+
+TwoIntsClient::Result TwoIntsClient::IncrementX() {
+  return IncrementX(GetServerAddress());
+}
+
+TwoIntsClient::Result TwoIntsClient::DecrementY() {
+  return DecrementY(GetServerAddress());
+}
 
 std::pair<std::int64_t, std::int64_t> TwoIntsClient::Get(
     const UdpAddress& dst_addr) {
   TwoIntsTxnRequest request;
-  request.set_type(TwoIntsTxnRequest::GET);
   request.mutable_get();
-  std::string request_str;
-  request.SerializeToString(&request_str);
 
-  TwoIntsTxnReply reply;
-  reply.ParseFromString(ExecTxn(request_str, dst_addr));
+  const std::string reply_str = ExecTxn(ProtoToString(request), dst_addr);
+  const auto reply = ProtoFromString<TwoIntsTxnReply>(reply_str);
   CHECK_EQ(reply.result(), TwoIntsTxnReply::COMMITTED);
   CHECK(reply.has_get());
   return {reply.get().x(), reply.get().y()};
@@ -21,13 +31,10 @@ std::pair<std::int64_t, std::int64_t> TwoIntsClient::Get(
 
 TwoIntsClient::Result TwoIntsClient::IncrementX(const UdpAddress& dst_addr) {
   TwoIntsTxnRequest request;
-  request.set_type(TwoIntsTxnRequest::INCREMENT_X);
   request.mutable_increment_x();
-  std::string request_str;
-  request.SerializeToString(&request_str);
 
-  TwoIntsTxnReply reply;
-  reply.ParseFromString(ExecTxn(request_str, dst_addr));
+  const std::string reply_str = ExecTxn(ProtoToString(request), dst_addr);
+  const auto reply = ProtoFromString<TwoIntsTxnReply>(reply_str);
   if (reply.result() == TwoIntsTxnReply::COMMITTED) {
     CHECK(reply.has_increment_x());
     return COMMITTED;
@@ -38,13 +45,10 @@ TwoIntsClient::Result TwoIntsClient::IncrementX(const UdpAddress& dst_addr) {
 
 TwoIntsClient::Result TwoIntsClient::DecrementY(const UdpAddress& dst_addr) {
   TwoIntsTxnRequest request;
-  request.set_type(TwoIntsTxnRequest::DECREMENT_Y);
   request.mutable_decrement_y();
-  std::string request_str;
-  request.SerializeToString(&request_str);
 
-  TwoIntsTxnReply reply;
-  reply.ParseFromString(ExecTxn(request_str, dst_addr));
+  const std::string reply_str = ExecTxn(ProtoToString(request), dst_addr);
+  const auto reply = ProtoFromString<TwoIntsTxnReply>(reply_str);
   if (reply.result() == TwoIntsTxnReply::COMMITTED) {
     CHECK(reply.has_decrement_y());
     return COMMITTED;

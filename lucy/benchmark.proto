@@ -30,25 +30,17 @@ message BenchmarkServerKillReply {
 }
 
 message BenchmarkServerRequest {
-  enum Type {
-    START_REQUEST = 0;
-    KILL_REQUEST = 1;
+  oneof request {
+    BenchmarkServerStartRequest start = 1;
+    BenchmarkServerKillRequest kill = 2;
   }
-
-  required Type type = 1;
-  optional BenchmarkServerStartRequest start_request = 2;
-  optional BenchmarkServerKillRequest kill_request = 3;
 }
 
 message BenchmarkServerReply {
-  enum Type {
-    START_REPLY = 0;
-    KILL_REPLY = 1;
+  oneof reply {
+    BenchmarkServerStartReply start = 1;
+    BenchmarkServerKillReply kill = 2;
   }
-
-  required Type type = 1;
-  optional BenchmarkServerStartReply start_reply = 2;
-  optional BenchmarkServerKillReply kill_reply = 3;
 }
 
 // Client.
@@ -80,23 +72,15 @@ message BenchmarkClientTwoIntsReply {
 }
 
 message BenchmarkClientRequest {
-  enum Type {
-    BANK_ACCOUNT = 0;
-    TWO_INTS = 1;
+  oneof request {
+    BenchmarkClientBankAccountRequest bank_account = 1;
+    BenchmarkClientTwoIntsRequest two_ints = 2;
   }
-
-  required Type type = 1;
-  optional BenchmarkClientBankAccountRequest bank_account = 2;
-  optional BenchmarkClientTwoIntsRequest two_ints = 3;
 }
 
 message BenchmarkClientReply {
-  enum Type {
-    BANK_ACCOUNT = 0;
-    TWO_INTS = 1;
+  oneof reply {
+    BenchmarkClientBankAccountReply bank_account = 1;
+    BenchmarkClientTwoIntsReply two_ints = 2;
   }
-
-  required Type type = 1;
-  optional BenchmarkClientBankAccountReply bank_account = 2;
-  optional BenchmarkClientTwoIntsReply two_ints = 3;
 }

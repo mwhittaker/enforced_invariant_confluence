@@ -44,26 +44,15 @@ message Die {
 }
 
 message ServerMessage {
-  enum Type {
-    MERGE_REQUEST = 0;
-    TXN_REQUEST = 1;
-    TXN_REPLY = 2;
-    PREPARE = 3;
-    PREPARE_OK = 4;
-    SYNC_REQUEST = 5;
-    SYNC_REPLY = 6;
-    START = 7;
-    DIE = 8;
+  oneof msg {
+    MergeRequest merge_request = 1;
+    TxnRequest txn_request = 2;
+    TxnReply txn_reply = 3;
+    Prepare prepare = 4;
+    PrepareOk prepare_ok = 5;
+    SyncRequest sync_request = 6;
+    SyncReply sync_reply = 7;
+    Start start = 8;
+    Die die = 9;
   }
-
-  required Type type = 1;
-  optional MergeRequest merge_request = 2;
-  optional TxnRequest txn_request = 3;
-  optional TxnReply txn_reply = 4;
-  optional Prepare prepare = 5;
-  optional PrepareOk prepare_ok = 6;
-  optional SyncRequest sync_request = 7;
-  optional SyncReply sync_reply = 8;
-  optional Start start = 9;
-  optional Die die = 10;
 }

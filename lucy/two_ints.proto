@@ -30,15 +30,11 @@ message TwoIntsGetReply {
 
 // Request and reply.
 message TwoIntsTxnRequest {
-  enum Type {
-    INCREMENT_X = 0;
-    DECREMENT_Y = 1;
-    GET = 2;
+  oneof request {
+    TwoIntsIncrementXRequest increment_x = 1;
+    TwoIntsDecrementYRequest decrement_y = 2;
+    TwoIntsGetRequest get = 3;
   }
-  required Type type = 1;
-  optional TwoIntsIncrementXRequest increment_x = 2;
-  optional TwoIntsDecrementYRequest decrement_y = 3;
-  optional TwoIntsGetRequest get = 4;
 }
 
 message TwoIntsTxnReply {
@@ -46,8 +42,11 @@ message TwoIntsTxnReply {
     COMMITTED = 0;
     ABORTED = 1;
   }
+
   required Result result = 1;
-  optional TwoIntsIncrementXReply increment_x = 2;
-  optional TwoIntsDecrementYReply decrement_y = 3;
-  optional TwoIntsGetReply get = 4;
+  oneof reply {
+    TwoIntsIncrementXReply increment_x = 2;
+    TwoIntsDecrementYReply decrement_y = 3;
+    TwoIntsGetReply get = 4;
+  }
 }

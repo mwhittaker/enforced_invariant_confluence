@@ -2,95 +2,85 @@
 
 #include "glog/logging.h"
 
-std::string TwoInts::Run(const std::string& txn) {
-  TwoIntsTxnRequest txn_request;
-  txn_request.ParseFromString(txn);
+#include "proto_util.h"
 
-  TwoIntsTxnReply txn_reply;
-  switch (txn_request.type()) {
-    case TwoIntsTxnRequest::INCREMENT_X: {
-      if (PointSatisfiesInvariant(x_ + 1, y_)) {
-        x_++;
-        txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
-        txn_reply.mutable_increment_x();
-      } else {
-        txn_reply.set_result(TwoIntsTxnReply::ABORTED);
-      }
-      break;
+std::string TwoInts::Run(const std::string& txn) {
+  const auto request = ProtoFromString<TwoIntsTxnRequest>(txn);
+  TwoIntsTxnReply reply;
+
+  if (request.has_increment_x()) {
+    if (PointSatisfiesInvariant(x_ + 1, y_)) {
+      x_++;
+      reply.set_result(TwoIntsTxnReply::COMMITTED);
+      reply.mutable_increment_x();
+    } else {
+      reply.set_result(TwoIntsTxnReply::ABORTED);
     }
-    case TwoIntsTxnRequest::DECREMENT_Y: {
-      if (PointSatisfiesInvariant(x_, y_ - 1)) {
-        y_--;
-        txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
-        txn_reply.mutable_decrement_y();
-      } else {
-        txn_reply.set_result(TwoIntsTxnReply::ABORTED);
-      }
-      break;
+  } else if (request.has_decrement_y()) {
+    if (PointSatisfiesInvariant(x_, y_ - 1)) {
+      y_--;
+      reply.set_result(TwoIntsTxnReply::COMMITTED);
+      reply.mutable_decrement_y();
+    } else {
+      reply.set_result(TwoIntsTxnReply::ABORTED);
     }
-    case TwoIntsTxnRequest::GET: {
-      txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
-      txn_reply.mutable_get()->set_x(x_);
-      txn_reply.mutable_get()->set_y(y_);
-      break;
-    }
-    default: { LOG(FATAL) << "Unrecognized txn type."; }
+  } else if (request.has_get()) {
+    reply.set_result(TwoIntsTxnReply::COMMITTED);
+    reply.mutable_get()->set_x(x_);
+    reply.mutable_get()->set_y(y_);
+  } else {
+    LOG(FATAL) << "Unrecognized txn type.";
   }
 
-  std::string txn_reply_str;
-  txn_reply.SerializeToString(&txn_reply_str);
-  return txn_reply_str;
+  return ProtoToString(reply);
 }
 
 SyncStatus TwoInts::RunSegmented(const std::string& txn, std::string* reply) {
-  TwoIntsTxnRequest txn_request;
-  txn_request.ParseFromString(txn);
-  switch (txn_request.type()) {
-    case TwoIntsTxnRequest::INCREMENT_X: {
-      if (PointSatisfiesSegmentInvariant(x_ + 1, y_, segment_)) {
-        x_++;
+  const auto request = ProtoFromString<TwoIntsTxnRequest>(txn);
 
-        TwoIntsTxnReply txn_reply;
-        txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
-        txn_reply.mutable_increment_x();
-        txn_reply.SerializeToString(reply);
-        return SyncStatus::EXECUTED_LOCALLY;
-      } else if (!PointSatisfiesInvariant(x_ + 1, y_)) {
-        TwoIntsTxnReply txn_reply;
-        txn_reply.set_result(TwoIntsTxnReply::ABORTED);
-        txn_reply.SerializeToString(reply);
-        return SyncStatus::EXECUTED_LOCALLY;
-      } else {
-        return SyncStatus::REQUIRES_SYNC;
-      }
-    }
-    case TwoIntsTxnRequest::DECREMENT_Y: {
-      if (PointSatisfiesSegmentInvariant(x_, y_ - 1, segment_)) {
-        y_--;
+  if (request.has_increment_x()) {
+    if (PointSatisfiesSegmentInvariant(x_ + 1, y_, segment_)) {
+      x_++;
 
-        TwoIntsTxnReply txn_reply;
-        txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
-        txn_reply.mutable_decrement_y();
-        txn_reply.SerializeToString(reply);
-        return SyncStatus::EXECUTED_LOCALLY;
-      } else if (!PointSatisfiesInvariant(x_, y_ - 1)) {
-        TwoIntsTxnReply txn_reply;
-        txn_reply.set_result(TwoIntsTxnReply::ABORTED);
-        txn_reply.SerializeToString(reply);
-        return SyncStatus::EXECUTED_LOCALLY;
-      } else {
-        return SyncStatus::REQUIRES_SYNC;
-      }
-    }
-    case TwoIntsTxnRequest::GET: {
       TwoIntsTxnReply txn_reply;
       txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
-      txn_reply.mutable_get()->set_x(x_);
-      txn_reply.mutable_get()->set_y(y_);
+      txn_reply.mutable_increment_x();
       txn_reply.SerializeToString(reply);
       return SyncStatus::EXECUTED_LOCALLY;
+    } else if (!PointSatisfiesInvariant(x_ + 1, y_)) {
+      TwoIntsTxnReply txn_reply;
+      txn_reply.set_result(TwoIntsTxnReply::ABORTED);
+      txn_reply.SerializeToString(reply);
+      return SyncStatus::EXECUTED_LOCALLY;
+    } else {
+      return SyncStatus::REQUIRES_SYNC;
     }
-    default: { LOG(FATAL) << "Unrecognized txn type."; }
+  } else if (request.has_decrement_y()) {
+    if (PointSatisfiesSegmentInvariant(x_, y_ - 1, segment_)) {
+      y_--;
+
+      TwoIntsTxnReply txn_reply;
+      txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
+      txn_reply.mutable_decrement_y();
+      txn_reply.SerializeToString(reply);
+      return SyncStatus::EXECUTED_LOCALLY;
+    } else if (!PointSatisfiesInvariant(x_, y_ - 1)) {
+      TwoIntsTxnReply txn_reply;
+      txn_reply.set_result(TwoIntsTxnReply::ABORTED);
+      txn_reply.SerializeToString(reply);
+      return SyncStatus::EXECUTED_LOCALLY;
+    } else {
+      return SyncStatus::REQUIRES_SYNC;
+    }
+  } else if (request.has_get()) {
+    TwoIntsTxnReply txn_reply;
+    txn_reply.set_result(TwoIntsTxnReply::COMMITTED);
+    txn_reply.mutable_get()->set_x(x_);
+    txn_reply.mutable_get()->set_y(y_);
+    txn_reply.SerializeToString(reply);
+    return SyncStatus::EXECUTED_LOCALLY;
+  } else {
+    LOG(FATAL) << "Unrecognized txn type.";
   }
 }
 

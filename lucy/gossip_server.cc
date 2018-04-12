@@ -2,6 +2,7 @@
 
 #include "glog/logging.h"
 
+#include "proto_util.h"
 #include "rand_util.h"
 
 void GossipServer::Run() {
@@ -13,24 +14,15 @@ void GossipServer::Run() {
     UdpAddress src_addr;
     socket_.RecvFrom(&msg, &src_addr);
 
-    ServerMessage proto;
-    proto.ParseFromString(msg);
-    switch (proto.type()) {
-      case ServerMessage::MERGE_REQUEST: {
-        CHECK(proto.has_merge_request());
-        HandleMergeRequest(proto.merge_request(), src_addr);
-        break;
-      }
-      case ServerMessage::TXN_REQUEST: {
-        CHECK(proto.has_txn_request());
-        HandleTxnRequest(proto.txn_request(), src_addr);
-        break;
-      }
-      case ServerMessage::DIE: {
-        CHECK(proto.has_die());
-        return;
-      }
-      default: { LOG(FATAL) << "Unexpected server message type"; }
+    const auto proto = ProtoFromString<ServerMessage>(msg);
+    if (proto.has_merge_request()) {
+      HandleMergeRequest(proto.merge_request(), src_addr);
+    } else if (proto.has_txn_request()) {
+      HandleTxnRequest(proto.txn_request(), src_addr);
+    } else if (proto.has_die()) {
+      return;
+    } else {
+      LOG(FATAL) << "Unexpected server message type";
     }
   }
 }
@@ -46,11 +38,8 @@ void GossipServer::HandleTxnRequest(const TxnRequest& txn_request,
                                     const UdpAddress& src_addr) {
   VLOG(1) << "Received TxnRequest from " << src_addr << ".";
   ServerMessage msg;
-  msg.set_type(ServerMessage::TXN_REPLY);
   msg.mutable_txn_reply()->set_reply(object_->Run(txn_request.txn()));
-  std::string s;
-  msg.SerializeToString(&s);
-  socket_.SendTo(s, src_addr);
+  socket_.SendTo(ProtoToString(msg), src_addr);
 
   num_requests_serviced_++;
   if (num_requests_serviced_ % num_requests_per_gossip_ == 0) {
@@ -60,10 +49,7 @@ void GossipServer::HandleTxnRequest(const TxnRequest& txn_request,
     const UdpAddress& dst_addr = cluster_.UdpAddrs()[dst_replica];
 
     ServerMessage msg;
-    msg.set_type(ServerMessage::MERGE_REQUEST);
     msg.mutable_merge_request()->set_object(object_->Get());
-    std::string s;
-    msg.SerializeToString(&s);
-    socket_.SendTo(s, dst_addr);
+    socket_.SendTo(ProtoToString(msg), dst_addr);
   }
 }

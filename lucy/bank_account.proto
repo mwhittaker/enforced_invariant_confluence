@@ -31,15 +31,11 @@ message BankAccountGetReply {
 
 // Request and reply.
 message BankAccountTxnRequest {
-  enum Type {
-    DEPOSIT = 0;
-    WITHDRAW = 1;
-    GET = 2;
+  oneof request {
+    BankAccountDepositRequest deposit = 1;
+    BankAccountWithdrawRequest withdraw = 2;
+    BankAccountGetRequest get = 3;
   }
-  required Type type = 1;
-  optional BankAccountDepositRequest deposit = 2;
-  optional BankAccountWithdrawRequest withdraw = 3;
-  optional BankAccountGetRequest get = 4;
 }
 
 message BankAccountTxnReply {
@@ -47,8 +43,11 @@ message BankAccountTxnReply {
     COMMITTED = 0;
     ABORTED = 1;
   }
+
   required Result result = 1;
-  optional BankAccountDepositReply deposit = 2;
-  optional BankAccountWithdrawReply withdraw = 3;
-  optional BankAccountGetReply get = 4;
+  oneof reply {
+    BankAccountDepositReply deposit = 2;
+    BankAccountWithdrawReply withdraw = 3;
+    BankAccountGetReply get = 4;
+  }
 }

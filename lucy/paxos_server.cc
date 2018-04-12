@@ -1,6 +1,7 @@
 #include "paxos_server.h"
 
 #include "glog/logging.h"
+#include "proto_util.h"
 
 void PaxosServer::Run() {
   if (AmLeader()) {
@@ -22,24 +23,16 @@ void PaxosServer::RunLeader() {
     UdpAddress src_addr;
     socket_.RecvFrom(&msg, &src_addr);
 
-    ServerMessage proto;
-    proto.ParseFromString(msg);
-    switch (proto.type()) {
-      case ServerMessage::TXN_REQUEST: {
-        CHECK(proto.has_txn_request());
-        HandleTxnRequest(proto.txn_request(), src_addr);
-        break;
-      }
-      case ServerMessage::PREPARE_OK: {
-        CHECK(proto.has_prepare_ok());
-        HandlePrepareOk(proto.prepare_ok(), src_addr);
-        break;
-      }
-      case ServerMessage::DIE: {
-        CHECK(proto.has_die());
-        return;
-      }
-      default: { LOG(FATAL) << "Unexpected server message type"; }
+    const auto proto = ProtoFromString<ServerMessage>(msg);
+    if (proto.has_txn_request()) {
+      HandleTxnRequest(proto.txn_request(), src_addr);
+    } else if (proto.has_prepare_ok()) {
+      HandlePrepareOk(proto.prepare_ok(), src_addr);
+      break;
+    } else if (proto.has_die()) {
+      return;
+    } else {
+      LOG(FATAL) << "Unexpected server message type";
     }
   }
 }
@@ -52,16 +45,11 @@ void PaxosServer::RunFollower() {
     std::string msg;
     UdpAddress src_addr;
     socket_.RecvFrom(&msg, &src_addr);
-
-    ServerMessage proto;
-    proto.ParseFromString(msg);
-    switch (proto.type()) {
-      case ServerMessage::PREPARE: {
-        CHECK(proto.has_prepare());
-        HandlePrepare(proto.prepare(), src_addr);
-        break;
-      }
-      default: { LOG(FATAL) << "Unexpected server message type"; }
+    const auto proto = ProtoFromString<ServerMessage>(msg);
+    if (proto.has_prepare()) {
+      HandlePrepare(proto.prepare(), src_addr);
+    } else {
+      LOG(FATAL) << "Unexpected server message type";
     }
   }
 }
@@ -81,14 +69,12 @@ void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
 
   // Send Prepare messages to all the other servers.
   ServerMessage msg;
-  msg.set_type(ServerMessage::PREPARE);
   msg.mutable_prepare()->set_txn_index(txn_index);
   msg.mutable_prepare()->set_txn(txn_request.txn());
   msg.mutable_prepare()->set_num_committed(num_committed_);
-  std::string s;
-  msg.SerializeToString(&s);
+  const std::string msg_str = ProtoToString(msg);
   for (std::size_t i = 1; i < cluster_.Size(); ++i) {
-    socket_.SendTo(s, cluster_.UdpAddrs()[i]);
+    socket_.SendTo(msg_str, cluster_.UdpAddrs()[i]);
   }
 }
 
@@ -103,9 +89,9 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
   // Make sure we're expecting a PrepareOk message.
   if (waiting_for_prepare_oks_.find(txn_index) ==
       waiting_for_prepare_oks_.end()) {
-    LOG(INFO) << "PaxosServer leader received a PrepareOk for transaction "
-              << txn_index << " but was not expecting PrepareOks. The leader "
-                              "is ignoring this PrepareOk.";
+    VLOG(1) << "PaxosServer leader received a PrepareOk for transaction "
+            << txn_index << " but was not expecting PrepareOks. The leader "
+                            "is ignoring this PrepareOk.";
   }
 
   // Record this PrepareOk.
@@ -134,12 +120,9 @@ void PaxosServer::HandlePrepare(const Prepare& prepare,
   // Record the transaction and reply to the leader.
   pending_txns_[prepare.txn_index()] = prepare.txn();
   ServerMessage msg;
-  msg.set_type(ServerMessage::PREPARE_OK);
   msg.mutable_prepare_ok()->set_txn_index(prepare.txn_index());
   msg.mutable_prepare_ok()->set_replica_index(replica_index_);
-  std::string s;
-  msg.SerializeToString(&s);
-  socket_.SendTo(s, src_addr);
+  socket_.SendTo(ProtoToString(msg), src_addr);
 
   // Commit any transactions that are ready to commit.
   num_committed_by_leader_ =
@@ -153,12 +136,9 @@ void PaxosServer::LeaderCommitReadyTransactions() {
     // Execute the transaction, and send a reply to the client.
     const PendingTxn& pending_txn = it->second;
     ServerMessage msg;
-    msg.set_type(ServerMessage::TXN_REPLY);
     msg.mutable_txn_reply()->set_reply(
         object_->Run(pending_txn.txn_request.txn()));
-    std::string s;
-    msg.SerializeToString(&s);
-    socket_.SendTo(s, pending_txn.src_addr);
+    socket_.SendTo(ProtoToString(msg), pending_txn.src_addr);
 
     num_committed_++;
     it = waiting_for_commit_.erase(it);
