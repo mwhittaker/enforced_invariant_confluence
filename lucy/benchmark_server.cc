@@ -84,16 +84,13 @@ void BenchmarkServer::StartServer(const BenchmarkServerStartRequest& start) {
 
   // Create the object.
   std::unique_ptr<Object> object;
-  switch (start.object()) {
-    case BenchmarkServerStartRequest::TWO_INTS: {
-      LOG(FATAL) << "TODO: Implement.";
-      break;
-    }
-    case BenchmarkServerStartRequest::BANK_ACCOUNT: {
-      object = std::unique_ptr<Object>(new BankAccount(cluster.Size(), index_));
-      break;
-    }
-    default: { LOG(FATAL) << "Unexpected object type."; }
+  if (start.has_two_ints()) {
+    object =
+        std::unique_ptr<Object>(new TwoInts(start.two_ints().segment_length()));
+  } else if (start.has_bank_account()) {
+    object = std::unique_ptr<Object>(new BankAccount(cluster.Size(), index_));
+  } else {
+    LOG(FATAL) << "Unexpected object type.";
   }
 
   // Create the server.

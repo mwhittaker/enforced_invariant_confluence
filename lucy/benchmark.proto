@@ -8,14 +8,19 @@ enum ServerType {
 
 // Server.
 message BenchmarkServerStartRequest {
-  enum Object {
-    TWO_INTS = 0;
-    BANK_ACCOUNT = 1;
+  message TwoInts {
+    required uint64 segment_length = 1;
+  }
+
+  message BankAccount {
   }
 
   required uint64 num_servers = 1;
-  required Object object = 2;
-  required ServerType server_type = 3;
+  oneof object {
+    TwoInts two_ints = 2;
+    BankAccount bank_account = 3;
+  }
+  required ServerType server_type = 4;
 }
 
 message BenchmarkServerStartReply {
