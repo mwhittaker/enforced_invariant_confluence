@@ -38,8 +38,9 @@ class TwoInts : public Object {
   TwoInts(std::size_t segment_length)
       : segment_length_(segment_length), segment_(PointToSegment(x_, y_)) {}
 
-  std::string Run(const std::string& txn) override;
-  SyncStatus RunSegmented(const std::string& txn, std::string* reply) override;
+  std::string ExecTxn(const std::string& txn) override;
+  SyncStatus ExecTxnSegmented(const std::string& txn,
+                              std::string* reply) override;
   void Merge(const std::string& o) override;
   void Set(const std::string& o) override;
   std::string Get() override;

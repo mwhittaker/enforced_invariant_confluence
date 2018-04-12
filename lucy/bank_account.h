@@ -11,8 +11,9 @@ class BankAccount : public Object {
  public:
   BankAccount(std::size_t num_replicas, replica_index_t replica);
 
-  std::string Run(const std::string& txn) override;
-  SyncStatus RunSegmented(const std::string& txn, std::string* reply) override;
+  std::string ExecTxn(const std::string& txn) override;
+  SyncStatus ExecTxnSegmented(const std::string& txn,
+                              std::string* reply) override;
   void Merge(const std::string& o) override;
   void Set(const std::string& o) override;
   std::string Get() override;

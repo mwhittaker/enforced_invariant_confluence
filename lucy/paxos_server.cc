@@ -137,7 +137,7 @@ void PaxosServer::LeaderCommitReadyTransactions() {
     const PendingTxn& pending_txn = it->second;
     ServerMessage msg;
     msg.mutable_txn_reply()->set_reply(
-        object_->Run(pending_txn.txn_request.txn()));
+        object_->ExecTxn(pending_txn.txn_request.txn()));
     socket_.SendTo(ProtoToString(msg), pending_txn.src_addr);
 
     num_committed_++;
@@ -149,7 +149,7 @@ void PaxosServer::FollowerCommitReadyTransactions() {
   auto it = pending_txns_.begin();
   while (it->first == num_committed_by_follower_ &&
          it->first < num_committed_by_leader_) {
-    object_->Run(it->second);
+    object_->ExecTxn(it->second);
     num_committed_by_follower_++;
     it = pending_txns_.erase(it);
   }

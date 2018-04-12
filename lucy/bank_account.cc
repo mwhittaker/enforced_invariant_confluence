@@ -15,7 +15,7 @@ BankAccount::BankAccount(std::size_t num_replicas, replica_index_t replica)
   CHECK_LT(replica, num_replicas);
 }
 
-std::string BankAccount::Run(const std::string& txn) {
+std::string BankAccount::ExecTxn(const std::string& txn) {
   const auto request = ProtoFromString<BankAccountTxnRequest>(txn);
   BankAccountTxnReply reply;
 
@@ -41,8 +41,8 @@ std::string BankAccount::Run(const std::string& txn) {
   return ProtoToString(reply);
 }
 
-SyncStatus BankAccount::RunSegmented(const std::string& txn,
-                                     std::string* reply) {
+SyncStatus BankAccount::ExecTxnSegmented(const std::string& txn,
+                                         std::string* reply) {
   const auto request = ProtoFromString<BankAccountTxnRequest>(txn);
   if (request.has_deposit()) {
     p_[replica_] += request.deposit().amount();

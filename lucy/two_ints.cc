@@ -4,7 +4,7 @@
 
 #include "proto_util.h"
 
-std::string TwoInts::Run(const std::string& txn) {
+std::string TwoInts::ExecTxn(const std::string& txn) {
   const auto request = ProtoFromString<TwoIntsTxnRequest>(txn);
   TwoIntsTxnReply reply;
 
@@ -35,7 +35,8 @@ std::string TwoInts::Run(const std::string& txn) {
   return ProtoToString(reply);
 }
 
-SyncStatus TwoInts::RunSegmented(const std::string& txn, std::string* reply) {
+SyncStatus TwoInts::ExecTxnSegmented(const std::string& txn,
+                                     std::string* reply) {
   const auto request = ProtoFromString<TwoIntsTxnRequest>(txn);
 
   if (request.has_increment_x()) {

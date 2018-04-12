@@ -38,7 +38,7 @@ void GossipServer::HandleTxnRequest(const TxnRequest& txn_request,
                                     const UdpAddress& src_addr) {
   VLOG(1) << "Received TxnRequest from " << src_addr << ".";
   ServerMessage msg;
-  msg.mutable_txn_reply()->set_reply(object_->Run(txn_request.txn()));
+  msg.mutable_txn_reply()->set_reply(object_->ExecTxn(txn_request.txn()));
   socket_.SendTo(ProtoToString(msg), src_addr);
 
   num_requests_serviced_++;
