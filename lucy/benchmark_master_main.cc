@@ -14,7 +14,7 @@ namespace {
 
 std::string Usage() {
   return "./benchmark_master_main <benchmark_server_cluster> "
-         "<benchmark_client_cluster>  "
+         "<benchmark_client_cluster> "
          "<vary_withdraws|vary_segments|vary_nodes>";
 }
 
@@ -35,7 +35,11 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
     std::vector<double> fraction_withdraws = {0.1, 0.2, 0.3, 0.4, 0.5,
                                               0.6, 0.7, 0.8, 0.9, 1.0};
     for (double fraction_withdraw : fraction_withdraws) {
+      LOG(INFO) << "server_type = " << ServerTypeToString(server_type);
+      LOG(INFO) << "fraction_withdraw = " << fraction_withdraw;
+
       // Start the servers.
+      LOG(INFO) << "Starting servers.";
       BenchmarkServerStartRequest start;
       start.set_num_servers(num_servers);
       start.mutable_bank_account();
@@ -43,16 +47,18 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
       master->ServersStart(start);
 
       // Run and print the workload.
+      LOG(INFO) << "Starting workload.";
       BenchmarkClientBankAccountRequest bank_account;
       bank_account.set_num_servers(num_servers);
       bank_account.set_fraction_withdraw(fraction_withdraw);
-      bank_account.set_duration_in_milliseconds(1000);
+      bank_account.set_duration_in_milliseconds(100);
       bank_account.set_server_type(server_type);
       double total_txns_per_second = master->ClientsBankAccount(bank_account);
       std::cout << ServerTypeToString(server_type) << ", " << fraction_withdraw
                 << ", " << total_txns_per_second << std::endl;
 
       // Kill the servers.
+      LOG(INFO) << "Killing servers.";
       BenchmarkServerKillRequest kill;
       master->ServersKill(kill);
     }
@@ -74,7 +80,7 @@ void VaryNodes(BenchmarkMaster *master) {
 int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
 
-  if (argc != 3) {
+  if (argc != 4) {
     std::cerr << Usage() << std::endl;
     return EXIT_FAILURE;
   }

@@ -8,6 +8,7 @@
 
 std::string Client::ExecTxn(const std::string& txn,
                             const UdpAddress& dst_addr) {
+  VLOG(1) << "Sending transaction to " << dst_addr << ".";
   // Send request.
   ServerMessage request;
   request.mutable_txn_request()->set_txn(txn);
@@ -16,6 +17,7 @@ std::string Client::ExecTxn(const std::string& txn,
   // Get reply.
   std::string reply_str;
   socket_.RecvFrom(&reply_str, nullptr);
+  VLOG(1) << "Received reply from " << dst_addr << ".";
   const auto reply = ProtoFromString<ServerMessage>(reply_str);
   CHECK(reply.has_txn_reply());
   return reply.txn_reply().reply();

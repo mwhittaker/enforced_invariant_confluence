@@ -45,8 +45,8 @@ BankAccountClient::Result BankAccountClient::Withdraw(
 
   const std::string reply_str = ExecTxn(ProtoToString(request), dst_addr);
   const auto reply = ProtoFromString<BankAccountTxnReply>(reply_str);
-  CHECK(reply.has_withdraw());
   if (reply.result() == BankAccountTxnReply::COMMITTED) {
+    CHECK(reply.has_withdraw());
     return COMMITTED;
   } else {
     return ABORTED;
