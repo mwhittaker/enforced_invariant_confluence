@@ -21,19 +21,14 @@ void BenchmarkClient::Run() {
     BenchmarkClientRequest proto;
     proto.ParseFromString(msg);
     switch (proto.type()) {
-      case BenchmarkClientRequest::VARY_WITHDRAWS: {
-        CHECK(proto.has_vary_withdraws());
-        HandleVaryWithdraws(proto.vary_withdraws(), src_addr);
+      case BenchmarkClientRequest::BANK_ACCOUNT: {
+        CHECK(proto.has_bank_account());
+        HandleBankAccount(proto.bank_account(), src_addr);
         break;
       }
-      case BenchmarkClientRequest::VARY_SEGMENTS: {
-        CHECK(proto.has_vary_segments());
-        HandleVarySegments(proto.vary_segments(), src_addr);
-        break;
-      }
-      case BenchmarkClientRequest::VARY_NODES: {
-        CHECK(proto.has_vary_nodes());
-        HandleVaryNodes(proto.vary_nodes(), src_addr);
+      case BenchmarkClientRequest::TWO_INTS: {
+        CHECK(proto.has_two_ints());
+        HandleTwoInts(proto.two_ints(), src_addr);
         break;
       }
       default: { LOG(FATAL) << "Unexpected benchmark client message type."; }
@@ -41,8 +36,8 @@ void BenchmarkClient::Run() {
   }
 }
 
-void BenchmarkClient::HandleVaryWithdraws(
-    const BenchmarkClientVaryWithdrawsRequest& vary_withdraws,
+void BenchmarkClient::HandleBankAccount(
+    const BenchmarkClientBankAccountRequest& vary_withdraws,
     const UdpAddress& src_addr) {
   using namespace std::chrono;
   LOG(INFO) << "Received VaryWithdraw request from " << src_addr << ".";
@@ -92,26 +87,20 @@ void BenchmarkClient::HandleVaryWithdraws(
 
   // Respond to the master.
   BenchmarkClientReply reply;
-  reply.set_type(BenchmarkClientReply::VARY_WITHDRAWS);
-  reply.mutable_vary_withdraws()->set_index(index_);
-  reply.mutable_vary_withdraws()->set_txns_per_second(txns_per_s);
+  reply.set_type(BenchmarkClientReply::BANK_ACCOUNT);
+  reply.mutable_bank_account()->set_index(index_);
+  reply.mutable_bank_account()->set_num_txns(num_transactions);
+  reply.mutable_bank_account()->set_duration_in_nanoseconds(duration.count());
+  reply.mutable_bank_account()->set_txns_per_second(txns_per_s);
   std::string reply_str;
   reply.SerializeToString(&reply_str);
   socket_.SendTo(reply_str, src_addr);
 }
 
-void BenchmarkClient::HandleVarySegments(
-    const BenchmarkClientVarySegmentsRequest& vary_segments,
+void BenchmarkClient::HandleTwoInts(
+    const BenchmarkClientTwoIntsRequest& vary_segments,
     const UdpAddress& src_addr) {
   LOG(INFO) << "Received VarySegments request from " << src_addr << ".";
   LOG(FATAL) << "TODO: Implement.";
   (void)vary_segments;
-}
-
-void BenchmarkClient::HandleVaryNodes(
-    const BenchmarkClientVaryNodesRequest& vary_nodes,
-    const UdpAddress& src_addr) {
-  LOG(INFO) << "Received VaryNodes request from " << src_addr << ".";
-  LOG(FATAL) << "TODO: Implement.";
-  (void)vary_nodes;
 }

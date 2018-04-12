@@ -52,58 +52,52 @@ message BenchmarkServerReply {
 }
 
 // Client.
-message BenchmarkClientVaryWithdrawsRequest {
+message BenchmarkClientBankAccountRequest {
   required uint64 num_servers = 1;
   required double fraction_withdraw = 2;
   required uint64 duration_in_milliseconds = 3;
   required ServerType server_type = 4;
 }
 
-message BenchmarkClientVaryWithdrawsReply {
+message BenchmarkClientBankAccountReply {
   required uint64 index = 1;
-  required double txns_per_second = 2;
+  required uint64 num_txns = 2;
+  required uint64 duration_in_nanoseconds = 3;
+  required double txns_per_second = 4;
 }
 
-message BenchmarkClientVarySegmentsRequest {
-  // TODO: Implement.
+message BenchmarkClientTwoIntsRequest {
+  required uint64 num_servers = 1;
+  required uint64 segment_side_length = 2;
+  required uint64 duration_in_milliseconds = 3;
+  required ServerType server_type = 4;
 }
 
-message BenchmarkClientVarySegmentsReply {
+message BenchmarkClientTwoIntsReply {
   required uint64 index = 1;
-  required double txns_per_second = 2;
-}
-
-message BenchmarkClientVaryNodesRequest {
-  // TODO: Implement.
-}
-
-message BenchmarkClientVaryNodesReply {
-  required uint64 index = 1;
-  required double txns_per_second = 2;
+  required uint64 num_txns = 2;
+  required uint64 duration_in_nanoseconds = 3;
+  required double txns_per_second = 4;
 }
 
 message BenchmarkClientRequest {
   enum Type {
-    VARY_WITHDRAWS = 0;
-    VARY_SEGMENTS = 1;
-    VARY_NODES = 2;
+    BANK_ACCOUNT = 0;
+    TWO_INTS = 1;
   }
 
   required Type type = 1;
-  optional BenchmarkClientVaryWithdrawsRequest vary_withdraws = 2;
-  optional BenchmarkClientVarySegmentsRequest vary_segments = 3;
-  optional BenchmarkClientVaryNodesRequest vary_nodes = 4;
+  optional BenchmarkClientBankAccountRequest bank_account = 2;
+  optional BenchmarkClientTwoIntsRequest two_ints = 3;
 }
 
 message BenchmarkClientReply {
   enum Type {
-    VARY_WITHDRAWS = 0;
-    VARY_SEGMENTS = 1;
-    VARY_NODES = 2;
+    BANK_ACCOUNT = 0;
+    TWO_INTS = 1;
   }
 
   required Type type = 1;
-  optional BenchmarkClientVaryWithdrawsReply vary_withdraws = 2;
-  optional BenchmarkClientVarySegmentsReply vary_segments = 3;
-  optional BenchmarkClientVaryNodesReply vary_nodes = 4;
+  optional BenchmarkClientBankAccountReply bank_account = 2;
+  optional BenchmarkClientTwoIntsReply two_ints = 3;
 }

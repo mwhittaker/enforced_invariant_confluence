@@ -18,14 +18,10 @@ class BenchmarkClient {
   void Run();
 
  private:
-  void HandleVaryWithdraws(
-      const BenchmarkClientVaryWithdrawsRequest& vary_withdraws,
-      const UdpAddress& src_addr);
-  void HandleVarySegments(
-      const BenchmarkClientVarySegmentsRequest& vary_segments,
-      const UdpAddress& src_addr);
-  void HandleVaryNodes(const BenchmarkClientVaryNodesRequest& vary_nodes,
-                       const UdpAddress& src_addr);
+  void HandleBankAccount(const BenchmarkClientBankAccountRequest& bank_account,
+                         const UdpAddress& src_addr);
+  void HandleTwoInts(const BenchmarkClientTwoIntsRequest& two_ints,
+                     const UdpAddress& src_addr);
 
   UdpSocket socket_;
   const Cluster benchmark_client_cluster_;

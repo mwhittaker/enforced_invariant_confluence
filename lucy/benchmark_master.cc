@@ -48,14 +48,14 @@ void BenchmarkMaster::ServersKill(const BenchmarkServerKillRequest& kill) {
   });
 }
 
-double BenchmarkMaster::ClientsVaryWithdraws(
-    const BenchmarkClientVaryWithdrawsRequest& vary_withdraws) {
+double BenchmarkMaster::ClientsBankAccount(
+    const BenchmarkClientBankAccountRequest& bank_account) {
   const std::size_t n = benchmark_client_cluster_.Size();
 
   // Send requests.
   BenchmarkClientRequest request;
-  request.set_type(BenchmarkClientRequest::VARY_WITHDRAWS);
-  *request.mutable_vary_withdraws() = vary_withdraws;
+  request.set_type(BenchmarkClientRequest::BANK_ACCOUNT);
+  *request.mutable_bank_account() = bank_account;
   std::string request_str;
   request.SerializeToString(&request_str);
   for (std::size_t i = 0; i < n; ++i) {
@@ -63,14 +63,14 @@ double BenchmarkMaster::ClientsVaryWithdraws(
   }
 
   // Wait for replies.
-  using Reply = BenchmarkClientVaryWithdrawsReply;
+  using Reply = BenchmarkClientBankAccountReply;
   const std::map<replica_index_t, Reply> replies =
       CollectNReplies<Reply>(n, [](const std::string& reply_str) -> Reply {
         BenchmarkClientReply reply;
         reply.ParseFromString(reply_str);
-        CHECK(reply.type() == BenchmarkClientReply::VARY_WITHDRAWS);
-        CHECK(reply.has_vary_withdraws());
-        return reply.vary_withdraws();
+        CHECK(reply.type() == BenchmarkClientReply::BANK_ACCOUNT);
+        CHECK(reply.has_bank_account());
+        return reply.bank_account();
       });
 
   // Compute total throughput.
@@ -81,14 +81,14 @@ double BenchmarkMaster::ClientsVaryWithdraws(
   return total_throughput;
 }
 
-double BenchmarkMaster::ClientsVarySegments(
-    const BenchmarkClientVarySegmentsRequest& vary_segments) {
+double BenchmarkMaster::ClientsTwoInts(
+    const BenchmarkClientTwoIntsRequest& two_ints) {
   const std::size_t n = benchmark_client_cluster_.Size();
 
   // Send requests.
   BenchmarkClientRequest request;
-  request.set_type(BenchmarkClientRequest::VARY_SEGMENTS);
-  *request.mutable_vary_segments() = vary_segments;
+  request.set_type(BenchmarkClientRequest::TWO_INTS);
+  *request.mutable_two_ints() = two_ints;
   std::string request_str;
   request.SerializeToString(&request_str);
   for (std::size_t i = 0; i < n; ++i) {
@@ -96,47 +96,14 @@ double BenchmarkMaster::ClientsVarySegments(
   }
 
   // Wait for replies.
-  using Reply = BenchmarkClientVarySegmentsReply;
+  using Reply = BenchmarkClientTwoIntsReply;
   const std::map<replica_index_t, Reply> replies =
       CollectNReplies<Reply>(n, [](const std::string& reply_str) -> Reply {
         BenchmarkClientReply reply;
         reply.ParseFromString(reply_str);
-        CHECK(reply.type() == BenchmarkClientReply::VARY_WITHDRAWS);
-        CHECK(reply.has_vary_segments());
-        return reply.vary_segments();
-      });
-
-  // Compute total throughput.
-  double total_throughput = 0;
-  for (const auto& p : replies) {
-    total_throughput += p.second.txns_per_second();
-  }
-  return total_throughput;
-}
-
-double BenchmarkMaster::ClientsVaryNodes(
-    const BenchmarkClientVaryNodesRequest& vary_nodes) {
-  const std::size_t n = benchmark_client_cluster_.Size();
-
-  // Send requests.
-  BenchmarkClientRequest request;
-  request.set_type(BenchmarkClientRequest::VARY_NODES);
-  *request.mutable_vary_nodes() = vary_nodes;
-  std::string request_str;
-  request.SerializeToString(&request_str);
-  for (std::size_t i = 0; i < n; ++i) {
-    socket_.SendTo(request_str, benchmark_client_cluster_.UdpAddrs()[i]);
-  }
-
-  // Wait for replies.
-  using Reply = BenchmarkClientVaryNodesReply;
-  const std::map<replica_index_t, Reply> replies =
-      CollectNReplies<Reply>(n, [](const std::string& reply_str) -> Reply {
-        BenchmarkClientReply reply;
-        reply.ParseFromString(reply_str);
-        CHECK(reply.type() == BenchmarkClientReply::VARY_NODES);
-        CHECK(reply.has_vary_nodes());
-        return reply.vary_nodes();
+        CHECK(reply.type() == BenchmarkClientReply::BANK_ACCOUNT);
+        CHECK(reply.has_two_ints());
+        return reply.two_ints();
       });
 
   // Compute total throughput.

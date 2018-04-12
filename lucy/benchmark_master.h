@@ -20,11 +20,9 @@ class BenchmarkMaster {
 
   void ServersStart(const BenchmarkServerStartRequest& start);
   void ServersKill(const BenchmarkServerKillRequest& kill);
-  double ClientsVaryWithdraws(
-      const BenchmarkClientVaryWithdrawsRequest& vary_withdraws);
-  double ClientsVarySegments(
-      const BenchmarkClientVarySegmentsRequest& vary_segments);
-  double ClientsVaryNodes(const BenchmarkClientVaryNodesRequest& vary_nodes);
+  double ClientsBankAccount(
+      const BenchmarkClientBankAccountRequest& vary_withdraws);
+  double ClientsTwoInts(const BenchmarkClientTwoIntsRequest& vary_segments);
 
  private:
   using reply_to_index_t = std::function<replica_index_t(const std::string&)>;

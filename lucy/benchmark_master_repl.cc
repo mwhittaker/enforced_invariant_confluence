@@ -17,18 +17,12 @@ std::string Usage() {
 }
 
 std::string ReplUsage() {
-  return "start "
-         "<num_servers> "
-         "<object> "
-         "<server type>\n"
-
+  return "start <num_servers> <object> <server type>\n"
          "kill\n"
-
-         "vary_withdraws "
-         "<num_servers> "
-         "<fraction_widthraw> "
-         "<duration_in_milliseconds> "
-         "<server type>";
+         "bank_account <num_servers> <fraction_widthraw> "
+         "<duration_in_milliseconds> <server type>"
+         "two_ints <num_servers> <segment_side_length> "
+         "<duration_in_milliseconds> <server type>";
 }
 
 BenchmarkServerStartRequest::Object StringToObject(const std::string& object) {
@@ -87,18 +81,18 @@ int main(int argc, char* argv[]) {
     } else if (words.size() == 1 && words[0] == "kill") {
       BenchmarkServerKillRequest kill;
       master.ServersKill(kill);
-    } else if (words.size() == 5 && words[0] == "vary_withdraws") {
+    } else if (words.size() == 5 && words[0] == "bank_account") {
       const std::uint64_t num_servers = std::stoul(words[1]);
       const double fraction_withdraw = std::stod(words[2]);
       const std::uint64_t duration_in_milliseconds = std::stoul(words[3]);
       ServerType server_type = StringToServerType(words[4]);
 
-      BenchmarkClientVaryWithdrawsRequest vary_withdraws;
-      vary_withdraws.set_num_servers(num_servers);
-      vary_withdraws.set_fraction_withdraw(fraction_withdraw);
-      vary_withdraws.set_duration_in_milliseconds(duration_in_milliseconds);
-      vary_withdraws.set_server_type(server_type);
-      double txns_per_s = master.ClientsVaryWithdraws(vary_withdraws);
+      BenchmarkClientBankAccountRequest bank_account;
+      bank_account.set_num_servers(num_servers);
+      bank_account.set_fraction_withdraw(fraction_withdraw);
+      bank_account.set_duration_in_milliseconds(duration_in_milliseconds);
+      bank_account.set_server_type(server_type);
+      double txns_per_s = master.ClientsBankAccount(bank_account);
       std::cout << txns_per_s << " txns per second." << std::endl;
     } else {
       std::cerr << ReplUsage() << std::endl;
