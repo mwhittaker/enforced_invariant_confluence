@@ -4,7 +4,8 @@
 
 #include "server.pb.h"
 
-std::string Client::Run(const std::string& txn, const UdpAddress& dst_addr) {
+std::string Client::ExecTxn(const std::string& txn,
+                            const UdpAddress& dst_addr) {
   // Send request.
   ServerMessage request;
   request.set_type(ServerMessage::TXN_REQUEST);

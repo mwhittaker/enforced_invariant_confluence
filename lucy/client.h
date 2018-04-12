@@ -7,7 +7,7 @@
 
 class Client {
  protected:
-  std::string Run(const std::string& txn, const UdpAddress& dst_addr);
+  std::string ExecTxn(const std::string& txn, const UdpAddress& dst_addr);
 
  private:
   UdpSocket socket_;

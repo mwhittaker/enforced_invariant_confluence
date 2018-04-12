@@ -11,6 +11,7 @@ int main(int, char* argv[]) {
 
   UdpAddress server_addr(HostPort("localhost", 9000));
   UdpSocket socket = UdpSocket(server_addr);
+  LOG(INFO) << "Echo server listening on " << server_addr << ".";
 
   while (true) {
     // Receive.

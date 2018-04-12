@@ -12,7 +12,7 @@ std::int64_t BankAccountClient::Get(const UdpAddress& dst_addr) {
   request.SerializeToString(&request_str);
 
   BankAccountTxnReply reply;
-  reply.ParseFromString(Run(request_str, dst_addr));
+  reply.ParseFromString(ExecTxn(request_str, dst_addr));
   CHECK(reply.has_get());
   CHECK_EQ(reply.result(), BankAccountTxnReply::COMMITTED);
   return reply.get().value();
@@ -27,7 +27,7 @@ BankAccountClient::Result BankAccountClient::Deposit(
   request.SerializeToString(&request_str);
 
   BankAccountTxnReply reply;
-  reply.ParseFromString(Run(request_str, dst_addr));
+  reply.ParseFromString(ExecTxn(request_str, dst_addr));
   CHECK(reply.has_deposit());
   CHECK_EQ(reply.result(), BankAccountTxnReply::COMMITTED);
   return COMMITTED;
@@ -42,7 +42,7 @@ BankAccountClient::Result BankAccountClient::Withdraw(
   request.SerializeToString(&request_str);
 
   BankAccountTxnReply reply;
-  reply.ParseFromString(Run(request_str, dst_addr));
+  reply.ParseFromString(ExecTxn(request_str, dst_addr));
   CHECK(reply.has_withdraw());
   if (reply.result() == BankAccountTxnReply::COMMITTED) {
     return COMMITTED;

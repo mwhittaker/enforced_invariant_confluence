@@ -42,7 +42,8 @@ int main(int argc, char* argv[]) {
   // Object.
   std::unique_ptr<Object> object;
   if (object_name == "two_ints") {
-    LOG(FATAL) << "Unimplemented";
+    object = std::unique_ptr<Object>(
+        new TwoInts(/*segment_length=*/1 * 1000 * 1000));
   } else if (object_name == "bank_account") {
     object =
         std::unique_ptr<Object>(new BankAccount(cluster.Size(), replica_index));
