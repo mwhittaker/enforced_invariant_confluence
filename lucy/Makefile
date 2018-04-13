@@ -3,10 +3,12 @@ CXX = clang++
 BIN = bin
 DEBUG=1
 CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -I$(BIN) \
-		   $(shell pkg-config protobuf) \
-		   $(shell pkg-config libglog)
+			$(shell pkg-config --cflags protobuf) \
+			$(shell pkg-config --cflags libglog) \
+			$(shell pkg-config --cflags libuv)
 LDFLAGS = $(shell pkg-config --libs protobuf) \
-          $(shell pkg-config --libs libglog)
+			$(shell pkg-config --libs libglog) \
+			$(shell pkg-config --libs libuv)
 
 PROTOS = $(wildcard *.proto)
 PROTO_HEADERS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.h))
@@ -21,6 +23,8 @@ BINARIES = \
 	benchmark_server_main \
 	echo_client \
 	echo_server \
+	loop_echo_client \
+	loop_echo_server \
 	server_main \
 	two_ints_client_repl \
 	two_ints_main

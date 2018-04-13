@@ -8,6 +8,8 @@ benchmark_master_repl
 benchmark_server_main
 echo_client
 echo_server
+loop_echo_client
+loop_echo_server
 server_main
 two_ints_client_repl
 two_ints_main

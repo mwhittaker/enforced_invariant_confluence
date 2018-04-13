@@ -11,3 +11,5 @@ $ sudo apt-get install -y libgoogle-glog-dev libprotobuf-dev protobuf-compiler
 ```
 
 Then, run `make`.
+
+TODO: add libuv installation instructions.

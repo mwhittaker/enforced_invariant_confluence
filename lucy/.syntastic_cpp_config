@@ -4,5 +4,7 @@
 -Wextra
 -Werror
 -Ibin
+-pthread
+-I/usr/local/include
 -g
 -O0
