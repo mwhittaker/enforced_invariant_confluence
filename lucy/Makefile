@@ -1,3 +1,4 @@
+# Flags.
 CC = clang
 CXX = clang++
 BIN = bin
@@ -15,6 +16,7 @@ PROTO_HEADERS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.h))
 PROTO_SOURCES = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.cc))
 PROTO_OBJECTS = $(addprefix $(BIN)/, $(PROTOS:%.proto=%.pb.o))
 
+# Sources and binaries.
 BINARIES = \
 	bank_account_client_repl \
 	benchmark_client_main \
@@ -35,8 +37,13 @@ HEADERS = $(wildcard *.h)
 OBJECTS = $(addprefix $(BIN)/, $(SOURCES:%.cc=%.o))
 NON_BINARY_OBJECTS = $(filter-out $(BINARY_OBJECTS), $(OBJECTS))
 
+# Conditional flags.
 ifeq ($(DEBUG), 1)
 	CXXFLAGS += -g -O0
+	ifeq ($(CXX), clang++)
+		CXXFLAGS += -fsanitize=address
+		CXXFLAGS += -fsanitize=undefined
+	endif
 else
 	CXXFLAGS += -O3
 endif
