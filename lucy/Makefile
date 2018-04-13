@@ -3,6 +3,7 @@ CC = clang
 CXX = clang++
 BIN = bin
 DEBUG=1
+VERBOSE=0
 CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -I$(BIN) \
 			$(shell pkg-config --cflags protobuf) \
 			$(shell pkg-config --cflags libglog) \
@@ -48,6 +49,12 @@ else
 	CXXFLAGS += -O3
 endif
 
+ifeq ($(VERBOSE), 0)
+	QUIET = @
+else
+	QUIET =
+endif
+
 default: all
 all: $(BIN) \
 	 $(PROTO_HEADERS) \
@@ -62,28 +69,32 @@ all: $(BIN) \
 -include $(OBJECTS:.o=.d)
 
 $(BIN):
-	mkdir -p $(BIN)
+	$(QUIET)mkdir -p $(BIN)
 
 $(BIN)/%.pb.h: %.proto
-	protoc --cpp_out=$(BIN) $<
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[PROTOC] $<"; fi
+	$(QUIET)protoc --cpp_out=$(BIN) $<
 
 $(PROTO_OBJECTS): $(BIN)/%.o: $(BIN)/%.cc
-	$(CXX) $(CXXFLAGS) $< -c -o $@
-	$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX   ] $<"; fi
+	$(QUIET)$(CXX) $(CXXFLAGS) $< -c -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
 
 $(OBJECTS): $(BIN)/%.o: %.cc
-	$(CXX) $(CXXFLAGS) $< -c -o $@
-	$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX   ] $<"; fi
+	$(QUIET)$(CXX) $(CXXFLAGS) $< -c -o $@
+	$(QUIET)$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
 
 $(BINARIES): %: $(BIN)/%.o $(PROTO_OBJECTS) $(NON_BINARY_OBJECTS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX   ] $@"; fi
+	$(QUIET)$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 tags: $(PROTOS) $(HEADERS) $(SOURCES)
-	ctags --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ -R .
+	$(QUIET)ctags --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ -R .
 
 .syntastic_cpp_config: Makefile
-	echo "" > $@
-	for flag in $(CXXFLAGS); do \
+	$(QUIET)echo "" > $@
+	$(QUIET)for flag in $(CXXFLAGS); do \
 		echo "$$flag" >> $@; \
 	done
 
