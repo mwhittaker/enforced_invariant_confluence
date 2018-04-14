@@ -1,9 +1,11 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
+#include <iostream>
 #include <string>
 
 enum class SyncStatus { EXECUTED_LOCALLY, REQUIRES_SYNC };
+std::ostream& operator<<(std::ostream& out, const SyncStatus status);
 
 class Object {
  public:

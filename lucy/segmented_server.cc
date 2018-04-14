@@ -28,10 +28,16 @@ void SegmentedServer::HandleTxnRequest(const TxnRequest& txn_request,
                                        const UdpAddress& src_addr) {
   VLOG(1) << "Received TxnRequest from " << src_addr << ".";
 
-  // Buffer the request in pending_txn_requests_. If we're in normal mode,
-  // we'll execute it right away. If we're in sync mode, we'll process requests
-  // in a FIFO order.
-  pending_txn_requests_.push_back(PendingTxn{txn_request, src_addr});
+  // Buffer the request in pending_txn_requests_ if we have space. If we're in
+  // normal mode, we'll execute it right away. If we're in sync mode, we'll
+  // process requests in a FIFO order. If pending_txn_requests_ is too big,
+  // then we just drop the request. The client will resend it later.
+  if (pending_txn_requests_.size() <= 100) {
+    pending_txn_requests_.push_back(PendingTxn{txn_request, src_addr});
+  } else {
+    VLOG(1)
+        << "SegmentedServer request buffer is full and is dropping a request.";
+  }
 
   if (mode_ != NORMAL) {
     VLOG(1) << "SegmentedServer received a transaction request during a "
@@ -53,7 +59,7 @@ void SegmentedServer::HandleMergeRequest(const MergeRequest& merge_request,
     return;
   }
 
-  CHECK(merge_request.epoch() <= epoch_);
+  CHECK_LE(merge_request.epoch(), epoch_);
   if (merge_request.epoch() == epoch_) {
     object_->Merge(merge_request.object());
   } else {
@@ -74,6 +80,7 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
             << sync_request.epoch()
             << " which is earlier than the current epoch " << epoch_
             << ", so the SegmentedServer is ignoring this SyncRequest";
+    return;
   }
 
   if (mode_ == NORMAL) {
@@ -85,14 +92,14 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
       return;
     }
 
-    CHECK(sync_request.epoch() == epoch_ + 1);
+    CHECK_EQ(sync_request.epoch(), epoch_ + 1);
     // Fall through and send reply.
   } else if (mode_ == SYNCING_FOLLOWER) {
-    CHECK(sync_request.epoch() == epoch_);
+    CHECK_EQ(sync_request.epoch(), epoch_);
     // Fall through and send reply.
   } else {
-    CHECK(mode_ == SYNCING_LEADER);
-    CHECK(sync_request.epoch() == epoch_);
+    CHECK_EQ(mode_, SYNCING_LEADER);
+    CHECK_EQ(sync_request.epoch(), epoch_);
 
     if (replica_index_ > sync_request.replica_index()) {
       VLOG(1) << "SegmentedServer in syncing leader mode received a "
@@ -131,13 +138,14 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
   // We cannot receive a sync reply for a sync request with an epoch higher
   // than our own because if we ever sent such a request, we would have updated
   // our epoch.
-  CHECK(sync_reply.epoch() <= epoch_);
+  CHECK_LE(sync_reply.epoch(), epoch_);
 
   // Ignore old SyncReplies.
   if (sync_reply.epoch() < epoch_) {
     VLOG(1) << "SegmentedServer received a SyncReply for epoch "
             << sync_reply.epoch() << " which is earlier than the current epoch "
             << epoch_ << ", so the SegmentedServer is ignoring this SyncReply";
+    return;
   }
 
   if (mode_ != SYNCING_LEADER) {
@@ -146,7 +154,8 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
     return;
   }
 
-  CHECK(sync_reply.epoch() == epoch_ && mode_ == SYNCING_LEADER);
+  CHECK_EQ(sync_reply.epoch(), epoch_);
+  CHECK_EQ(mode_, SYNCING_LEADER);
   pending_sync_replies_.insert({sync_reply.replica_index(), sync_reply});
   if (pending_sync_replies_.size() < cluster_.Size() - 1) {
     // We haven't yet heard back from all the other replicas.
@@ -186,7 +195,7 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
   }
 
   // Resume normal processing.
-  pending_sync_replies_.erase(epoch_);
+  pending_sync_replies_.clear();
   pending_sync_txn_.reset();
   mode_ = NORMAL;
   ProcessBufferedTxns();
@@ -201,7 +210,7 @@ void SegmentedServer::HandleStart(const Start& start,
   // present or the future, the replica that sent it would have to have
   // received a StartReply from us which means that we would have updated our
   // epoch to be at least as big as it, if not bigger.
-  CHECK(start.epoch() <= epoch_);
+  CHECK_LE(start.epoch(), epoch_);
 
   // If the start.epoch() is from the past, then we just ignore it. It is a
   // duplicated or re-ordered message.
@@ -223,8 +232,8 @@ void SegmentedServer::HandleStart(const Start& start,
   // syncing follower. In order for the syncing leader to have sent the start,
   // it would have had to receive a SyncReply from us. When we sent the
   // SyncReply, we would have transitionined into SYNCING_FOLLOWER mode.
-  CHECK(start.epoch() == epoch_);
-  CHECK(mode_ == SYNCING_FOLLOWER);
+  CHECK_EQ(start.epoch(), epoch_);
+  CHECK_EQ(mode_, SYNCING_FOLLOWER);
   object_->Set(start.object());
   mode_ = NORMAL;
   ProcessBufferedTxns();
@@ -236,7 +245,7 @@ void SegmentedServer::HandleStart(const Start& start,
 // twice, so it doesn't actually violate any guarantees. Still, it would easy
 // to avoid redundantly executing the same transaction multiple times.
 void SegmentedServer::ProcessBufferedTxns() {
-  CHECK(mode_ == NORMAL);
+  CHECK_EQ(mode_, NORMAL);
 
   auto it = pending_txn_requests_.begin();
   while (it != pending_txn_requests_.end()) {
@@ -257,7 +266,7 @@ void SegmentedServer::ProcessBufferedTxns() {
 
       it = pending_txn_requests_.erase(it);
     } else {
-      CHECK(status == SyncStatus::REQUIRES_SYNC);
+      CHECK_EQ(status, SyncStatus::REQUIRES_SYNC);
       // Transition to sync mode and save the transaction for later execution.
       // TODO(mwhittaker): Avoid redundant copies of pending_sync_txn_.
       mode_ = SYNCING_LEADER;
