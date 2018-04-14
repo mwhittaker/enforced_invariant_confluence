@@ -1,6 +1,26 @@
 #include "paxos_server.h"
 
+#include <chrono>
+
+#include "glog/logging.h"
+
 #include "proto_util.h"
+
+PaxosServer::PaxosServer(const Cluster& cluster, replica_index_t replica_index,
+                         Object* object, Loop* loop)
+    : Server(cluster, replica_index, object, loop) {
+  if (AmLeader()) {
+    LOG(INFO) << "PaxosServer leader listening on "
+              << cluster_.UdpAddrs()[replica_index_] << ".";
+    const std::chrono::milliseconds delay(1000);
+    resend_prepares_timer_ =
+        loop->RegisterTimer(delay, [this]() { LeaderResendPrepares(); });
+    resend_prepares_timer_.Start();
+  } else {
+    LOG(INFO) << "PaxosServer follower listening on "
+              << cluster_.UdpAddrs()[replica_index_] << ".";
+  }
+}
 
 void PaxosServer::OnRecv(const std::string& msg, const UdpAddress& src_addr) {
   if (AmLeader()) {
@@ -125,6 +145,27 @@ void PaxosServer::LeaderCommitReadyTransactions() {
     num_committed_++;
     it = waiting_for_commit_.erase(it);
   }
+}
+
+void PaxosServer::LeaderResendPrepares() {
+  for (const auto& p : prepare_ok_replies_) {
+    const txn_index_t txn_index = p.first;
+    const std::set<replica_index_t> replies = p.second;
+    const PendingTxn& pending_txn = waiting_for_prepare_oks_[txn_index];
+
+    ServerMessage msg;
+    msg.mutable_prepare()->set_txn_index(txn_index);
+    msg.mutable_prepare()->set_txn(pending_txn.txn_request.txn());
+    msg.mutable_prepare()->set_num_committed(num_committed_);
+    const std::string msg_str = ProtoToString(msg);
+    for (std::size_t i = 1; i < cluster_.Size(); ++i) {
+      if (replies.count(i) == 0) {
+        SendTo(msg_str, cluster_.UdpAddrs()[i]);
+      }
+    }
+  }
+
+  resend_prepares_timer_.Reset();
 }
 
 void PaxosServer::FollowerCommitReadyTransactions() {

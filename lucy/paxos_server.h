@@ -5,36 +5,29 @@
 #include <map>
 #include <set>
 
-#include "glog/logging.h"
-
+#include "loop.h"
 #include "server.h"
 #include "server.pb.h"
 
 class PaxosServer : public Server {
  public:
   PaxosServer(const Cluster& cluster, replica_index_t replica_index,
-              Object* object, Loop* loop)
-      : Server(cluster, replica_index, object, loop) {
-    if (AmLeader()) {
-      LOG(INFO) << "PaxosServer leader listening on "
-                << cluster_.UdpAddrs()[replica_index_] << ".";
-    } else {
-      LOG(INFO) << "PaxosServer follower listening on "
-                << cluster_.UdpAddrs()[replica_index_] << ".";
-    }
-  }
-
-  void OnRecv(const std::string& msg, const UdpAddress& src_addr) override;
+              Object* object, Loop* loop);
 
  private:
-  bool AmLeader() const;
+  // Message handling.
+  void OnRecv(const std::string& msg, const UdpAddress& src_addr) override;
   void OnRecvLeader(const std::string& msg, const UdpAddress& src_addr);
   void OnRecvFollower(const std::string& msg, const UdpAddress& src_addr);
   void HandleTxnRequest(const TxnRequest& txn_request,
                         const UdpAddress& src_addr);
   void HandlePrepareOk(const PrepareOk& prepare_ok, const UdpAddress& src_addr);
   void HandlePrepare(const Prepare& prepare, const UdpAddress& src_addr);
+
+  // Helpers.
+  bool AmLeader() const;
   void LeaderCommitReadyTransactions();
+  void LeaderResendPrepares();
   void FollowerCommitReadyTransactions();
 
   // Leader.
@@ -47,6 +40,7 @@ class PaxosServer : public Server {
   std::map<txn_index_t, PendingTxn> waiting_for_prepare_oks_;
   std::map<txn_index_t, std::set<replica_index_t>> prepare_ok_replies_;
   std::map<txn_index_t, PendingTxn> waiting_for_commit_;
+  Loop::Timer resend_prepares_timer_;
 
   // Follower.
   std::map<txn_index_t, std::string> pending_txns_;
