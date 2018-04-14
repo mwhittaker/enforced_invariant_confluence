@@ -19,6 +19,12 @@ SegmentedServer::SegmentedServer(const Cluster& cluster,
   resend_start_timer_ = loop->RegisterTimer(delay, [this]() { ResendStart(); });
 }
 
+void SegmentedServer::Close() {
+  Server::Close();
+  resend_sync_request_timer_.Close();
+  resend_start_timer_.Close();
+}
+
 void SegmentedServer::OnRecv(const std::string& msg,
                              const UdpAddress& src_addr) {
   const auto proto = ProtoFromString<ServerMessage>(msg);

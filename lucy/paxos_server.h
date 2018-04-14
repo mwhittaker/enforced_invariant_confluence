@@ -14,6 +14,8 @@ class PaxosServer : public Server {
   PaxosServer(const Cluster& cluster, replica_index_t replica_index,
               Object* object, Loop* loop);
 
+  void Close() override;
+
  private:
   // Message handling.
   void OnRecv(const std::string& msg, const UdpAddress& src_addr) override;

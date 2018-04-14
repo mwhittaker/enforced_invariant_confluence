@@ -51,12 +51,15 @@ Loop::Actor::Actor(Loop* loop) : socket_(new uv_udp_t{}) {
 }
 
 Loop::Actor::~Actor() {
-  if (socket_) {
-    Stop();
+  if (!closed_) {
+    CHECK(socket_);
+    Close();
   }
 }
 
 void Loop::Actor::StartRecv() {
+  CHECK(!closed_);
+
   const auto alloc_callback =  //
       [](uv_handle_t* handle, std::size_t suggested_size, uv_buf_t* buf) {
         (void)handle;
@@ -107,7 +110,32 @@ void Loop::Actor::StartRecv() {
   uv_udp_recv_start(socket_.get(), alloc_callback, recv_callback);
 }
 
+void Loop::Actor::Close() {
+  if (closed_) {
+    VLOG(1) << "Actor already closed; not closing again.";
+    return;
+  }
+
+  int err = uv_udp_recv_stop(socket_.get());
+  CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
+
+  // We cannot destruct socket_ until the close callback below is finished.
+  // Thus, we have to put the pointer to the uv_udp_t in the uv_udp_t
+  // itself and then delete it within the close callback.
+  uv_udp_t* socket = socket_.release();
+  socket->data = reinterpret_cast<void*>(socket);
+  uv_close(reinterpret_cast<uv_handle_t*>(socket), [](uv_handle_t* handle) {
+    VLOG(1) << "socket_ closed.";
+    uv_udp_t* socket = reinterpret_cast<uv_udp_t*>(handle->data);
+    delete socket;
+  });
+
+  closed_ = true;
+}
+
 void Loop::Actor::SendTo(const std::string& msg, const UdpAddress& addr) {
+  CHECK(!closed_);
+
   // libuv manages memory in a somewhat annoying way. If we want to send a
   // string over UDP, we have to allocate the string on the heap, pack a
   // pointer
@@ -161,13 +189,7 @@ void Loop::Actor::SendTo(const google::protobuf::Message& proto,
   SendTo(ProtoToString(proto), addr);
 }
 
-void Loop::Actor::Stop() {
-  int err = uv_udp_recv_stop(socket_.get());
-  CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
-}
-
-// Timer
-// ///////////////////////////////////////////////////////////////////////
+// Timer ///////////////////////////////////////////////////////////////////////
 Loop::Timer::Timer(std::unique_ptr<uv_timer_t> timer, callback_t callback,
                    const std::chrono::milliseconds delay)
     : timer_(std::move(timer)),
@@ -180,14 +202,16 @@ Loop::Timer::Timer(std::unique_ptr<uv_timer_t> timer, callback_t callback,
 }
 
 Loop::Timer::~Timer() {
-  // When the timer is destroyed, the callback is freed. If we didn't stop the
-  // timer, then the freed callback would be called.
+  // If the timer was default initialized or if Close() was called, then timer_
+  // is null.
   if (timer_) {
-    Stop();
+    CHECK(!closed_);
+    Close();
   }
 }
 
 void Loop::Timer::Start() {
+  CHECK(!closed_);
   auto callback = [](uv_timer_t* handle) {
     callback_t* f = reinterpret_cast<callback_t*>(handle->data);
     (*f)();
@@ -198,21 +222,46 @@ void Loop::Timer::Start() {
 }
 
 void Loop::Timer::Reset() {
+  CHECK(!closed_);
   Stop();
   Start();
 }
 
 void Loop::Timer::Stop() {
+  CHECK(!closed_);
   int err = uv_timer_stop(timer_.get());
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 }
 
-// Loop
-// ////////////////////////////////////////////////////////////////////////
+void Loop::Timer::Close() {
+  if (closed_) {
+    VLOG(1) << "Timer already closed; not closing again.";
+    return;
+  }
+
+  Stop();
+
+  // We cannot destruct timer_ until the close callback below is finished.
+  // Thus, we have to put the pointer to the uv_timer_t in the uv_timer_t
+  // itself and then delete it within the close callback.
+  uv_timer_t* timer = timer_.release();
+  timer->data = reinterpret_cast<void*>(timer);
+  uv_close(reinterpret_cast<uv_handle_t*>(timer), [](uv_handle_t* handle) {
+    VLOG(1) << "timer closed.";
+    uv_timer_t* timer = reinterpret_cast<uv_timer_t*>(handle->data);
+    delete timer;
+  });
+
+  closed_ = true;
+}
+
+// Loop ////////////////////////////////////////////////////////////////////////
 Loop::Loop() : loop_(new uv_loop_t{}), async_(new uv_async_t{}) {
+  VLOG(1) << "Initializing loop.";
   int err = uv_loop_init(loop_.get());
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 
+  VLOG(1) << "Initializing async.";
   async_->data = reinterpret_cast<void*>(this);
   const auto async_callback = [](uv_async_t* handle) {
     auto* loop = reinterpret_cast<Loop*>(handle->data);
@@ -227,15 +276,14 @@ Loop::Loop() : loop_(new uv_loop_t{}), async_(new uv_async_t{}) {
 }
 
 Loop::~Loop() {
-  if (loop_) {
-    Stop();
-    int err = uv_loop_close(loop_.get());
-    CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
-  }
+  Stop();
+  int err = uv_loop_close(loop_.get());
+  CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 }
 
 Loop::Timer Loop::RegisterTimer(const std::chrono::milliseconds& delay,
                                 const callback_t& callback) {
+  CHECK(!stopped_);
   std::unique_ptr<uv_timer_t> timer(new uv_timer_t{});
   int err = uv_timer_init(loop_.get(), timer.get());
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
@@ -243,30 +291,54 @@ Loop::Timer Loop::RegisterTimer(const std::chrono::milliseconds& delay,
 }
 
 void Loop::RunFromAnotherThread(const callback_t& callback) {
+  CHECK(!stopped_);
   pending_callbacks_.push_back(callback);
   uv_async_send(async_.get());
 }
 
-void Loop::Run() { uv_run(loop_.get(), UV_RUN_DEFAULT); }
+void Loop::Run() {
+  CHECK(!stopped_);
+  int err = uv_run(loop_.get(), UV_RUN_DEFAULT);
+  VLOG(1) << "uv_run returned " << err;
+}
 
 void Loop::Stop() {
-  // See https://stackoverflow.com/a/25831688/3187068.
-  uv_stop(loop_.get());
-  uv_walk(loop_.get(),
-          [](uv_handle_t* handle, void* arg) {
-            (void)arg;
-            if (!uv_is_closing(handle)) {
-              uv_close(handle,
-                       /*close_cb=*/[](uv_handle_t* handle) { (void)handle; });
-            }
-          },
-          /*arg=*/nullptr);
+  CHECK(loop_);
+  CHECK(async_);
 
-  // This should return 0, but for whatever reason, it returns 1. Running it
-  // again makes it return 0.
+  if (stopped_) {
+    VLOG(1) << "Loop already stopped; not stopping again.";
+    return;
+  }
+
+  // Close the async.
+  uv_close(reinterpret_cast<uv_handle_t*>(async_.get()),
+           [](uv_handle_t* handle) {
+             VLOG(1) << "async_ closed.";
+             (void)handle;
+           });
+
+  // See https://stackoverflow.com/a/25831688/3187068.
+  VLOG(1) << "Stopping loop.";
+  uv_stop(loop_.get());
+  uv_walk(
+      loop_.get(),
+      [](uv_handle_t* handle, void*) {
+        if (!uv_is_closing(handle)) {
+          LOG(FATAL)
+              << "Unclosing handle of type "
+              << uv_handle_type_name(handle->type)
+              << " found. You must close all handles before stopping the loop.";
+        }
+      },
+      nullptr);
+
   int err = uv_run(loop_.get(), UV_RUN_DEFAULT);
-  CHECK(err == 0 || err == 1);
+  VLOG(1) << "uv_run returned " << err;
   err = uv_run(loop_.get(), UV_RUN_DEFAULT);
+  VLOG(1) << "uv_run returned " << err;
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
   CHECK(!uv_loop_alive(loop_.get()));
+
+  stopped_ = true;
 }

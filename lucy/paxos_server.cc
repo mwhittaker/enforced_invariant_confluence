@@ -22,6 +22,13 @@ PaxosServer::PaxosServer(const Cluster& cluster, replica_index_t replica_index,
   }
 }
 
+void PaxosServer::Close() {
+  Server::Close();
+  if (AmLeader()) {
+    resend_prepares_timer_.Close();
+  }
+}
+
 void PaxosServer::OnRecv(const std::string& msg, const UdpAddress& src_addr) {
   if (AmLeader()) {
     OnRecvLeader(msg, src_addr);

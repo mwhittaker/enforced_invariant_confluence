@@ -72,6 +72,11 @@ void Client::OnRecv(const std::string& msg, const UdpAddress& src_addr) {
   OnTxnRply(reply.txn_reply().reply(), src_addr);
 }
 
+void Client::Close() {
+  Loop::Actor::Close();
+  resend_pending_txn_timer_.Close();
+}
+
 void Client::ResendPendingTxn() {
   CHECK(pending_);
 

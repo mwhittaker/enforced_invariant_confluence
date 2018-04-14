@@ -48,6 +48,7 @@ void BenchmarkServer::HandleKillRequest(const BenchmarkServerKillRequest& kill,
   (void)kill;
 
   // Kill the server.
+  server_->Close();
   server_.reset();
   object_.reset();
 

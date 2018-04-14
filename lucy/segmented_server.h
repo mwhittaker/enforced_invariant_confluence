@@ -20,6 +20,8 @@ class SegmentedServer : public Server {
   SegmentedServer(const Cluster& cluster, replica_index_t replica_index,
                   Object* object, Loop* loop);
 
+  void Close() override;
+
  private:
   enum Mode { NORMAL = 0, SYNCING_LEADER = 1, SYNCING_FOLLOWER = 2 };
 

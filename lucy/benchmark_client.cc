@@ -64,8 +64,10 @@ void BenchmarkClient::HandleBankAccount(
   });
 
   // Stop client loop.
-  client_loop.RunFromAnotherThread([&client]() { client.Stop(); });
-  client_loop.RunFromAnotherThread([&client_loop]() { client_loop.Stop(); });
+  client_loop.RunFromAnotherThread([&client, &client_loop]() {
+    client.Close();
+    client_loop.Stop();
+  });
   client_loop_thread.join();
 
   // Respond to the master.
@@ -108,8 +110,10 @@ void BenchmarkClient::HandleTwoInts(
   });
 
   // Stop client loop.
-  client_loop.RunFromAnotherThread([&client]() { client.Stop(); });
-  client_loop.RunFromAnotherThread([&client_loop]() { client_loop.Stop(); });
+  client_loop.RunFromAnotherThread([&client, &client_loop]() {
+    client.Close();
+    client_loop.Stop();
+  });
   client_loop_thread.join();
 
   // Respond to the master.

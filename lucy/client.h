@@ -10,6 +10,9 @@
 #include "udp.h"
 
 class Client : public Loop::Actor {
+ public:
+  void Close() override;
+
  protected:
   Client(ServerType server_type, const Cluster& server_cluster, Loop* loop);
 
