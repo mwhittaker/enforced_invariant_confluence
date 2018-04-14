@@ -8,5 +8,3 @@
 -I/usr/local/include
 -g
 -O0
--fsanitize=address
--fsanitize=undefined

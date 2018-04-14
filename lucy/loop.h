@@ -20,7 +20,9 @@ class Loop {
   class Actor {
    public:
     Actor(const HostPort& host_port, Loop* loop);
+    Actor(const UdpAddress& addr, Loop* loop);
     Actor(Loop* loop);
+    virtual ~Actor();
     void SendTo(const std::string& msg, const UdpAddress& addr);
     void SendTo(const google::protobuf::Message& proto, const UdpAddress& addr);
     void Stop();
@@ -35,7 +37,7 @@ class Loop {
       Actor* actor;
     };
 
-    void Start();
+    void StartRecv();
 
     std::unique_ptr<uv_udp_t> socket_;
     std::uint64_t pending_send_id_ = 0;

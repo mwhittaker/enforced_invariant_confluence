@@ -1,6 +1,9 @@
 #ifndef GOSSIP_SERVER_H_
 #define GOSSIP_SERVER_H_
 
+#include "glog/logging.h"
+
+#include "loop.h"
 #include "server.h"
 #include "server.pb.h"
 #include "udp.h"
@@ -8,10 +11,13 @@
 class GossipServer : public Server {
  public:
   GossipServer(const Cluster& cluster, replica_index_t replica_index,
-               Object* object)
-      : Server(cluster, replica_index, object) {}
+               Object* object, Loop* loop)
+      : Server(cluster, replica_index, object, loop) {
+    LOG(INFO) << "GossipServer running on "
+              << cluster_.UdpAddrs()[replica_index_] << ".";
+  }
 
-  void Run() override;
+  void OnRecv(const std::string& msg, const UdpAddress& src_addr) override;
 
  private:
   void HandleMergeRequest(const MergeRequest& merge_request,

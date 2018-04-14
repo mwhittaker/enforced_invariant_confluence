@@ -7,6 +7,8 @@
 #include <memory>
 #include <set>
 
+#include "glog/logging.h"
+
 #include "server.h"
 #include "server.pb.h"
 
@@ -15,10 +17,13 @@ using epoch_t = std::uint64_t;
 class SegmentedServer : public Server {
  public:
   SegmentedServer(const Cluster& cluster, replica_index_t replica_index,
-                  Object* object)
-      : Server(cluster, replica_index, object) {}
+                  Object* object, Loop* loop)
+      : Server(cluster, replica_index, object, loop) {
+    LOG(INFO) << "SegmentedServer listening on "
+              << cluster_.UdpAddrs()[replica_index_] << ".";
+  }
 
-  void Run() override;
+  void OnRecv(const std::string& msg, const UdpAddress& src_addr) override;
 
  private:
   enum Mode { NORMAL = 0, SYNCING_LEADER = 1, SYNCING_FOLLOWER = 2 };

@@ -8,6 +8,7 @@
 #include "bank_account.h"
 #include "cluster.h"
 #include "gossip_server.h"
+#include "loop.h"
 #include "object.h"
 #include "paxos_server.h"
 #include "segmented_server.h"
@@ -53,20 +54,20 @@ int main(int argc, char* argv[]) {
   }
 
   // Server.
+  Loop loop;
   std::unique_ptr<Server> server;
   if (server_mode == "paxos") {
     server = std::unique_ptr<Server>(
-        new PaxosServer(cluster, replica_index, object.get()));
+        new PaxosServer(cluster, replica_index, object.get(), &loop));
   } else if (server_mode == "segmented") {
     server = std::unique_ptr<Server>(
-        new SegmentedServer(cluster, replica_index, object.get()));
+        new SegmentedServer(cluster, replica_index, object.get(), &loop));
   } else if (server_mode == "gossip") {
     server = std::unique_ptr<Server>(
-        new GossipServer(cluster, replica_index, object.get()));
+        new GossipServer(cluster, replica_index, object.get(), &loop));
   } else {
     std::cerr << Usage() << std::endl;
     return EXIT_FAILURE;
   }
-
-  server->Run();
+  loop.Run();
 }

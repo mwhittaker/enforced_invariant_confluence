@@ -6,31 +6,24 @@
 #include "proto_util.h"
 #include "rand_util.h"
 
-void SegmentedServer::Run() {
-  LOG(INFO) << "SegmentedServer listening on "
-            << cluster_.UdpAddrs()[replica_index_] << ".";
-
-  while (true) {
-    std::string msg;
-    UdpAddress src_addr;
-    socket_.RecvFrom(&msg, &src_addr);
-
-    const auto proto = ProtoFromString<ServerMessage>(msg);
-    if (proto.has_txn_request()) {
-      HandleTxnRequest(proto.txn_request(), src_addr);
-    } else if (proto.has_merge_request()) {
-      HandleMergeRequest(proto.merge_request(), src_addr);
-    } else if (proto.has_sync_request()) {
-      HandleSyncRequest(proto.sync_request(), src_addr);
-    } else if (proto.has_sync_reply()) {
-      HandleSyncReply(proto.sync_reply(), src_addr);
-    } else if (proto.has_start()) {
-      HandleStart(proto.start(), src_addr);
-    } else if (proto.has_die()) {
-      return;
-    } else {
-      LOG(FATAL) << "Unexpected server message type";
-    }
+void SegmentedServer::OnRecv(const std::string& msg,
+                             const UdpAddress& src_addr) {
+  const auto proto = ProtoFromString<ServerMessage>(msg);
+  if (proto.has_txn_request()) {
+    HandleTxnRequest(proto.txn_request(), src_addr);
+  } else if (proto.has_merge_request()) {
+    HandleMergeRequest(proto.merge_request(), src_addr);
+  } else if (proto.has_sync_request()) {
+    HandleSyncRequest(proto.sync_request(), src_addr);
+  } else if (proto.has_sync_reply()) {
+    HandleSyncReply(proto.sync_reply(), src_addr);
+  } else if (proto.has_start()) {
+    HandleStart(proto.start(), src_addr);
+  } else if (proto.has_die()) {
+    // TODO: Stop any pending timers.
+    Stop();
+  } else {
+    LOG(FATAL) << "Unexpected server message type";
   }
 }
 
@@ -130,7 +123,7 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
   msg.mutable_sync_reply()->set_replica_index(replica_index_);
   msg.mutable_sync_reply()->set_epoch(sync_request.epoch());
   msg.mutable_sync_reply()->set_object(object_->Get());
-  socket_.SendTo(ProtoToString(msg), src_addr);
+  SendTo(msg, src_addr);
 }
 
 void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
@@ -178,7 +171,7 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
   std::string reply = object_->ExecTxn(pending_sync_txn_->txn.txn());
   ServerMessage txn_reply;
   txn_reply.mutable_txn_reply()->set_reply(reply);
-  socket_.SendTo(ProtoToString(txn_reply), pending_sync_txn_->src_addr);
+  SendTo(txn_reply, pending_sync_txn_->src_addr);
 
   // Send Start messages to the other replicas.
   VLOG(1) << "SegmentedServer sync leader sending start to all other replicas.";
@@ -188,7 +181,7 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
   const std::string start_s = ProtoToString(start);
   for (replica_index_t i = 0; i < cluster_.Size(); ++i) {
     if (i != replica_index_) {
-      socket_.SendTo(start_s, cluster_.UdpAddrs()[i]);
+      SendTo(start_s, cluster_.UdpAddrs()[i]);
     }
   }
 
@@ -253,7 +246,7 @@ void SegmentedServer::ProcessBufferedTxns() {
       // Reply to the client.
       ServerMessage msg;
       msg.mutable_txn_reply()->set_reply(reply);
-      socket_.SendTo(ProtoToString(msg), it->src_addr);
+      SendTo(msg, it->src_addr);
 
       // Send merge requests if necessary.
       num_requests_serviced_++;
@@ -282,7 +275,7 @@ void SegmentedServer::ProcessBufferedTxns() {
       const std::string msg_str = ProtoToString(msg);
       for (std::size_t i = 0; i < cluster_.Size(); ++i) {
         if (i != replica_index_) {
-          socket_.SendTo(msg_str, cluster_.UdpAddrs()[i]);
+          SendTo(msg_str, cluster_.UdpAddrs()[i]);
         }
       }
 
@@ -300,5 +293,5 @@ void SegmentedServer::SendMergeRequest() {
   ServerMessage msg;
   msg.mutable_merge_request()->set_object(object_->Get());
   msg.mutable_merge_request()->set_epoch(epoch_);
-  socket_.SendTo(ProtoToString(msg), dst_addr);
+  SendTo(msg, dst_addr);
 }

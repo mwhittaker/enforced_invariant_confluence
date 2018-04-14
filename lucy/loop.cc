@@ -23,8 +23,22 @@ Loop::Actor::Actor(const HostPort& host_port, Loop* loop)
   err = uv_udp_bind(socket_.get(), sockaddr, UV_UDP_REUSEADDR);
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 
-  // Start
-  Start();
+  // StartRecv.
+  StartRecv();
+}
+
+Loop::Actor::Actor(const UdpAddress& addr, Loop* loop)
+    : socket_(new uv_udp_t{}) {
+  // Init.
+  int err = uv_udp_init(loop->loop_.get(), socket_.get());
+  CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
+
+  // Bind.
+  err = uv_udp_bind(socket_.get(), addr.SockAddr(), UV_UDP_REUSEADDR);
+  CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
+
+  // StartRecv.
+  StartRecv();
 }
 
 Loop::Actor::Actor(Loop* loop) : socket_(new uv_udp_t{}) {
@@ -32,11 +46,17 @@ Loop::Actor::Actor(Loop* loop) : socket_(new uv_udp_t{}) {
   int err = uv_udp_init(loop->loop_.get(), socket_.get());
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 
-  // Start
-  Start();
+  // StartRecv.
+  StartRecv();
 }
 
-void Loop::Actor::Start() {
+Loop::Actor::~Actor() {
+  if (socket_) {
+    Stop();
+  }
+}
+
+void Loop::Actor::StartRecv() {
   const auto alloc_callback =  //
       [](uv_handle_t* handle, std::size_t suggested_size, uv_buf_t* buf) {
         (void)handle;
@@ -47,11 +67,13 @@ void Loop::Actor::Start() {
   const auto recv_callback =  //
       [](uv_udp_t* handle, ssize_t nread, const uv_buf_t* buf,
          const struct sockaddr* sockaddr, unsigned flags) {
-        (void)flags;
 
         // Take ownership of buf's data immediately since we want to guarantee
         // that it is freed.
         std::unique_ptr<char[]> data(buf->base);
+
+        // Check that we received an entire UDP packet.
+        CHECK(!(flags & UV_UDP_PARTIAL));
 
         // libuv invokes recv_callback like this after every message is
         // received.
@@ -87,12 +109,15 @@ void Loop::Actor::Start() {
 
 void Loop::Actor::SendTo(const std::string& msg, const UdpAddress& addr) {
   // libuv manages memory in a somewhat annoying way. If we want to send a
-  // string over UDP, we have to allocate the string on the heap, pack a pointer
-  // to it in a uv_buf_t, and call uv_udp_send with the pointer. Then, after the
+  // string over UDP, we have to allocate the string on the heap, pack a
+  // pointer
+  // to it in a uv_buf_t, and call uv_udp_send with the pointer. Then, after
+  // the
   // send callback is invoked, we have to free the memory. See [1] for more
   // details.
   //
-  // To accomplish this, we allocate a PendingSend object on the heap and store
+  // To accomplish this, we allocate a PendingSend object on the heap and
+  // store
   // it in a map in the Actor. The PendingSend stores the send request and the
   // message data (in a vector). We shove a pointer to this PendingSend in the
   // send_request. When the send callback is called, we remove the PendingSend
@@ -142,7 +167,8 @@ void Loop::Actor::Stop() {
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 }
 
-// Timer ///////////////////////////////////////////////////////////////////////
+// Timer
+// ///////////////////////////////////////////////////////////////////////
 Loop::Timer::Timer(std::unique_ptr<uv_timer_t> timer, callback_t callback,
                    const std::chrono::milliseconds delay)
     : timer_(std::move(timer)),
@@ -182,7 +208,8 @@ void Loop::Timer::Stop() {
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 }
 
-// Loop ////////////////////////////////////////////////////////////////////////
+// Loop
+// ////////////////////////////////////////////////////////////////////////
 Loop::Loop() : loop_(new uv_loop_t{}), async_(new uv_async_t{}) {
   int err = uv_loop_init(loop_.get());
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
@@ -201,9 +228,11 @@ Loop::Loop() : loop_(new uv_loop_t{}), async_(new uv_async_t{}) {
 }
 
 Loop::~Loop() {
-  Stop();
-  int err = uv_loop_close(loop_.get());
-  CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
+  if (loop_) {
+    Stop();
+    int err = uv_loop_close(loop_.get());
+    CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
+  }
 }
 
 Loop::Timer Loop::RegisterTimer(const std::chrono::milliseconds& delay,

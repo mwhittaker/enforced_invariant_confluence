@@ -90,7 +90,6 @@ void TwoInts::Merge(const std::string& o) {
   proto.ParseFromString(o);
   x_ = std::max(x_, proto.x());
   y_ = std::max(y_, proto.y());
-  CHECK(PointSatisfiesInvariant(x_, y_)) << x_ << ", " << y_;
 }
 
 void TwoInts::Set(const std::string& o) {
@@ -99,7 +98,6 @@ void TwoInts::Set(const std::string& o) {
   x_ = proto.x();
   y_ = proto.y();
   segment_ = PointToSegment(x_, y_);
-  CHECK(PointSatisfiesInvariant(x_, y_)) << x_ << ", " << y_;
 }
 
 std::string TwoInts::Get() {

@@ -3,8 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include "glog/logging.h"
-
 #include "bank_account.h"
 #include "gossip_server.h"
 #include "host_port.h"
@@ -14,24 +12,16 @@
 #include "server.pb.h"
 #include "two_ints.h"
 
-void BenchmarkServer::Run() {
-  LOG(INFO) << "BenchmarkServer running on "
-            << benchmark_server_cluster_.UdpAddrs()[index_] << ".";
-
-  while (true) {
-    std::string msg;
-    UdpAddress src_addr;
-    socket_.RecvFrom(&msg, &src_addr);
-
-    BenchmarkServerRequest proto;
-    proto.ParseFromString(msg);
-    if (proto.has_start()) {
-      HandleStartRequest(proto.start(), src_addr);
-    } else if (proto.has_kill()) {
-      HandleKillRequest(proto.kill(), src_addr);
-    } else {
-      LOG(FATAL) << "Unexpected message type.";
-    }
+void BenchmarkServer::OnRecv(const std::string& msg,
+                             const UdpAddress& src_addr) {
+  BenchmarkServerRequest proto;
+  proto.ParseFromString(msg);
+  if (proto.has_start()) {
+    HandleStartRequest(proto.start(), src_addr);
+  } else if (proto.has_kill()) {
+    HandleKillRequest(proto.kill(), src_addr);
+  } else {
+    LOG(FATAL) << "Unexpected message type.";
   }
 }
 
@@ -42,15 +32,14 @@ void BenchmarkServer::HandleStartRequest(
   // Sanity check start.
   CHECK_GE(start.num_servers(), 1);
   CHECK_LT(index_, start.num_servers());
-  CHECK(!server_thread_.joinable());
 
   // Start the server.
-  server_thread_ = std::thread(&BenchmarkServer::StartServer, this, start);
+  BenchmarkServer::StartServer(start);
 
   // Send an ack.
   BenchmarkServerReply reply;
   reply.mutable_start()->set_index(index_);
-  socket_.SendTo(ProtoToString(reply), src_addr);
+  SendTo(reply, src_addr);
 }
 
 void BenchmarkServer::HandleKillRequest(const BenchmarkServerKillRequest& kill,
@@ -58,20 +47,14 @@ void BenchmarkServer::HandleKillRequest(const BenchmarkServerKillRequest& kill,
   DLOG(INFO) << "Received KillRequest from " << src_addr << ".";
   (void)kill;
 
-  if (server_thread_.joinable()) {
-    // Send kill message to server.
-    ServerMessage die;
-    die.mutable_die();
-    socket_.SendTo(ProtoToString(die), server_cluster_.UdpAddrs()[index_]);
-
-    // Join the thread.
-    server_thread_.join();
-  }
+  // Kill the server.
+  server_.reset();
+  object_.reset();
 
   // Send an ack.
   BenchmarkServerReply reply;
   reply.mutable_kill()->set_index(index_);
-  socket_.SendTo(ProtoToString(reply), src_addr);
+  SendTo(reply, src_addr);
 }
 
 void BenchmarkServer::StartServer(const BenchmarkServerStartRequest& start) {
@@ -83,36 +66,32 @@ void BenchmarkServer::StartServer(const BenchmarkServerStartRequest& start) {
   Cluster cluster(host_ports);
 
   // Create the object.
-  std::unique_ptr<Object> object;
   if (start.has_two_ints()) {
-    object =
+    object_ =
         std::unique_ptr<Object>(new TwoInts(start.two_ints().segment_length()));
   } else if (start.has_bank_account()) {
-    object = std::unique_ptr<Object>(new BankAccount(cluster.Size(), index_));
+    object_ = std::unique_ptr<Object>(new BankAccount(cluster.Size(), index_));
   } else {
     LOG(FATAL) << "Unexpected object type.";
   }
 
   // Create the server.
-  std::unique_ptr<Server> server;
   switch (start.server_type()) {
     case PAXOS: {
-      server = std::unique_ptr<Server>(
-          new PaxosServer(cluster, index_, object.get()));
+      server_ = std::unique_ptr<Server>(
+          new PaxosServer(cluster, index_, object_.get(), loop_));
       break;
     }
     case SEGMENTED: {
-      server = std::unique_ptr<Server>(
-          new SegmentedServer(cluster, index_, object.get()));
+      server_ = std::unique_ptr<Server>(
+          new SegmentedServer(cluster, index_, object_.get(), loop_));
       break;
     }
     case GOSSIP: {
-      server = std::unique_ptr<Server>(
-          new GossipServer(cluster, index_, object.get()));
+      server_ = std::unique_ptr<Server>(
+          new GossipServer(cluster, index_, object_.get(), loop_));
       break;
     }
     default: { LOG(FATAL) << "Unexpected server type."; }
   }
-
-  server->Run();
 }

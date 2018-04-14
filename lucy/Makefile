@@ -3,6 +3,7 @@ CC = clang
 CXX = clang++
 BIN = bin
 DEBUG=1
+SANITIZERS=1
 VERBOSE=0
 CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -I$(BIN) \
 			$(shell pkg-config --cflags protobuf) \
@@ -42,8 +43,10 @@ NON_BINARY_OBJECTS = $(filter-out $(BINARY_OBJECTS), $(OBJECTS))
 ifeq ($(DEBUG), 1)
 	CXXFLAGS += -g -O0
 	ifeq ($(CXX), clang++)
-		CXXFLAGS += -fsanitize=address
-		CXXFLAGS += -fsanitize=undefined
+		ifeq ($(SANITIZERS), 1)
+			CXXFLAGS += -fsanitize=address
+			CXXFLAGS += -fsanitize=undefined
+		endif
 	endif
 else
 	CXXFLAGS += -O3
@@ -76,17 +79,17 @@ $(BIN)/%.pb.h: %.proto
 	$(QUIET)protoc --cpp_out=$(BIN) $<
 
 $(PROTO_OBJECTS): $(BIN)/%.o: $(BIN)/%.cc
-	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX   ] $<"; fi
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX]    $<"; fi
 	$(QUIET)$(CXX) $(CXXFLAGS) $< -c -o $@
 	$(QUIET)$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
 
 $(OBJECTS): $(BIN)/%.o: %.cc
-	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX   ] $<"; fi
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX]    $<"; fi
 	$(QUIET)$(CXX) $(CXXFLAGS) $< -c -o $@
 	$(QUIET)$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
 
 $(BINARIES): %: $(BIN)/%.o $(PROTO_OBJECTS) $(NON_BINARY_OBJECTS)
-	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX   ] $@"; fi
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX]    $@"; fi
 	$(QUIET)$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 tags: $(PROTOS) $(HEADERS) $(SOURCES)

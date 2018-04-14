@@ -1,55 +1,43 @@
 #include "paxos_server.h"
 
-#include "glog/logging.h"
 #include "proto_util.h"
 
-void PaxosServer::Run() {
+void PaxosServer::OnRecv(const std::string& msg, const UdpAddress& src_addr) {
   if (AmLeader()) {
-    RunLeader();
+    OnRecvLeader(msg, src_addr);
   } else {
-    RunFollower();
+    OnRecvFollower(msg, src_addr);
   }
 }
 
 bool PaxosServer::AmLeader() const { return replica_index_ == 0; }
 
-void PaxosServer::RunLeader() {
-  LOG(INFO) << "PaxosServer leader listening on "
-            << cluster_.UdpAddrs()[replica_index_] << ".";
-
-  while (true) {
-    std::string msg;
-    UdpAddress src_addr;
-    socket_.RecvFrom(&msg, &src_addr);
-
-    const auto proto = ProtoFromString<ServerMessage>(msg);
-    if (proto.has_txn_request()) {
-      HandleTxnRequest(proto.txn_request(), src_addr);
-    } else if (proto.has_prepare_ok()) {
-      HandlePrepareOk(proto.prepare_ok(), src_addr);
-      break;
-    } else if (proto.has_die()) {
-      return;
-    } else {
-      LOG(FATAL) << "Unexpected server message type";
-    }
+void PaxosServer::OnRecvLeader(const std::string& msg,
+                               const UdpAddress& src_addr) {
+  const auto proto = ProtoFromString<ServerMessage>(msg);
+  if (proto.has_txn_request()) {
+    HandleTxnRequest(proto.txn_request(), src_addr);
+  } else if (proto.has_prepare_ok()) {
+    HandlePrepareOk(proto.prepare_ok(), src_addr);
+  } else if (proto.has_die()) {
+    // TODO: Stop any pending timers.
+    Stop();
+    return;
+  } else {
+    LOG(FATAL) << "Unexpected server message type";
   }
 }
 
-void PaxosServer::RunFollower() {
+void PaxosServer::OnRecvFollower(const std::string& msg,
+                                 const UdpAddress& src_addr) {
   LOG(INFO) << "PaxosServer follower listening on "
             << cluster_.UdpAddrs()[replica_index_] << ".";
 
-  while (true) {
-    std::string msg;
-    UdpAddress src_addr;
-    socket_.RecvFrom(&msg, &src_addr);
-    const auto proto = ProtoFromString<ServerMessage>(msg);
-    if (proto.has_prepare()) {
-      HandlePrepare(proto.prepare(), src_addr);
-    } else {
-      LOG(FATAL) << "Unexpected server message type";
-    }
+  const auto proto = ProtoFromString<ServerMessage>(msg);
+  if (proto.has_prepare()) {
+    HandlePrepare(proto.prepare(), src_addr);
+  } else {
+    LOG(FATAL) << "Unexpected server message type";
   }
 }
 
@@ -73,7 +61,7 @@ void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
   msg.mutable_prepare()->set_num_committed(num_committed_);
   const std::string msg_str = ProtoToString(msg);
   for (std::size_t i = 1; i < cluster_.Size(); ++i) {
-    socket_.SendTo(msg_str, cluster_.UdpAddrs()[i]);
+    SendTo(msg_str, cluster_.UdpAddrs()[i]);
   }
 }
 
@@ -121,7 +109,7 @@ void PaxosServer::HandlePrepare(const Prepare& prepare,
   ServerMessage msg;
   msg.mutable_prepare_ok()->set_txn_index(prepare.txn_index());
   msg.mutable_prepare_ok()->set_replica_index(replica_index_);
-  socket_.SendTo(ProtoToString(msg), src_addr);
+  SendTo(msg, src_addr);
 
   // Commit any transactions that are ready to commit.
   num_committed_by_leader_ =
@@ -137,7 +125,7 @@ void PaxosServer::LeaderCommitReadyTransactions() {
     ServerMessage msg;
     msg.mutable_txn_reply()->set_reply(
         object_->ExecTxn(pending_txn.txn_request.txn()));
-    socket_.SendTo(ProtoToString(msg), pending_txn.src_addr);
+    SendTo(msg, pending_txn.src_addr);
 
     num_committed_++;
     it = waiting_for_commit_.erase(it);

@@ -7,6 +7,8 @@ enum class SyncStatus { EXECUTED_LOCALLY, REQUIRES_SYNC };
 
 class Object {
  public:
+  virtual ~Object() {}
+
   virtual std::string ExecTxn(const std::string& txn) = 0;
   virtual SyncStatus ExecTxnSegmented(const std::string& txn,
                                       std::string* reply);
