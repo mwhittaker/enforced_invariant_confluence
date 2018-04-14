@@ -6,11 +6,13 @@ message MergeRequest {
 }
 
 message TxnRequest {
-  required bytes txn = 1;
+  required uint64 request_id = 1;
+  required bytes txn = 2;
 }
 
 message TxnReply {
-  required bytes reply = 1;
+  required uint64 request_id = 1;
+  required bytes reply = 2;
 }
 
 message Prepare {

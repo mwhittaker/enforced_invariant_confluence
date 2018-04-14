@@ -162,7 +162,6 @@ void Loop::Actor::SendTo(const google::protobuf::Message& proto,
 }
 
 void Loop::Actor::Stop() {
-  LOG(INFO) << "stopping actor";
   int err = uv_udp_recv_stop(socket_.get());
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
 }
