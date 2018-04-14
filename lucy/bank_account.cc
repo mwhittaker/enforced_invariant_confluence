@@ -29,6 +29,7 @@ std::string BankAccount::ExecTxn(const std::string& txn) {
       reply.mutable_withdraw();
       reply.set_result(BankAccountTxnReply::COMMITTED);
     } else {
+      reply.mutable_withdraw();
       reply.set_result(BankAccountTxnReply::ABORTED);
     }
   } else if (request.has_get()) {

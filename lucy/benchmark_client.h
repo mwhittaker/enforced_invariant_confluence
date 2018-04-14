@@ -34,8 +34,7 @@ class BenchmarkClient {
                          const UdpAddress& src_addr);
   void HandleTwoInts(const BenchmarkClientTwoIntsRequest& two_ints,
                      const UdpAddress& src_addr);
-  WorkloadResult ExecWorkloadFor(Loop* client_loop,
-                                 std::chrono::milliseconds duration,
+  WorkloadResult ExecWorkloadFor(std::chrono::milliseconds duration,
                                  std::function<void(void)> f) const;
   Cluster ServerSubCluster(std::size_t n) const;
 

@@ -249,4 +249,24 @@ void Loop::RunFromAnotherThread(const callback_t& callback) {
 
 void Loop::Run() { uv_run(loop_.get(), UV_RUN_DEFAULT); }
 
-void Loop::Stop() { uv_stop(loop_.get()); }
+void Loop::Stop() {
+  // See https://stackoverflow.com/a/25831688/3187068.
+  uv_stop(loop_.get());
+  uv_walk(loop_.get(),
+          [](uv_handle_t* handle, void* arg) {
+            (void)arg;
+            if (!uv_is_closing(handle)) {
+              uv_close(handle,
+                       /*close_cb=*/[](uv_handle_t* handle) { (void)handle; });
+            }
+          },
+          /*arg=*/nullptr);
+
+  // This should return 0, but for whatever reason, it returns 1. Running it
+  // again makes it return 0.
+  int err = uv_run(loop_.get(), UV_RUN_DEFAULT);
+  CHECK(err == 0 || err == 1);
+  err = uv_run(loop_.get(), UV_RUN_DEFAULT);
+  CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
+  CHECK(!uv_loop_alive(loop_.get()));
+}

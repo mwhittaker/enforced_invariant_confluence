@@ -43,12 +43,16 @@ void BenchmarkClient::HandleBankAccount(
   CHECK_LE(1, bank_account.num_servers());
   CHECK_LE(bank_account.num_servers(), server_cluster_.Size());
 
-  // Run workload.
   const Cluster cluster = ServerSubCluster(bank_account.num_servers());
   Loop client_loop;
   BankAccountClient client(bank_account.server_type(), cluster, &client_loop);
+
+  // Start client loop.
+  std::thread client_loop_thread([&client_loop]() { client_loop.Run(); });
+
+  // Run workload.
   auto duration = milliseconds(bank_account.duration_in_milliseconds());
-  const WorkloadResult result = ExecWorkloadFor(&client_loop, duration, [&]() {
+  const WorkloadResult result = ExecWorkloadFor(duration, [&]() {
     std::promise<BankAccountClient::Result> promise;
     auto future = promise.get_future();
     if (RandomBool(bank_account.fraction_withdraw())) {
@@ -58,6 +62,11 @@ void BenchmarkClient::HandleBankAccount(
     }
     future.get();
   });
+
+  // Stop client loop.
+  client_loop.RunFromAnotherThread([&client]() { client.Stop(); });
+  client_loop.RunFromAnotherThread([&client_loop]() { client_loop.Stop(); });
+  client_loop_thread.join();
 
   // Respond to the master.
   BenchmarkClientReply reply;
@@ -78,12 +87,16 @@ void BenchmarkClient::HandleTwoInts(
   CHECK_LE(1, two_ints.num_servers());
   CHECK_LE(two_ints.num_servers(), server_cluster_.Size());
 
-  // Run workload.
   const Cluster cluster = ServerSubCluster(two_ints.num_servers());
   Loop client_loop;
   TwoIntsClient client(two_ints.server_type(), cluster, &client_loop);
+
+  // Start client loop.
+  std::thread client_loop_thread([&client_loop]() { client_loop.Run(); });
+
+  // Run workload.
   auto duration = milliseconds(two_ints.duration_in_milliseconds());
-  const WorkloadResult result = ExecWorkloadFor(&client_loop, duration, [&]() {
+  const WorkloadResult result = ExecWorkloadFor(duration, [&]() {
     std::promise<TwoIntsClient::Result> promise;
     auto future = promise.get_future();
     if (RandomBool(0.5)) {
@@ -93,6 +106,11 @@ void BenchmarkClient::HandleTwoInts(
     }
     future.get();
   });
+
+  // Stop client loop.
+  client_loop.RunFromAnotherThread([&client]() { client.Stop(); });
+  client_loop.RunFromAnotherThread([&client_loop]() { client_loop.Stop(); });
+  client_loop_thread.join();
 
   // Respond to the master.
   BenchmarkClientReply reply;
@@ -105,12 +123,8 @@ void BenchmarkClient::HandleTwoInts(
 }
 
 BenchmarkClient::WorkloadResult BenchmarkClient::ExecWorkloadFor(
-    Loop* client_loop, std::chrono::milliseconds duration,
-    std::function<void(void)> f) const {
+    std::chrono::milliseconds duration, std::function<void(void)> f) const {
   using namespace std::chrono;
-
-  // Start client loop.
-  std::thread client_loop_thread([client_loop]() { client_loop->Run(); });
 
   // Record the start and anticipated start time.
   high_resolution_clock clock;
@@ -134,10 +148,6 @@ BenchmarkClient::WorkloadResult BenchmarkClient::ExecWorkloadFor(
   double txns_per_ns =
       static_cast<double>(num_transactions) / actual_duration.count();
   double txns_per_s = txns_per_ns * 1e9;
-
-  // Stop client loop.
-  client_loop->RunFromAnotherThread([client_loop]() { client_loop->Stop(); });
-  client_loop_thread.join();
 
   return {num_transactions, actual_duration, txns_per_s};
 }

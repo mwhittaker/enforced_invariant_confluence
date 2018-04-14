@@ -56,23 +56,27 @@ void BankAccountClient::OnTxnRply(const std::string& txn_reply,
   if (reply.has_get()) {
     CHECK(get_promise_ != nullptr);
     CHECK_EQ(reply.result(), BankAccountTxnReply::COMMITTED);
-    get_promise_->set_value(reply.get().value());
+    auto* promise = get_promise_;
     get_promise_ = nullptr;
+    promise->set_value(reply.get().value());
   } else if (reply.has_deposit()) {
     CHECK(deposit_promise_ != nullptr);
     CHECK_EQ(reply.result(), BankAccountTxnReply::COMMITTED);
-    deposit_promise_->set_value(COMMITTED);
+    auto* promise = deposit_promise_;
     deposit_promise_ = nullptr;
+    promise->set_value(COMMITTED);
   } else if (reply.has_withdraw()) {
     CHECK(withdraw_promise_ != nullptr);
-    if (reply.result() == BankAccountTxnReply::COMMITTED) {
-      withdraw_promise_->set_value(COMMITTED);
-    } else {
-      withdraw_promise_->set_value(ABORTED);
-    }
+    auto* promise = withdraw_promise_;
     withdraw_promise_ = nullptr;
+    if (reply.result() == BankAccountTxnReply::COMMITTED) {
+      promise->set_value(COMMITTED);
+    } else {
+      promise->set_value(ABORTED);
+    }
   } else {
-    LOG(FATAL) << "Unrecognized transaction reply.";
+    LOG(FATAL) << "Unrecognized transaction reply: " << reply.DebugString()
+               << ".";
   }
 }
 
