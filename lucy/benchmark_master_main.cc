@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -31,6 +32,8 @@ std::string ServerTypeToString(ServerType server_type) {
 }
 
 void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
+  std::ofstream vary_withdraws_file("vary_withdraws.csv");
+
   for (ServerType server_type : {GOSSIP, SEGMENTED, PAXOS}) {
     std::vector<double> fraction_withdraws = {0, 0.01, 0.05, 0.1, 0.2};
     for (double fraction_withdraw : fraction_withdraws) {
@@ -45,7 +48,7 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
       start.set_server_type(server_type);
       master->ServersStart(start);
 
-      // Run and print the workload.
+      // Run the workload.
       LOG(INFO) << "Starting workload.";
       BenchmarkClientBankAccountRequest bank_account;
       bank_account.set_num_servers(num_servers);
@@ -53,8 +56,13 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
       bank_account.set_duration_in_milliseconds(1000);
       bank_account.set_server_type(server_type);
       double total_txns_per_second = master->ClientsBankAccount(bank_account);
+
+      // Print and save the workload.
       std::cout << ServerTypeToString(server_type) << ", " << fraction_withdraw
                 << ", " << total_txns_per_second << std::endl;
+      vary_withdraws_file << ServerTypeToString(server_type) << ", "
+                          << fraction_withdraw << ", " << total_txns_per_second
+                          << std::endl;
 
       // Kill the servers.
       LOG(INFO) << "Killing servers.";

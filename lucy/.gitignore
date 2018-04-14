@@ -1,5 +1,6 @@
 bin/
 *.txt
+vary_withdraws.csv
 
 bank_account_client_repl
 benchmark_client_main
