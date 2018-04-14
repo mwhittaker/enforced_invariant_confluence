@@ -76,6 +76,7 @@ void Client::ResendPendingTxn() {
   CHECK(pending_);
 
   // Send the request again.
+  VLOG(1) << "Resending pending transaction.";
   ServerMessage request;
   request.mutable_txn_request()->set_txn(pending_txn_request_);
   request.mutable_txn_request()->set_request_id(request_id_);
