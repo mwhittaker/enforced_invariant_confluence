@@ -40,9 +40,6 @@ message Start {
   required uint64 epoch = 2;
 }
 
-message Die {
-}
-
 message ServerMessage {
   oneof msg {
     MergeRequest merge_request = 1;
@@ -53,6 +50,5 @@ message ServerMessage {
     SyncRequest sync_request = 6;
     SyncReply sync_reply = 7;
     Start start = 8;
-    Die die = 9;
   }
 }

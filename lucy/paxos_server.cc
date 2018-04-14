@@ -19,10 +19,6 @@ void PaxosServer::OnRecvLeader(const std::string& msg,
     HandleTxnRequest(proto.txn_request(), src_addr);
   } else if (proto.has_prepare_ok()) {
     HandlePrepareOk(proto.prepare_ok(), src_addr);
-  } else if (proto.has_die()) {
-    // TODO: Stop any pending timers.
-    Stop();
-    return;
   } else {
     LOG(FATAL) << "Unexpected server message type";
   }

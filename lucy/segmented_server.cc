@@ -19,9 +19,6 @@ void SegmentedServer::OnRecv(const std::string& msg,
     HandleSyncReply(proto.sync_reply(), src_addr);
   } else if (proto.has_start()) {
     HandleStart(proto.start(), src_addr);
-  } else if (proto.has_die()) {
-    // TODO: Stop any pending timers.
-    Stop();
   } else {
     LOG(FATAL) << "Unexpected server message type";
   }

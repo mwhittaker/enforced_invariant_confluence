@@ -9,9 +9,6 @@ void GossipServer::OnRecv(const std::string& msg, const UdpAddress& src_addr) {
     HandleMergeRequest(proto.merge_request(), src_addr);
   } else if (proto.has_txn_request()) {
     HandleTxnRequest(proto.txn_request(), src_addr);
-  } else if (proto.has_die()) {
-    // TODO: Stop any pending timers.
-    Stop();
   } else {
     LOG(FATAL) << "Unexpected server message type";
   }
