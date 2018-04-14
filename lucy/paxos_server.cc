@@ -26,9 +26,6 @@ void PaxosServer::OnRecvLeader(const std::string& msg,
 
 void PaxosServer::OnRecvFollower(const std::string& msg,
                                  const UdpAddress& src_addr) {
-  LOG(INFO) << "PaxosServer follower listening on "
-            << cluster_.UdpAddrs()[replica_index_] << ".";
-
   const auto proto = ProtoFromString<ServerMessage>(msg);
   if (proto.has_prepare()) {
     HandlePrepare(proto.prepare(), src_addr);
