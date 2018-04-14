@@ -25,6 +25,7 @@ void GossipServer::HandleTxnRequest(const TxnRequest& txn_request,
                                     const UdpAddress& src_addr) {
   VLOG(1) << "Received TxnRequest from " << src_addr << ".";
   ServerMessage msg;
+  msg.mutable_txn_reply()->set_request_id(txn_request.request_id());
   msg.mutable_txn_reply()->set_reply(object_->ExecTxn(txn_request.txn()));
   SendTo(msg, src_addr);
 

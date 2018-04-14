@@ -11,15 +11,23 @@
 #include "rand_util.h"
 #include "two_ints_client.h"
 
-void BenchmarkClient::OnRecv(const std::string& msg,
-                             const UdpAddress& src_addr) {
-  const auto proto = ProtoFromString<BenchmarkClientRequest>(msg);
-  if (proto.has_bank_account()) {
-    HandleBankAccount(proto.bank_account(), src_addr);
-  } else if (proto.has_two_ints()) {
-    HandleTwoInts(proto.two_ints(), src_addr);
-  } else {
-    LOG(FATAL) << "Unexpected benchmark client message type.";
+void BenchmarkClient::Run() {
+  LOG(INFO) << "BenchmarkClient listening on "
+            << benchmark_client_cluster_.UdpAddrs()[index_] << ".";
+
+  while (true) {
+    std::string msg;
+    UdpAddress src_addr;
+    socket_.RecvFrom(&msg, &src_addr);
+
+    const auto proto = ProtoFromString<BenchmarkClientRequest>(msg);
+    if (proto.has_bank_account()) {
+      HandleBankAccount(proto.bank_account(), src_addr);
+    } else if (proto.has_two_ints()) {
+      HandleTwoInts(proto.two_ints(), src_addr);
+    } else {
+      LOG(FATAL) << "Unexpected benchmark client message type.";
+    }
   }
 }
 
@@ -48,7 +56,7 @@ void BenchmarkClient::HandleBankAccount(
     } else {
       client.Deposit(/*amount=*/1, &promise);
     }
-    (void)future;
+    future.get();
   });
 
   // Respond to the master.
@@ -58,7 +66,7 @@ void BenchmarkClient::HandleBankAccount(
   reply.mutable_bank_account()->set_duration_in_nanoseconds(
       result.duration.count());
   reply.mutable_bank_account()->set_txns_per_second(result.txns_per_second);
-  SendTo(ProtoToString(reply), src_addr);
+  socket_.SendTo(ProtoToString(reply), src_addr);
 }
 
 void BenchmarkClient::HandleTwoInts(
@@ -83,7 +91,7 @@ void BenchmarkClient::HandleTwoInts(
     } else {
       client.DecrementY(&promise);
     }
-    (void)future;
+    future.get();
   });
 
   // Respond to the master.
@@ -93,7 +101,7 @@ void BenchmarkClient::HandleTwoInts(
   reply.mutable_two_ints()->set_duration_in_nanoseconds(
       result.duration.count());
   reply.mutable_two_ints()->set_txns_per_second(result.txns_per_second);
-  SendTo(ProtoToString(reply), src_addr);
+  socket_.SendTo(ProtoToString(reply), src_addr);
 }
 
 BenchmarkClient::WorkloadResult BenchmarkClient::ExecWorkloadFor(

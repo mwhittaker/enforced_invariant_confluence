@@ -119,6 +119,8 @@ void PaxosServer::LeaderCommitReadyTransactions() {
     // Execute the transaction, and send a reply to the client.
     const PendingTxn& pending_txn = it->second;
     ServerMessage msg;
+    msg.mutable_txn_reply()->set_request_id(
+        pending_txn.txn_request.request_id());
     msg.mutable_txn_reply()->set_reply(
         object_->ExecTxn(pending_txn.txn_request.txn()));
     SendTo(msg, pending_txn.src_addr);

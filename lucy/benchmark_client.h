@@ -12,18 +12,16 @@
 #include "server.h"
 #include "udp.h"
 
-class BenchmarkClient : Loop::Actor {
+class BenchmarkClient {
  public:
   BenchmarkClient(const Cluster& benchmark_client_cluster,
-                  const Cluster& server_cluster, replica_index_t index,
-                  Loop* loop)
-      : Loop::Actor(loop),
+                  const Cluster& server_cluster, replica_index_t index)
+      : socket_(benchmark_client_cluster.UdpAddrs()[index]),
         benchmark_client_cluster_(benchmark_client_cluster),
         server_cluster_(server_cluster),
-        index_(index) {
-    LOG(INFO) << "BenchmarkClient listening on "
-              << benchmark_client_cluster_.UdpAddrs()[index_] << ".";
-  }
+        index_(index) {}
+
+  void Run();
 
  private:
   struct WorkloadResult {
@@ -32,7 +30,6 @@ class BenchmarkClient : Loop::Actor {
     const double txns_per_second;
   };
 
-  void OnRecv(const std::string& msg, const UdpAddress& src_addr) override;
   void HandleBankAccount(const BenchmarkClientBankAccountRequest& bank_account,
                          const UdpAddress& src_addr);
   void HandleTwoInts(const BenchmarkClientTwoIntsRequest& two_ints,
@@ -42,6 +39,7 @@ class BenchmarkClient : Loop::Actor {
                                  std::function<void(void)> f) const;
   Cluster ServerSubCluster(std::size_t n) const;
 
+  UdpSocket socket_;
   const Cluster benchmark_client_cluster_;
   const Cluster server_cluster_;
   replica_index_t index_;

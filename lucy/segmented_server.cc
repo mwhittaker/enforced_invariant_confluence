@@ -167,6 +167,9 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
   CHECK(pending_sync_txn_);
   std::string reply = object_->ExecTxn(pending_sync_txn_->txn.txn());
   ServerMessage txn_reply;
+
+  txn_reply.mutable_txn_reply()->set_request_id(
+      pending_sync_txn_->txn.request_id());
   txn_reply.mutable_txn_reply()->set_reply(reply);
   SendTo(txn_reply, pending_sync_txn_->src_addr);
 
@@ -242,6 +245,7 @@ void SegmentedServer::ProcessBufferedTxns() {
     if (status == SyncStatus::EXECUTED_LOCALLY) {
       // Reply to the client.
       ServerMessage msg;
+      msg.mutable_txn_reply()->set_request_id(it->txn.request_id());
       msg.mutable_txn_reply()->set_reply(reply);
       SendTo(msg, it->src_addr);
 

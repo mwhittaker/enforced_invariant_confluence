@@ -9,7 +9,6 @@
 #include "benchmark.pb.h"
 #include "benchmark_client.h"
 #include "cluster.h"
-#include "loop.h"
 #include "udp.h"
 
 namespace {
@@ -36,8 +35,7 @@ int main(int argc, char* argv[]) {
 
   const Cluster benchmark_client_cluster(benchmark_client_cluster_filename);
   const Cluster server_cluster(server_cluster_filename);
-  Loop loop;
   BenchmarkClient benchmark_client(benchmark_client_cluster, server_cluster,
-                                   index, &loop);
-  loop.Run();
+                                   index);
+  benchmark_client.Run();
 }
