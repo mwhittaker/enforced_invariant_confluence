@@ -152,7 +152,6 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
             << ", so the SegmentedServer is becoming a follower.";
     CHECK_GT(sync_request.replica_index(), replica_index_);
     CHECK(pending_sync_txn_);
-    LOG(INFO) << "Clearing pending_sync_txn_.";
     pending_txn_requests_.push_front(*pending_sync_txn_);
     pending_sync_txn_.reset();
     pending_sync_replies_.clear();
@@ -257,7 +256,6 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
     }
   }
 
-  LOG(INFO) << "Clearing pending_sync_txn_.";
   // Clean up our metadata and set up timers.
   mode_ = WAITING_FOR_START_ACKS;
   resend_sync_request_timer_.Stop();
@@ -390,7 +388,6 @@ void SegmentedServer::ProcessBufferedTxns() {
       // TODO(mwhittaker): Avoid redundant copies of pending_sync_txn_.
       mode_ = SYNCING_LEADER;
       CHECK(!pending_sync_txn_);
-      LOG(INFO) << "Setting pending txn.";
       pending_sync_txn_ = std::unique_ptr<PendingTxn>(new PendingTxn(*it));
       pending_txn_requests_.erase(it);
 
