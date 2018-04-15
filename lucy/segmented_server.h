@@ -23,7 +23,12 @@ class SegmentedServer : public Server {
   void Close() override;
 
  private:
-  enum Mode { NORMAL = 0, SYNCING_LEADER = 1, SYNCING_FOLLOWER = 2 };
+  enum Mode {
+    NORMAL = 0,
+    SYNCING_LEADER = 1,
+    SYNCING_FOLLOWER = 2,
+    WAITING_FOR_START_ACKS = 3
+  };
 
   struct PendingTxn {
     TxnRequest txn;

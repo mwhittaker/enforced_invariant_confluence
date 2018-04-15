@@ -130,21 +130,7 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
 
     CHECK_EQ(sync_request.epoch(), epoch_);
     // Fall through and send reply.
-  } else {
-    CHECK_EQ(mode_, SYNCING_LEADER);
-
-    if (sync_request.epoch() > epoch_) {
-      VLOG(1) << "SegmentedServer syncing leader in epoch " << epoch_
-              << " received a sync request for epoch " << sync_request.epoch()
-              << ". This means that the SegmentedServer sent starts to "
-                 "everyone but is still waiting for a reply. In the meantime, "
-                 "another replica is starting a sync for epoch "
-              << epoch_ << ". The SegmentedServer is ignoring the request and "
-                           "waiting for the missing start ack.";
-      CHECK_EQ(sync_request.epoch(), epoch_ + 1);
-      return;
-    }
-
+  } else if (mode_ == SYNCING_LEADER) {
     CHECK_EQ(sync_request.epoch(), epoch_);
 
     if (replica_index_ > sync_request.replica_index()) {
@@ -166,12 +152,34 @@ void SegmentedServer::HandleSyncRequest(const SyncRequest& sync_request,
             << ", so the SegmentedServer is becoming a follower.";
     CHECK_GT(sync_request.replica_index(), replica_index_);
     CHECK(pending_sync_txn_);
+    LOG(INFO) << "Clearing pending_sync_txn_.";
     pending_txn_requests_.push_front(*pending_sync_txn_);
     pending_sync_txn_.reset();
     pending_sync_replies_.clear();
     resend_sync_request_timer_.Stop();
 
     // Fall through and send reply.
+  } else {
+    CHECK_EQ(mode_, WAITING_FOR_START_ACKS);
+
+    if (sync_request.epoch() > epoch_) {
+      VLOG(1) << "SegmentedServer waiting for acks in epoch " << epoch_
+              << " received a sync request for epoch " << sync_request.epoch()
+              << ". This means that the SegmentedServer sent starts to "
+                 "everyone but is still waiting for a reply. In the meantime, "
+                 "another replica is starting a sync for epoch "
+              << epoch_ << ". The SegmentedServer is ignoring the request and "
+                           "waiting for the missing start ack.";
+      CHECK_EQ(sync_request.epoch(), epoch_ + 1);
+      return;
+    }
+
+    CHECK_EQ(sync_request.epoch(), epoch_);
+    VLOG(1) << "SegmentedServer waiting for acks in epoch " << epoch_
+            << " received a sync request for epoch " << sync_request.epoch()
+            << ". This server has already determined this epoch, so it is "
+               "ignoring the request.";
+    return;
   }
 
   mode_ = SYNCING_FOLLOWER;
@@ -249,7 +257,9 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
     }
   }
 
+  LOG(INFO) << "Clearing pending_sync_txn_.";
   // Clean up our metadata and set up timers.
+  mode_ = WAITING_FOR_START_ACKS;
   resend_sync_request_timer_.Stop();
   pending_sync_replies_.clear();
   pending_sync_txn_.reset();
@@ -332,7 +342,7 @@ void SegmentedServer::HandleStartAck(const StartAck& start_ack,
     return;
   }
 
-  CHECK_EQ(mode_, SYNCING_LEADER);
+  CHECK_EQ(mode_, WAITING_FOR_START_ACKS);
   start_acks_.insert(start_ack.replica_index());
   if (start_acks_.size() < cluster_.Size() - 1) {
     // We haven't yet received acks from the other replicas.
@@ -380,6 +390,7 @@ void SegmentedServer::ProcessBufferedTxns() {
       // TODO(mwhittaker): Avoid redundant copies of pending_sync_txn_.
       mode_ = SYNCING_LEADER;
       CHECK(!pending_sync_txn_);
+      LOG(INFO) << "Setting pending txn.";
       pending_sync_txn_ = std::unique_ptr<PendingTxn>(new PendingTxn(*it));
       pending_txn_requests_.erase(it);
 
@@ -435,7 +446,7 @@ void SegmentedServer::ResendSyncRequest() {
 }
 
 void SegmentedServer::ResendStart() {
-  CHECK_EQ(mode_, SYNCING_LEADER);
+  CHECK_EQ(mode_, WAITING_FOR_START_ACKS);
   VLOG(1)
       << "SegmentedServer sync leader resending start to all other replicas.";
 
