@@ -15,7 +15,7 @@ Client::Client(ServerType server_type, const Cluster& server_cluster,
       server_cluster_(server_cluster),
       loop_(loop) {
   resend_pending_txn_timer_ = loop->RegisterTimer(
-      std::chrono::milliseconds(100), [this]() { ResendPendingTxn(); });
+      std::chrono::milliseconds(400), [this]() { ResendPendingTxn(); });
 }
 
 UdpAddress Client::GetServerAddress() const {
@@ -81,7 +81,7 @@ void Client::ResendPendingTxn() {
   CHECK(pending_);
 
   // Send the request again.
-  VLOG(1) << "Resending pending transaction.";
+  LOG(INFO) << "Resending pending transaction.";
   ServerMessage request;
   request.mutable_txn_request()->set_txn(pending_txn_request_);
   request.mutable_txn_request()->set_request_id(request_id_);

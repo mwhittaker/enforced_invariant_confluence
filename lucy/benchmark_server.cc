@@ -8,6 +8,7 @@
 #include "host_port.h"
 #include "paxos_server.h"
 #include "proto_util.h"
+#include "segmented_master_server.h"
 #include "segmented_server.h"
 #include "server.pb.h"
 #include "two_ints.h"
@@ -34,7 +35,7 @@ void BenchmarkServer::HandleStartRequest(
   CHECK_LT(index_, start.num_servers());
 
   // Start the server.
-  BenchmarkServer::StartServer(start);
+  StartServer(start);
 
   // Send an ack.
   BenchmarkServerReply reply;
@@ -86,6 +87,11 @@ void BenchmarkServer::StartServer(const BenchmarkServerStartRequest& start) {
     case SEGMENTED: {
       server_ = std::unique_ptr<Server>(
           new SegmentedServer(cluster, index_, object_.get(), loop_));
+      break;
+    }
+    case SEGMENTED_MASTER: {
+      server_ = std::unique_ptr<Server>(
+          new SegmentedMasterServer(cluster, index_, object_.get(), loop_));
       break;
     }
     case GOSSIP: {

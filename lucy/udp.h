@@ -10,14 +10,18 @@
 #include "sys/types.h"
 
 #include "host_port.h"
+#include "server.pb.h"
 
 class UdpAddress {
  public:
   UdpAddress();
   UdpAddress(const struct sockaddr_in& addr);
+  UdpAddress(const SockAddrIn& sockaddr_in);
   UdpAddress(const HostPort& host_port);
+
   const struct sockaddr* SockAddr() const;
   int SockAddrLen() const;
+  SockAddrIn ToProto() const;
 
   friend std::ostream& operator<<(std::ostream& out, const UdpAddress& addr) {
     char s[INET_ADDRSTRLEN];

@@ -25,6 +25,8 @@ std::string ServerTypeToString(ServerType server_type) {
       return "gossip";
     case SEGMENTED:
       return "segmented";
+    case SEGMENTED_MASTER:
+      return "segmented_master";
     case PAXOS:
       return "paxos";
     default: { LOG(FATAL) << "Unexpected server type."; }
@@ -34,10 +36,13 @@ std::string ServerTypeToString(ServerType server_type) {
 void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
   std::ofstream vary_withdraws_file("vary_withdraws.csv");
 
-  for (ServerType server_type : {GOSSIP, SEGMENTED, PAXOS}) {
-    std::vector<double> fraction_withdraws = {0, 0.01, 0.05, 0.1, 0.2};
+  for (ServerType server_type : {GOSSIP, SEGMENTED, SEGMENTED_MASTER, PAXOS}) {
+    // for (ServerType server_type : {SEGMENTED_MASTER}) {
+    std::vector<double> fraction_withdraws = {0,   0.01, 0.025, 0.05,
+                                              0.1, 0.2,  0.3,   0.4};
     for (double fraction_withdraw : fraction_withdraws) {
-      LOG(INFO) << "server_type = " << ServerTypeToString(server_type);
+      LOG(INFO) << "=====================================================";
+      LOG(INFO) << "server_type       = " << ServerTypeToString(server_type);
       LOG(INFO) << "fraction_withdraw = " << fraction_withdraw;
 
       // Start the servers.
@@ -53,13 +58,15 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
       BenchmarkClientBankAccountRequest bank_account;
       bank_account.set_num_servers(num_servers);
       bank_account.set_fraction_withdraw(fraction_withdraw);
-      bank_account.set_duration_in_milliseconds(1000);
+      bank_account.set_duration_in_milliseconds(5000);
       bank_account.set_server_type(server_type);
       double total_txns_per_second = master->ClientsBankAccount(bank_account);
 
       // Print and save the workload.
-      std::cout << ServerTypeToString(server_type) << ", " << fraction_withdraw
+      LOG(INFO) << "";
+      LOG(INFO) << ServerTypeToString(server_type) << ", " << fraction_withdraw
                 << ", " << total_txns_per_second << std::endl;
+      LOG(INFO) << "";
       vary_withdraws_file << ServerTypeToString(server_type) << ", "
                           << fraction_withdraw << ", " << total_txns_per_second
                           << std::endl;
@@ -68,6 +75,9 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
       LOG(INFO) << "Killing servers.";
       BenchmarkServerKillRequest kill;
       master->ServersKill(kill);
+
+      LOG(INFO) << "=====================================================";
+      LOG(INFO) << "";
     }
   }
 }

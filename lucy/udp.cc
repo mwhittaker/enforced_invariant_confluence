@@ -15,6 +15,12 @@ UdpAddress::UdpAddress() {}
 
 UdpAddress::UdpAddress(const struct sockaddr_in& addr) : addr_(addr) {}
 
+UdpAddress::UdpAddress(const SockAddrIn& sockaddr_in) {
+  addr_.sin_family = AF_INET;
+  addr_.sin_port = sockaddr_in.port();
+  addr_.sin_addr.s_addr = sockaddr_in.addr();
+}
+
 UdpAddress::UdpAddress(const HostPort& host_port) {
   const std::string node = host_port.Host();
   const std::string service = std::to_string(host_port.Port());
@@ -31,6 +37,13 @@ const struct sockaddr* UdpAddress::SockAddr() const {
 }
 
 int UdpAddress::SockAddrLen() const { return sizeof(addr_); }
+
+SockAddrIn UdpAddress::ToProto() const {
+  SockAddrIn proto;
+  proto.set_port(addr_.sin_port);
+  proto.set_addr(addr_.sin_addr.s_addr);
+  return proto;
+}
 
 struct sockaddr_in UdpAddress::GetAddrInfo(const char* node,
                                            const char* service,

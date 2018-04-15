@@ -1,5 +1,10 @@
 syntax = "proto2";
 
+message SockAddrIn {
+  required uint64 addr = 1;
+  required uint32 port = 2;
+}
+
 message MergeRequest {
   required bytes object = 1;
   optional uint64 epoch = 2;
@@ -8,6 +13,12 @@ message MergeRequest {
 message TxnRequest {
   required uint64 request_id = 1;
   required bytes txn = 2;
+}
+
+message ForwardedTxnRequest {
+  required uint64 request_id = 1;
+  required bytes txn = 2;
+  required SockAddrIn src_addr = 3;
 }
 
 message TxnReply {
@@ -29,6 +40,7 @@ message PrepareOk {
 message SyncRequest {
   required uint64 replica_index = 1;
   required uint64 epoch = 2;
+  optional bytes old_object = 3;
 }
 
 message SyncReply {
@@ -51,12 +63,13 @@ message ServerMessage {
   oneof msg {
     MergeRequest merge_request = 1;
     TxnRequest txn_request = 2;
-    TxnReply txn_reply = 3;
-    Prepare prepare = 4;
-    PrepareOk prepare_ok = 5;
-    SyncRequest sync_request = 6;
-    SyncReply sync_reply = 7;
-    Start start = 8;
-    StartAck start_ack = 9;
+    ForwardedTxnRequest forwarded_txn_request = 3;
+    TxnReply txn_reply = 4;
+    Prepare prepare = 5;
+    PrepareOk prepare_ok = 6;
+    SyncRequest sync_request = 7;
+    SyncReply sync_reply = 8;
+    Start start = 9;
+    StartAck start_ack = 10;
   }
 }

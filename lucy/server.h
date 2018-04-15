@@ -10,6 +10,7 @@
 
 using txn_index_t = std::uint64_t;
 using replica_index_t = std::uint64_t;
+using epoch_t = std::uint64_t;
 
 class Server : public Loop::Actor {
  public:

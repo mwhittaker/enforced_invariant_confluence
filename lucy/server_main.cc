@@ -11,6 +11,7 @@
 #include "loop.h"
 #include "object.h"
 #include "paxos_server.h"
+#include "segmented_master_server.h"
 #include "segmented_server.h"
 #include "server.h"
 #include "two_ints.h"
@@ -19,7 +20,7 @@ namespace {
 
 std::string Usage() {
   return "./server_main <cluster_file> <index> <two_ints|bank_account> "
-         "<paxos|segmented|gossip>";
+         "<paxos|segmented|segmented_master|gossip>";
 }
 
 }  // namespace
@@ -62,6 +63,9 @@ int main(int argc, char* argv[]) {
   } else if (server_mode == "segmented") {
     server = std::unique_ptr<Server>(
         new SegmentedServer(cluster, replica_index, object.get(), &loop));
+  } else if (server_mode == "segmented_master") {
+    server = std::unique_ptr<Server>(
+        new SegmentedMasterServer(cluster, replica_index, object.get(), &loop));
   } else if (server_mode == "gossip") {
     server = std::unique_ptr<Server>(
         new GossipServer(cluster, replica_index, object.get(), &loop));

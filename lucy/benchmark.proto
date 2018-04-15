@@ -3,7 +3,8 @@ syntax = "proto2";
 enum ServerType {
   GOSSIP = 0;
   SEGMENTED = 1;
-  PAXOS = 2;
+  SEGMENTED_MASTER = 2;
+  PAXOS = 3;
 }
 
 // Server.

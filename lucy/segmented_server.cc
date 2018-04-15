@@ -13,7 +13,7 @@ SegmentedServer::SegmentedServer(const Cluster& cluster,
   LOG(INFO) << "SegmentedServer listening on "
             << cluster_.UdpAddrs()[replica_index_] << ".";
 
-  const std::chrono::milliseconds delay(50);
+  const std::chrono::milliseconds delay(100);
   resend_sync_request_timer_ =
       loop->RegisterTimer(delay, [this]() { ResendSyncRequest(); });
   resend_start_timer_ = loop->RegisterTimer(delay, [this]() { ResendStart(); });
