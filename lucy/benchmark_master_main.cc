@@ -84,10 +84,8 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
 void VarySegments(std::size_t num_servers, BenchmarkMaster *master) {
   std::ofstream var_segments_file("vary_segments.csv");
 
-  // for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
-  for (ServerType server_type : {SEGMENTED_MASTER}) {
-    std::vector<std::uint64_t> segment_lengths = {10,  25,    50,      100,
-                                                  200, 10000, 10000000};
+  for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
+    std::vector<std::uint64_t> segment_lengths = {2, 3, 4, 5, 6, 7, 8, 9, 10};
     for (double segment_length : segment_lengths) {
       LOG(INFO) << "=====================================================";
       LOG(INFO) << "server_type    = " << ServerTypeToString(server_type);

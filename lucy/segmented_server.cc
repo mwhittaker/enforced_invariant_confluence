@@ -256,6 +256,9 @@ void SegmentedServer::HandleSyncReply(const SyncReply& sync_reply,
     }
   }
 
+  // Perform start.
+  object_->Set(start.start().object());
+
   // Clean up our metadata and set up timers.
   mode_ = WAITING_FOR_START_ACKS;
   resend_sync_request_timer_.Stop();

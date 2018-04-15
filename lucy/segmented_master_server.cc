@@ -230,6 +230,9 @@ void SegmentedMasterServer::HandleSyncReply(const SyncReply& sync_reply,
     }
   }
 
+  // Perform start.
+  object_->Set(start.start().object());
+
   // Store the object for later.
   most_recent_start_object_ = object_->Get();
 

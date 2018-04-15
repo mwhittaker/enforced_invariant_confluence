@@ -12,18 +12,18 @@ std::string TwoInts::ExecTxn(const std::string& txn) {
     if (PointSatisfiesInvariant(x_ + 1, y_)) {
       x_++;
       reply.set_result(TwoIntsTxnReply::COMMITTED);
-      reply.mutable_increment_x();
     } else {
       reply.set_result(TwoIntsTxnReply::ABORTED);
     }
+    reply.mutable_increment_x();
   } else if (request.has_decrement_y()) {
     if (PointSatisfiesInvariant(x_, y_ - 1)) {
       y_--;
       reply.set_result(TwoIntsTxnReply::COMMITTED);
-      reply.mutable_decrement_y();
     } else {
       reply.set_result(TwoIntsTxnReply::ABORTED);
     }
+    reply.mutable_decrement_y();
   } else if (request.has_get()) {
     reply.set_result(TwoIntsTxnReply::COMMITTED);
     reply.mutable_get()->set_x(x_);
@@ -51,6 +51,7 @@ SyncStatus TwoInts::ExecTxnSegmented(const std::string& txn,
     } else if (!PointSatisfiesInvariant(x_ + 1, y_)) {
       TwoIntsTxnReply txn_reply;
       txn_reply.set_result(TwoIntsTxnReply::ABORTED);
+      txn_reply.mutable_increment_x();
       txn_reply.SerializeToString(reply);
       return SyncStatus::EXECUTED_LOCALLY;
     } else {
@@ -68,6 +69,7 @@ SyncStatus TwoInts::ExecTxnSegmented(const std::string& txn,
     } else if (!PointSatisfiesInvariant(x_, y_ - 1)) {
       TwoIntsTxnReply txn_reply;
       txn_reply.set_result(TwoIntsTxnReply::ABORTED);
+      txn_reply.mutable_decrement_y();
       txn_reply.SerializeToString(reply);
       return SyncStatus::EXECUTED_LOCALLY;
     } else {
@@ -121,18 +123,20 @@ bool TwoInts::PointSatisfiesSegmentInvariant(std::int64_t x, std::int64_t y,
 }
 
 std::int64_t TwoInts::XToSegmentCorner(std::int64_t x) const {
+  std::int64_t length = static_cast<std::int64_t>(segment_length_);
   if (x >= 0) {
-    return (x / segment_length_) * segment_length_;
+    return (x / length) * length;
   } else {
-    return ((x / segment_length_) * segment_length_) - (segment_length_ - 1);
+    return ((x / length) * length) - (length - 1);
   }
 }
 
 std::int64_t TwoInts::YToSegmentCorner(std::int64_t y) const {
+  std::int64_t length = static_cast<std::int64_t>(segment_length_);
   if (y <= 0) {
-    return (y / segment_length_) * segment_length_;
+    return (y / length) * length;
   } else {
-    return ((y / segment_length_) * segment_length_) + (segment_length_ - 1);
+    return ((y / length) * length) + (length - 1);
   }
 }
 
