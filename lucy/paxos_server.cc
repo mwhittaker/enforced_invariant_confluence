@@ -12,7 +12,7 @@ PaxosServer::PaxosServer(const Cluster& cluster, replica_index_t replica_index,
   if (AmLeader()) {
     LOG(INFO) << "PaxosServer leader listening on "
               << cluster_.UdpAddrs()[replica_index_] << ".";
-    const std::chrono::milliseconds delay(1000);
+    const std::chrono::milliseconds delay(100);
     resend_prepares_timer_ =
         loop->RegisterTimer(delay, [this]() { LeaderResendPrepares(); });
     resend_prepares_timer_.Start();
@@ -87,7 +87,8 @@ void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
 
 void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
                                   const UdpAddress& src_addr) {
-  VLOG(1) << "PaxosServer received PrepareOk from " << src_addr << ".";
+  VLOG(1) << "PaxosServer received PrepareOk from " << src_addr
+          << " for transaction " << prepare_ok.txn_index() << ".";
 
   // Save ourselves some typing.
   const txn_index_t txn_index = prepare_ok.txn_index();
@@ -99,6 +100,7 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
     VLOG(1) << "PaxosServer leader received a PrepareOk for transaction "
             << txn_index << " but was not expecting PrepareOks. The leader "
                             "is ignoring this PrepareOk.";
+    return;
   }
 
   // Record this PrepareOk.
@@ -122,7 +124,8 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
 
 void PaxosServer::HandlePrepare(const Prepare& prepare,
                                 const UdpAddress& src_addr) {
-  VLOG(1) << "PaxosServer received Prepare from " << src_addr << ".";
+  VLOG(1) << "PaxosServer received Prepare from " << src_addr
+          << " for transaction " << prepare.txn_index() << ".";
 
   // Record the transaction and reply to the leader.
   pending_txns_[prepare.txn_index()] = prepare.txn();
@@ -138,6 +141,11 @@ void PaxosServer::HandlePrepare(const Prepare& prepare,
 }
 
 void PaxosServer::LeaderCommitReadyTransactions() {
+  VLOG(1) << "PaxosServer has " << num_committed_
+          << " committed transactions and the first waiting for commit "
+             "transaction is "
+          << waiting_for_commit_.begin()->first << ".";
+
   auto it = waiting_for_commit_.begin();
   while (it->first == num_committed_) {
     // Execute the transaction, and send a reply to the client.
@@ -159,6 +167,8 @@ void PaxosServer::LeaderResendPrepares() {
     const txn_index_t txn_index = p.first;
     const std::set<replica_index_t> replies = p.second;
     const PendingTxn& pending_txn = waiting_for_prepare_oks_[txn_index];
+
+    VLOG(1) << "Resending prepares for transaction " << txn_index << ".";
 
     ServerMessage msg;
     msg.mutable_prepare()->set_txn_index(txn_index);
