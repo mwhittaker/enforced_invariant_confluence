@@ -56,9 +56,11 @@ void BenchmarkClient::HandleBankAccount(
     std::promise<BankAccountClient::Result> promise;
     auto future = promise.get_future();
     if (RandomBool(bank_account.fraction_withdraw())) {
-      client.Withdraw(/*amount=*/1, &promise);
+      client_loop.RunFromAnotherThread(
+          [&]() { client.Withdraw(/*amount=*/1, &promise); });
     } else {
-      client.Deposit(/*amount=*/1, &promise);
+      client_loop.RunFromAnotherThread(
+          [&]() { client.Deposit(/*amount=*/1, &promise); });
     }
     future.get();
   });
@@ -98,13 +100,14 @@ void BenchmarkClient::HandleTwoInts(
 
   // Run workload.
   auto duration = milliseconds(two_ints.duration_in_milliseconds());
-  const WorkloadResult result = ExecWorkloadFor(duration, [&]() {
+  const WorkloadResult result = ExecWorkloadFor(duration, [&client_loop,
+                                                           &client]() {
     std::promise<TwoIntsClient::Result> promise;
     auto future = promise.get_future();
     if (RandomBool(0.5)) {
-      client.IncrementX(&promise);
+      client_loop.RunFromAnotherThread([&]() { client.IncrementX(&promise); });
     } else {
-      client.DecrementY(&promise);
+      client_loop.RunFromAnotherThread([&]() { client.DecrementY(&promise); });
     }
     future.get();
   });

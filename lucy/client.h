@@ -29,7 +29,6 @@ class Client : public Loop::Actor {
 
   const ServerType server_type_;
   const Cluster server_cluster_;
-  Loop* loop_;
 
   // Pending transactions.
   std::uint64_t request_id_ = 0;

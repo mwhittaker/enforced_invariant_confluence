@@ -5,6 +5,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -92,6 +93,7 @@ class Loop {
   std::unique_ptr<uv_loop_t> loop_;
   std::unique_ptr<uv_async_t> async_;
   std::vector<callback_t> pending_callbacks_;
+  std::mutex pending_callbacks_mutex_;
 };
 
 #endif  // TRANSPORT_H_

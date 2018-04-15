@@ -12,8 +12,7 @@ Client::Client(ServerType server_type, const Cluster& server_cluster,
                Loop* loop)
     : Loop::Actor(loop),
       server_type_(server_type),
-      server_cluster_(server_cluster),
-      loop_(loop) {
+      server_cluster_(server_cluster) {
   resend_pending_txn_timer_ = loop->RegisterTimer(
       std::chrono::milliseconds(400), [this]() { ResendPendingTxn(); });
 }
@@ -44,7 +43,7 @@ void Client::SendTxnRequest(const std::string& txn_request,
   ServerMessage request;
   request.mutable_txn_request()->set_txn(txn_request);
   request.mutable_txn_request()->set_request_id(request_id_);
-  loop_->RunFromAnotherThread([=]() { SendTo(request, dst_addr); });
+  SendTo(request, dst_addr);
 
   // Start the timer.
   resend_pending_txn_timer_.Start();

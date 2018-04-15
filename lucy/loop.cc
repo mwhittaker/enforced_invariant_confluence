@@ -262,6 +262,7 @@ Loop::Loop() : loop_(new uv_loop_t{}), async_(new uv_async_t{}) {
   async_->data = reinterpret_cast<void*>(this);
   const auto async_callback = [](uv_async_t* handle) {
     auto* loop = reinterpret_cast<Loop*>(handle->data);
+    std::lock_guard<std::mutex> lock(loop->pending_callbacks_mutex_);
     for (auto it = loop->pending_callbacks_.begin();
          it != loop->pending_callbacks_.end();
          it = loop->pending_callbacks_.erase(it)) {
@@ -288,6 +289,7 @@ Loop::Timer Loop::RegisterTimer(const std::chrono::milliseconds& delay,
 }
 
 void Loop::RunFromAnotherThread(const callback_t& callback) {
+  std::lock_guard<std::mutex> lock(pending_callbacks_mutex_);
   CHECK(!stopped_);
   pending_callbacks_.push_back(callback);
   uv_async_send(async_.get());
