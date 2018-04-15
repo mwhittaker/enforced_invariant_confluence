@@ -25,22 +25,25 @@ install_glog() {
 }
 
 install_protobuf() {
-    sudo add-apt-repository ppa:maarten-fonville/protobuf
-    sudo apt-get update
+    sudo add-apt-repository ppa:maarten-fonville/protobuf -y
+    sudo apt-get update -y
     sudo apt-get install -y libprotobuf-dev protobuf-compiler
 }
 
 install_libuv() {
+    sudo apt-get install -y libtool m4 automake
     git clone https://github.com/libuv/libuv.git
     cd libuv
+    sh autogen.sh
     ./configure
     make
     sudo make install
 }
 
 main() {
-    sudo apt-get -y update
-    sudo apt-get -y upgrade
+    sudo apt-get update -y
+    sudo apt-get upgrade -y
+    sudo apt-get install -y pkg-config exuberant-ctags
     install_clang
     install_glog
     install_protobuf
