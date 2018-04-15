@@ -82,7 +82,7 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
 }
 
 void VarySegments(std::size_t num_servers, BenchmarkMaster *master) {
-  std::ofstream var_segments_file("vary_segments.csv");
+  std::ofstream vary_segments_file("vary_segments.csv");
 
   for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
     std::vector<std::uint64_t> segment_lengths = {2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -112,9 +112,9 @@ void VarySegments(std::size_t num_servers, BenchmarkMaster *master) {
       LOG(INFO) << ServerTypeToString(server_type) << ", " << segment_length
                 << ", " << total_txns_per_second << std::endl;
       LOG(INFO) << "";
-      var_segments_file << ServerTypeToString(server_type) << ", "
-                        << segment_length << ", " << total_txns_per_second
-                        << std::endl;
+      vary_segments_file << ServerTypeToString(server_type) << ", "
+                         << segment_length << ", " << total_txns_per_second
+                         << std::endl;
 
       // Kill the servers.
       LOG(INFO) << "Killing servers.";
@@ -127,9 +127,54 @@ void VarySegments(std::size_t num_servers, BenchmarkMaster *master) {
   }
 }
 
-void VaryNodes(BenchmarkMaster *master) {
-  (void)master;
-  LOG(FATAL) << "TODO: Implement.";
+void VaryNodes(const std::size_t total_num_servers, BenchmarkMaster *master) {
+  std::ofstream vary_nodes_file("vary_nodes.csv");
+
+  for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
+    std::vector<std::uint64_t> num_servers = {2, 3, 4, 8, 16, 24, 32};
+    for (double num_server : num_servers) {
+      if (num_server > total_num_servers) {
+        continue;
+      }
+
+      LOG(INFO) << "=====================================================";
+      LOG(INFO) << "server_type = " << ServerTypeToString(server_type);
+      LOG(INFO) << "num_server  = " << num_server;
+
+      // Start the servers.
+      LOG(INFO) << "Starting servers.";
+      BenchmarkServerStartRequest start;
+      start.set_num_servers(num_server);
+      start.mutable_bank_account();
+      start.set_server_type(server_type);
+      master->ServersStart(start);
+
+      // Run the workload.
+      LOG(INFO) << "Starting workload.";
+      BenchmarkClientBankAccountRequest bank_account;
+      bank_account.set_num_servers(num_server);
+      bank_account.set_fraction_withdraw(0.25);
+      bank_account.set_duration_in_milliseconds(5000);
+      bank_account.set_server_type(server_type);
+      double total_txns_per_second = master->ClientsBankAccount(bank_account);
+
+      // Print and save the workload.
+      LOG(INFO) << "";
+      LOG(INFO) << ServerTypeToString(server_type) << ", " << num_server << ", "
+                << total_txns_per_second << std::endl;
+      LOG(INFO) << "";
+      vary_nodes_file << ServerTypeToString(server_type) << ", " << num_server
+                      << ", " << total_txns_per_second << std::endl;
+
+      // Kill the servers.
+      LOG(INFO) << "Killing servers.";
+      BenchmarkServerKillRequest kill;
+      master->ServersKill(kill);
+
+      LOG(INFO) << "=====================================================";
+      LOG(INFO) << "";
+    }
+  }
 }
 
 }  // namespace
@@ -153,7 +198,7 @@ int main(int argc, char *argv[]) {
   } else if (workload == "vary_segments") {
     VarySegments(benchmark_server_cluster.Size(), &master);
   } else if (workload == "vary_nodes") {
-    VaryNodes(&master);
+    VaryNodes(benchmark_server_cluster.Size(), &master);
   } else {
     std::cerr << Usage() << std::endl;
     return EXIT_FAILURE;

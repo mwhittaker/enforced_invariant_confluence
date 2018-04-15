@@ -4,7 +4,10 @@
 
 #include "google/protobuf/message.h"
 
+#include "host_port.h"
 #include "proto_util.h"
+
+static constexpr std::size_t NUM_CLIENTS_PER_SERVER = 2;
 
 void BenchmarkMaster::ServersStart(const BenchmarkServerStartRequest& start) {
   // Send requests.
@@ -44,14 +47,16 @@ void BenchmarkMaster::ServersKill(const BenchmarkServerKillRequest& kill) {
 
 double BenchmarkMaster::ClientsBankAccount(
     const BenchmarkClientBankAccountRequest& bank_account) {
-  const std::size_t n = benchmark_client_cluster_.Size();
+  const Cluster benchmark_client_cluster =
+      ClientsSubcluster(bank_account.num_servers());
+  const std::size_t n = benchmark_client_cluster.Size();
 
   // Send requests.
   BenchmarkClientRequest request;
   *request.mutable_bank_account() = bank_account;
   const std::string request_str = ProtoToString(request);
   for (std::size_t i = 0; i < n; ++i) {
-    socket_.SendTo(request_str, benchmark_client_cluster_.UdpAddrs()[i]);
+    socket_.SendTo(request_str, benchmark_client_cluster.UdpAddrs()[i]);
   }
 
   // Wait for replies.
@@ -73,14 +78,16 @@ double BenchmarkMaster::ClientsBankAccount(
 
 double BenchmarkMaster::ClientsTwoInts(
     const BenchmarkClientTwoIntsRequest& two_ints) {
-  const std::size_t n = benchmark_client_cluster_.Size();
+  const Cluster benchmark_client_cluster =
+      ClientsSubcluster(two_ints.num_servers());
+  const std::size_t n = benchmark_client_cluster.Size();
 
   // Send requests.
   BenchmarkClientRequest request;
   *request.mutable_two_ints() = two_ints;
   const std::string request_str = ProtoToString(request);
   for (std::size_t i = 0; i < n; ++i) {
-    socket_.SendTo(request_str, benchmark_client_cluster_.UdpAddrs()[i]);
+    socket_.SendTo(request_str, benchmark_client_cluster.UdpAddrs()[i]);
   }
 
   // Wait for replies.
@@ -98,6 +105,17 @@ double BenchmarkMaster::ClientsTwoInts(
     total_throughput += p.second.txns_per_second();
   }
   return total_throughput;
+}
+
+Cluster BenchmarkMaster::ClientsSubcluster(std::size_t num_servers) const {
+  std::size_t num_clients = std::min(benchmark_client_cluster_.Size(),
+                                     num_servers * NUM_CLIENTS_PER_SERVER);
+  const std::vector<HostPort> all_host_ports =
+      benchmark_client_cluster_.HostPorts();
+  auto begin = all_host_ports.begin();
+  auto end = all_host_ports.begin() + num_clients;
+  const std::vector<HostPort> host_ports(begin, end);
+  return Cluster(host_ports);
 }
 
 void BenchmarkMaster::WaitForNReplies(std::size_t n,

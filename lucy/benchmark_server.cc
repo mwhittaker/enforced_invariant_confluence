@@ -48,13 +48,19 @@ void BenchmarkServer::HandleKillRequest(const BenchmarkServerKillRequest& kill,
   DLOG(INFO) << "Received KillRequest from " << src_addr << ".";
   (void)kill;
 
-  // Kill the server.
-  VLOG(1) << "Closing the server.";
-  server_->Close();
-  VLOG(1) << "Freeing the server.";
-  server_.reset();
-  VLOG(1) << "Freeing the object.";
-  object_.reset();
+  if (server_) {
+    // Kill the server.
+    VLOG(1) << "Closing the server.";
+    server_->Close();
+    VLOG(1) << "Freeing the server.";
+    server_.reset();
+  }
+
+  if (object_) {
+    VLOG(1) << "Freeing the object.";
+    object_.reset();
+  }
+
   VLOG(1) << "Everything killed.";
 
   // Send an ack.

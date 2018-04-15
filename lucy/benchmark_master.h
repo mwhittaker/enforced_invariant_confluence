@@ -25,6 +25,8 @@ class BenchmarkMaster {
   double ClientsTwoInts(const BenchmarkClientTwoIntsRequest& vary_segments);
 
  private:
+  Cluster ClientsSubcluster(std::size_t num_servers) const;
+
   using reply_to_index_t = std::function<replica_index_t(const std::string&)>;
   void WaitForNReplies(std::size_t n, const reply_to_index_t& f);
 
