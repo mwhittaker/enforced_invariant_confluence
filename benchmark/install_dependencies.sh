@@ -31,7 +31,7 @@ install_protobuf() {
 }
 
 install_libuv() {
-    git clone git@github.com:libuv/libuv.git
+    git clone https://github.com/libuv/libuv.git
     cd libuv
     ./configure
     make
