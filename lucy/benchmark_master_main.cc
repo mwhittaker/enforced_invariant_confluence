@@ -16,7 +16,7 @@ namespace {
 std::string Usage() {
   return "./benchmark_master_main <benchmark_server_cluster> "
          "<benchmark_client_cluster> "
-         "<vary_withdraws|vary_segments|vary_nodes>";
+         "<vary_withdraws|vary_segments|vary_nodes|all>";
 }
 
 std::string ServerTypeToString(ServerType server_type) {
@@ -198,6 +198,10 @@ int main(int argc, char *argv[]) {
   } else if (workload == "vary_segments") {
     VarySegments(benchmark_server_cluster.Size(), &master);
   } else if (workload == "vary_nodes") {
+    VaryNodes(benchmark_server_cluster.Size(), &master);
+  } else if (workload == "all") {
+    VaryWithdraws(benchmark_server_cluster.Size(), &master);
+    VarySegments(benchmark_server_cluster.Size(), &master);
     VaryNodes(benchmark_server_cluster.Size(), &master);
   } else {
     std::cerr << Usage() << std::endl;
