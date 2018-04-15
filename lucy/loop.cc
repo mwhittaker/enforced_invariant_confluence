@@ -138,14 +138,11 @@ void Loop::Actor::SendTo(const std::string& msg, const UdpAddress& addr) {
 
   // libuv manages memory in a somewhat annoying way. If we want to send a
   // string over UDP, we have to allocate the string on the heap, pack a
-  // pointer
-  // to it in a uv_buf_t, and call uv_udp_send with the pointer. Then, after
-  // the
-  // send callback is invoked, we have to free the memory. See [1] for more
-  // details.
+  // pointer to it in a uv_buf_t, and call uv_udp_send with the pointer. Then,
+  // after the send callback is invoked, we have to free the memory. See [1]
+  // for more details.
   //
-  // To accomplish this, we allocate a PendingSend object on the heap and
-  // store
+  // To accomplish this, we allocate a PendingSend object on the heap and store
   // it in a map in the Actor. The PendingSend stores the send request and the
   // message data (in a vector). We shove a pointer to this PendingSend in the
   // send_request. When the send callback is called, we remove the PendingSend
