@@ -43,7 +43,7 @@ install_libuv() {
 main() {
     sudo apt-get update -y
     sudo apt-get upgrade -y
-    sudo apt-get install -y pkg-config exuberant-ctags
+    sudo apt-get install -y gcc g++ make pkg-config exuberant-ctags
     install_clang
     install_glog
     install_protobuf
