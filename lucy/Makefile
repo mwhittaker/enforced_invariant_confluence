@@ -89,7 +89,7 @@ $(OBJECTS): $(BIN)/%.o: %.cc
 	$(QUIET)$(CXX) $(CXXFLAGS) -MM $< -MP -MT $@ > $(BIN)/$*.d
 
 $(BINARIES): %: $(BIN)/%.o $(PROTO_OBJECTS) $(NON_BINARY_OBJECTS)
-	@if [ "$(VERBOSE)" = 0 ]; then echo "[CXX]    $@"; fi
+	@if [ "$(VERBOSE)" = 0 ]; then echo "[LD]     $@"; fi
 	$(QUIET)$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 tags: $(PROTOS) $(HEADERS) $(SOURCES)

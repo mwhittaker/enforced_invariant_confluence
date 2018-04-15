@@ -36,8 +36,7 @@ std::string ServerTypeToString(ServerType server_type) {
 void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
   std::ofstream vary_withdraws_file("vary_withdraws.csv");
 
-  for (ServerType server_type : {GOSSIP, SEGMENTED, SEGMENTED_MASTER, PAXOS}) {
-    // for (ServerType server_type : {SEGMENTED_MASTER}) {
+  for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
     std::vector<double> fraction_withdraws = {0,   0.01, 0.025, 0.05,
                                               0.1, 0.2,  0.3,   0.4};
     for (double fraction_withdraw : fraction_withdraws) {
@@ -82,9 +81,52 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
   }
 }
 
-void VarySegments(BenchmarkMaster *master) {
-  (void)master;
-  LOG(FATAL) << "TODO: Implement.";
+void VarySegments(std::size_t num_servers, BenchmarkMaster *master) {
+  std::ofstream var_segments_file("vary_segments.csv");
+
+  // for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
+  for (ServerType server_type : {SEGMENTED_MASTER}) {
+    std::vector<std::uint64_t> segment_lengths = {10,  25,    50,      100,
+                                                  200, 10000, 10000000};
+    for (double segment_length : segment_lengths) {
+      LOG(INFO) << "=====================================================";
+      LOG(INFO) << "server_type    = " << ServerTypeToString(server_type);
+      LOG(INFO) << "segment_length = " << segment_length;
+
+      // Start the servers.
+      LOG(INFO) << "Starting servers.";
+      BenchmarkServerStartRequest start;
+      start.set_num_servers(num_servers);
+      start.mutable_two_ints()->set_segment_length(segment_length);
+      start.set_server_type(server_type);
+      master->ServersStart(start);
+
+      // Run the workload.
+      LOG(INFO) << "Starting workload.";
+      BenchmarkClientTwoIntsRequest two_ints;
+      two_ints.set_num_servers(num_servers);
+      two_ints.set_duration_in_milliseconds(5000);
+      two_ints.set_server_type(server_type);
+      double total_txns_per_second = master->ClientsTwoInts(two_ints);
+
+      // Print and save the workload.
+      LOG(INFO) << "";
+      LOG(INFO) << ServerTypeToString(server_type) << ", " << segment_length
+                << ", " << total_txns_per_second << std::endl;
+      LOG(INFO) << "";
+      var_segments_file << ServerTypeToString(server_type) << ", "
+                        << segment_length << ", " << total_txns_per_second
+                        << std::endl;
+
+      // Kill the servers.
+      LOG(INFO) << "Killing servers.";
+      BenchmarkServerKillRequest kill;
+      master->ServersKill(kill);
+
+      LOG(INFO) << "=====================================================";
+      LOG(INFO) << "";
+    }
+  }
 }
 
 void VaryNodes(BenchmarkMaster *master) {
@@ -111,7 +153,7 @@ int main(int argc, char *argv[]) {
   if (workload == "vary_withdraws") {
     VaryWithdraws(benchmark_server_cluster.Size(), &master);
   } else if (workload == "vary_segments") {
-    VarySegments(&master);
+    VarySegments(benchmark_server_cluster.Size(), &master);
   } else if (workload == "vary_nodes") {
     VaryNodes(&master);
   } else {

@@ -38,17 +38,13 @@ class Loop {
 
    private:
     struct PendingSend {
-      std::unique_ptr<uv_udp_send_t> send_request;
-      std::uint64_t id;
+      uv_udp_send_t* send_request;
       std::vector<char> data;
-      Actor* actor;
     };
 
     void StartRecv();
 
     std::unique_ptr<uv_udp_t> socket_;
-    std::uint64_t pending_send_id_ = 0;
-    std::map<std::uint64_t, std::unique_ptr<PendingSend>> pending_sends_;
     bool closed_ = false;
   };
 

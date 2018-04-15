@@ -136,31 +136,11 @@ void Loop::Actor::Close() {
 void Loop::Actor::SendTo(const std::string& msg, const UdpAddress& addr) {
   CHECK(!closed_);
 
-  // libuv manages memory in a somewhat annoying way. If we want to send a
-  // string over UDP, we have to allocate the string on the heap, pack a
-  // pointer to it in a uv_buf_t, and call uv_udp_send with the pointer. Then,
-  // after the send callback is invoked, we have to free the memory. See [1]
-  // for more details.
-  //
-  // To accomplish this, we allocate a PendingSend object on the heap and store
-  // it in a map in the Actor. The PendingSend stores the send request and the
-  // message data (in a vector). We shove a pointer to this PendingSend in the
-  // send_request. When the send callback is called, we remove the PendingSend
-  // from the Actor's map. The destructors will free both the send request and
-  // the allocated memory stored in the vector.
-  //
-  // [1]: https://groups.google.com/forum/#!topic/libuv/MM4FsFjJGvs
-
   // Set up the PendingSend object.
-  std::uint64_t pending_send_id = pending_send_id_++;
-  std::unique_ptr<PendingSend> pending_send(new PendingSend{
-      /*send_request=*/std::unique_ptr<uv_udp_send_t>(new uv_udp_send_t{}),  //
-      /*id=*/pending_send_id,                                                //
-      /*data=*/std::vector<char>(msg.begin(), msg.end()),                    //
-      /*actor=*/this                                                         //
-  });
-  pending_send->send_request->data =
-      reinterpret_cast<void*>(pending_send.get());
+  uv_udp_send_t* send_request = new uv_udp_send_t{};
+  std::vector<char> data(msg.begin(), msg.end());
+  PendingSend* pending_send = new PendingSend{send_request, std::move(data)};
+  send_request->data = reinterpret_cast<void*>(pending_send);
 
   // Send the message.
   uv_buf_t buf;
@@ -168,17 +148,14 @@ void Loop::Actor::SendTo(const std::string& msg, const UdpAddress& addr) {
   buf.len = pending_send->data.size();
   const auto send_callback = [](uv_udp_send_t* send_request, int err) {
     CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
-    auto* pending_send = reinterpret_cast<PendingSend*>(send_request->data);
-    std::uint64_t id = pending_send->id;
-    Actor* actor = pending_send->actor;
-    actor->pending_sends_.erase(id);
+    PendingSend* pending_send =
+        reinterpret_cast<PendingSend*>(send_request->data);
+    delete pending_send->send_request;
+    delete pending_send;
   };
-  int err = uv_udp_send(pending_send->send_request.get(), socket_.get(), &buf,
+  int err = uv_udp_send(send_request, socket_.get(), &buf,
                         /*nbufs=*/1, addr.SockAddr(), send_callback);
   CHECK_EQ(err, 0) << uv_err_name(err) << ": " << uv_strerror(err);
-
-  // Store the PendingSend for later.
-  pending_sends_[pending_send_id] = std::move(pending_send);
 }
 
 void Loop::Actor::SendTo(const google::protobuf::Message& proto,

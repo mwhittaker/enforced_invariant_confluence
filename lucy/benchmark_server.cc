@@ -49,9 +49,13 @@ void BenchmarkServer::HandleKillRequest(const BenchmarkServerKillRequest& kill,
   (void)kill;
 
   // Kill the server.
+  VLOG(1) << "Closing the server.";
   server_->Close();
+  VLOG(1) << "Freeing the server.";
   server_.reset();
+  VLOG(1) << "Freeing the object.";
   object_.reset();
+  VLOG(1) << "Everything killed.";
 
   // Send an ack.
   BenchmarkServerReply reply;
