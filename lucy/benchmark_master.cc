@@ -7,7 +7,7 @@
 #include "host_port.h"
 #include "proto_util.h"
 
-static constexpr std::size_t NUM_CLIENTS_PER_SERVER = 2;
+static constexpr std::size_t NUM_CLIENTS_PER_SERVER = 3;
 
 void BenchmarkMaster::ServersStart(const BenchmarkServerStartRequest& start) {
   // Send requests.

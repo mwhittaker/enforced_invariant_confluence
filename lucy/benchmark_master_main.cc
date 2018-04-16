@@ -37,8 +37,9 @@ void VaryWithdraws(const std::size_t num_servers, BenchmarkMaster *master) {
   std::ofstream vary_withdraws_file("vary_withdraws.csv");
 
   for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
-    std::vector<double> fraction_withdraws = {0,   0.01, 0.025, 0.05,
-                                              0.1, 0.2,  0.3,   0.4};
+    std::vector<double> fraction_withdraws = {0,   0.01, 0.02, 0.03, 0.04, 0.05,
+                                              0.1, 0.2,  0.3,  0.4,  0.5,  0.6,
+                                              0.7, 0.8,  0.9,  1.0};
     for (double fraction_withdraw : fraction_withdraws) {
       LOG(INFO) << "=====================================================";
       LOG(INFO) << "server_type       = " << ServerTypeToString(server_type);
@@ -85,7 +86,8 @@ void VarySegments(std::size_t num_servers, BenchmarkMaster *master) {
   std::ofstream vary_segments_file("vary_segments.csv");
 
   for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
-    std::vector<std::uint64_t> segment_lengths = {2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::vector<std::uint64_t> segment_lengths = {2, 3, 4,  5,  6,  7,
+                                                  8, 9, 10, 20, 30, 40};
     for (double segment_length : segment_lengths) {
       LOG(INFO) << "=====================================================";
       LOG(INFO) << "server_type    = " << ServerTypeToString(server_type);
@@ -131,7 +133,8 @@ void VaryNodes(const std::size_t total_num_servers, BenchmarkMaster *master) {
   std::ofstream vary_nodes_file("vary_nodes.csv");
 
   for (ServerType server_type : {GOSSIP, SEGMENTED_MASTER, PAXOS}) {
-    std::vector<std::uint64_t> num_servers = {2, 3, 4, 8, 16, 24, 32};
+    std::vector<std::uint64_t> num_servers = {2, 3,  4,  5,  6,  7,
+                                              8, 16, 20, 24, 28, 32};
     for (double num_server : num_servers) {
       if (num_server > total_num_servers) {
         continue;
@@ -153,7 +156,7 @@ void VaryNodes(const std::size_t total_num_servers, BenchmarkMaster *master) {
       LOG(INFO) << "Starting workload.";
       BenchmarkClientBankAccountRequest bank_account;
       bank_account.set_num_servers(num_server);
-      bank_account.set_fraction_withdraw(0.25);
+      bank_account.set_fraction_withdraw(0.1);
       bank_account.set_duration_in_milliseconds(5000);
       bank_account.set_server_type(server_type);
       double total_txns_per_second = master->ClientsBankAccount(bank_account);
