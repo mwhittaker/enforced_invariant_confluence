@@ -112,6 +112,9 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
     return;
   }
 
+  VLOG(1) << "PaxosServer leader received a PrepareOk for transaction "
+          << txn_index << "from all other replicas!";
+
   // If we have received a PrepareOk from every other server, then we're ready
   // to try and commit this transaction. We add it to waiting_for_commit_ and
   // also clean up the metadata in prepare_ok_replies_ and
