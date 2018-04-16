@@ -14,7 +14,7 @@ Client::Client(ServerType server_type, const Cluster& server_cluster,
       server_type_(server_type),
       server_cluster_(server_cluster) {
   resend_pending_txn_timer_ = loop->RegisterTimer(
-      std::chrono::milliseconds(400), [this]() { ResendPendingTxn(); });
+      std::chrono::milliseconds(1000), [this]() { ResendPendingTxn(); });
 }
 
 UdpAddress Client::GetServerAddress() const {
