@@ -73,6 +73,7 @@ void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
   // the other servers and once we've committed all previous transactions, we
   // will commit this transaction.
   waiting_for_prepare_oks_.insert({txn_index, {txn_request, src_addr}});
+  prepare_ok_replies_[txn_index];
 
   // Send Prepare messages to all the other servers.
   ServerMessage msg;
@@ -113,7 +114,7 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
   }
 
   VLOG(1) << "PaxosServer leader received a PrepareOk for transaction "
-          << txn_index << "from all other replicas!";
+          << txn_index << " from all other replicas!";
 
   // If we have received a PrepareOk from every other server, then we're ready
   // to try and commit this transaction. We add it to waiting_for_commit_ and
