@@ -49,6 +49,8 @@ main() {
     for ((i = 0; i < "${#ssh_cmds[@]}"; ++i)); do
         tmux send-keys -t "$i" "${ssh_cmds[i]}" C-m
     done
+
+    tmux set-window-option synchronize-panes on
 }
 
 main

@@ -6,6 +6,7 @@ main() {
     # Clone the repo and install dependencies.
     if ! [[ -d enforced_invariant_confluence ]]; then
         echo "enforced_invariant_confluence doesn't exist"
+        sudo apt-get install -y git
         # Enable us to clone github repos without user interaction
         # (https://serverfault.com/a/641392).
         ssh-keyscan github.com >> ~/.ssh/known_hosts
