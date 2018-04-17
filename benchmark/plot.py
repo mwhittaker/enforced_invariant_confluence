@@ -41,14 +41,14 @@ def plot_vary_withdraws(data):
     segmented_x, segmented_y = splits['segmented_master']
     paxos_x, paxos_y = splits['paxos']
 
-    plt.figure()
+    plt.figure(figsize=(8, 3))
     plt.semilogy(gossip_x, gossip_y, **EVENTUAL_FMT)
     plt.semilogy(segmented_x, segmented_y, **IC_FMT)
     plt.semilogy(paxos_x, paxos_y, **LIN_FMT)
-    plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.12), prop={'size': 12})
+    plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.2), prop={'size': 12})
     plt.xlabel('Fraction Withdrawals')
     plt.ylabel('Throughput (txns/s)')
-    plt.savefig('vary_withdraws.pdf')
+    plt.savefig('vary_withdraws.pdf', bbox_inches='tight')
     plt.close()
 
 def plot_vary_segments(data):
@@ -58,14 +58,13 @@ def plot_vary_segments(data):
     segmented_x, segmented_y = splits['segmented_master']
     paxos_x, paxos_y = splits['paxos']
 
-    plt.figure()
+    plt.figure(figsize=(8, 3))
     plt.semilogy(gossip_x, gossip_y, **EVENTUAL_FMT)
     plt.semilogy(segmented_x, segmented_y, **IC_FMT)
     plt.semilogy(paxos_x, paxos_y, **LIN_FMT)
     plt.xlabel('Segment Side Length')
     plt.ylabel('Throughput (txns/s)')
-    plt.tight_layout()
-    plt.savefig('vary_segments.pdf')
+    plt.savefig('vary_segments.pdf', bbox_inches='tight')
     plt.close()
 
 def plot_vary_nodes(data):
@@ -75,14 +74,14 @@ def plot_vary_nodes(data):
     segmented_x, segmented_y = splits['segmented_master']
     paxos_x, paxos_y = splits['paxos']
 
-    plt.figure()
+    plt.figure(figsize=(8, 4))
     plt.semilogy(gossip_x, gossip_y, **EVENTUAL_FMT)
     plt.semilogy(segmented_x, segmented_y, **IC_FMT)
     plt.semilogy(paxos_x, paxos_y, **LIN_FMT)
-    plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.12), prop={'size': 12})
+    plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.15), prop={'size': 12})
     plt.xlabel('Number of Nodes')
     plt.ylabel('Throughput (txns/s)')
-    plt.savefig('vary_nodes.pdf')
+    plt.savefig('vary_nodes.pdf', bbox_inches='tight')
     plt.close()
 
 def main():
