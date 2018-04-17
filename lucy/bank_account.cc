@@ -8,7 +8,7 @@
 BankAccount::BankAccount(std::size_t num_replicas, replica_index_t replica)
     : num_replicas_(num_replicas),
       replica_(replica),
-      p_(/*count=*/num_replicas, /*value=*/0),
+      p_(/*count=*/num_replicas, /*value=*/50 * 1000 * 1000),
       n_(/*count=*/num_replicas, /*value=*/0) {
   CHECK_GT(num_replicas, 0);
   CHECK_GE(replica, 0);
