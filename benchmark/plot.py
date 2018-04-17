@@ -12,7 +12,7 @@ EVENTUAL_FMT = {
     'linewidth': 2,
 }
 IC_FMT = {
-    'label': 'invariant confluent',
+    'label': 'segmented',
     'marker': 'o',
     'linewidth': 2,
 }
