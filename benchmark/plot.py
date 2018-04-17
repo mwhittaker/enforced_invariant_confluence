@@ -5,10 +5,6 @@ import sys
 
 import matplotlib.pyplot as plt
 
-VARY_WITHDRAWS = 'vary_withdraws.csv'
-VARY_SEGMENTS = 'vary_segments.csv'
-VARY_NODES = 'vary_nodes.csv'
-
 def load_csv(filename):
     with open(filename, 'r') as f:
         reader = csv.reader(f, delimiter=',')
@@ -29,9 +25,9 @@ def plot_vary_withdraws(data):
     paxos_x, paxos_y = splits['paxos']
 
     plt.figure()
-    plt.plot(gossip_x, gossip_y, label='eventual', marker='o')
-    plt.plot(segmented_x, segmented_y, label='invariant confluent', marker='s')
-    plt.plot(paxos_x, paxos_y, label='linearizable', marker='^')
+    plt.semilogy(gossip_x, gossip_y, label='eventual', marker='o')
+    plt.semilogy(segmented_x, segmented_y, label='invariant confluent', marker='s')
+    plt.semilogy(paxos_x, paxos_y, label='linearizable', marker='^')
     plt.legend()
     plt.xlabel('Fraction Withdrawals')
     plt.ylabel('Throughput (txns/s)')
@@ -46,9 +42,9 @@ def plot_vary_segments(data):
     paxos_x, paxos_y = splits['paxos']
 
     plt.figure()
-    plt.plot(gossip_x, gossip_y, label='eventual', marker='o')
-    plt.plot(segmented_x, segmented_y, label='invariant confluent', marker='s')
-    plt.plot(paxos_x, paxos_y, label='linearizable', marker='^')
+    plt.semilogy(gossip_x, gossip_y, label='eventual', marker='o')
+    plt.semilogy(segmented_x, segmented_y, label='invariant confluent', marker='s')
+    plt.semilogy(paxos_x, paxos_y, label='linearizable', marker='^')
     plt.legend()
     plt.xlabel('Segment Side Length')
     plt.ylabel('Throughput (txns/s)')
@@ -63,9 +59,9 @@ def plot_vary_nodes(data):
     paxos_x, paxos_y = splits['paxos']
 
     plt.figure()
-    plt.plot(gossip_x, gossip_y, label='eventual', marker='o')
-    plt.plot(segmented_x, segmented_y, label='invariant confluent', marker='s')
-    plt.plot(paxos_x, paxos_y, label='linearizable', marker='^')
+    plt.semilogy(gossip_x, gossip_y, label='eventual', marker='o')
+    plt.semilogy(segmented_x, segmented_y, label='invariant confluent', marker='s')
+    plt.semilogy(paxos_x, paxos_y, label='linearizable', marker='^')
     plt.legend()
     plt.xlabel('Number of Nodes')
     plt.ylabel('Throughput (txns/s)')
@@ -73,14 +69,13 @@ def plot_vary_nodes(data):
     plt.close()
 
 def main():
-    for filename in [VARY_WITHDRAWS, VARY_SEGMENTS, VARY_NODES]:
-        if not os.path.isfile(filename):
-            print(f'{filename} does not exist.')
-            sys.exit(1)
+    if len(sys.argv) != 4:
+        print('python plot.py <vary_withdraws.csv> <vary_segments.csv> <vary_nodes.csv>')
+        sys.exit(1)
 
-    plot_vary_withdraws(load_csv(VARY_WITHDRAWS))
-    plot_vary_segments(load_csv(VARY_SEGMENTS))
-    plot_vary_nodes(load_csv(VARY_NODES))
+    plot_vary_withdraws(load_csv(sys.argv[1]))
+    plot_vary_segments(load_csv(sys.argv[2]))
+    plot_vary_nodes(load_csv(sys.argv[3]))
 
 if __name__ == '__main__':
     main()
