@@ -33,7 +33,7 @@ main() {
         --instance-type "$instance_type" \
         --key-name "$key_name" \
         --security-group-ids "$security_group_ids" \
-        --count 9
+        --count 32
         # --dry-run
 }
 

@@ -41,9 +41,9 @@ def main():
 
     with open("benchmark_client_cluster.txt", "w") as f:
         for private_ip in private_ips:
-            f.write('host_port {{ host: "{}" port: 8000 }}\n'.format(private_ip))
-            f.write('host_port {{ host: "{}" port: 8001 }}\n'.format(private_ip))
-            f.write('host_port {{ host: "{}" port: 8002 }}\n'.format(private_ip))
+            f.write('host_port {{ host: "{}" port: 9000 }}\n'.format(private_ip))
+            f.write('host_port {{ host: "{}" port: 9001 }}\n'.format(private_ip))
+            f.write('host_port {{ host: "{}" port: 9002 }}\n'.format(private_ip))
 
 if __name__ == '__main__':
     main()
