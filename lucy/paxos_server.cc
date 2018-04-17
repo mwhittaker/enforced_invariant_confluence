@@ -12,7 +12,7 @@ PaxosServer::PaxosServer(const Cluster& cluster, replica_index_t replica_index,
   if (AmLeader()) {
     LOG(INFO) << "PaxosServer leader listening on "
               << cluster_.UdpAddrs()[replica_index_] << ".";
-    const std::chrono::milliseconds delay(20);
+    const std::chrono::milliseconds delay(100);
     resend_prepares_timer_ =
         loop->RegisterTimer(delay, [this]() { LeaderResendPrepares(); });
     resend_prepares_timer_.Start();
@@ -64,6 +64,12 @@ void PaxosServer::OnRecvFollower(const std::string& msg,
 void PaxosServer::HandleTxnRequest(const TxnRequest& txn_request,
                                    const UdpAddress& src_addr) {
   VLOG(1) << "PaxosServer received TxnRequest from " << src_addr << ".";
+
+  // Drop this request if we're already waiting for too many requests.
+  if (waiting_for_prepare_oks_.size() > 100) {
+    VLOG(1) << "PaxosServer request buffer is full and is dropping a request.";
+    return;
+  }
 
   // Assign this transaction a new transaction index.
   const txn_index_t txn_index = txn_index_;
