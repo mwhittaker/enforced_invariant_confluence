@@ -18,8 +18,9 @@ interleavings of operations that are allowed by these weak consistency models.
 In fact, weak consistency models strip an application developer of one of the
 earliest and most effective tools that is used to reason about the execution of
 programs: application invariants~\cite{hoare1969axiomatic}. Even if every
-transaction executing in a weakly consistent system maintains an application
-invariant, the system as a whole can produce invariant-violating states.
+transaction executing in a weakly consistent system individually maintains an
+application invariant, the system as a whole can produce invariant-violating
+states.
 
 % When people want to replicate data, they have to make a choice between strong and weak consistency. When choosing strong consistency, everything makes sense, reasoning is easy. But CAP and the latency one tell us that the avilability and latency of our system will be reduced. If we choose weak consistency, then things run really fast, but we can no longer reason about the application. In fact, we risk the possibility one our greatest tools that we use to reason about software: invariants. With weak consistency models , even if every transaction preserves the invariant, the invariant may still be broken when stuff is interleaved.
 
@@ -32,7 +33,7 @@ the need for any coordination~\cite{bailis2014coordination}. If an object is
 invariant-confluent with respect to an invariant, we can replicate it with the
 performance benefits of weak consistency and (some of) the correctness benefits
 of strong consistency. However, the task of identifying whether or not an
-object actually is invariant-confluent remain a challenge. Bailis et al.\
+object actually is invariant-confluent remains a challenge. Bailis et al.\
 manually categorized a set of common objects, transactions, and invariants
 (e.g.\ foreign key constraints on relations, linear constraints on integers) as
 invariant-confluent or not, but ideally we would have a general purpose program
