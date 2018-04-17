@@ -59,6 +59,10 @@
   \end{center}
 }
 
+% New theorem environments.
+\theoremstyle{definition}
+\newtheorem{benchmark}{Benchmark}
+
 % Labels and references. To label a figure use the \figlabel command, to label
 % a lemma, use the \lemlabel command, etc. Similarly, use the \figref, lemref,
 % etc. commands to reference these labels. For example:
@@ -98,6 +102,8 @@
 \newcommand{\secref}[1]{Section~\ref{sec:#1}}
 \newcommand{\thmlabel}[1]{\genericlabel{thm}{#1}}
 \newcommand{\thmref}[1]{Theorem~\ref{thm:#1}}
+\newcommand{\benchlabel}[1]{\genericlabel{bench}{#1}}
+\newcommand{\benchref}[1]{Benchmark~\ref{bench:#1}}
 
 % Surrounding symbols.
 \DeclarePairedDelimiter{\parens}{(}{)}

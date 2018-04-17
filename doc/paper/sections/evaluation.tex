@@ -19,7 +19,7 @@ and system models. We then evaluate Lucy by answering the following questions:
     object vary as we vary the workload, segmentation, and replication factor?
 \end{itemize}
 
-\subsection{Lucy}
+\subsection{Implementation}
 Lucy includes an implementation of the interactive decision procedure described
 in \algoref{InteractiveDecisionProcedure}, an implementation of a decision
 procedure which checks criteria (1) - (4) from \thmref{LatticeProperty}, and an
@@ -30,7 +30,7 @@ transactions, and invariants in a small Python DSL and interact with the
 interactive decision procedures using an interactive Python console. We use
 Z3~\cite{de2008z3} to implement our invariant-closure decision procedure,
 compiling objects and invariants into a formula which is satisfiable if and
-only if the object is \emph{not} invariant-confluent. If the object is
+only if the object is \emph{not} invariant-closed. If the object is
 invariant-closed, then Z3 concludes that the formula is unsatisfiable.
 Otherwise, if the object is not invariant-closed, then Z3 produces a
 counterexample witnessing the satisfiability of the formula.
@@ -38,11 +38,40 @@ counterexample witnessing the satisfiability of the formula.
 Lucy also includes an implementation of the invariant-confluence and
 segmented-invariant confluence system models in roughly 3,500 lines of C++.
 Users specify objects, transactions, invariants, and segmentations in C++. Lucy
-then replicates the objects using invariant-confluence, segmented
-invariant-confluence, eventual consistency, or linearizability. In
-\secref{SegmentedInvariantConfluenceEval}, we compare the performance of these
-various consistency models.
-%
+then replicates the objects using segmented invariant-confluence (or
+invariant-confluence if the segmentation contains a single segment without any
+disallowed transactions). Clients send every transaction request to a randomly
+selected server. When a server receives a transaction request, it executes
+\algoref{TxnExecution} to attempt to execute the transaction locally. If the
+transaction requires global coordination, then the server forwards the
+transaction request to a predetermined leader. When the leader receives a
+transaction request, it sends a coordination request to all other servers. When
+a server receives a coordination request from the leader, it stops processing
+transactions and sends the leader its state in a coordination reply. When the
+leader receives coordination replies from all other servers, it executes the
+transaction, and then sends its state to the other servers. When a server
+receives a new state, it adopts the state, computes its new active segment, and
+resumes normal processing. After every 100 transactions processed, a server
+sends a merge request to a randomly selected server. Merge requests are tagged
+with a monotonically increasing epoch number that is incremented by the master
+after every round of global coordination. This allows servers to discard merge
+requests from previous epochs.
+
+Lucy can also replicate an object with eventual consistency and with
+linearizability. With eventual consistency, clients send every transaction
+request to a randomly selected server. The server executes the transaction
+locally and returns immediately to the client, sending merge requests after
+every 100 transactions. With linearizability, clients send every transaction
+request to a predetermined leader. The leader relays the transaction request to
+all other servers, and when it receives replies from them, it executes the
+transaction and replies to the client. This communication pattern mimics the
+``normal operation'' of state machine replication protocols like
+Paxos~\cite{lamport1998part} and Viewstamped
+Replicated~\cite{liskov2012viewstamped}. In
+\secref{SegmentedInvariantConfluenceEval}, we compare the performance of
+replicating with segmented invariant-confluence against the performance of
+replicating with eventual consistency and linearizability.
+
 Because fault-tolerance is largely an orthogonal concern to
 invariant-confluence, Lucy is implemented without fault-tolerance. It would be
 straightforward to add fault-tolerance to Lucy, but it would not affect our
@@ -58,10 +87,15 @@ redundancy.
 % \subsection{TPC and Feral}
 % \todo{See which of the Feral and TPC transactions we can determine automatically}
 
-\subsection{Segmented Invariant Confluence}\seclabel{SegmentedInvariantConfluenceEval}
-% \todo{one graph: number of locked operations x axis; throughput on the y-axis}
-% \todo{one graph: number of segments on the x-axis; throughput on the y-axis}
-% \todo{compare with no coordination and "VR"}
+\subsection{Segmented Invariant Confluence}%
+\seclabel{SegmentedInvariantConfluenceEval}
+In this section, we evaluate the performance of replicating an object with
+segmented invariant-confluence as compared to replicating it with eventual
+consistency or linearizability. We begin with two benchmarks that demonstrate
+the same concept: the performance of segmented invariant-confluent replication
+varies with the amount of global coordination induced by either (a) performing
+a transaction that is disallowed within a segment or (b) transitioning between
+segments.
 
 \begin{figure}[ht]
   \centering
@@ -74,8 +108,81 @@ redundancy.
     \includegraphics[width=\columnwidth]{figures/vary_segments.pdf}
   \end{subfigure}
 
-  \caption{}\figlabel{}
+  \caption{%
+    Segmented invariant-confluent replication throughput versus coordination,
+    induced by executing disallowed transactions (top) and by transitioning
+    across segments (bottom).
+  }\figlabel{ThroughputVsGlobalSyncs}
 \end{figure}
+
+\begin{benchmark}\benchlabel{VaryWithdraws}
+Consider again the PN-Counter from \exampleref{CounreachableExample} and the
+corresponding transactions, invariants, and single-segment segmentation that
+forbids concurrent decrements. We replicate this object on 32 servers
+deployed on 32 m5.xlarge EC2 instances within the same availability zone.  Each
+server has three colocated clients that issue deposit and withdrawal
+transactions. We replicate the object with eventual consistency, segmented
+invariant-confluence, and linearizability and measure the system's total
+throughput as we vary the fraction of client requests that are withdrawals. The
+results are shown in the top of \figref{ThroughputVsGlobalSyncs}.
+
+Both eventually consistent replication and linearizable replication are
+unaffected by the workload, achieving roughly 700,000 and 7,000 transactions
+per second respectively. Expectedly, eventually consistent replication
+significantly outperforms linearizable replication because (a) transactions can
+be sent to any server (not just the leader) and (b) servers do not coordinate
+with each other at all.
+%
+Segmented invariant-confluent replication performs well for low-withdrawal
+workloads and performs increasingly poorly as we increase the fraction of
+withdrawal transactions, eventually becoming slower that linearizable
+replication. For example, with 5\% withdrawal transactions, segmented
+invariant-confluent replication performs an order of magnitude better than
+linearizable replication; with 50\% withdrawals, it performs as well; and with
+100\% withdrawals, it performs two times worse.
+
+These results are expected. Deposit transactions can execute without any
+coordination while withdrawal transactions require global coordination. As we
+increase the fraction of withdrawals, we increase the amount of coordination
+that the system has to perform which in turn drastically decreases the
+throughput. These results also offer two insights:
+%
+First, for low-withdrawal workloads, segmented invariant-confluent replication
+achieves a compromise between strong and weak consistency. It guarantees that
+invariants are maintained (which is impossible with eventual consistency if the
+object is not invariant-confluent) with performance many times better than
+strongly consistent replication.
+%
+Second, segmented invariant-confluent replication is poorly suited to workloads
+that require a large amount of coordination. For workloads without much inherit
+concurrency (e.g.\ withdraw-mostly workloads), maintaining invariants is best
+done with strong consistency. It provides stronger guarantees with better
+performance.
+\end{benchmark}
+
+\begin{benchmark}\benchlabel{VarySegmentLength}
+  Consider again the object, transactions, and invariants from \exampleref{Z2}
+  and \exampleref{SegmentedZ2}. As with \benchref{VaryWithdraws}, we replicate
+  the object across 32 servers. Clients issue 50\% increment $x$ transactions,
+  and 50\% decrement $y$ transactions. We consider a ``checkerboard''
+  segmentation $\Sigma_n = \setst{(I_{i, j}, T)}{i, j \in \ints}$ where segment
+  invariant $I_{i, j}$ consists of the square of points $\setst{(x, y)}{ni \leq
+  x < n(i + 1), nj \leq y < n(j + 1)}$ with side length $n$. For example,
+  $\Sigma_1$ places each point in its own segment, $\Sigma_2$ tessellates
+  $\ints^2$ with 2x2 squares, $\Sigma_3$ tessellates $\ints^2$ with 3x3
+  squares, and so on. We measure the throughput of the object replicated with
+  eventually consistent, segmented invariant-confluent, and linearizable
+  replication as we vary the segment side length $n$. The results are shown in
+  the bottom \figref{ThroughputVsGlobalSyncs}.
+
+  This benchmark tells the same tale as \benchref{VaryWithdraws}. Eventual
+  consistency and linearizability are unaffected by workload, and eventual
+  consistency outperforms linearizability by roughly two orders of magnitude.
+  In this example, the segmented invariant-confluent replication only requires
+  coordination when transitioning between segment boundaries, so as we increase
+  the segment side length, the throughput of the system increases
+  significantly.
+\end{benchmark}
 
 \begin{figure}[ht]
   \centering
@@ -83,4 +190,3 @@ redundancy.
   \caption{}\figlabel{}
 \end{figure}
 
-\uselengthunit{in}\printlength{\columnwidth}
