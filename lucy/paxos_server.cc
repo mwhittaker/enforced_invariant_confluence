@@ -122,6 +122,15 @@ void PaxosServer::HandlePrepareOk(const PrepareOk& prepare_ok,
   VLOG(1) << "PaxosServer leader received a PrepareOk for transaction "
           << txn_index << " from all other replicas!";
 
+  // Reply to the client. We should be waiting to commit the transaction first,
+  // but this hack simulates a much more optimized variant of Paxos.
+  ServerMessage msg;
+  msg.mutable_txn_reply()->set_request_id(
+      waiting_for_prepare_oks_[txn_index].txn_request.request_id());
+  msg.mutable_txn_reply()->set_reply(
+      object_->ExecTxn(waiting_for_prepare_oks_[txn_index].txn_request.txn()));
+  SendTo(msg, waiting_for_prepare_oks_[txn_index].src_addr);
+
   // If we have received a PrepareOk from every other server, then we're ready
   // to try and commit this transaction. We add it to waiting_for_commit_ and
   // also clean up the metadata in prepare_ok_replies_ and
@@ -158,14 +167,15 @@ void PaxosServer::LeaderCommitReadyTransactions() {
 
   auto it = waiting_for_commit_.begin();
   while (it->first == num_committed_) {
-    // Execute the transaction, and send a reply to the client.
-    const PendingTxn& pending_txn = it->second;
-    ServerMessage msg;
-    msg.mutable_txn_reply()->set_request_id(
-        pending_txn.txn_request.request_id());
-    msg.mutable_txn_reply()->set_reply(
-        object_->ExecTxn(pending_txn.txn_request.txn()));
-    SendTo(msg, pending_txn.src_addr);
+    // TODO: Clean up.
+    // // Execute the transaction, and send a reply to the client.
+    // const PendingTxn& pending_txn = it->second;
+    // ServerMessage msg;
+    // msg.mutable_txn_reply()->set_request_id(
+    //     pending_txn.txn_request.request_id());
+    // msg.mutable_txn_reply()->set_reply(
+    //     object_->ExecTxn(pending_txn.txn_request.txn()));
+    // SendTo(msg, pending_txn.src_addr);
 
     num_committed_++;
     it = waiting_for_commit_.erase(it);
