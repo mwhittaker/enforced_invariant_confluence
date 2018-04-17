@@ -3,7 +3,24 @@ import csv
 import os
 import sys
 
+import matplotlib
 import matplotlib.pyplot as plt
+
+EVENTUAL_FMT = {
+    'label': 'eventual',
+    'marker': 'o',
+    'linewidth': 2,
+}
+IC_FMT = {
+    'label': 'invariant confluent',
+    'marker': 'o',
+    'linewidth': 2,
+}
+LIN_FMT = {
+    'label': 'linearizable',
+    'marker': '^',
+    'linewidth': 2,
+}
 
 def load_csv(filename):
     with open(filename, 'r') as f:
@@ -25,10 +42,10 @@ def plot_vary_withdraws(data):
     paxos_x, paxos_y = splits['paxos']
 
     plt.figure()
-    plt.semilogy(gossip_x, gossip_y, label='eventual', marker='o')
-    plt.semilogy(segmented_x, segmented_y, label='invariant confluent', marker='s')
-    plt.semilogy(paxos_x, paxos_y, label='linearizable', marker='^')
-    plt.legend()
+    plt.semilogy(gossip_x, gossip_y, **EVENTUAL_FMT)
+    plt.semilogy(segmented_x, segmented_y, **IC_FMT)
+    plt.semilogy(paxos_x, paxos_y, **LIN_FMT)
+    plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.12), prop={'size': 12})
     plt.xlabel('Fraction Withdrawals')
     plt.ylabel('Throughput (txns/s)')
     plt.savefig('vary_withdraws.pdf')
@@ -42,12 +59,12 @@ def plot_vary_segments(data):
     paxos_x, paxos_y = splits['paxos']
 
     plt.figure()
-    plt.semilogy(gossip_x, gossip_y, label='eventual', marker='o')
-    plt.semilogy(segmented_x, segmented_y, label='invariant confluent', marker='s')
-    plt.semilogy(paxos_x, paxos_y, label='linearizable', marker='^')
-    plt.legend()
+    plt.semilogy(gossip_x, gossip_y, **EVENTUAL_FMT)
+    plt.semilogy(segmented_x, segmented_y, **IC_FMT)
+    plt.semilogy(paxos_x, paxos_y, **LIN_FMT)
     plt.xlabel('Segment Side Length')
     plt.ylabel('Throughput (txns/s)')
+    plt.tight_layout()
     plt.savefig('vary_segments.pdf')
     plt.close()
 
@@ -59,10 +76,10 @@ def plot_vary_nodes(data):
     paxos_x, paxos_y = splits['paxos']
 
     plt.figure()
-    plt.semilogy(gossip_x, gossip_y, label='eventual', marker='o')
-    plt.semilogy(segmented_x, segmented_y, label='invariant confluent', marker='s')
-    plt.semilogy(paxos_x, paxos_y, label='linearizable', marker='^')
-    plt.legend()
+    plt.semilogy(gossip_x, gossip_y, **EVENTUAL_FMT)
+    plt.semilogy(segmented_x, segmented_y, **IC_FMT)
+    plt.semilogy(paxos_x, paxos_y, **LIN_FMT)
+    plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.12), prop={'size': 12})
     plt.xlabel('Number of Nodes')
     plt.ylabel('Throughput (txns/s)')
     plt.savefig('vary_nodes.pdf')
@@ -72,6 +89,10 @@ def main():
     if len(sys.argv) != 4:
         print('python plot.py <vary_withdraws.csv> <vary_segments.csv> <vary_nodes.csv>')
         sys.exit(1)
+
+    font = {'family' : 'normal',
+            'size'   : 15}
+    matplotlib.rc('font', **font)
 
     plot_vary_withdraws(load_csv(sys.argv[1]))
     plot_vary_segments(load_csv(sys.argv[2]))
