@@ -12,7 +12,7 @@ PaxosServer::PaxosServer(const Cluster& cluster, replica_index_t replica_index,
   if (AmLeader()) {
     LOG(INFO) << "PaxosServer leader listening on "
               << cluster_.UdpAddrs()[replica_index_] << ".";
-    const std::chrono::milliseconds delay(100);
+    const std::chrono::milliseconds delay(500);
     resend_prepares_timer_ =
         loop->RegisterTimer(delay, [this]() { LeaderResendPrepares(); });
     resend_prepares_timer_.Start();
