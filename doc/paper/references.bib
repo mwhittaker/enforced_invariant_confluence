@@ -1,3 +1,4 @@
+% Invariant-Confluence
 @article{bailis2014coordination,
   title={Coordination avoidance in database systems},
   author={Bailis, Peter and Fekete, Alan and Franklin, Michael J and Ghodsi, Ali and Hellerstein, Joseph M and Stoica, Ion},
@@ -25,17 +26,6 @@
   organization={Springer}
 }
 
-@article{gilbert2002brewer,
-  title={Brewer's conjecture and the feasibility of consistent, available, partition-tolerant web services},
-  author={Gilbert, Seth and Lynch, Nancy},
-  journal={ACM SIGACT News},
-  volume={33},
-  number={2},
-  pages={51--59},
-  year={2002},
-  publisher={ACM}
-}
-
 @article{bailis2013highly,
   title={Highly available transactions: Virtues and limitations},
   author={Bailis, Peter and Davidson, Aaron and Fekete, Alan and Ghodsi, Ali and Hellerstein, Joseph M and Stoica, Ion},
@@ -54,42 +44,6 @@
   pages={279--293},
   year={2016},
   organization={ACM}
-}
-
-@inproceedings{alvaro2010boom,
-  title={Boom analytics: exploring data-centric, declarative programming for the cloud},
-  author={Alvaro, Peter and Condie, Tyson and Conway, Neil and Elmeleegy, Khaled and Hellerstein, Joseph M and Sears, Russell},
-  booktitle={Proceedings of the 5th European conference on Computer systems},
-  pages={223--236},
-  year={2010},
-  organization={ACM}
-}
-
-@inproceedings{alvaro2011consistency,
-  title={Consistency Analysis in Bloom: a CALM and Collected Approach.},
-  author={Alvaro, Peter and Conway, Neil and Hellerstein, Joseph M and Marczak, William R},
-  booktitle={CIDR},
-  pages={249--260},
-  year={2011},
-  organization={Citeseer}
-}
-
-@inproceedings{conway2012logic,
-  title={Logic and lattices for distributed programming},
-  author={Conway, Neil and Marczak, William R and Alvaro, Peter and Hellerstein, Joseph M and Maier, David},
-  booktitle={Proceedings of the Third ACM Symposium on Cloud Computing},
-  pages={1},
-  year={2012},
-  organization={ACM}
-}
-
-@inproceedings{de2008z3,
-  title={Z3: An efficient SMT solver},
-  author={De Moura, Leonardo and Bj{\o}rner, Nikolaj},
-  booktitle={International conference on Tools and Algorithms for the Construction and Analysis of Systems},
-  pages={337--340},
-  year={2008},
-  organization={Springer}
 }
 
 @inproceedings{balegas2015putting,
@@ -126,19 +80,6 @@
   year={2012}
 }
 
-@book{winskel1993formal,
-  title={The formal semantics of programming languages: an introduction},
-  author={Winskel, Glynn},
-  year={1993},
-  publisher={MIT press}
-}
-
-@misc{cs6110sp2016lecture19,
-    title = {Denotational Semantics},
-    howpublished = {\url{http://www.cs.cornell.edu/courses/cs6110/2016sp/lectures/lecture19.pdf}},
-    note = {Accessed: 2016-11-15}
-}
-
 @article{gotsman2016cause,
   title={'Cause I'm strong enough: Reasoning about consistency choices in distributed systems},
   author={Gotsman, Alexey and Yang, Hongseok and Ferreira, Carla and Najafzadeh, Mahsa and Shapiro, Marc},
@@ -148,17 +89,6 @@
   pages={371--384},
   year={2016},
   publisher={ACM}
-}
-
-@article{abadi2012consistency,
-  title={Consistency tradeoffs in modern distributed database system design: CAP is only part of the story},
-  author={Abadi, Daniel},
-  journal={Computer},
-  volume={45},
-  number={2},
-  pages={37--42},
-  year={2012},
-  publisher={IEEE}
 }
 
 @inproceedings{de2008z3,
@@ -216,7 +146,62 @@
   organization={ACM}
 }
 
+@inproceedings{moraru2013there,
+  title={There is more consensus in egalitarian parliaments},
+  author={Moraru, Iulian and Andersen, David G and Kaminsky, Michael},
+  booktitle={Proceedings of the Twenty-Fourth ACM Symposium on Operating Systems Principles},
+  pages={358--372},
+  year={2013},
+  organization={ACM}
+}
+
+@article{vincent2015designing,
+  title={Designing Distributed Systems Using Approximate Synchrony in Data Center Networks},
+  author={Vincent, Dan RK Ports Jialin Li and Krishnamurthy, Liu Naveen Kr Sharma Arvind},
+  journal={on Networked Systems Design and Implementation (NSDI’15)},
+  pages={43},
+  year={2015}
+}
+
+@inproceedings{oki1988viewstamped,
+  title={Viewstamped replication: A new primary copy method to support highly-available distributed systems},
+  author={Oki, Brian M and Liskov, Barbara H},
+  booktitle={Proceedings of the seventh annual ACM Symposium on Principles of distributed computing},
+  pages={8--17},
+  year={1988},
+  organization={ACM}
+}
+
+@techreport{lamport2005generalized,
+  title={Generalized consensus and paxos},
+  author={Lamport, Leslie},
+  year={2005},
+  institution={Technical Report MSR-TR-2005-33, Microsoft Research}
+}
+
+@article{lamport2006fast,
+  title={Fast paxos},
+  author={Lamport, Leslie},
+  journal={Distributed Computing},
+  volume={19},
+  number={2},
+  pages={79--103},
+  year={2006},
+  publisher={Springer}
+}
+
 % CAP and Friends
+@article{gilbert2002brewer,
+  title={Brewer's conjecture and the feasibility of consistent, available, partition-tolerant web services},
+  author={Gilbert, Seth and Lynch, Nancy},
+  journal={ACM SIGACT News},
+  volume={33},
+  number={2},
+  pages={51--59},
+  year={2002},
+  publisher={ACM}
+}
+
 @article{brewer2012cap,
   title={CAP twelve years later: How the" rules" have changed},
   author={Brewer, Eric},
@@ -240,6 +225,23 @@
 }
 
 % Weak Consistency Models
+@inproceedings{lloyd2011don,
+  title={Don't settle for eventual: scalable causal consistency for wide-area storage with COPS},
+  author={Lloyd, Wyatt and Freedman, Michael J and Kaminsky, Michael and Andersen, David G},
+  booktitle={Proceedings of the Twenty-Third ACM Symposium on Operating Systems Principles},
+  pages={401--416},
+  year={2011},
+  organization={ACM}
+}
+
+@inproceedings{mehdi2017can,
+  title={I Can't Believe It's Not Causal! Scalable Causal Consistency with No Slowdown Cascades.},
+  author={Mehdi, Syed Akbar and Littley, Cody and Crooks, Natacha and Alvisi, Lorenzo and Bronson, Nathan and Lloyd, Wyatt},
+  booktitle={NSDI},
+  pages={453--468},
+  year={2017}
+}
+
 @article{vogels2009eventually,
   title={Eventually consistent},
   author={Vogels, Werner},
@@ -269,7 +271,30 @@
   publisher={Springer}
 }
 
+% Strong Consistency
+@article{herlihy1990linearizability,
+  title={Linearizability: A correctness condition for concurrent objects},
+  author={Herlihy, Maurice P and Wing, Jeannette M},
+  journal={ACM Transactions on Programming Languages and Systems (TOPLAS)},
+  volume={12},
+  number={3},
+  pages={463--492},
+  year={1990},
+  publisher={ACM}
+}
+
 % Invariants
+@article{balegas2015towards,
+  title={Towards Fast Invariant Preservation in Geo-replicated Systems},
+  author={Balegas, Valter and Duarte, S{\'e}rgio and Ferreira, Carla and Rodrigues, Rodrigo and Pregui{\c{c}}a, Nuno and Najafzadeh, Mahsa and Shapiro, Marc},
+  journal={ACM SIGOPS Operating Systems Review},
+  volume={49},
+  number={1},
+  pages={121--125},
+  year={2015},
+  publisher={ACM}
+}
+
 @article{hoare1969axiomatic,
   title={An axiomatic basis for computer programming},
   author={Hoare, Charles Antony Richard},
@@ -278,5 +303,90 @@
   number={10},
   pages={576--580},
   year={1969},
+  publisher={ACM}
+}
+
+% Bloom
+@article{hellerstein2010declarative,
+  title={The declarative imperative: experiences and conjectures in distributed logic},
+  author={Hellerstein, Joseph M},
+  journal={ACM SIGMOD Record},
+  volume={39},
+  number={1},
+  pages={5--19},
+  year={2010},
+  publisher={ACM}
+}
+
+@inproceedings{alvaro2010boom,
+  title={Boom analytics: exploring data-centric, declarative programming for the cloud},
+  author={Alvaro, Peter and Condie, Tyson and Conway, Neil and Elmeleegy, Khaled and Hellerstein, Joseph M and Sears, Russell},
+  booktitle={Proceedings of the 5th European conference on Computer systems},
+  pages={223--236},
+  year={2010},
+  organization={ACM}
+}
+
+@inproceedings{alvaro2011consistency,
+  title={Consistency Analysis in Bloom: a CALM and Collected Approach.},
+  author={Alvaro, Peter and Conway, Neil and Hellerstein, Joseph M and Marczak, William R},
+  booktitle={CIDR},
+  pages={249--260},
+  year={2011},
+  organization={Citeseer}
+}
+
+@inproceedings{conway2012logic,
+  title={Logic and lattices for distributed programming},
+  author={Conway, Neil and Marczak, William R and Alvaro, Peter and Hellerstein, Joseph M and Maier, David},
+  booktitle={Proceedings of the Third ACM Symposium on Cloud Computing},
+  pages={1},
+  year={2012},
+  organization={ACM}
+}
+
+@incollection{alvaro2011dedalus,
+  title={Dedalus: Datalog in time and space},
+  author={Alvaro, Peter and Marczak, William R and Conway, Neil and Hellerstein, Joseph M and Maier, David and Sears, Russell},
+  booktitle={Datalog Reloaded},
+  pages={262--281},
+  year={2011},
+  publisher={Springer}
+}
+
+@article{alvaro2013declarative,
+  title={A declarative semantics for Dedalus},
+  author={Alvaro, Peter and Ameloot, Tom J and Hellerstein, Joseph M and Marczak, William R and Van den Bussche, Jan},
+  year={2013}
+}
+
+@article{ameloot2013relational,
+  title={Relational transducers for declarative networking},
+  author={Ameloot, Tom J and Neven, Frank and Van den Bussche, Jan},
+  journal={Journal of the ACM (JACM)},
+  volume={60},
+  number={2},
+  pages={15},
+  year={2013},
+  publisher={ACM}
+}
+
+@inproceedings{zinn2012win,
+  title={Win-move is coordination-free (sometimes)},
+  author={Zinn, Daniel and Green, Todd J and Lud{\"a}scher, Bertram},
+  booktitle={Proceedings of the 15th International Conference on Database Theory},
+  pages={99--113},
+  year={2012},
+  organization={ACM}
+}
+
+@article{ameloot2016weaker,
+  title={Weaker forms of monotonicity for declarative networking: a more fine-grained answer to the CALM-conjecture},
+  author={Ameloot, Tom J and Ketsman, Bas and Neven, Frank and Zinn, Daniel},
+  journal={ACM Transactions on Database Systems (TODS)},
+  volume={40},
+  number={4},
+  pages={21},
+  year={2016},
   publisher={ACM}
 }
