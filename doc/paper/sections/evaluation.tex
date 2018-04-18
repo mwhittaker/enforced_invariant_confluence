@@ -187,6 +187,40 @@ performance.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/vary_nodes.pdf}
-  \caption{}\figlabel{}
+  \caption{%
+    Throughput of eventually consistent, segmented invariant-confluent, and
+    linearizable replication measured against the number of
+    nodes.
+  }\figlabel{VaryNodes}
 \end{figure}
 
+\begin{benchmark}
+  In this benchmark, we measure the scale-out of segmented invariant-confluent
+  replication. We repeat \benchref{VaryWithdraws} with a 10\% withdrawal rate,
+  but this time we vary the number of servers we use to replicate our object.
+  When we replicate with $n$ servers, we use $3n$ clients (the $3$ colocated
+  clients on each server) as part of the workload. The results are shown in
+  \figref{VaryNodes}.
+
+  Eventually consistent replication scales perfectly with the number of nodes,
+  confirming the results in~\cite{bailis2014coordination}. With eventually
+  consistent replication, servers do not coordinate at all, so they are
+  completely unaffected by the number of servers. Linearizable replication, on
+  the other hand, scales up to about 3-5 servers before performance begins to
+  decrease. These numbers are consistent with typical deployments of
+  state-machine replication protocols like Paxos~\cite{chandra2007paxos}.
+  Because all messages are sent to the leader, the leader becomes the
+  bottleneck as the number of servers and clients increases. Moreover, the
+  leader must wait for responses from more servers, increasing the latency of
+  the slowest response which in turn decreases throughput.
+  Segmented invariant-confluent replication scales up to about 6-8 servers
+  before succumbing to the same scalability bottlenecks as linearizable
+  replication.
+
+  These results highlight the importance of coordination avoidance in
+  distributed databases. While segmented invariant-confluent replication scales
+  out slightly better than linearizable replication, both scale significantly
+  worse than eventually consistent replication even for a very low (i.e.\ 10\%)
+  withdrawal workload. This demonstrates that even a small amount of
+  coordination can significantly reduce the scalability of a system.
+\end{benchmark}
