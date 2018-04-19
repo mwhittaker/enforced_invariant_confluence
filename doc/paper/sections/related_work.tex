@@ -1,13 +1,37 @@
 \section{Related Work}
 
+\newcommand{\sieve}{\textsc{sieve}}
+\paragraph{RedBlue Consistency and \sieve}
+RedBlue consistency is a form of consistency that sits between causal
+consistency and linearizability~\cite{li2012making}. With RedBlue consistency,
+every operation is labelled as red or blue. All operations are executed with
+causal consistency, but with the added restrictions that red operations are
+executed in a single total order embedded within the causal ordering.
+RedBlue consistency is similar to segmented invariant-confluence with a single
+segment in which all red operations are removed from the segment's set of
+allowable transactions.  In~\cite{li2012making}, Li et al.\ define
+\defword{invariant safety} as a sufficient condition for RedBlue consistent
+objects to be invariant-confluent.  Invariant safety is an analog of
+invariant-closure for an operation-based (as opposed-to state
+based~\cite{shapiro2011conflict}) system model.  In~\cite{li2014automating}, Li
+et al.\ develop techniques to identify which operations are invariant safe.
+Like invariant-closure, invariant safety is a sufficient but not necessary
+condition for invariant-confluence. Li et al.\ develop sophisticated techniques
+for deciding invariant safety that involve calculating weakest preconditions.
+These techniques are complementary to our work and can be used to improve the
+invariant-closure subroutine used by our decision procedures.
+
 \paragraph{Super relevant stuf}
+
 % Super relevant
+% title={'Cause I'm strong enough: Reasoning about consistency choices in distributed systems},
+
+% escrow
+
 % Towards Fast Invariant Preservation in Geo-replicated Systems
 % title={Coordination avoidance in database systems},
 % title={Putting consistency back into eventual consistency},
 % title={The homeostasis protocol: Avoiding transaction coordination through program analysis},
-% title={Automating the choice of consistency levels in replicated systems},
-% title={Making geo-replicated systems fast as possible, consistent when necessary},
 % title={'Cause I'm strong enough: Reasoning about consistency choices in distributed systems},
 % Feral
 % The CISE Tool: Proving Weakly-Consistent Applications Correct
@@ -20,17 +44,48 @@
 %   Find work on static partitioning of data based on program?
 %   Transaction chopping / healing?
 
-\paragraph{CALM Theorem}
-\cite{alvaro2013declarative}
-\cite{ameloot2013relational}
-\cite{ameloot2016weaker}
-\cite{hellerstein2010declarative}
-\cite{alvaro2011dedalus}
-\cite{alvaro2010boom}
-\cite{alvaro2011consistency}
-\cite{conway2012logic}
-\cite{zinn2012win}
-
 \paragraph{CRDTs}
-% coordination free convergence as opposed to coordination free invs describe inv-confluence as sort of a crdt with certain properties or something.
+CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
+semilattices with inflationary update methods. Due to their algebraic
+properties, CRDTs can be replicated with strong eventual consistency without
+the need for any coordination. Our definition of distributed objects and our
+invariant-confluence system model are inspired directly by the corresponding
+definitions and system models in~\cite{shapiro2011conflict}. Note that an
+invariant-confluent object does not necessarily have to be eventually
+consistent. In fact, equipping a distributed object with the trivial merge
+function $x \join y = x$ makes the object invariant-confluent with respect
+any set of transactions and any invariant, but it makes the object very
+inconsistent. Thus, it's natural (though not necessary) to use CRDTs as
+invariant-confluent distributed objects, achieving a combination of eventual
+consistency and invariant-preservation. Our criteria in
+\thmref{LatticeProperty} also borrow ideas from CRDTs, exploiting the nice
+algebraic properties of semilattices.
 
+\paragraph{CALM Theorem}
+Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
+formalism, Dedalus~\cite{alvaro2011dedalus, alvaro2013declarative}, are
+declarative Datalog-based programming languages that are designed to program
+distributed systems. The accompanying CALM
+theorem~\cite{hellerstein2010declarative, ameloot2013relational} states that if
+a program can be written in the monotone fragment of these languages, then
+there exists a coordination-free implementation of the program. Moreover,
+monotone programs are invariant to message reordering, whereas non-monotone
+programs may experience anomalies if messages are reordered in the network. The
+CALM theorem provides guarantees about the outputs of a program, but it does
+not guarantee that invariants are maintained throughout the duration of an
+execution. Moreover, Bloom and Dedalus are general purpose programming
+languages that can be used to implement a variety of distributed systems (e.g.
+a sharded database), while invariant-confluence is defined strictly in the
+context of replicated data.
+
+\paragraph{Proof Assistants}
+Our interactive decision procedure bears resemblance to interactive proof
+assistants like Coq~\cite{coq2017}, Isabelle~\cite{nipkow2002isabelle},
+Agda~\cite{norell2008dependently}, and Idris~\cite{brady2013idris}. Proof
+assistants guide users through the process of interactively provided a proof
+that witnesses the validity of a formula. Our interactive decision procedure
+guides users through the process of interactively generating a set of reachable
+and unreachable points that witness the invariant-confluence of an object. An
+interesting avenue for future work is to integrate an proof assistant into our
+interactive decision procedure. For example, a proof assistant could verify
+that a state labelled unreachable by a user is actually unreachable.
