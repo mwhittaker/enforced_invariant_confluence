@@ -1,0 +1,57 @@
+\documentclass{vldb}
+
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\usepackage{balance}
+\usepackage{invariantconfluence}
+\usepackage{pervasives_vldb}
+\usepackage{printlen}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
+\usetikzlibrary{patterns}
+
+% Include information below and uncomment for camera ready.
+\vldbTitle{TODO}
+\vldbAuthors{Michael Whittaker and Joseph M. Hellerstein}
+\vldbDOI{https://doi.org/TBD}
+
+\begin{document}
+
+\title{TODO}
+
+\numberofauthors{2}
+\author{
+\alignauthor
+Michael Whittaker \\
+       \affaddr{UC Berkeley}\\
+       \affaddr{Berkeley, CA}\\
+       \email{mjwhittaker@berkeley.edu}
+\alignauthor
+Joseph M. Hellerstein \\
+       \affaddr{UC Berkeley}\\
+       \affaddr{Berkeley, CA}\\
+       \email{hellerstein@berkeley.edu}
+}
+\date{TBD}
+
+\maketitle
+{\input{sections/abstract}}
+{\input{sections/introduction}}
+{\input{sections/invariant_confluence}}
+{\input{sections/invariant_closure}}
+{\input{sections/interactive_decision_procedure}}
+{\input{sections/merge_reduction}}
+{\input{sections/segmented_invariant_confluence.tex}}
+{\input{sections/evaluation}}
+{\input{sections/related_work}}
+{\input{sections/conclusion}}
+
+\balance
+
+{\input{sections/acknowledgements}}
+
+\bibliographystyle{abbrv}
+\bibliography{references}
+\end{document}
