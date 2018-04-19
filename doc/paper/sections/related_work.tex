@@ -8,7 +8,7 @@ invariant-confluence including program analysis in database systems, CRDTs, the
 CALM theorem, and interactive proof assistants.
 
 \newcommand{\sieve}{\textsc{sieve}}
-\paragraph{RedBlue Consistency and \sieve}
+\textbf{RedBlue Consistency and \sieve.}
 RedBlue consistency is a form of consistency that sits between causal
 consistency and linearizability~\cite{li2012making}. With RedBlue consistency,
 every operation is labelled as red or blue. All operations are executed with
@@ -28,7 +28,7 @@ involve calculating weakest preconditions.  These techniques are complementary
 to our work and can be used to improve the invariant-closure subroutine used by
 our decision procedures.
 
-\paragraph{The Homeostasis Protocol}
+\textbf{The Homeostasis Protocol.}
 The homeostasis protocol~\cite{roy2015homeostasis} uses program analysis to
 avoid unnecessary coordination between servers in a sharded database. The
 protocol generates global invariants, called global treaties, and servers can
@@ -46,7 +46,7 @@ protocol's mechanism of establishing invariants and operating without
 coordination so long as the invariants are maintained is very similar to our
 design of segmented invariant-confluence.
 
-\paragraph{Explicit Consistency}
+\textbf{Explicit Consistency.}
 A system provides explicit consistency with respect to a partial ordering of
 transactions if every server executes the transactions in a total order that
 respects the partial order and in a way such that the invariant is always
@@ -65,7 +65,7 @@ segmentation with certain transactions disallowed; and escrow transactions can
 be emulated with a segmentation that allows for concurrent decrements only when
 value being decremented is sufficiently large.
 
-\paragraph{Token-Based Invariant-Confluence}
+\textbf{Token-Based Invariant-Confluence.}
 In~\cite{gotsman2016cause}, Gotsman et al.\ discuss a hybrid token-based
 consistency model that generalizes RedBlue consistency. An application designer
 defines a set of tokens and specifies which pairs of tokens conflict. Then,
@@ -96,7 +96,7 @@ integrate the token-based approach into segmented invariant-confluence.
 % Declarative Programming over Eventually Consistent Data Stores
 % Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants
 
-\paragraph{CRDTs}
+\textbf{CRDTs.}
 CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
 semilattices with inflationary update methods. Due to their algebraic
 properties, CRDTs can be replicated with strong eventual consistency without
@@ -113,7 +113,7 @@ consistency and invariant-preservation. Our criteria in
 \thmref{LatticeProperty} also borrow ideas from CRDTs, exploiting the nice
 algebraic properties of semilattices.
 
-\paragraph{CALM Theorem}
+\textbf{CALM Theorem.}
 Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
 formalism, Dedalus~\cite{alvaro2011dedalus, alvaro2013declarative}, are
 declarative Datalog-based programming languages that are designed to program
@@ -130,7 +130,7 @@ languages that can be used to implement a variety of distributed systems (e.g.
 a sharded database), while invariant-confluence is defined strictly in the
 context of replicated data.
 
-\paragraph{Program Analysis in Database Systems}
+\textbf{Program Analysis in Database Systems.}
 Using program analysis to improve the performance of database systems is not
 new. For example, it has been used to improve the performance of
 database-backed web applications~\cite{cheung2014using, wu2016transaction,
@@ -140,7 +140,7 @@ on invariant-confluence continues the theme of using program analysis to reap
 the performance benefits of understanding program semantics that would
 otherwise be left on the table.
 
-\paragraph{Proof Assistants}
+\textbf{Proof Assistants.}
 Our interactive decision procedure bears resemblance to interactive proof
 assistants like Coq~\cite{coq2017}, Isabelle~\cite{nipkow2002isabelle},
 Agda~\cite{norell2008dependently}, and Idris~\cite{brady2013idris}. Proof
