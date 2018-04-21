@@ -192,7 +192,7 @@ class StratifiedChecker(Checker):
                 elif isinstance(crdt, ast.CSetIntersect):
                     checker.set_intersect(name, crdt.a, None)
                 elif isinstance(crdt, ast.CMap):
-                    checker.map(name, crdt.k, crdt.v, None)
+                    checker.map(name, crdt.a, crdt.b, None)
                 elif isinstance(crdt, ast.COption):
                     checker.option(name, crdt.a, None)
                 else:
