@@ -45,7 +45,11 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
     elif isinstance(e, ast.ESetMin):
         return min(eval_expr(e.x, env))
     elif isinstance(e, ast.ESetMax):
-        return max(eval_expr(e.x, env))
+        xs = eval_expr(e.x, env)
+        if len(xs) == 0:
+            return None
+        else:
+            return max(xs)
     elif isinstance(e, ast.ETuple2First):
         return eval_expr(e.x, env)[0]
     elif isinstance(e, ast.ETuple2Second):

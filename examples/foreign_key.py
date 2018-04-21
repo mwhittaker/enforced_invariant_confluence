@@ -14,9 +14,9 @@ Run with
 """
 
 checker = get_checker()
-XA = checker.set_union('XA', TInt(), {1, 2})
+XA = checker.set_union('XA', TInt(), EEmptySet(TInt()))
 XR = checker.set_union('XR', TInt(), EEmptySet(TInt()))
-YA = checker.set_union('YA', TInt(), {1, 2, 3, 4})
+YA = checker.set_union('YA', TInt(), EEmptySet(TInt()))
 YR = checker.set_union('YR', TInt(), EEmptySet(TInt()))
 
 # Invariant.
