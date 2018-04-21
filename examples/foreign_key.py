@@ -18,9 +18,16 @@ XA = checker.set_union('XA', TInt(), {1, 2})
 XR = checker.set_union('XR', TInt(), EEmptySet(TInt()))
 YA = checker.set_union('YA', TInt(), {1, 2, 3, 4})
 YR = checker.set_union('YR', TInt(), EEmptySet(TInt()))
+
+# Invariant.
 checker.add_invariant(
     'X_subset_Y',
     XA.diff(XR).subseteq(YA.diff(YR)))
+
+# Transactions.
 for i in range(5):
     checker.add_transaction(f'X_sub_{i}', [XR.join_assign({i})])
     checker.add_transaction(f'Y_add_{i}', [YA.join_assign({i})])
+
+# checker.refine_invariant(XA.eq({1, 2}))
+# checker.refine_invariant(YR.eq(EEmptySet(TInt())))

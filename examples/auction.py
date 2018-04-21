@@ -19,11 +19,26 @@ Run with
 checker = get_checker()
 bids = checker.set_union('bids', TInt(), EEmptySet(TInt()))
 winning_bid = checker.option('winning_bid', CIntMax(), ENone(TInt()))
+
+# Invariant.
 checker.add_invariant(
     'winning_bid_is_max',
     winning_bid.is_some() >> winning_bid.unwrap().eq(ESetMax(bids)))
+
+# Transactions.
 checker.add_transaction('close', [
     winning_bid.assign(ESome(ESetMax(bids)))
 ])
 for i in range(5):
     checker.add_transaction(f'bid_{i}', [bids.assign(bids.union({i}))])
+
+if isinstance(checker, StratifiedChecker):
+    auction_open = checker.stratum('auction_open')
+    auction_open.add_invariant(winning_bid.is_none())
+    auction_open.add_transaction('close')
+    for i in range(5):
+        auction_open.add_transaction(f'bid_{i}')
+
+    auction_closed = checker.stratum('auction_closed')
+    auction_closed.add_invariant(winning_bid.is_some())
+    auction_closed.add_invariant(winning_bid.unwrap().eq(ESetMax(bids)))
