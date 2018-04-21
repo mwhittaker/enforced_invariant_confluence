@@ -87,4 +87,6 @@ something like `export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"` to
 your `~/.bashrc`.
 
 Then, `cd` into the `lucy` directory and run `make` (or `make DEBUG=0` or `make
-VERBOSE=1`).
+VERBOSE=1`). Note that the code refers to segmented invariant-confluence as
+stratified invariant-confluence. The name's are different, but they are 100%
+the same thing.
