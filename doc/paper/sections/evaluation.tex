@@ -1,23 +1,24 @@
 \section{Evaluation}\seclabel{Evaluation}
-In this section, we describe Lucy: an implementation of our decision procedures
-and system models. We then evaluate Lucy by answering the following questions:
-\begin{itemize}
-  \item
-    How practical is the interactive invariant-confluence decision procedure?
-    Can we use it to classify real-world transactions and invariants?
-  \item
-    How practical is segmented invariant-confluence? Are real-world workloads
-    amenable to segmentation?
-  \item
-    How efficient is the interactive invariant-confluence decision procedure?
-  \item
-    How efficiently can we replicate a segmented invariant-confluent object as
-    compared to alternative approaches like replicating with weak or strong
-    consistency?
-  \item
-    How does the performance of replicating a segmented invariant-confluence
-    object vary as we vary the workload, segmentation, and replication factor?
-\end{itemize}
+In this section, we describe and evaluate Lucy: a prototype implementation of
+our decision procedures and system models.
+% We evaluate Lucy by answering the following questions:
+% \begin{itemize}
+%   \item
+%     How practical is the interactive invariant-confluence decision procedure?
+%     Can we use it to classify real-world transactions and invariants?
+%   \item
+%     How practical is segmented invariant-confluence? Are real-world workloads
+%     amenable to segmentation?
+%   \item
+%     How efficient is the interactive invariant-confluence decision procedure?
+%   \item
+%     How efficiently can we replicate a segmented invariant-confluent object as
+%     compared to alternative approaches like replicating with weak or strong
+%     consistency?
+%   \item
+%     How does the performance of replicating a segmented invariant-confluence
+%     object vary as we vary the workload, segmentation, and replication factor?
+% \end{itemize}
 
 \subsection{Implementation}
 Lucy includes an implementation of the interactive decision procedure described
@@ -29,7 +30,7 @@ are implemented in roughly 2,500 lines of Python. Users specify objects,
 transactions, and invariants in a small Python DSL and interact with the
 interactive decision procedures using an interactive Python console. We use
 Z3~\cite{de2008z3} to implement our invariant-closure decision procedure,
-compiling objects and invariants into a formula which is satisfiable if and
+compiling an object and invariant into a formula that is satisfiable if and
 only if the object is \emph{not} invariant-closed. If the object is
 invariant-closed, then Z3 concludes that the formula is unsatisfiable.
 Otherwise, if the object is not invariant-closed, then Z3 produces a
@@ -81,20 +82,136 @@ procedures) and C++ (for the runtime). In the future, we plan on removing this
 redundancy.
 
 \subsection{Decision Procedures}
+We now evaluate the practicality and efficiency of our decision procedure
+prototypes. We begin by demonstrating the decision procedure on a handful of
+simple, yet practical examples. We then, discuss TODO
+
 % \todo{Bank account with and without decrements.}
 % \todo{Auction example.}
 % \todo{Foreign keys with and without deletions.}
 % \subsection{TPC and Feral}
 % \todo{See which of the Feral and TPC transactions we can determine automatically}
+\example[$\ints^2$]\examplelabel{TwoIntsEval}
+We begin with a minimal working example. Consider again our recurring example
+of $\ints^2$ from \exampleref{Z2}. The Python code used to describe the object,
+transactions, and invariant is given in \figref{Z2Code}. When we call
+\python{checker.check()}, the interactive decision procedure produces
+a counterexample in less than a tenth of a second.  After we label the
+counterexample and refine the invariant with $y \leq 0$, the interactive
+decision procedure determines that the object is invariant-confluent, again, in
+less than a tenth of a second. Note that the object is invariant-confluent but
+\emph{not} invariant-closed, so prior work that relies on invariant-closure
+alone to determine invariant-confluence would not be able to identify this
+example as invariant-confluent.
+
+\begin{figure}[ht]
+  \begin{Python}[gobble=4]
+    checker = InteractiveInvariantConfluenceChecker()
+    x = checker.int_max('x', 0) # An int, x, merged by max.
+    y = checker.int_max('y', 0) # An int, y, merged by max.
+    checker.add_transaction('increment_x', [x.assign(x + 1)])
+    checker.add_transaction('decrement_y', [y.assign(y - 1)])
+    checker.add_invariant(x * y <= 0)
+    checker.check()
+  \end{Python}
+  \caption{\exampleref{TwoIntsEval} specification}\figlabel{Z2Code}
+\end{figure}
+
+\example[Foreign Keys]\examplelabel{ForeignKeysEval}
+A 2P-Set $X = (A_X, R_X)$ is a set CRDT composed of a set of additions $A_X$
+and a set of removals $R_X$~\cite{shapiro2011comprehensive}. We view the state
+of the set $X$ as the difference $A_X - R_X$ of the addition and removal sets.
+To add an element $x$ to the set, we add $x$ to $A_X$. Similarly, to remove $x$
+from the set, we add it to $R_X$. The merge of two 2P-sets is a pairwise union
+(i.e. $(A_X, R_X) \join (A_Y, R_Y) = (A_X \cup A_Y, R_X \cup R_Y)$).
+
+We can use 2P-sets to model a simple relational database with foreign key
+constraints. Let object $O = (X, Y) = ((A_X, R_X), (A_Y, R_Y))$ consist of a
+pair of two 2P-Sets $X$ and $Y$, which we view as relations. Our invariant $X
+\subseteq Y$ (i.e. $(A_X - R_X) \subseteq (A_Y - R_Y)$) models a foreign key
+constraint from $X$ to $Y$. We ran our decision procedure on the object with
+initial state $((\emptyset, \emptyset), (\emptyset, \emptyset))$ and
+transactions that allow arbitrary insertions and deletions into $X$ and $Y$.
+After less than a tenth of a second, the decision procedure produced a
+reachable counterexample witnessing the fact that the object is not
+invariant-confluent. A concurrent insertion into $X$ and deletion from $Y$ can
+lead to a state which violates the invariant. This object is not
+invariant-confluent and therefore not invariant-closed. Thus, previous tools
+depending on invariant-closure as a sufficient condition would be unable to
+conclude definitively that the object is \emph{not} invariant-confluent.
+
+We also reran the decision procedure, but this time with insertions into $X$
+and deletions from $Y$ disallowed. In less than a tenth of a second, the
+decision procedure correctly deduced that the object is now
+invariant-confluent. These results were manually proven
+in~\cite{bailis2014coordination}, but our tool was able to confirm them
+automatically in a negligible amount of time.
+
+\example[Auction]\examplelabel{AuctionEval}
+We now consider a simple auction system introduced in~\cite{gotsman2016cause}.
+Our object consists of a set $B$ of integer-valued bids and a optional winning
+bid $w$. Initially, $B = \emptyset$ and $w = \bot$ (indicating that there is no
+winning bid yet) and we merge states by taking the union of $B$ and the maximum
+of $w$ (where $\bot < n$ for all integers $n$). One transaction $t_b$ places a bid
+$b$ by inserting it into $B$. Another transaction $t_\text{close}$ closes the
+auction and sets $w$ equal to the largest bid in $B$. Our invariant is that if
+the auction is closed (i.e.\ $w \neq \bot$), then $w = \max(B)$. We ran our
+decision procedure on this example and in a third of a second, it produced a
+reachable counterexample witnessing the fact that the object is not
+invariant-confluent.  If we concurrently close the auction and place an large
+bid, then we can end up in a state in which the auction is closed, but there is
+a higher bid in $B$.
+
+We then segmented our object as follows. The first segment $(\setst{(B, w)}{w =
+\bot}, \setst{t_b}{b \in \ints})$ allows any bidding transaction so long as the
+bid is open. The second segment $(\setst{B, w}{I \cap w \neq \bot}, \emptyset)$
+includes all auctions which have already been closed and forbids all
+transactions. This segmentation captures the intuition that bids should be
+permitted only when the auction is open. We ran our segmented
+invariant-confluence decision procedure on this example, and it was able to
+deduce without any human interaction that the example was segmented
+invariant-confluent in less than a tenth of a second.
+
+\example[Escrow Transactions]\examplelabel{EscrowTransactionsEval}
+Escrow transactions are a concurrency control technique that allows a database
+to execute transactions that increment and decrement numeric values with more
+concurrency than is otherwise possible with general-purpose techniques like
+two-phase locking~\cite{o1986escrow}. The main idea is that a portion of the
+numeric value is put in escrow, after which a transaction can freely decrement
+the value so long as it is not decremented by more than the amount that has
+been escrowed. We now show how segmented invariant-confluence can be used to
+implement escrow transactions.
+
+Consider again the PN-Counter $s = (p_1, p_2, p_3), (n_1, n_2, n_3)$ from
+\exampleref{CounreachableExample} replicated on three servers with transactions
+to increment and decrement the PN-Counter. In
+\exampleref{CounreachableExample}, we found that concurrent decrements violate
+invariant-confluence which led us to a segmentation which prohibited concurrent
+decrements. We now propose a new segmentation with escrow amount $k$ that will
+allow us to perform concurrent decrements that respect the escrowed value. The
+first segment $(\setst{(p_1, p_2, p_3), (n_1, n_2, n_3)}{p_1, p_2, p_3 \geq k
+\land n_1, n_2, n_3 \leq k}, T)$ allows for concurrent increments and
+decrements so long as every $p_i \geq k$ and every $n_i \leq k$. Intuitively,
+this segment represents the situation in which every server has escrowed a
+value of $k$. They can decrement freely, so long as they don't exceed their
+escrow budget of $k$. The second segment is the one presented in
+\exampleref{CounreachableExample} which prohibits concurrent decrements. We ran
+our decision procedure on this example and it concluded that it was segmented
+invariant-confluent in less than a tenth of a second and without any human
+interaction.
+
+\textbf{TPC-C and Feral Concurrency Control.}
+
+TODO
 
 \subsection{Segmented Invariant Confluence}%
 \seclabel{SegmentedInvariantConfluenceEval}
-In this section, we evaluate the performance of replicating an object with
-segmented invariant-confluence as compared to replicating it with eventual
-consistency or linearizability. We begin with two benchmarks that demonstrate
-the same concept: the performance of segmented invariant-confluent replication
-varies with the amount of global coordination induced by either (a) performing
-a transaction that is disallowed within a segment or (b) transitioning between
+Now, we evaluate the performance of replicating an object with segmented
+invariant-confluence as compared to replicating it with eventual consistency or
+linearizability. We begin with two benchmarks that demonstrate the same
+concept: the performance of segmented invariant-confluent replication varies
+with the amount of global coordination induced by either (a) performing a
+transaction that is disallowed within a segment or (b) transitioning between
 segments.
 
 \begin{figure}[ht]
