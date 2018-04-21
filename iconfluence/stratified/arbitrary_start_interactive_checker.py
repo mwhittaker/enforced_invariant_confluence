@@ -137,7 +137,7 @@ class ArbitraryStartInteractiveChecker(ArbitraryStartChecker):
             zss.add(to_var_z == from_var_z)
         return zss, to_venv
 
-    def check(self) -> Decision:
+    def _check(self) -> Decision:
         if self.lhs is not None:
             assert self.rhs is not None, self.rhs
             if self.label is None:

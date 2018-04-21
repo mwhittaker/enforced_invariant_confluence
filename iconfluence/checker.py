@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any, Dict, Optional, Set
+import time
 
 from . import ast
 from . import typecheck
@@ -111,5 +112,12 @@ class Checker:
         inv = typecheck.typecheck_invariant(inv, self.type_env)
         self.invariants[name] = inv
 
-    def check(self) -> Decision:
+    def _check(self) -> Decision:
         raise NotImplementedError()
+
+    def check(self) -> Decision:
+        start = time.time()
+        ret = self._check()
+        stop = time.time()
+        print(f'Check took {stop - start} seconds.')
+        return ret

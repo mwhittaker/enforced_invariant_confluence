@@ -281,7 +281,7 @@ class InteractiveChecker(Checker):
 
             return Decision.UNKNOWN
 
-    def check(self) -> Decision:
+    def _check(self) -> Decision:
         # Make sure that both counterexamples are labelled, if they exist.
         msg = ('State {0} is unlabelled. Call `{0}_reachable()` to label ' +
                 'the state as reachable or `{0}_unreachable()` to label the ' +

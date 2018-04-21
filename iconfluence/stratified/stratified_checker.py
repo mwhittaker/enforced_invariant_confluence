@@ -121,7 +121,7 @@ class StratifiedChecker(Checker):
         self.strata.append(s)
         return s
 
-    def check(self) -> Decision:
+    def _check(self) -> Decision:
         # Check that there is at least one stratum.
         if len(self.strata) == 0:
             _wrap_print('Create strata with the stratum() method before ' +
@@ -135,8 +135,15 @@ class StratifiedChecker(Checker):
                 return Decision.YES
             elif Decision.NO in decisions:
                 return Decision.NO
+            elif Decision.UNKNOWN in decisions:
+                return Decision.UNKNOWN
             else:
-                assert Decision.UNKNOWN in decisions, decisions
+                assert None in decisions, decisions
+                _wrap_print('We\'re not sure if this object is ' +
+                            'invariant-confluent. Please call check() on '
+                            'each stratum and follow the instructions ' +
+                            'provided to determine if each stratum is ' +
+                            'invariant-confluent. Then, call check() again.')
                 return Decision.UNKNOWN
 
         # Check that the start state satisfies the invariant.

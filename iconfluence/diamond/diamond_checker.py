@@ -221,7 +221,7 @@ class DiamondChecker(Checker):
                         return False
         return True
 
-    def check(self) -> Decision:
+    def _check(self) -> Decision:
         # Criterion 1 is enforced automatically because the only available
         # datatypes are CRDTs.
 

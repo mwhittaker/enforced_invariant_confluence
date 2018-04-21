@@ -24,7 +24,7 @@ class GuessAndCheckChecker(checker.Checker):
         invs = self.invariants.values()
         return all(eval_invariant(inv, state) for inv in invs)
 
-    def check(self) -> checker.Decision:
+    def _check(self) -> checker.Decision:
         if self.verbose:
             print(f'Exploring {self.num_states} states...')
         self.state_explorer.explore(self.num_states)
