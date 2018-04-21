@@ -49,13 +49,13 @@ $ echo 'export PYTHONPATH="$PYTHONPATH:$HOME/z3/build/python"'
 Then, play with the examples in [`examples/`](examples/).
 
 ```bash
-$ PYTHONPATH=. python -i -m examples.all_datatypes
-$ PYTHONPATH=. python -i -m examples.auction
-$ PYTHONPATH=. python -i -m examples.bank_deposit_and_withdraw
-$ PYTHONPATH=. python -i -m examples.bank_deposit_only
-$ PYTHONPATH=. python -i -m examples.foreign_key
-$ PYTHONPATH=. python -i -m examples.subsets
-$ PYTHONPATH=. python -i -m examples.two_ints
+$ PYTHONPATH+=:. python -i -m examples.all_datatypes
+$ PYTHONPATH+=:. python -i -m examples.auction
+$ PYTHONPATH+=:. python -i -m examples.bank_deposit_and_withdraw
+$ PYTHONPATH+=:. python -i -m examples.bank_deposit_only
+$ PYTHONPATH+=:. python -i -m examples.foreign_key
+$ PYTHONPATH+=:. python -i -m examples.subsets
+$ PYTHONPATH+=:. python -i -m examples.two_ints
 ```
 
 ## Runtime
