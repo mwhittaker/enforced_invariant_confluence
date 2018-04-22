@@ -1,100 +1,91 @@
 \section{Related Work}
-We now discuss RedBlue consistency~\cite{li2012making, li2014automating}, the
-homeostasis protocol~\cite{roy2015homeostasis}, explicit
-consistency~\cite{balegas2015putting}, and token-based
-invariant-confluence~\cite{gotsman2016cause}: four very relevant pieces of
-work. We also briefly survey other related research in the area of
-invariant-confluence including program analysis in database systems, CRDTs, the
-CALM theorem, and interactive proof assistants.
+% Other possibilities:
+%   - Towards Fast Invariant Preservation in Geo-replicated Systems
+%   - Feral Concurrency Control
+%   - The CISE Tool: Proving Weakly-Consistent Applications Correct
+%   - Declarative Programming over Eventually Consistent Data Stores
+%   - Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants
 
-\newcommand{\sieve}{\textsc{sieve}}
+\newcommand{\sieve}{\textsc{SIEVE}}
 \textbf{RedBlue Consistency and \sieve.}
-RedBlue consistency is a form of consistency that sits between causal
-consistency and linearizability~\cite{li2012making}. With RedBlue consistency,
-every operation is labelled as red or blue. All operations are executed with
-causal consistency, but with the added restrictions that red operations are
-executed in a single total order embedded within the causal ordering.
-RedBlue consistency is similar to segmented invariant-confluence with a single
-segment in which all red operations are removed from the segment's set of
-allowable transactions. In~\cite{li2012making}, Li et al.\ define
-invariant safety as a sufficient condition for RedBlue consistent objects to be
+RedBlue consistency is a consistency model that sits between causal consistency
+and linearizability~\cite{li2012making}.
+%
+With RedBlue consistency, every operation is manually labelled as either red or
+blue. All operations are executed with causal consistency, but with the added
+restrictions that red operations are executed in a single total order embedded
+within the causal ordering.
+%
+Invariant safety is a sufficient condition for RedBlue consistent objects to be
 invariant-confluent. Invariant safety is an analog of invariant-closure for an
-operation-based (as opposed-to state based~\cite{shapiro2011conflict}) system
-model. In~\cite{li2014automating}, Li et al.\ develop techniques to identify
-which operations are invariant safe.  Like invariant-closure, invariant safety
-is a sufficient but not necessary condition for invariant-confluence. Li et
-al.\ develop sophisticated techniques for deciding invariant safety that
-involve calculating weakest preconditions.  These techniques are complementary
-to our work and can be used to improve the invariant-closure subroutine used by
-our decision procedures.
+operation-based system model (as opposed-to the state based system model that
+we use). In~\cite{li2014automating}, Li et al.\ develop techniques to identify
+invariant safe operations. Like invariant-closure, invariant safety is a
+sufficient but not necessary condition for invariant-confluence. Li et al.\
+develop sophisticated techniques for deciding invariant safety that involve
+calculating weakest preconditions. These techniques are complementary to our
+work and can be used to improve the invariant-closure subroutine used by our
+decision procedures.
 
 \textbf{The Homeostasis Protocol.}
 The homeostasis protocol~\cite{roy2015homeostasis} uses program analysis to
-avoid unnecessary coordination between servers in a sharded database. The
+avoid unnecessary coordination between servers in a \emph{sharded} database
+(whereas invariant-confluence targets \emph{replicated} databases). The
 protocol generates global invariants, called global treaties, and servers can
 operate without coordination so long as they preserve the treaty. When the
-treaty is violated, the nodes perform a round of coordination. The protocol
-guarantees that transactions are executed with observational equivalence with
-respect to some serial execution of the transactions. This means that
-intermediate states may be inconsistent, but externally observable side effects
-and the final database state are consistent. The observational equivalence
-guaranteed by the homeostasis is stronger than the guarantees of
-invariant-confluence. As a result, there are invariants and transaction
-workloads which the homeostasis protocol would execute with more coordination
+treaty is violated, the nodes perform a round of coordination and establish a
+new treaty. The protocol guarantees that transactions are executed with
+observational equivalence with respect to some serial execution of the
+transactions. This means that intermediate states may be inconsistent, but
+externally observable side effects and the final database state are consistent.
+The observational equivalence guaranteed by the homeostasis is stronger than
+the guarantees of invariant-confluence. As a result, there are invariants and
+workloads that the homeostasis protocol would execute with more coordination
 than a segmented invariant-confluent execution. Still, the homeostasis
 protocol's mechanism of establishing invariants and operating without
 coordination so long as the invariants are maintained is very similar to our
 design of segmented invariant-confluence.
 
 \textbf{Explicit Consistency.}
-A system provides explicit consistency with respect to a partial ordering of
-transactions if every server executes the transactions in a total order that
-respects the partial order and in a way such that the invariant is always
-preserved~\cite{balegas2015towards}. Thus, explicit consistency is like a
-combination of invariant-confluence and causal consistency, similar to RedBlue
-consistency. To determine if a workload is amenable to explicitly consistent
-replication, Balegas et al. determine if all pairs of transactions can be
-concurrently executed on the same start state without violating the invariant~\cite{balegas2015towards}.
-This is a sufficient condition for explicit consistency similar to criterion
-(3) in \thmref{LatticeProperty}. Balegas et al. also describe a variety of
+Explicit consistency~\cite{balegas2015towards} is a consistency model that
+combines invariant-confluence and causal consistency, similar to RedBlue
+consistency with invariant safety. To determine if a workload is amenable to
+explicitly consistent replication, Balegas et al.\ determine if all pairs of
+transactions can be concurrently executed on the same start state without
+violating the invariant~\cite{balegas2015towards}.  This is a sufficient
+condition for explicit consistency similar to criterion (3) in
+\thmref{LatticeProperty}. Balegas et al.\ also describe a variety of
 techniques---like conflict resolution, locking, and escrow
 transactions~\cite{o1986escrow}---that can be used to replicate workloads that
-do meet their sufficient conditions. Conflict resolution involves choosing an
-appropriate merge function; locking can be implemented as a single segment
-segmentation with certain transactions disallowed; and escrow transactions can
-be emulated with a segmentation that allows for concurrent decrements only when
-value being decremented is sufficiently large.
+do not meet their sufficient conditions. As discussed in \secref{Evaluation},
+simple forms of these techniques can be modelled with segmented
+invariant-confluence.
 
 \textbf{Token-Based Invariant-Confluence.}
 In~\cite{gotsman2016cause}, Gotsman et al.\ discuss a hybrid token-based
-consistency model that generalizes RedBlue consistency. An application designer
-defines a set of tokens and specifies which pairs of tokens conflict. Then,
-transactions acquire some subset of the tokens. This allows the application
-designer to specify which transactions conflict at a fine granularity. With no
-tokens, the model is equivalent to causal consistency. With all transactions
-acquiring a single self-conflicting token, the model is equivalent to
-sequential consistency~\cite{lamport1979make}. With some transactions acquiring
-a single self-conflicting token and some transactions acquiring no tokens, the
-model is equivalent to RedBlue consistency. Gotsman et al.\ develop sufficient
-conditions to determine whether a given token scheme is sufficient to guarantee
-that a global invariant is never broken. This model of consistency is very
-similar to segmented invariant-confluence. The token-based approach allows
-users to specify certain conflicts that are not possible with segmented
-invariant-confluence. A segmentation only allows transactions within a segment
-to acquire a single self-conflicting lock. However, segmented
-invariant-confluence also introduces the notion of segmenting the invariant,
-which cannot be emulated with the token based approach. For example,
-implementing \exampleref{SegmentedZ2} with the token-based approach is
-challenging without being able to segment the top-left quadrant from the
-bottom-right quadrant. An interesting direction for future work is to try and
-integrate the token-based approach into segmented invariant-confluence.
-
-% Towards Fast Invariant Preservation in Geo-replicated Systems
+consistency model that generalizes a family of consistency models including
+causal consistency, sequential consistency, and RedBlue consistency. An
+application designer defines a set of tokens and specifies which pairs of
+tokens conflict, and transactions acquire some subset of the tokens when they
+execute. This allows the application designer to specify which transactions
+conflict with each other.
 %
-% Feral
-% The CISE Tool: Proving Weakly-Consistent Applications Correct
-% Declarative Programming over Eventually Consistent Data Stores
-% Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants
+% With no tokens, the model is equivalent to causal consistency. With all
+% transactions acquiring a single self-conflicting token, the model is equivalent
+% to sequential consistency~\cite{lamport1979make}. With some transactions
+% acquiring a single self-conflicting token and some transactions acquiring no
+% tokens, the model is equivalent to RedBlue consistency.
+%
+Gotsman et al.\ develop sufficient conditions to determine whether a given
+token scheme is sufficient to guarantee that a global invariant is never
+broken. This model of consistency is very similar to segmented
+invariant-confluence. The token-based approach allows users to specify certain
+conflicts that are not possible with segmented invariant-confluence. A
+segmentation only allows transactions within a segment to acquire a single
+self-conflicting lock. However, segmented invariant-confluence also introduces
+the notion of invariant segmentation, which cannot be emulated with the token
+based approach. For example, it is difficult to emulate escrow transactions
+with the token-based approach.
 
 \textbf{CRDTs.}
 CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
@@ -104,10 +95,7 @@ the need for any coordination. Our definition of distributed objects and our
 invariant-confluence system model are inspired directly by the corresponding
 definitions and system models in~\cite{shapiro2011conflict}. Note that an
 invariant-confluent object does not necessarily have to be eventually
-consistent. In fact, equipping a distributed object with the trivial merge
-function $x \join y = x$ makes the object invariant-confluent with respect
-any set of transactions and any invariant, but it makes the object very
-inconsistent. Thus, it's natural (though not necessary) to use CRDTs as
+consistent, so it is natural (though not necessary) to use CRDTs as
 invariant-confluent distributed objects, achieving a combination of eventual
 consistency and invariant-preservation. Our criteria in
 \thmref{LatticeProperty} also borrow ideas from CRDTs, exploiting the nice
@@ -120,15 +108,15 @@ declarative Datalog-based programming languages that are designed to program
 distributed systems. The accompanying CALM
 theorem~\cite{hellerstein2010declarative, ameloot2013relational} states that if
 a program can be written in the monotone fragment of these languages, then
-there exists a coordination-free implementation of the program. Moreover,
-monotone programs are invariant to message reordering, whereas non-monotone
-programs may experience anomalies if messages are reordered in the network. The
-CALM theorem provides guarantees about the outputs of a program, but it does
-not guarantee that invariants are maintained throughout the duration of an
+there exists a coordination-free implementation of the program.
+% Moreover, monotone programs are invariant to message reordering, whereas
+% non-monotone programs may experience anomalies if messages are reordered in the
+% network.
+The CALM theorem provides guarantees about the outputs of a program, but it
+does not guarantee that invariants are maintained throughout the duration of an
 execution. Moreover, Bloom and Dedalus are general purpose programming
 languages that can be used to implement a variety of distributed systems (e.g.
-a sharded database), while invariant-confluence is defined strictly in the
-context of replicated data.
+a sharded database) which are outside of the scope of invariant-confluence.
 
 \textbf{Program Analysis in Database Systems.}
 Using program analysis to improve the performance of database systems is not
@@ -137,8 +125,7 @@ database-backed web applications~\cite{cheung2014using, wu2016transaction,
 ramachandra2012program} and used to improve the performance of optimistic
 concurrency control on multi-core machines~\cite{wu2016transaction}. Our work
 on invariant-confluence continues the theme of using program analysis to reap
-the performance benefits of understanding program semantics that would
-otherwise be left on the table.
+the performance benefits gained from understanding program semantics.
 
 % \textbf{Proof Assistants.}
 % Our interactive decision procedure bears resemblance to interactive proof
