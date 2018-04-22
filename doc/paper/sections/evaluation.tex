@@ -200,9 +200,43 @@ our decision procedure on this example and it concluded that it was segmented
 invariant-confluent in less than a tenth of a second and without any human
 interaction.
 
-\textbf{TPC-C and Feral Concurrency Control.}
+\example[TPC-C]\examplelabel{TpccEval}
+TPC-C is a ubiquitous OLTP database benchmark with a workload that models a
+simple warehousing application~\cite{difallah2013oltp}. The TPC-C specification
+outlines twelve ``consistency requirements'' (read invariants) that govern the
+warehousing application. In~\cite{bailis2014coordination}, Bailis et al.\
+categorize the invariants into one of three types:
+\begin{enumerate}
+  \item
+    Three of the twelve invariants are foreign key constraints.  As discussed
+    in \exampleref{ForeignKeysEval}, our decision procedures can automatically
+    verify conditions under which foreign key constraints are
+    invariant-confluent.
 
-TODO
+  \item
+    \newcommand{\ttt}[1]{{\smaller \texttt{#1}}}
+    Seven of the twelve invariants involve maintaining arithmetic relationships
+    between relations. Our decision procedures can correctly identify these as
+    invariant-confluent. Consider, for example, invariant 1 which dictates that
+    a warehouse's year to date balance \ttt{W\_YTD} is equal to the sum of the
+    district year to date balances \ttt{D\_YTD} of the twenty districts that
+    are associated with the warehouse. The Payment transaction randomly selects
+    a district and increments \ttt{W\_YTD} and \ttt{D\_YTD} by a randomly
+    generated amount. We model this workload with a PN-Counter for \ttt{W\_YTD}
+    and twenty PN-Counters for the twenty instances of \ttt{D\_YTD}. We applied
+    Lucy to this workload, and it determined that the workload was
+    invariant-confluent in less than a second.
+
+  \item
+    Two of the twelve invariants involve generating sequential and unique
+    identifiers. This workload is \emph{not} invariant-confluent, but when the
+    sequentiality requirement is dropped, it is invariant-confluent.
+    Unfortunately, modelling unique key generation in our theoretical framework
+    (and in our prototype implementation) is not possible because we have thus
+    far tacitly assumed that transaction execution is deterministic. We leave a
+    generalization of our theory to non-deterministic transactions for future
+    work.
+\end{enumerate}
 
 \subsection{Segmented Invariant Confluence}%
 \seclabel{SegmentedInvariantConfluenceEval}
