@@ -49,7 +49,7 @@ def plot_vary_withdraws(data):
     plt.semilogy(segmented_x, segmented_y, **IC_FMT)
     plt.semilogy(paxos_x, paxos_y, **LIN_FMT)
     plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.2), prop={'size': 12})
-    plt.xlabel('Fraction Withdrawals')
+    plt.xlabel('Decrement Frequency (fraction of workload)')
     plt.ylabel('Throughput (txns/s)')
     plt.savefig('vary_withdraws.pdf', bbox_inches='tight')
     plt.close()
