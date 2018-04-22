@@ -12,18 +12,18 @@ simple~\cite{herlihy1990linearizability}.  Unfortunately, strong consistency is
 at odds with performance. The CAP theorem and PACELC theorem tell us that
 strongly consistent systems suffer from higher latency at best and
 unavailability at worst~\cite{gilbert2002brewer, brewer2012cap,
-abadi2012consistency}. On the other hand, weak consistency models like
-eventual consistency~\cite{vogels2009eventually}, PRAM consistency~\cite{lipton1988pram},
-causal consistency~\cite{ahamad1995causal}, and others~\cite{lloyd2011don,
-mehdi2017can} allow data to be replicated with high availability and low
-latency, but they put a tremendous burden on the application designer to reason
-about the complex interleavings of operations that are allowed by these weak
-consistency models. In fact, weak consistency models strip an application
-developer of one of the earliest and most effective tools that is used to
-reason about the execution of programs: application
+abadi2012consistency}. On the other hand, weak consistency models like eventual
+consistency~\cite{vogels2009eventually}, PRAM
+consistency~\cite{lipton1988pram}, causal consistency~\cite{ahamad1995causal},
+and others~\cite{lloyd2011don, mehdi2017can} allow data to be replicated with
+high availability and low latency, but they put a tremendous burden on the
+application designer to reason about the complex interleavings of operations
+that are allowed by these weak consistency models. In fact, weak consistency
+models strip an application developer of one of the earliest and most effective
+tools that is used to reason about the execution of programs: application
 invariants~\cite{hoare1969axiomatic, balegas2015towards}. Even if every
 transaction executing in a weakly consistent system individually maintains an
-application invariant, the system as a whole can produce invariant-violating
+application invariant, the system as a whole can produce invariant violating
 states.
 
 Is it possible for us to have our strongly consistent cake and eat it with high
@@ -32,61 +32,63 @@ still ensure that its invariants are maintained? Yes, sometimes. Bailis et al.\
 introduced the notion of \invariantconfluence{} as a necessary and sufficient
 condition for when invariants can be maintained over replicated data without
 the need for any coordination~\cite{bailis2014coordination}. If an object is
-invariant-confluent with respect to an invariant, we can replicate it with the
-performance benefits of weak consistency and (some of) the correctness benefits
-of strong consistency. However, the task of identifying whether or not an
-object actually is invariant-confluent remains a challenge. Bailis et al.\
+\invariantconfluent{} with respect to an invariant, we can replicate it with
+the performance benefits of weak consistency and (some of) the correctness
+benefits of strong consistency. However, the task of identifying whether or not
+an object actually is \invariantconfluent{} remains a challenge. Bailis et al.\
 manually categorized a set of common objects, transactions, and invariants
 (e.g.\ foreign key constraints on relations, linear constraints on integers) as
-invariant-confluent or not, but ideally we would have a general purpose program
-that can automatically determine \invariantconfluence{} for us. \textbf{The first
-main thrust of this paper is to make progress towards a general-purpose
-\invariantconfluence{} decision procedure.}
+\invariantconfluent{} or not, but ideally we would have a general purpose
+program that can automatically determine \invariantconfluence{} for us.
+\textbf{The first main thrust of this paper is to make progress towards a
+general-purpose \invariantconfluence{} decision procedure.}
 
 Designing a general-purpose \invariantconfluence{} decision procedure is
 difficult\footnote{Actually, it's impossible. Determining whether an object is
-invariant-confluent is, in general, undecidable. Still, we can develop a
+\invariantconfluent{} is, in general, undecidable. Still, we can develop a
 decision procedure that works well in the common case.}. Many existing
-approaches instead develop a decision procedure for invariant-closure, a
+approaches instead develop a decision procedure for \invariantclosure{}, a
 sufficient (but not necessary) condition for
 \invariantconfluence{}~\cite{li2012making, li2014automating}. The existing
-approaches check to see if an object is invariant-closed. If it is, then they
-conclude that it is also invariant-confluent. If it's not, then the current
+approaches check to see if an object is \invariantclosed{}. If it is, then they
+conclude that it is also \invariantconfluent{}. If it's not, then the current
 approaches are unable to conclude anything about whether or not the object is
-invariant-confluent. In this paper, we take a step back and study the
-underlying reason \emph{why} invariant-closure is not necessary for
+\invariantconfluent{}. In this paper, we take a step back and study the
+underlying reason \emph{why} \invariantclosure{} is not necessary for
 \invariantconfluence{}. We find that \invariantconfluence{} is fundamentally a
 property about reachability, about whether certain values of our replicated
 object can actually be obtained in the execution of a system. We discover that
-unreachable, yet invariant-satisfying, states cause invariant-closure to be an
-unnecessary condition. Using this understanding, we construct a set of modest
-conditions under which invariant-closure and \invariantconfluence{} are in fact
-\emph{equivalent}, allowing us to reduce the problem of determining
-\invariantconfluence{} to that of determining invariant-closure.
+unreachable, yet invariant satisfying, states cause \invariantclosure{} to be
+an unnecessary condition. Using this understanding, we construct a set of
+modest conditions under which \invariantclosure{} and \invariantconfluence{}
+are in fact \emph{equivalent}, allowing us to reduce the problem of determining
+\invariantconfluence{} to that of determining \invariantclosure{}.
 
 Then, we use these conditions to design a general-purpose interactive
 \invariantconfluence{} decision procedure. Users iteratively interact with the
 decision procedure, eliminating unreachable states from the invariant, moving
-towards the conditions under which invariant-closure and \invariantconfluence{}
-are equivalent. Meanwhile, the decision-procedure generates example reachable
-and unreachable states which help the user recognize patterns that describe
-reachability. We also leverage our intuitions about reachability to develop a
-new sufficient condition for \invariantconfluence{}, dubbed merge-reducibility.
-Merge-reducibility covers some cases that are not covered by invariant-closure,
-and it can be automatically checked without any user interaction.
+towards the conditions under which \invariantclosure{} and
+\invariantconfluence{} are equivalent. Meanwhile, the decision-procedure
+generates example reachable and unreachable states which help the user
+recognize patterns that describe reachability. We also leverage our intuitions
+about reachability to develop a new sufficient condition for
+\invariantconfluence{}, dubbed \mergereducibility. \Mergereducibility{} covers
+some cases that are not covered by \invariantclosure{}, and it can be
+automatically checked without any user interaction.
 
 \textbf{The second main thrust of this paper is to take a step beyond
-  \invariantconfluence{} and develop a generalization of \invariantconfluence{}
+\invariantconfluence{} and develop a generalization of \invariantconfluence{}
 called segmented \invariantconfluence{}.} While \invariantconfluence{}
 characterizes objects which can be replicated \emph{without any} coordination,
-segmented \invariantconfluence{} allows us to replicate non-invariant-confluent
-objects with \emph{minimal coordination}. The main idea is that
-invariant-satisfying states are divided into a number of segments, and the set
-of allowable of transactions within each segment is restricted. Within a
-segment, servers act without any coordination, synchronizing only to transition
-across segment boundaries. This design highlights the trade-off between
-application complexity and coordination-freedom; more complex applications
-require more segments which require more coordination, and vice-versa.
+segmented \invariantconfluence{} allows us to replicate
+non-\invariantconfluent{} objects with \emph{minimal coordination}. The main
+idea is that invariant satisfying states are divided into a number of segments,
+and the set of allowable transactions within each segment is restricted.
+Within a segment, servers act without any coordination, synchronizing only to
+transition across segment boundaries. This design highlights the trade-off
+between application complexity and coordination-freedom; more complex
+applications require more segments which require more coordination, and
+vice-versa.
 
 In closing, here is an outline of the paper and of our contributions:
 \begin{itemize}
@@ -95,7 +97,7 @@ In closing, here is an outline of the paper and of our contributions:
     that is both formal and simple (\secref{InvariantConfluence}).
 
   \item
-    We develop an understanding of why invariant-closure is not necessary and
+    We develop an understanding of why \invariantclosure{} is not necessary and
     use this understanding to develop conditions under which it is both
     necessary and sufficient (\secref{InvariantClosure}).
 
@@ -106,18 +108,17 @@ In closing, here is an outline of the paper and of our contributions:
 
   \item
     We again exploit these conditions to design a novel non-trivial sufficient
-    condition for \invariantconfluence{}, merge-reducibility, that does not
+    condition for \invariantconfluence{}, \mergereducibility, that does not
     depend on user interaction (\secref{MergeReduction}).
 
   \item
     We present segmented \invariantconfluence{}: a generalization of
     \invariantconfluence{} that uses a small amount of coordination to maintain
     invariants for replicated objects that are otherwise not
-    invariant-confluent (\secref{SegmentedInvariantConfluence}).
+    \invariantconfluent{} (\secref{SegmentedInvariantConfluence}).
 
   \item
     We implement our decision procedures and sufficient conditions for both
-    \invariantconfluence{} and segmented \invariantconfluence{} in a system called
-    Lucy, then use Lucy to evaluate the efficacy or our methods
-    (\secref{Evaluation}).
+    \invariantconfluence{} and segmented \invariantconfluence{} in a system
+    called Lucy, then use Lucy to evaluate our methods (\secref{Evaluation}).
 \end{itemize}
