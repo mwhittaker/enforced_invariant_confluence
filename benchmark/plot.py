@@ -10,16 +10,19 @@ EVENTUAL_FMT = {
     'label': 'eventual',
     'marker': 'o',
     'linewidth': 2,
+    'markersize': 8,
 }
 IC_FMT = {
     'label': 'segmented',
-    'marker': 'o',
+    'marker': 's',
     'linewidth': 2,
+    'markersize': 8,
 }
 LIN_FMT = {
     'label': 'linearizable',
     'marker': '^',
     'linewidth': 2,
+    'markersize': 8,
 }
 
 def load_csv(filename):
