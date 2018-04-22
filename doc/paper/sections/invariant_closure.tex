@@ -1,4 +1,4 @@
-\section{Invariant-Closure}\seclabel{InvariantClosure}
+\section{Invariant Closure}\seclabel{InvariantClosure}
 Our ultimate goal is to write a program that can automatically decide whether a
 given distributed object $O$ is \sTIconfluent{}. Such a program has to
 automatically prove or disprove that every reachable state satisfies the
@@ -6,15 +6,15 @@ invariant. However, automatically reasoning about the possibly infinite set of
 reachable states is challenging, especially because transactions and merge
 functions can be complex and can be interleaved arbitrarily in an execution.
 Due to this complexity, existing systems that aim to automatically decide
-invariant-confluence instead focus on deciding a sufficient condition for
-invariant-confluence---dubbed \defword{invariant-closure}---that is simpler to
+\invariantconfluence{} instead focus on deciding a sufficient condition for
+\invariantconfluence{}---dubbed \defword{\invariantclosure{}}---that is simpler to
 reason about~\cite{li2012making, li2014automating}. In this section, we define
-invariant-closure and study why the condition is sufficient but not necessary.
+\invariantclosure{} and study why the condition is sufficient but not necessary.
 Armed with this understanding, we present conditions under which it is both
 sufficient and necessary.
 
-We say an object $O = (S, \join)$ is \defword{invariant-closed} with respect to
-an invariant $I$, abbreviated \defword{\Iclosed{}}, if invariant-satisfying
+We say an object $O = (S, \join)$ is \defword{\invariantclosed{}} with respect to
+an invariant $I$, abbreviated \defword{\Iclosed{}}, if invariant satisfying
 states are closed under merge. That is, for every state $s_1, s_2 \in S$, if
 $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
 
@@ -24,22 +24,22 @@ $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
   then $O$ is \sTIconfluent{}.
 \end{theorem}
 
-\thmref{IclosureImpliesIconfluence} states that invariant-closure is
-sufficient for invariant-confluence. Intuitively, our system model ensures that
+\thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is
+sufficient for \invariantconfluence{}. Intuitively, our system model ensures that
 transaction execution preserves the invariant, so if merging states also
 preserves the invariant and if our start state satisfies the invariant, then
 inductively it is impossible for us to reach a state that doesn't satisfy the
 invariant.
 
-This is good news because checking if an object is invariant-closed is more
-straightforward than checking if it is invariant-confluent. Existing systems
+This is good news because checking if an object is \invariantclosed{} is more
+straightforward than checking if it is \invariantconfluent{}. Existing systems
 typically use an SMT solver like Z3 to check if an object is
-invariant-closed~\cite{de2008z3, balegas2015putting, gotsman2016cause}. If it
-is, then by \thmref{IclosureImpliesIconfluence}, it is invariant-confluent.
-Unfortunately, invariant-closure is \emph{not} necessary for
-invariant-confluence, so if an object is \emph{not} invariant-closed, these
-systems cannot conclude that the object is \emph{not} invariant-confluent. The
-reason why invariant-closure is not necessary for invariant-confluence is best
+\invariantclosed{}~\cite{de2008z3, balegas2015putting, gotsman2016cause}. If it
+is, then by \thmref{IclosureImpliesIconfluence}, it is \invariantconfluent{}.
+Unfortunately, \invariantclosure{} is \emph{not} necessary for
+\invariantconfluence{}, so if an object is \emph{not} \invariantclosed{}, these
+systems cannot conclude that the object is \emph{not} \invariantconfluent{}. The
+reason why \invariantclosure{} is not necessary for \invariantconfluence{} is best
 explained through an example.
 
 \begin{example}\examplelabel{Z2}
@@ -55,28 +55,28 @@ explained through an example.
   in which we draw each state $(x, y)$ as a point in space. The invariant
   consists of the second and fourth quadrant, and the reachable states consist
   of the fourth quadrant. From this, it's immediate that the reachable states
-  are a subset of the invariant, so $O$ is invariant-confluent. However,
+  are a subset of the invariant, so $O$ is \invariantconfluent{}. However,
   letting $s_1 = (-1, 1)$ and $s_2 = (1, -1)$, we see that $O$ is not
-  invariant-closed. $I(s_1)$ and $I(s_2)$, but letting $s_3 = s_1 \join s_2 =
+  \invariantclosed{}. $I(s_1)$ and $I(s_2)$, but letting $s_3 = s_1 \join s_2 =
   (1, 1)$, we see $\lnot I(s_3)$.
 \end{example}
 
 {\input{figures/z2}}
 
 In \exampleref{Z2}, $s_1$ and $s_2$ witness the fact that $O$ is not
-invariant-closed, but $s_1$ is not reachable. This is not particular to
-\exampleref{Z2}. In fact, it is fundamentally the reason why invariant-closure
-is not equivalent to invariant-confluence. Invariant-confluence is, at its
-core, a property of reachable states, but invariant-closure is completely
-ignorant of reachability. As a result, invariant-satisfying yet unreachable
-states like $s_1$ are the key hurdle preventing invariant-closure from being
-equivalent to invariant-confluence. This is formalized by
+\invariantclosed{}, but $s_1$ is not reachable. This is not particular to
+\exampleref{Z2}. In fact, it is fundamentally the reason why \invariantclosure{}
+is not equivalent to \invariantconfluence{}. \Invariantconfluence{} is, at its
+core, a property of reachable states, but \invariantclosure{} is completely
+ignorant of reachability. As a result, invariant satisfying yet unreachable
+states like $s_1$ are the key hurdle preventing \invariantclosure{} from being
+equivalent to \invariantconfluence{}. This is formalized by
 \thmref{IclosureEquivalentIconfluence}
 
 \begin{theorem}\thmlabel{IclosureEquivalentIconfluence}
   Consider an object $O = (S, \join)$, a start state $s_0 \in S$, a set of
   transactions $T$, and an invariant $I$. If the invariant is a subset of the
-  reachable states (i.e. $I \subseteq \setst{s \in S}{\sTIreachable{s}}$), then
+  reachable states (i.e. $I \subseteq \setst{s \in S}{\sTIreachablepredicate{s}}$), then
   \[
     \text{$I(s_0)$ and $O$ is \Iclosed{}} \iff \text{$O$ is \sTIconfluent{}}
   \]
@@ -90,9 +90,9 @@ equivalent to invariant-confluence. This is formalized by
   \join s_2$, satisfy the invariant.
 \end{proof}
 
-% - define invariant-closure and introduce it as a sufficient condition
+% - define \invariantclosure{} and introduce it as a sufficient condition
 % - cite existing work to show that people have used invariant closure to
-%   reason about invariant-confluence
+%   reason about \invariantconfluence{}
 % - explain why invariant closure can fail and why its not sufficient using the
 %   two-integers example
 % - state main theorem

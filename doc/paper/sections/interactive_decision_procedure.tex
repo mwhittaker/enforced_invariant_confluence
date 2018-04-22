@@ -17,8 +17,8 @@
 
     \State
 
-    \algocomment{$R$ is a set of $\sTIreachable{}$ states.}
-    \algocomment{$NR$ is a set of $\sTIunreachable{}$ states.}
+    \algocomment{$R$ is a set of \sTIreachable{} states.}
+    \algocomment{$NR$ is a set of \sTIunreachable{} states.}
     \algocomment{$I(s_0)$ is a precondition.}
     \Function{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
       \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I - NR$}
@@ -76,24 +76,24 @@ procedure using an SMT solver like Z3~\cite{de2008z3}.
 reachable, so if it does not satisfy the invariant, then $O$ is not
 \sTIconfluent{} and \IsInvConfluent{} returns false. Otherwise,
 \IsInvConfluent{} calls a helper function \Helper{} which---in addition to $O$,
-$s_0$, $T$, and $I$---takes as arguments a set $R$ of $\sTIreachable{}$ states
-and a set $NR$ of $\sTIunreachable{}$ states. Like \IsInvConfluent, \Helper$(O,
+$s_0$, $T$, and $I$---takes as arguments a set $R$ of \sTIreachable{} states
+and a set $NR$ of \sTIunreachable{} states. Like \IsInvConfluent, \Helper$(O,
 s_0, T, I, R, NR)$ returns whether $O$ is \sTIconfluent{} (assuming $R$ and
 $NR$ are correct).  As \algoref{InteractiveDecisionProcedure} executes, $NR$ is
 iteratively increased which removes unreachable states from $I$ until $I
-\subseteq \setst{s}{\sTIreachable{s}}$.
+\subseteq \setst{s}{\sTIreachablepredicate{s}}$.
 
 First, \Helper{} checks to see if $O$ is \iclosed{(I - NR)}.
 %
 If \IsIclosed{} determines that $O$ is \iclosed{(I - NR)}, then by
 \thmref{IclosureImpliesIconfluence}, $O$ is \sticonfluent{s_0}{T}{I-NR}, so
 \[
-  \setst{s \in S}{\stireachable{s_0}{T}{I-NR}{s}}
+  \setst{s \in S}{\stireachablepredicate{s_0}{T}{I-NR}{s}}
     \subseteq I - NR
     \subseteq I
 \]
-If $NR$ only contains $\sTIunreachable{}$ states, then the set of
-$\sTIreachable{}$ states is equal to set of $\stireachable{s_0}{T}{I-NR}{}$
+If $NR$ only contains \sTIunreachable{} states, then the set of
+\sTIreachable{} states is equal to set of \stireachable{s_0}{T}{I-NR}{}
 states which, as we just showed, is a subset of $I$.  Thus, $O$ is
 \sTIconfluent{}, so \Helper{} return true.
 
@@ -112,11 +112,11 @@ can also refine $I$ by augmenting $R$ and $NR$ arbitrarily (see
 \figref{DecisionProcedureExample} for an example). In this step, we also make
 sure that $s_0 \notin NR$ since we know that $s_0$ is reachable.
 
-After $s_1$ and $s_2$ have been labelled as $\sTIreachable{}$ or not, we
-continue. If both $s_1$ and $s_2$ are $\sTIreachable{}$, then so is $s_1 \join
+After $s_1$ and $s_2$ have been labelled as \sTIreachable{} or not, we
+continue. If both $s_1$ and $s_2$ are \sTIreachable{}, then so is $s_1 \join
 s_2$, but $\lnot I(s_1 \join s_2)$. Thus, $O$ is not \sTIconfluent{}, so
 \Helper{} returns false. Otherwise, one of $s_1$ and $s_2$ is
-$\sTIunreachable{}$, so we recurse.
+\sTIunreachable{}, so we recurse.
 
 \Helper{} recurses only when one of $s_1$ or $s_2$ is unreachable, so $NR$
 grows after every recursive invocation of \Helper{}. Similarly, $R$ continues
@@ -143,8 +143,8 @@ In this case, \Helper{} might erroneously find $s_1$ and $s_2 \in R$ and return
 false, concluding that $O$ is not \sTIconfluent{} even when it is.  This is
 inconvenient, but not catastrophic. We can modify
 \algoref{InteractiveDecisionProcedure} so that \Helper{} requires that whenever
-a user labels a state $s$ as $\sTIreachable{}$, they must also provide an
-$\sTIreachable{}$ expression $e$ that evaluates to $s$. Here, $e$ acts a proof
+a user labels a state $s$ as \sTIreachable{}, they must also provide an
+\sTIreachable{} expression $e$ that evaluates to $s$. Here, $e$ acts a proof
 that certifies that $s$ is indeed reachable. This increases the burden on the
 user but completely eliminates this class of errors.
 
@@ -162,6 +162,6 @@ it might not be \sTIconfluent{}). Thus, when a user replicates their
 distributed object across a set of servers, they can deploy with the invariant
 $I - NR$ instead of $I$. If $NR$ is correct and only contains unreachable
 states, then deploying with $I - NR$ is equivalent to deploying with $I$. If
-$NR$ is incorrect and contains some $\sTIreachable{}$ states, then some of
+$NR$ is incorrect and contains some \sTIreachable{} states, then some of
 these states are artificially made unreachable, but the system is still
 guaranteed to never produce a state which violates $I$.

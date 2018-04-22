@@ -17,20 +17,20 @@ restrictions that red operations are executed in a single total order embedded
 within the causal ordering.
 %
 Invariant safety is a sufficient condition for RedBlue consistent objects to be
-invariant-confluent. Invariant safety is an analog of invariant-closure for an
+\invariantconfluent{}. Invariant safety is an analog of \invariantclosure{} for an
 operation-based system model (as opposed-to the state based system model that
 we use). In~\cite{li2014automating}, Li et al.\ develop techniques to identify
-invariant safe operations. Like invariant-closure, invariant safety is a
-sufficient but not necessary condition for invariant-confluence. Li et al.\
+invariant safe operations. Like \invariantclosure{}, invariant safety is a
+sufficient but not necessary condition for \invariantconfluence{}. Li et al.\
 develop sophisticated techniques for deciding invariant safety that involve
 calculating weakest preconditions. These techniques are complementary to our
-work and can be used to improve the invariant-closure subroutine used by our
+work and can be used to improve the \invariantclosure{} subroutine used by our
 decision procedures.
 
 \textbf{The Homeostasis Protocol.}
 The homeostasis protocol~\cite{roy2015homeostasis} uses program analysis to
 avoid unnecessary coordination between servers in a \emph{sharded} database
-(whereas invariant-confluence targets \emph{replicated} databases). The
+(whereas \invariantconfluence{} targets \emph{replicated} databases). The
 protocol generates global invariants, called global treaties, and servers can
 operate without coordination so long as they preserve the treaty. When the
 treaty is violated, the nodes perform a round of coordination and establish a
@@ -39,16 +39,16 @@ observational equivalence with respect to some serial execution of the
 transactions. This means that intermediate states may be inconsistent, but
 externally observable side effects and the final database state are consistent.
 The observational equivalence guaranteed by the homeostasis is stronger than
-the guarantees of invariant-confluence. As a result, there are invariants and
+the guarantees of \invariantconfluence{}. As a result, there are invariants and
 workloads that the homeostasis protocol would execute with more coordination
-than a segmented invariant-confluent execution. Still, the homeostasis
+than a segmented \invariantconfluent{} execution. Still, the homeostasis
 protocol's mechanism of establishing invariants and operating without
 coordination so long as the invariants are maintained is very similar to our
-design of segmented invariant-confluence.
+design of segmented \invariantconfluence{}.
 
 \textbf{Explicit Consistency.}
 Explicit consistency~\cite{balegas2015towards} is a consistency model that
-combines invariant-confluence and causal consistency, similar to RedBlue
+combines \invariantconfluence{} and causal consistency, similar to RedBlue
 consistency with invariant safety. To determine if a workload is amenable to
 explicitly consistent replication, Balegas et al.\ determine if all pairs of
 transactions can be concurrently executed on the same start state without
@@ -59,9 +59,9 @@ techniques---like conflict resolution, locking, and escrow
 transactions~\cite{o1986escrow}---that can be used to replicate workloads that
 do not meet their sufficient conditions. As discussed in \secref{Evaluation},
 simple forms of these techniques can be modelled with segmented
-invariant-confluence.
+\invariantconfluence{}.
 
-\textbf{Token-Based Invariant-Confluence.}
+\textbf{Token Based Invariant Confluence.}
 In~\cite{gotsman2016cause}, Gotsman et al.\ discuss a hybrid token-based
 consistency model that generalizes a family of consistency models including
 causal consistency, sequential consistency, and RedBlue consistency. An
@@ -79,10 +79,10 @@ conflict with each other.
 Gotsman et al.\ develop sufficient conditions to determine whether a given
 token scheme is sufficient to guarantee that a global invariant is never
 broken. This model of consistency is very similar to segmented
-invariant-confluence. The token-based approach allows users to specify certain
-conflicts that are not possible with segmented invariant-confluence. A
+\invariantconfluence{}. The token-based approach allows users to specify certain
+conflicts that are not possible with segmented \invariantconfluence{}. A
 segmentation only allows transactions within a segment to acquire a single
-self-conflicting lock. However, segmented invariant-confluence also introduces
+self-conflicting lock. However, segmented \invariantconfluence{} also introduces
 the notion of invariant segmentation, which cannot be emulated with the token
 based approach. For example, it is difficult to emulate escrow transactions
 with the token-based approach.
@@ -92,12 +92,12 @@ CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
 semilattices with inflationary update methods. Due to their algebraic
 properties, CRDTs can be replicated with strong eventual consistency without
 the need for any coordination. Our definition of distributed objects and our
-invariant-confluence system model are inspired directly by the corresponding
+\invariantconfluence{} system model are inspired directly by the corresponding
 definitions and system models in~\cite{shapiro2011conflict}. Note that an
-invariant-confluent object does not necessarily have to be eventually
+\invariantconfluent{} object does not necessarily have to be eventually
 consistent, so it is natural (though not necessary) to use CRDTs as
-invariant-confluent distributed objects, achieving a combination of eventual
-consistency and invariant-preservation. Our criteria in
+\invariantconfluent{} distributed objects, achieving a combination of eventual
+consistency and invariant preservation. Our criteria in
 \thmref{LatticeProperty} also borrow ideas from CRDTs, exploiting the nice
 algebraic properties of semilattices.
 
@@ -116,7 +116,7 @@ The CALM theorem provides guarantees about the outputs of a program, but it
 does not guarantee that invariants are maintained throughout the duration of an
 execution. Moreover, Bloom and Dedalus are general purpose programming
 languages that can be used to implement a variety of distributed systems (e.g.
-a sharded database) which are outside of the scope of invariant-confluence.
+a sharded database) which are outside of the scope of \invariantconfluence{}.
 
 \textbf{Program Analysis in Database Systems.}
 Using program analysis to improve the performance of database systems is not
@@ -124,7 +124,7 @@ new. For example, it has been used to improve the performance of
 database-backed web applications~\cite{cheung2014using, wu2016transaction,
 ramachandra2012program} and used to improve the performance of optimistic
 concurrency control on multi-core machines~\cite{wu2016transaction}. Our work
-on invariant-confluence continues the theme of using program analysis to reap
+on \invariantconfluence{} continues the theme of using program analysis to reap
 the performance benefits gained from understanding program semantics.
 
 % \textbf{Proof Assistants.}
@@ -134,7 +134,7 @@ the performance benefits gained from understanding program semantics.
 % assistants guide users through the process of interactively provided a proof
 % that witnesses the validity of a formula. Our interactive decision procedure
 % guides users through the process of interactively generating a set of reachable
-% and unreachable points that witness the invariant-confluence of an object. An
+% and unreachable points that witness the \invariantconfluence{} of an object. An
 % interesting avenue for future work is to integrate an proof assistant into our
 % interactive decision procedure. For example, a proof assistant could verify
 % that a state labelled unreachable by a user is actually unreachable.

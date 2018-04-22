@@ -1,29 +1,29 @@
-\section{Segmented Invariant-Confluence}\seclabel{SegmentedInvariantConfluence}
+\section{Segmented Invariant Confluence}\seclabel{SegmentedInvariantConfluence}
 \newcommand{\IsIclosed}{\textsf{IsIclosed}}
 
-If a distributed object is invariant-confluent, then the object can be
+If a distributed object is \invariantconfluent{}, then the object can be
 replicated without the need for any form of coordination to maintain the
-object's invariant. But what if the object is \emph{not} invariant-confluent?
-In this section, we present a generalization of invariant-confluence called
-\defword{segmented invariant-confluence} that can be used to maintain the
-invariants of non-invariant-confluent objects, requiring only a small amount of
+object's invariant. But what if the object is \emph{not} \invariantconfluent{}?
+In this section, we present a generalization of \invariantconfluence{} called
+\defword{segmented \invariantconfluence{}} that can be used to maintain the
+invariants of non-\invariantconfluent{} objects, requiring only a small amount of
 coordination.
 
-The main idea behind segmented invariant-confluence is to segment the state
+The main idea behind segmented \invariantconfluence{} is to segment the state
 space into a number of segments and restrict the set of allowable transactions
-within each segment in such a way that the object is invariant-confluent
+within each segment in such a way that the object is \invariantconfluent{}
 \emph{within each segment} (even though it may not be globally
-invariant-confluent). Then, servers can run coordination-free within a segment
+\invariantconfluent{}). Then, servers can run coordination-free within a segment
 and need only coordinate when transitioning from one segment to another. We now
-formalize segmented invariant-confluence, describe the system model we use to
-replicate segmented invariant-confluent objects, and introduce a segmented
-invariant-confluence decision procedure.
+formalize segmented \invariantconfluence{}, describe the system model we use to
+replicate segmented \invariantconfluent{} objects, and introduce a segmented
+\invariantconfluence{} decision procedure.
 
 \subsection{Formalism}
 Consider a distributed object $O = (S, \join)$, a start state $s_0 \in S$, a
 set of transitions $T$, and an invariant $I$. A segmentation $\Sigma = (I_1,
 T_1), \ldots, (I_n, T_n)$ is a sequence of $n$ segments $(I_i, T_i)$ where
-every $T_i$ is a subset of $T$. $O$ is \defword{segmented invariant-confluent}
+every $T_i$ is a subset of $T$. $O$ is \defword{segmented \invariantconfluent{}}
 with respect to $s_0$, $T$, $I$, and $\Sigma$, abbreviated
 \defword{\sTISconfluent}, if the following conditions hold:
 \begin{itemize}
@@ -36,7 +36,7 @@ with respect to $s_0$, $T$, $I$, and $\Sigma$, abbreviated
     they do not have to partition $I$; they just have to cover $I$.
 
   \item
-    $O$ is invariant-confluent within each segment. That is, for every $(I_i,
+    $O$ is \invariantconfluent{} within each segment. That is, for every $(I_i,
     T_i) \in \Sigma$ and for every state $s \in I_i$, $O$ is
     \sticonfluent{s}{T_i}{I_i}.
 \end{itemize}
@@ -66,7 +66,7 @@ with respect to $s_0$, $T$, $I$, and $\Sigma$, abbreviated
 
 \subsection{System Model}
 Now, we describe the system model used to replicate a segmented
-invariant-confluent object without any coordination within a segment and with
+\invariantconfluent{} object without any coordination within a segment and with
 only a small amount of coordination when transitioning between segments. As
 before, we replicate an object $O$ across a set $p_1, \ldots, p_n$ of $n$
 servers each of which manages a replica $s_i \in S$ of the object. Every server
@@ -78,8 +78,8 @@ see momentarily the significance of the active segment.
 
 As before, servers repeatedly perform one of two actions: execute a transaction
 or merge states with another server. Merging states in the segmented
-invariant-confluence system model is identical to merging states in the
-invariant-confluence system model. A server $p_i$ sends its state $s_i$ to
+\invariantconfluence{} system model is identical to merging states in the
+\invariantconfluence{} system model. A server $p_i$ sends its state $s_i$ to
 another server $p_j$ which \emph{must} merge $s_i$ into its state $s_j$.
 %
 Transaction execution in the new system model, on the other hand, is a bit more
@@ -113,7 +113,7 @@ global coordination to execute $t$, as described in the previous paragraph.
 Transaction execution is summarized in \algoref{TxnExecution}.
 
 \begin{algorithm}[t]
-  \caption{Transaction execution in segmented invariant-confluence system model}%
+  \caption{Transaction execution in segmented \invariantconfluence{} system model}%
   \algolabel{TxnExecution}
   \begin{algorithmic}
     \If{$t \notin T_i$}
@@ -128,23 +128,23 @@ Transaction execution is summarized in \algoref{TxnExecution}.
 \end{algorithm}
 
 This system model guarantees that all replicas of a segmented
-invariant-confluent object always satisfy the invariant. All servers begin in
+\invariantconfluent{} object always satisfy the invariant. All servers begin in
 the same initial state and with the same active segment. Thus, because $O$ is
-invariant-confluent with respect to every segment, servers can execute
+\invariantconfluent{} with respect to every segment, servers can execute
 transactions within the active segment without any coordination and guarantee
 that the invariant is never violated. Any operation that would violate the
-assumptions of invariant-confluence system model (e.g.\ executing a transaction
+assumptions of \invariantconfluence{} system model (e.g.\ executing a transaction
 that's not permitted in the active segment or executing a permitted transaction
 that leads to a state outside the active segment) triggers a global
 coordination. Globally coordinated transactions are only executed if they
 maintain the invariant. Moreover, if a globally coordinated transaction leads
 to another segment, the coordination ensures that all servers begin in the same
 start state and with the same active replica, reestablishing the assumptions of
-the invariant-confluence system model.
+the \invariantconfluence{} system model.
 
 \subsection{Interactive Decision Procedure}
 In order to determine whether or not an object $O$ is \sTISconfluent{} we have
-to determine whether or not $O$ is invariant-confluent within each segment
+to determine whether or not $O$ is \invariantconfluent{} within each segment
 $(I_i, T_i) \in \Sigma$. That is, we have determine if $O$ is
 \sticonfluent{s}{T_i}{I_i} confluent for every state $s \in I_i$. Ideally, we
 could leverage \algoref{InteractiveDecisionProcedure}, invoking it once per
@@ -160,13 +160,13 @@ an object is \sticonfluent{s}{T}{I} for every state $s \in I$. To do so, we
 need to extend the notion of reachability to a notion of coreachability and
 then generalize \thmref{IclosureEquivalentIconfluence}. Two states $s_1, s_2
 \in I$ are \defword{coreachable} with respect to $T$ and $I$, abbreviated
-\defword{$\TIcoreachable{s_1, s_2}$}, if there exists some state $s_0 \in I$
-such that $s_1$ and $s_2$ are both $\sTIreachable{}$.
+\defword{$\TIcoreachablepredicate{s_1, s_2}$}, if there exists some state $s_0 \in I$
+such that $s_1$ and $s_2$ are both \sTIreachable{}.
 
 \begin{theorem}\thmlabel{ExtendedIclosureEquivalentIconfluence}
   Consider an object $O = (S, \join)$, a set of transactions $T$, and an
   invariant $I$. If every pair of states in the invariant are coreachable (i.e.
-  $\forall s_1, s_2 \in S.\ \TIcoreachable{s_1, s_2}$), then
+  $\forall s_1, s_2 \in S.\ \TIcoreachablepredicate{s_1, s_2}$), then
   \[
     \text{$O$ is \Iclosed{}}
     \iff
@@ -180,9 +180,9 @@ such that $s_1$ and $s_2$ are both $\sTIreachable{}$.
   the invariant.
   %
   For the reverse direction, consider two arbitrary states $s_1, s_2 \in I$.
-  The two points are $\TIcoreachable{}$, so there exists some state $s_0$ from
+  The two points are \TIcoreachable{}, so there exists some state $s_0$ from
   which they can be reached. $O$ is \sTIconfluent{} and $s_1 \join s_2$ is
-  $\sTIreachable{}$, so it satisfies the invariant.
+  \sTIreachable{}, so it satisfies the invariant.
 \end{proof}
 
 Using \thmref{ExtendedIclosureEquivalentIconfluence}, we develop
@@ -202,13 +202,13 @@ is the same.\footnote{%
   \join s_2)$. If no such states exist, then closed is true, and $s_1$ and
   $s_2$ are null.
 }
-Now, a segmented invariant-confluence decision procedure, can simply invoke
+Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
 \algoref{ArbitraryStartInteractiveDecisionProcedure} once on each segment.
 
 \newcommand{\algocomment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
 \begin{algorithm}[t]
   \caption{%
-    Interactive invariant-confluence decision procedure for arbitrary start
+    Interactive \invariantconfluence{} decision procedure for arbitrary start
     state $s \in I$
   }%
   \algolabel{ArbitraryStartInteractiveDecisionProcedure}
@@ -220,8 +220,8 @@ Now, a segmented invariant-confluence decision procedure, can simply invoke
 
     \State
 
-    \algocomment{$R$ is a set of $\TIcoreachable{}$ states.}
-    \algocomment{$NR$ is a set of $\TIcounreachable{}$ states.}
+    \algocomment{$R$ is a set of \TIcoreachable{} states.}
+    \algocomment{$NR$ is a set of \TIcounreachable{} states.}
     \Function{Helper}{$O$, $T$, $I$, $R$, $NR$}
       \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I$, $NR$}
       \If {closed}
@@ -256,27 +256,27 @@ Now, a segmented invariant-confluence decision procedure, can simply invoke
   transactions. Applying, \algoref{ArbitraryStartInteractiveDecisionProcedure},
   \IsIclosed{} again returns false with states $s_1$ and $s_2$. This time,
   however, the user recognizes that the two states are not
-  $\ticoreachable{T^+}{I}{}$. The user refines $NR$ with the observation that
+  \ticoreachable{T^+}{I}. The user refines $NR$ with the observation that
   two states are coreachable if and only if they have the same values of $n_1,
   n_2, n_3$. After this, \IsIclosed{} and
   \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.
 \end{example}
 
 \subsection{Discussion}
-There are a couple of things worth noting about segmented invariant-confluence,
-its system model, and its decision procedure. First, invariant-confluence is a
-very coarse-grained property. If an object is invariant-confluent, then we can
-replicate it with no coordination. If it is not invariant-confluent, then we
-have no guarantees. There's no in-between. Segmented invariant-confluence, on
+There are a couple of things worth noting about segmented \invariantconfluence{},
+its system model, and its decision procedure. First, \invariantconfluence{} is a
+very coarse-grained property. If an object is \invariantconfluent{}, then we can
+replicate it with no coordination. If it is not \invariantconfluent{}, then we
+have no guarantees. There's no in-between. Segmented \invariantconfluence{}, on
 the other hand, is a much more fine-grained property that can be applied to
 applications with varying degrees of complexity. Segmented
-invariant-confluence provides guarantees to complex applications that require a
+\invariantconfluence{} provides guarantees to complex applications that require a
 large number of segments and to simple applications with a smaller number of
-segments, whereas invariant-confluence only provides guarantees to applications
+segments, whereas \invariantconfluence{} only provides guarantees to applications
 that can be segmented into a single segment.
 
-Second, segmented invariant-confluence naturally subsumes a distributed locking
-approach to replicating non-invariant-confluent objects.  This approach first
+Second, segmented \invariantconfluence{} naturally subsumes a distributed locking
+approach to replicating non-\invariantconfluent{} objects.  This approach first
 recognizes which transactions cannot be safely executed concurrently and then
 requires them to acquire a distributed lock before
 executing~\cite{balegas2015putting, gotsman2016cause}. For example, in a
@@ -300,7 +300,7 @@ global coordination is avoided. Similarly, servers can buffer transactions that
 require global coordination, executing an entire batch of these transactions
 during a single round of global coordination.
 
-Fourth, a segmented invariant-confluence decision procedure can also leverage
+Fourth, a segmented \invariantconfluence{} decision procedure can also leverage
 \thmref{LatticeProperty} in addition to
 \algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
 criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in

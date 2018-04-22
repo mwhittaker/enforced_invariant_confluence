@@ -83,10 +83,10 @@
     \caption{%
       \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
       counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. \Helper{} randomly
-      generate some $\sTIreachable{}$ points and adds them to $R$. Lucky for
-      us, $s_2 \in R$, so \Helper{} knows that it is $\sTIreachable{}$.
+      generate some \sTIreachable{} points and adds them to $R$. Lucky for
+      us, $s_2 \in R$, so \Helper{} knows that it is \sTIreachable{}.
       \Helper{} is not sure about $s_1$, so it asks the user. After some
-      thought, the user tells \Helper{} that $s_1$ is $\sTIunreachable{}$, so
+      thought, the user tells \Helper{} that $s_1$ is \sTIunreachable{}, so
       \Helper{} adds $s_1$ to $NR$ and then recurses.
     }
     \figlabel{DecisionProcedureExampleB}
@@ -120,7 +120,7 @@
     \caption{%
       \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
       counterexample $s_1 = (-1, 2)$ and $s_2 = (3, -3)$. \Helper{} randomly
-      generates some $\sTIreachable{}$ points and adds them to $R$. $s_1, s_2
+      generates some \sTIreachable{} points and adds them to $R$. $s_1, s_2
       \notin R, NR$, so \Helper{} ask the user to label them. The user puts
       $s_1$ in $NR$ and $s_2$ in $R$. Then, \Helper{} recurses.
     }
@@ -165,10 +165,10 @@
     \caption{%
       \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
       counterexample $s_1 = (-2, 1)$ and $s_2 = (1, -1)$. \Helper{} randomly
-      generates some $\sTIreachable{}$ points and adds them to $R$. $s_2 \in R$
+      generates some \sTIreachable{} points and adds them to $R$. $s_2 \in R$
       but $s_1 \notin R, NR$, so \Helper{} asks the user to label $s_1$. The
       user notices a pattern in $R$ and $NR$ and after some thought, concludes
-      that every point with negative $x$-coordinate is $\sTIunreachable{}$.
+      that every point with negative $x$-coordinate is \sTIunreachable{}.
       They update $NR$ to $-\ints \times \ints$. Then, \Helper{} recurses.
       \Helper{} determines that $O$ is \iclosed{(I - NR)} and returns true!
     }
