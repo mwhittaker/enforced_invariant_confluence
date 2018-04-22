@@ -53,10 +53,10 @@ leader receives coordination replies from all other servers, it executes the
 transaction, and then sends its state to the other servers. When a server
 receives a new state, it adopts the state, computes its new active segment, and
 resumes normal processing. After every 100 transactions processed, a server
-sends a merge request to a randomly selected server. Merge requests are tagged
-with a monotonically increasing epoch number that is incremented by the master
-after every round of global coordination. This allows servers to discard merge
-requests from previous epochs.
+sends a merge request to a randomly selected server.
+% Merge requests are tagged with a monotonically increasing epoch number that is
+% incremented by the master after every round of global coordination. This allows
+% servers to discard merge requests from previous epochs.
 
 Lucy can also replicate an object with eventual consistency and with
 linearizability. With eventual consistency, clients send every transaction
@@ -64,22 +64,21 @@ request to a randomly selected server. The server executes the transaction
 locally and returns immediately to the client, sending merge requests after
 every 100 transactions. With linearizability, clients send every transaction
 request to a predetermined leader. The leader relays the transaction request to
-all other servers, and when it receives replies from them, it executes the
-transaction and replies to the client. This communication pattern mimics the
-``normal operation'' of state machine replication protocols like
-Paxos~\cite{lamport1998part} and Viewstamped
-Replicated~\cite{liskov2012viewstamped}. In
-\secref{SegmentedInvariantConfluenceEval}, we compare the performance of
-replicating with segmented invariant-confluence against the performance of
-replicating with eventual consistency and linearizability.
+all other servers, and when the leader receives replies from them, it executes
+the transaction and replies to the client. This communication pattern mimics
+the ``normal operation'' of state machine replication protocols
+\cite{lamport1998part, liskov2012viewstamped}.
+% In \secref{SegmentedInvariantConfluenceEval}, we compare the performance of
+% replicating with segmented invariant-confluence against the performance of
+% replicating with eventual consistency and linearizability.
 
 Because fault-tolerance is largely an orthogonal concern to
 invariant-confluence, Lucy is implemented without fault-tolerance. It would be
 straightforward to add fault-tolerance to Lucy, but it would not affect our
-discussions or evaluation, so we leave it for future work. Moreover, users
-currently have to specify their workloads in Python (for the decision
-procedures) and C++ (for the runtime). In the future, we plan on removing this
-redundancy.
+discussions or evaluation, so we leave it for future work.
+% Moreover, users currently have to specify their workloads in Python (for the
+% decision procedures) and C++ (for the runtime). In the future, we plan on
+% removing this redundancy.
 
 \subsection{Decision Procedures}
 We now evaluate the practicality and efficiency of our decision procedure
@@ -91,8 +90,8 @@ analyze the TPC-C benchmark.
 We begin with a minimal working example. Consider again our recurring example
 of $\ints^2$ from \exampleref{Z2}. The Python code used to describe the object,
 transactions, and invariant is given in \figref{Z2Code}. When we call
-\python{checker.check()}, the interactive decision procedure produces
-a counterexample in less than a tenth of a second.  After we label the
+\python{checker.check()}, the interactive decision procedure produces a
+counterexample in less than a tenth of a second.  After we label the
 counterexample and refine the invariant with $y \leq 0$, the interactive
 decision procedure determines that the object is invariant-confluent, again, in
 less than a tenth of a second. Note that the object is invariant-confluent but
@@ -127,8 +126,8 @@ pair of two 2P-Sets $X$ and $Y$, which we view as relations. Our invariant $X
 \subseteq Y$ (i.e. $(A_X - R_X) \subseteq (A_Y - R_Y)$) models a foreign key
 constraint from $X$ to $Y$. We ran our decision procedure on the object with
 initial state $((\emptyset, \emptyset), (\emptyset, \emptyset))$ and
-transactions that allow arbitrary insertions and deletions into $X$ and $Y$.
-After less than a tenth of a second, the decision procedure produced a
+with transactions that allow arbitrary insertions and deletions into $X$ and
+$Y$. After less than a tenth of a second, the decision procedure produced a
 reachable counterexample witnessing the fact that the object is not
 invariant-confluent. A concurrent insertion into $X$ and deletion from $Y$ can
 lead to a state which violates the invariant. This object is not
@@ -154,19 +153,18 @@ auction and sets $w$ equal to the largest bid in $B$. Our invariant is that if
 the auction is closed (i.e.\ $w \neq \bot$), then $w = \max(B)$. We ran our
 decision procedure on this example and in a third of a second, it produced a
 reachable counterexample witnessing the fact that the object is not
-invariant-confluent.  If we concurrently close the auction and place an large
+invariant-confluent.  If we concurrently close the auction and place a large
 bid, then we can end up in a state in which the auction is closed, but there is
-a higher bid in $B$.
+a bid in $B$ larger than $w$.
 
 We then segmented our object as follows. The first segment $(\setst{(B, w)}{w =
-\bot}, \setst{t_b}{b \in \ints})$ allows any bidding transaction so long as the
-bid is open. The second segment $(\setst{B, w}{I \cap w \neq \bot}, \emptyset)$
-includes all auctions which have already been closed and forbids all
-transactions. This segmentation captures the intuition that bids should be
-permitted only when the auction is open. We ran our segmented
-invariant-confluence decision procedure on this example, and it was able to
-deduce without any human interaction that the example was segmented
-invariant-confluent in less than a tenth of a second.
+\bot}, \setst{t_b}{b \in \ints})$ allows bidding so long as the bid is open.
+The second segment $(\setst{B, w}{w \neq \bot} \cap I, \emptyset)$ includes all
+auctions which have already been closed and forbids all transactions. This
+segmentation captures the intuition that bids should be permitted only when the
+auction is open. We ran our segmented invariant-confluence decision procedure
+on this example, and it was able to deduce without any human interaction that
+the example was segmented invariant-confluent in less than a tenth of a second.
 
 \example[Escrow Transactions]\examplelabel{EscrowTransactionsEval}
 Escrow transactions are a concurrency control technique that allows a database
@@ -175,7 +173,7 @@ concurrency than is otherwise possible with general-purpose techniques like
 two-phase locking~\cite{o1986escrow}. The main idea is that a portion of the
 numeric value is put in escrow, after which a transaction can freely decrement
 the value so long as it is not decremented by more than the amount that has
-been escrowed. We now show how segmented invariant-confluence can be used to
+been escrowed. We show how segmented invariant-confluence can be used to
 implement escrow transactions.
 
 Consider again the PN-Counter $s = (p_1, p_2, p_3), (n_1, n_2, n_3)$ from
@@ -204,29 +202,29 @@ warehousing application. In~\cite{bailis2014coordination}, Bailis et al.\
 categorize the invariants into one of three types:
 \begin{enumerate}
   \item
-    Three of the twelve invariants are foreign key constraints.  As discussed
-    in \exampleref{ForeignKeysEval}, our decision procedures can automatically
-    verify conditions under which foreign key constraints are
+    Three of the twelve invariants are \textbf{foreign key constraints}.  As
+    discussed in \exampleref{ForeignKeysEval}, our decision procedures can
+    automatically verify conditions under which foreign key constraints are
     invariant-confluent.
 
   \item
     \newcommand{\ttt}[1]{{\smaller \texttt{#1}}}
-    Seven of the twelve invariants involve maintaining arithmetic relationships
-    between relations. Our decision procedures can correctly identify these as
-    invariant-confluent. Consider, for example, invariant 1 which dictates that
-    a warehouse's year to date balance \ttt{W\_YTD} is equal to the sum of the
-    district year to date balances \ttt{D\_YTD} of the twenty districts that
-    are associated with the warehouse. The Payment transaction randomly selects
-    a district and increments \ttt{W\_YTD} and \ttt{D\_YTD} by a randomly
-    generated amount. We model this workload with a PN-Counter for \ttt{W\_YTD}
-    and twenty PN-Counters for the twenty instances of \ttt{D\_YTD}. We applied
-    Lucy to this workload, and it determined that the workload was
-    invariant-confluent in less than a second.
+    Seven of the twelve invariants involve \textbf{maintaining arithmetic
+    relationships between relations}. Our decision procedures can correctly
+    identify these as invariant-confluent. Consider, for example, invariant 1
+    which dictates that a warehouse's year to date balance \ttt{W\_YTD} is
+    equal to the sum of the district year to date balances \ttt{D\_YTD} of the
+    twenty districts that are associated with the warehouse. The Payment
+    transaction randomly selects a district and increments \ttt{W\_YTD} and
+    \ttt{D\_YTD} by a randomly generated amount. We model this workload with a
+    PN-Counter for \ttt{W\_YTD} and twenty PN-Counters for the twenty instances
+    of \ttt{D\_YTD}. We applied Lucy to this workload, and it determined that
+    the workload was invariant-confluent in less than a second.
 
   \item
-    Two of the twelve invariants involve generating sequential and unique
-    identifiers. This workload is \emph{not} invariant-confluent, but when the
-    sequentiality requirement is dropped, it is invariant-confluent.
+    Two of the twelve invariants involve generating \textbf{sequential and
+    unique identifiers}. This workload is \emph{not} invariant-confluent, but
+    when the sequentiality requirement is dropped, it is invariant-confluent.
     Unfortunately, modelling unique key generation in our theoretical framework
     (and in our prototype implementation) is not possible because we have thus
     far tacitly assumed that transaction execution is deterministic. We leave a
@@ -238,11 +236,11 @@ categorize the invariants into one of three types:
 \seclabel{SegmentedInvariantConfluenceEval}
 Now, we evaluate the performance of replicating an object with segmented
 invariant-confluence as compared to replicating it with eventual consistency or
-linearizability. We begin with two benchmarks that demonstrate the same
-concept: the performance of segmented invariant-confluent replication varies
-with the amount of global coordination induced by either (a) performing a
-transaction that is disallowed within a segment or (b) transitioning between
-segments.
+linearizability.
+% We begin with two benchmarks that demonstrate the same concept: the performance
+% of segmented invariant-confluent replication varies with the amount of global
+% coordination induced by either (a) performing a transaction that is disallowed
+% within a segment or (b) transitioning between segments.
 
 \begin{figure}[ht]
   \centering
@@ -275,14 +273,15 @@ results are shown in the top of \figref{ThroughputVsGlobalSyncs}.
 
 Both eventually consistent replication and linearizable replication are
 unaffected by the workload, achieving roughly 700,000 and 7,000 transactions
-per second respectively. Expectedly, eventually consistent replication
-significantly outperforms linearizable replication because (a) transactions can
-be sent to any server (not just the leader) and (b) servers do not coordinate
-with each other at all.
+per second respectively.
+%
+% Expectedly, eventually consistent replication significantly outperforms
+% linearizable replication because (a) transactions can be sent to any server
+% (not just the leader) and (b) servers do not coordinate with each other at all.
 %
 Segmented invariant-confluent replication performs well for low-withdrawal
 workloads and performs increasingly poorly as we increase the fraction of
-withdrawal transactions, eventually becoming slower that linearizable
+withdrawal transactions, eventually performing worse than linearizable
 replication. For example, with 5\% withdrawal transactions, segmented
 invariant-confluent replication performs an order of magnitude better than
 linearizable replication; with 50\% withdrawals, it performs as well; and with
@@ -350,16 +349,21 @@ performance.
   \figref{VaryNodes}.
 
   Eventually consistent replication scales perfectly with the number of nodes,
-  confirming the results in~\cite{bailis2014coordination}. With eventually
-  consistent replication, servers do not coordinate at all, so they are
-  completely unaffected by the number of servers. Linearizable replication, on
-  the other hand, scales up to about 3-5 servers before performance begins to
-  decrease. These numbers are consistent with typical deployments of
-  state-machine replication protocols like Paxos~\cite{chandra2007paxos}.
-  Because all messages are sent to the leader, the leader becomes the
-  bottleneck as the number of servers and clients increases. Moreover, the
-  leader must wait for responses from more servers, increasing the latency of
-  the slowest response which in turn decreases throughput.
+  confirming the results in~\cite{bailis2014coordination}.
+  %
+  % With eventually consistent replication, servers do not coordinate at all, so
+  % they are completely unaffected by the number of servers.
+  %
+  Linearizable replication, on the other hand, scales up to about 3-5 servers
+  before performance begins to decrease. These numbers are consistent with
+  typical deployments of state-machine replication protocols like
+  Paxos~\cite{chandra2007paxos}.
+  %
+  % Because all messages are sent to the leader, the leader becomes the
+  % bottleneck as the number of servers and clients increases. Moreover, the
+  % leader must wait for responses from more servers, increasing the latency of
+  % the slowest response which in turn decreases throughput.
+  %
   Segmented invariant-confluent replication scales up to about 6-8 servers
   before succumbing to the same scalability bottlenecks as linearizable
   replication.
