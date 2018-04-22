@@ -35,7 +35,7 @@ state $s_i$ to state $t(s_i)$. If $t(s_i)$ satisfies the invariant---i.e.
 $I(t(s_i))$---then $p_i$ commits the transaction and remains in state $t(s_i)$.
 Otherwise, $p_i$ aborts the transaction and reverts to state $s_i$.
 
-Second, a server $p_i$ can sent its state $s_i$ to another server $p_j$ with
+Second, a server $p_i$ can send its state $s_i$ to another server $p_j$ with
 state $s_j$ causing $p_j$ to transition from state $s_j$  to state $s_i \join
 s_j$. Servers periodically merge states with one another in order to keep their
 states loosely synchronized\footnote{%
