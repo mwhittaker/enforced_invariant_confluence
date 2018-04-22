@@ -15,13 +15,16 @@ def _get_parser() -> ArgumentParser:
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--checker', '-c',
                         choices=checkers, default='interactive')
+    parser.add_argument('--num_explored_per_step', '-n', type=int, default=100)
     return parser
 
 def get_checker() -> Checker:
     parser = _get_parser()
     args = parser.parse_args()
     if args.checker == 'interactive':
-        return InteractiveChecker(verbose=args.verbose)
+        return InteractiveChecker(
+            verbose=args.verbose,
+            num_explored_states_per_step=args.num_explored_per_step)
     elif args.checker == 'guess_and_check':
         return GuessAndCheckChecker(verbose=args.verbose)
     elif args.checker == 'diamond':
