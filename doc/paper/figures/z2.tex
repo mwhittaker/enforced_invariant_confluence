@@ -1,9 +1,22 @@
+\newcommand{\xmin}{-2}
+\newcommand{\xmax}{2}
+\newcommand{\ymin}{-2}
+\newcommand{\ymax}{2}
+
 \tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt]
 \tikzstyle{inv}=[line width=0.75pt, draw=black]
 \tikzstyle{pointinv}=[point, inv]
 \tikzstyle{invregion}=[rounded corners, fill=flatgreen!50, draw=none]
 \tikzstyle{reachableregion}=[rounded corners, fill=flatblue!50, draw=none]
 \tikzstyle{statelabel}=[anchor=south west, inner sep=1pt]
+
+% Axes.
+\newcommand{\xyaxes}{
+  \draw[] (\xmin.5, 0) to (\xmax.5, 0);
+  \draw[] (0, \ymin.5) to (0, \ymax.5);
+  \node at (\xmax + 1, 0) {$x$};
+  \node at (0, \ymax + 1) {$y$};
+}
 
 % Quadrant 1.
 \newcommand{\quadi}[5]{{
@@ -61,12 +74,15 @@
   }
 }}
 
-\newcommand{\xmin}{-2}
-\newcommand{\xmax}{2}
-\newcommand{\ymin}{-2}
-\newcommand{\ymax}{2}
+% State labels.
+\newcommand{\statelabels}{
+  \node[statelabel] at (0, 0) {$s_0$};
+  \node[statelabel] at (-1, 1) {$s_1$};
+  \node[statelabel] at (1, -1) {$s_2$};
+  \node[statelabel] at (1, 1) {$s_3$};
+}
 
-\begin{figure}[ht]
+\begin{figure}[t]
   \centering
 
   \begin{subfigure}[b]{0.5\columnwidth}
@@ -82,18 +98,12 @@
         \draw (-0.5, -0.5) to (\xmin.5, -0.5);
       \end{scope}
 
-      \draw[] (\xmin, 0) to (\xmax, 0);
-      \draw[] (0, \ymin) to (0, \ymax);
-
+      \xyaxes{}
       \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
       \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
       \quadii{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
       \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-
-      \node[statelabel] at (0, 0) {$s_0$};
-      \node[statelabel] at (-1, 1) {$s_1$};
-      \node[statelabel] at (1, -1) {$s_2$};
-      \node[statelabel] at (1, 1) {$s_3$};
+      \statelabels{}
     \end{tikzpicture}
     \caption{Invariant}\figlabel{Z2Invariant}
   \end{subfigure}%
@@ -105,18 +115,12 @@
         \draw[reachableregion, draw=black] (-0.5, 0.5) rectangle (\xmax.9, \ymin.9);
       \end{scope}
 
-      \draw[] (\xmin, 0) to (\xmax, 0);
-      \draw[] (0, \ymin) to (0, \ymax);
-
+      \xyaxes{}
       \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
       \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
       \quadii{point}{\xmin}{\xmax}{\ymin}{\ymax}
       \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-
-      \node[statelabel] at (0, 0) {$s_0$};
-      \node[statelabel] at (-1, 1) {$s_1$};
-      \node[statelabel] at (1, -1) {$s_2$};
-      \node[statelabel] at (1, 1) {$s_3$};
+      \statelabels{}
     \end{tikzpicture}
     \caption{Reachable points}\figlabel{Z2Reachable}
   \end{subfigure}

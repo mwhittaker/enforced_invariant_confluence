@@ -5,7 +5,7 @@
 
 \newcommand{\algocomment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
 \begin{algorithm}[t]
-  \caption{Interactive invariant-confluence decision procedure}%
+  \caption{Interactive invariantconfluence{} decision procedure}%
   \algolabel{InteractiveDecisionProcedure}
   \begin{algorithmic}
     \algocomment{Return if $O$ is \sTIconfluent{}.}
@@ -23,22 +23,21 @@
     \Function{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
       \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I - NR$}
       \If {closed}
-        \State \Return true
+        \Return true
       \EndIf
-      \State Augment $R$ and $NR$ with random search and user input
+      \State Augment $R, NR$ with random search and user input
       \If{$s_1, s_2 \in R$}
         \Return false
-      \Else\
-        \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
       \EndIf
+      \State \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
-\thmref{IclosureEquivalentIconfluence} tells us that if all
-invariant-satisfying points are reachable, then invariant-closure and
-invariant-confluence are equivalent. In this section, we present the
-interactive invariant-confluence decision procedure shown in
+\thmref{IclosureEquivalentIconfluence} tells us that if all invariant
+satisfying points are reachable, then \invariantclosure{} and
+invariantconfluence{} are equivalent. In this section, we present the
+interactive invariantconfluence{} decision procedure shown in
 \algoref{InteractiveDecisionProcedure} which takes advantage of this result.
 
 \subsection{The Decision Procedure}
@@ -52,25 +51,25 @@ $I$\footnote{%
 }. The user then interacts with
 \algoref{InteractiveDecisionProcedure} to iteratively eliminate unreachable
 states from the invariant. Meanwhile, the algorithm leverages an
-invariant-closure decision procedure to either (a) conclude that $O$ is or is
+\invariantclosure{} decision procedure to either (a) conclude that $O$ is or is
 not \sTIconfluent{} or (b) provide counterexamples to the user to help them
 eliminate unreachable states. After all unreachable states have been eliminated
 from the invariant, \thmref{IclosureEquivalentIconfluence} allows us to reduce
-the problem of invariant-confluence directly to the problem of
-invariant-closure, and the algorithm terminates.
+the problem of invariantconfluence{} directly to the problem of
+\invariantclosure{}, and the algorithm terminates.
 %
 We now describe \algoref{InteractiveDecisionProcedure} in detail. An example of
 how to use \algoref{InteractiveDecisionProcedure} on \exampleref{Z2} is given
 in \figref{DecisionProcedureExample}.
 
-\IsInvConfluent{} assumes access to an invariant-closure decision procedure
+\IsInvConfluent{} assumes access to an \invariantclosure{} decision procedure
 \IsIclosed$(O, I)$ which returns a triple (closed, $s_1$, $s_2$). closed is a
 boolean indicating whether $O$ is \Iclosed{}. If closed is true, then $s_1$ and
 $s_2$ are null. If closed is false, then $s_1$ and $s_2$ are a counterexample
 witnessing the fact that $O$ is not \Iclosed{}. That is, $I(s_1)$ and $I(s_2)$,
 but $\lnot I(s_1 \join s_2)$ (e.g. $s_1$ and $s_2$ from \exampleref{Z2}).  As
-we mentioned earlier, we can (and do) implement the invariant-closure decision
-procedure using an SMT solver like Z3~\cite{de2008z3}.
+we mentioned earlier, we can (and do) implement the \invariantclosure{}
+decision procedure using an SMT solver like Z3~\cite{de2008z3}.
 
 \IsInvConfluent{} first checks that $s_0$ satisfies the invariant. $s_0$ is
 reachable, so if it does not satisfy the invariant, then $O$ is not
@@ -80,8 +79,8 @@ $s_0$, $T$, and $I$---takes as arguments a set $R$ of \sTIreachable{} states
 and a set $NR$ of \sTIunreachable{} states. Like \IsInvConfluent, \Helper$(O,
 s_0, T, I, R, NR)$ returns whether $O$ is \sTIconfluent{} (assuming $R$ and
 $NR$ are correct).  As \algoref{InteractiveDecisionProcedure} executes, $NR$ is
-iteratively increased which removes unreachable states from $I$ until $I
-\subseteq \setst{s}{\sTIreachablepredicate{s}}$.
+iteratively increased, which removes unreachable states from $I$ until $I
+\subseteq \setst{s \in S}{\sTIreachablepredicate{s}}$.
 
 First, \Helper{} checks to see if $O$ is \iclosed{(I - NR)}.
 %
@@ -92,17 +91,17 @@ If \IsIclosed{} determines that $O$ is \iclosed{(I - NR)}, then by
     \subseteq I - NR
     \subseteq I
 \]
-If $NR$ only contains \sTIunreachable{} states, then the set of
-\sTIreachable{} states is equal to set of \stireachable{s_0}{T}{I-NR}{}
-states which, as we just showed, is a subset of $I$.  Thus, $O$ is
-\sTIconfluent{}, so \Helper{} return true.
+Because $NR$ only contains \sTIunreachable{} states, then the set of
+\sTIreachable{} states is equal to set of \stireachable{s_0}{T}{I-NR}{} states
+which, as we just showed, is a subset of $I$.  Thus, $O$ is \sTIconfluent{}, so
+\Helper{} return true.
 
-If \IsIclosed{} determines that $O$ is \emph{not} \iclosed{(I - NR)}, then
-we have a counterexample $s_1, s_2$. We want to determine whether $s_1$ and
-$s_2$ are reachable or unreachable. We can do so in two ways.
+If \IsIclosed{} determines that $O$ is \emph{not} \iclosed{(I - NR)}, then we
+have a counterexample $s_1, s_2$. We want to determine whether $s_1$ and $s_2$
+are reachable or unreachable. We can do so in two ways.
 %
-First, we can randomly generate a set of reachable states and add them to
-$R$. If $s_1$ or $s_2$ lies in $R$, then we know they are reachable.
+First, we can randomly generate a set of reachable states and add them to $R$.
+If $s_1$ or $s_2$ is in $R$, then we know they are reachable.
 %
 Second, we can prompt the user to tell us directly whether or not the states
 are reachable or unreachable.
@@ -146,7 +145,7 @@ inconvenient, but not catastrophic. We can modify
 a user labels a state $s$ as \sTIreachable{}, they must also provide an
 \sTIreachable{} expression $e$ that evaluates to $s$. Here, $e$ acts a proof
 that certifies that $s$ is indeed reachable. This increases the burden on the
-user but completely eliminates this class of errors.
+user but completely eliminates this type of user error.
 
 \textbf{A user can label a reachable state as unreachable.}
 In this case, \IsIclosed$(O, I - NR)$ might return true, even though $O$ is not
@@ -162,6 +161,6 @@ it might not be \sTIconfluent{}). Thus, when a user replicates their
 distributed object across a set of servers, they can deploy with the invariant
 $I - NR$ instead of $I$. If $NR$ is correct and only contains unreachable
 states, then deploying with $I - NR$ is equivalent to deploying with $I$. If
-$NR$ is incorrect and contains some \sTIreachable{} states, then some of
-these states are artificially made unreachable, but the system is still
-guaranteed to never produce a state which violates $I$.
+$NR$ is incorrect and contains some \sTIreachable{} states, then some of these
+states are artificially made unreachable, but the system is still guaranteed to
+never produce a state which violates $I$.

@@ -40,9 +40,11 @@
     \begin{tikzpicture}[scale=\tikzscale]
       \draw[reachable, draw=black] (-0.5, 0.5) rectangle (0.5, -0.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
@@ -52,6 +54,7 @@
       \draw (-0.5, -0.5) to (-0.5, \ymin.5);
       \draw (-0.5, -0.5) to (\xmin.5, -0.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
     \end{tikzpicture}
     \caption{%
       \IsInvConfluent{} determines $I(s_0)$ and then calls \Helper{} with $R =
@@ -65,10 +68,12 @@
     \begin{tikzpicture}[scale=\tikzscale]
       \draw[reachable, draw=black] (-0.5, 0.5) rectangle (1.5, -1.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \pointrect{unreachable, draw=black}{(-1, 1)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
@@ -79,11 +84,12 @@
       \draw (-0.5, -0.5) to (\xmin.5, -0.5);
       \pointrect{nothing, draw=black}{(-1, 1)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
     \end{tikzpicture}
     \caption{%
       \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
       counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. \Helper{} randomly
-      generate some \sTIreachable{} points and adds them to $R$. Lucky for
+      generates some \sTIreachable{} points and adds them to $R$. Lucky for
       us, $s_2 \in R$, so \Helper{} knows that it is \sTIreachable{}.
       \Helper{} is not sure about $s_1$, so it asks the user. After some
       thought, the user tells \Helper{} that $s_1$ is \sTIunreachable{}, so
@@ -98,12 +104,14 @@
       \draw[reachable, draw=black] (-0.5, 0.5) rectangle (2.5, -2.5);
       \pointrect{reachable, draw=black}{(3, -3)}
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \pointrect{unreachable}{(-1, 1)}
       \pointrect{unreachable}{(-1, 2)}
       \draw (-1.5, 0.5) rectangle (-0.5, 2.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
@@ -116,6 +124,7 @@
       \pointrect{nothing}{(-1, 2)}
       \draw (-1.5, 0.5) rectangle (-0.5, 2.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
     \end{tikzpicture}
     \caption{%
       \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
@@ -149,18 +158,21 @@
                          to ++(1, 0)
                          to ++(0, 2);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \draw[unreachable] (\xmin.5, \ymax.5) rectangle (-0.5, \ymin.5);
       \draw (\xmin.5, \ymax.5) to (-0.5, \ymax.5) to
             (-0.5, \ymin.5) to (\xmin.5, \ymin.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
     \end{tikzpicture}\hspace{\tikzhspace}
     \begin{tikzpicture}[scale=\tikzscale]
       \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
       \draw (-0.5, 0.5) to (\xmax.5, 0.5);
       \draw (-0.5, 0.5) to (-0.5, \ymin.5);
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
     \end{tikzpicture}
     \caption{%
       \Helper{} determines that $O$ is not \iclosed{(I - NR)} with

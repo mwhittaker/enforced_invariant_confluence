@@ -7,14 +7,14 @@ reachable states is challenging, especially because transactions and merge
 functions can be complex and can be interleaved arbitrarily in an execution.
 Due to this complexity, existing systems that aim to automatically decide
 \invariantconfluence{} instead focus on deciding a sufficient condition for
-\invariantconfluence{}---dubbed \defword{\invariantclosure{}}---that is simpler to
-reason about~\cite{li2012making, li2014automating}. In this section, we define
-\invariantclosure{} and study why the condition is sufficient but not necessary.
-Armed with this understanding, we present conditions under which it is both
-sufficient and necessary.
+\invariantconfluence{}---dubbed \defword{\invariantclosure{}}---that is simpler
+to reason about~\cite{li2012making, li2014automating}. In this section, we
+define \invariantclosure{} and study why the condition is sufficient but not
+necessary.  Armed with this understanding, we present conditions under which it
+is both sufficient and necessary.
 
-We say an object $O = (S, \join)$ is \defword{\invariantclosed{}} with respect to
-an invariant $I$, abbreviated \defword{\Iclosed{}}, if invariant satisfying
+We say an object $O = (S, \join)$ is \defword{\invariantclosed{}} with respect
+to an invariant $I$, abbreviated \defword{\Iclosed{}}, if invariant satisfying
 states are closed under merge. That is, for every state $s_1, s_2 \in S$, if
 $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
 
@@ -25,8 +25,8 @@ $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
 \end{theorem}
 
 \thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is
-sufficient for \invariantconfluence{}. Intuitively, our system model ensures that
-transaction execution preserves the invariant, so if merging states also
+sufficient for \invariantconfluence{}. Intuitively, our system model ensures
+that transaction execution preserves the invariant, so if merging states also
 preserves the invariant and if our start state satisfies the invariant, then
 inductively it is impossible for us to reach a state that doesn't satisfy the
 invariant.
@@ -38,9 +38,11 @@ typically use an SMT solver like Z3 to check if an object is
 is, then by \thmref{IclosureImpliesIconfluence}, it is \invariantconfluent{}.
 Unfortunately, \invariantclosure{} is \emph{not} necessary for
 \invariantconfluence{}, so if an object is \emph{not} \invariantclosed{}, these
-systems cannot conclude that the object is \emph{not} \invariantconfluent{}. The
-reason why \invariantclosure{} is not necessary for \invariantconfluence{} is best
-explained through an example.
+systems cannot conclude that the object is \emph{not} \invariantconfluent{}.
+The reason why \invariantclosure{} is not necessary for \invariantconfluence{}
+is best explained through an example.
+
+{\input{figures/z2}}
 
 \begin{example}\examplelabel{Z2}
   Let $O = (\ints \times \ints, \join)$ consist of pairs $(x, y)$ of integers
@@ -61,22 +63,21 @@ explained through an example.
   (1, 1)$, we see $\lnot I(s_3)$.
 \end{example}
 
-{\input{figures/z2}}
-
 In \exampleref{Z2}, $s_1$ and $s_2$ witness the fact that $O$ is not
 \invariantclosed{}, but $s_1$ is not reachable. This is not particular to
-\exampleref{Z2}. In fact, it is fundamentally the reason why \invariantclosure{}
-is not equivalent to \invariantconfluence{}. \Invariantconfluence{} is, at its
-core, a property of reachable states, but \invariantclosure{} is completely
-ignorant of reachability. As a result, invariant satisfying yet unreachable
-states like $s_1$ are the key hurdle preventing \invariantclosure{} from being
-equivalent to \invariantconfluence{}. This is formalized by
-\thmref{IclosureEquivalentIconfluence}
+\exampleref{Z2}. In fact, it is fundamentally the reason why
+\invariantclosure{} is not equivalent to \invariantconfluence{}.
+\Invariantconfluence{} is, at its core, a property of reachable states, but
+\invariantclosure{} is completely ignorant of reachability. As a result,
+invariant satisfying yet unreachable states like $s_1$ are the key hurdle
+preventing \invariantclosure{} from being equivalent to \invariantconfluence{}.
+This is formalized by \thmref{IclosureEquivalentIconfluence}
 
 \begin{theorem}\thmlabel{IclosureEquivalentIconfluence}
   Consider an object $O = (S, \join)$, a start state $s_0 \in S$, a set of
   transactions $T$, and an invariant $I$. If the invariant is a subset of the
-  reachable states (i.e. $I \subseteq \setst{s \in S}{\sTIreachablepredicate{s}}$), then
+  reachable states (i.e. $I \subseteq \setst{s \in
+  S}{\sTIreachablepredicate{s}}$), then
   \[
     \text{$I(s_0)$ and $O$ is \Iclosed{}} \iff \text{$O$ is \sTIconfluent{}}
   \]
@@ -89,11 +90,3 @@ equivalent to \invariantconfluence{}. This is formalized by
   And because $O$ is \sTIconfluent{}, all reachable points, including $s_1
   \join s_2$, satisfy the invariant.
 \end{proof}
-
-% - define \invariantclosure{} and introduce it as a sufficient condition
-% - cite existing work to show that people have used invariant closure to
-%   reason about \invariantconfluence{}
-% - explain why invariant closure can fail and why its not sufficient using the
-%   two-integers example
-% - state main theorem
-

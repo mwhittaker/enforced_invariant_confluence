@@ -8,18 +8,20 @@ introducing our system model of replicated objects and then present a formal
 definition of \invariantconfluence{}.
 
 \subsection{System Model}
-A \defword{distributed object} $O = (S, \join)$ consists of a set $S$ of
-states and a binary merge operator $\join: S \times S \to S$ which merges two
-states into one. A \defword{transaction} $t: S \to S$ is a function which maps
-one state to another. An \defword{invariant} $I$ is a subset of $S$.
-Notationally, we write $I(s)$ to denote that $s$ satisfies the invariant (i.e.
-$s \in I$) and $\lnot I(s)$ to denote that $s$ does not satisfy the invariant
-(i.e. $s \notin I$).
-%
-For example, $O = (\ints, +)$ is a distributed object consisting of integers
-merged by addition; $t(x) = x + 1$ is a transaction which adds one to a state;
-and $\setst{x \in \ints}{x \geq 0}$ is the invariant that states $x$ are
-non-negative.
+A \defword{distributed object} $O = (S, \join)$ consists of a set $S$ of states
+and a binary merge operator $\join: S \times S \to S$ which merges two states
+into one. A \defword{transaction} $t: S \to S$ is a function which maps one
+state to another. An \defword{invariant} $I$ is a subset of $S$.  Notationally,
+we write $I(s)$ to denote that $s$ satisfies the invariant (i.e.  $s \in I$)
+and $\lnot I(s)$ to denote that $s$ does not satisfy the invariant (i.e. $s
+\notin I$).
+
+\begin{example}\examplelabel{Ints}
+  $O = (\ints, +)$ is a distributed object consisting of integers merged by
+  addition; $t(x) = x + 1$ is a transaction which adds one to a state; and
+  $\setst{x \in \ints}{x \geq 0}$ is the invariant that states $x$ are
+  non-negative.
+\end{example}
 
 In our system model, a distributed object $O$ is replicated across a set $p_1,
 \ldots, p_n$ of $n$ servers. Each server $p_i$ manages a replica $s_i \in S$ of
@@ -45,10 +47,10 @@ Note that unlike with transactions, servers \emph{cannot} abort a merge; server
 $p_j$ must transition from $s_j$ to $s_i \join s_j$ whether or not $s_i \join
 s_j$ satisfies the invariant.
 
-Informally, $O$ is \defword{\invariantconfluent{}} with respect to $s_0$, $T$, and
-$I$, abbreviated \defword{\sTIconfluent{}}, if every replica $s_1, \ldots, s_n$
-is guaranteed to always satisfy the invariant $I$ in every possible execution
-of the system.
+Informally, $O$ is \defword{\invariantconfluent{}} with respect to $s_0$, $T$,
+and $I$, abbreviated \defword{\sTIconfluent{}}, if every replica $s_1, \ldots,
+s_n$ is guaranteed to always satisfy the invariant $I$ in every possible
+execution of the system.
 
 \subsection{Expression-Based Formalism}
 To define \invariantconfluence{} formally, we represent a state produced by a
@@ -85,9 +87,14 @@ following equations:
     e_2}$.
 \end{itemize}
 Similarly, we say a state $s \in S$ is \sTIreachable{} if there exists a
-\sTIreachable{} expression $e$ that evaluates to $s$.
+\sTIreachable{} expression $e$ that evaluates to $s$. Returning to
+\exampleref{Ints} with start state $s_0 = 42$, we see that all integers greater
+than or equal to 42 (i.e.\ $\setst{x \in \ints}{x \geq 42}$) are
+\sTIreachable{}, and all other integers are \sTIunreachable{}.
 
 Finally, we say $O$ is \defword{\invariantconfluent} with respect to $s_0$,
 $T$, and $I$, abbreviated \defword{\sTIconfluent{}}, if all reachable states
-satisfy the invariant: $\setst{s \in S}{\sTIreachablepredicate{s}} \subseteq
-I$.
+satisfy the invariant:
+\[
+  \setst{s \in S}{\sTIreachablepredicate{s}} \subseteq I
+\]
