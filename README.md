@@ -12,10 +12,12 @@ if the replicated object never takes on a value that violates the invariant.
 Bailis characterized many common invariants (e.g. uniqueness constraints,
 foreign key constraints), showing which could be maintained without
 coordination. However, this characterization required hand-written proofs.
-This research project aims to expand on Bailis' research with a decision
-procedure to algorithmically determine when an object is invariant-confluent.
-This repository contains some [theoretical pencil-and-paper work](doc) and
-[accompanying implementations](iconfluence).
+This research project expands on Bailis' research in two ways. First, we design
+a decision procedure to algorithmically determine when an object is
+invariant-confluent. Second, we develop segmented invariant-confluence: a
+generalization of invariant-confluence. This repository contains some
+[documentation](doc) describing the research and [accompanying
+implementations](iconfluence) of the stuff described in the documentation.
 
 ## Decision Procedure
 Our decision procedures require python version >= 3.6. We recommend creating a
