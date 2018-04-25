@@ -87,7 +87,7 @@ def plot_bank_account(data):
         plt.savefig(f'throughput_vs_fraction_{n}.pdf', bbox_inches='tight')
         plt.close()
 
-    # First, we plot the throughput (y-axis) vs number of nodes (x-axis) for
+    # Next, we plot the throughput (y-axis) vs number of nodes (x-axis) for
     # each fraction of withdraws.
     def filter_fraction_sort_num_servers(records, f):
         filtered = [r for r in records if r['fraction_withdraw'] == f]
@@ -111,6 +111,35 @@ def plot_bank_account(data):
         plt.ylabel('Throughput (txns/s)')
         plt.savefig(f'throughput_vs_num_nodes_{f}.pdf', bbox_inches='tight')
         plt.close()
+
+    # Finally, we plot the throughput (y-axis) vs number of nodes (x-axis) for
+    # a couple different fraction of withdraws on the same plot.
+    gossip, master, paxos = partition_by_server_type(records)
+    gossip_xs, gossip_ys = filter_fraction_sort_num_servers(gossip, 0)
+    paxos_xs, paxos_ys = filter_fraction_sort_num_servers(paxos, 0)
+    fractions = [0.01, 0.05, 0.2, 0.5]
+    master_data = {f: filter_fraction_sort_num_servers(master, f)
+                   for f in fractions}
+    markers = {
+        0.01: 's',
+        0.05: 'p',
+        0.2: '*',
+        0.5: 'x',
+    }
+
+    plt.figure(figsize=(8, 4))
+    plt.semilogy(gossip_xs, gossip_ys, **EVENTUAL_FMT)
+    plt.semilogy(paxos_xs, paxos_ys, **LIN_FMT)
+    for f, (xs, ys) in master_data.items():
+        fmt = dict(IC_FMT.items())
+        del fmt['label']
+        del fmt['marker']
+        plt.semilogy(xs, ys, marker=markers[f], label=f'segmented ({f})', **fmt)
+    plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.25), prop={'size': 12})
+    plt.xlabel('Number of Nodes')
+    plt.ylabel('Throughput (txns/s)')
+    plt.savefig(f'throughput_vs_num_nodes_multi.pdf', bbox_inches='tight')
+    plt.close()
 
 def main():
     if len(sys.argv) != 2:
