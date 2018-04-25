@@ -5,6 +5,10 @@
 %   - The CISE Tool: Proving Weakly-Consistent Applications Correct
 %   - Declarative Programming over Eventually Consistent Data Stores
 %   - Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants
+In this section, we detail four alternate approaches to maintaining invariants
+without coordination: RedBlue consistency and Sieve, the homeostasis protocol,
+explicit consistency, and token based invariant confluence. We then survey
+other bodies of related work.
 
 \newcommand{\sieve}{\textsc{SIEVE}}
 \textbf{RedBlue Consistency and \sieve.}
@@ -16,33 +20,33 @@ blue. All operations are executed with causal consistency, but with the added
 restrictions that red operations are executed in a single total order embedded
 within the causal ordering.
 %
-Invariant safety is a sufficient (but not necessary) condition for RedBlue
-consistent objects to be \invariantconfluent{} and is an analog of
-\invariantclosure{} for an operation-based system model (as opposed to the
-state based system model that we use).  In~\cite{li2014automating}, Li et al.\
-develop sophisticated techniques for deciding invariant safety that involve
-calculating weakest preconditions. These techniques are complementary to our
-work and can be used to improve the \invariantclosure{} subroutine used by our
-decision procedures.
+In~\cite{li2012making}, Li et al.\ also introduce invariant safety as a
+sufficient (but not necessary) condition for RedBlue consistent objects to be
+\invariantconfluent{}. Invariant safety is an analog of \invariantclosure{} for
+an operation-based system model (as opposed to the state based system model
+that we use). Li et al.\ develop sophisticated techniques for deciding
+invariant safety that involve calculating weakest preconditions. These
+techniques are complementary to our work and can be used to improve the
+\invariantclosure{} subroutine used by our decision procedures.
 
 \textbf{The Homeostasis Protocol.}
 The homeostasis protocol~\cite{roy2015homeostasis} uses program analysis to
 avoid unnecessary coordination between servers in a \emph{sharded} database
-(whereas \invariantconfluence{} targets \emph{replicated} databases). The
-protocol generates global invariants, called global treaties, and servers
-operate without coordination so long as they preserve the treaty. When the
-treaty is violated, the nodes perform a round of coordination and establish a
-new treaty. The protocol guarantees that transactions are executed with
-observational equivalence with respect to some serial execution of the
-transactions. This means that intermediate states may be inconsistent, but
-externally observable side effects and the final database state are consistent.
-The observational equivalence guaranteed by the homeostasis is stronger than
-the guarantees of \invariantconfluence{}. As a result, there are invariants and
+(whereas \invariantconfluence{} targets \emph{replicated} databases).  The
+protocol guarantees that transactions are executed with observational
+equivalence with respect to some serial execution of the transactions. This
+means that intermediate states may be inconsistent, but externally observable
+side effects and the final database state are consistent.  The observational
+equivalence guaranteed by the homeostasis protocol is stronger than the
+guarantees of \invariantconfluence{}. As a result, there are invariants and
 workloads that the homeostasis protocol would execute with more coordination
-than a segmented \invariantconfluent{} execution. Still, the homeostasis
-protocol's mechanism of establishing invariants and operating without
-coordination so long as the invariants are maintained is very similar to our
-design of segmented \invariantconfluence{}.
+than a segmented \invariantconfluent{} execution.  The protocol generates
+global invariants, called global treaties, and servers operate without
+coordination so long as they preserve the treaty. When the treaty is violated,
+the nodes perform a round of coordination and establish a new treaty.  This
+mechanism of establishing invariants and operating without coordination so long
+as the invariants are maintained is very similar to our design of segmented
+\invariantconfluence{}.
 
 \textbf{Explicit Consistency.}
 Explicit consistency~\cite{balegas2015towards} is a consistency model that
@@ -50,10 +54,10 @@ combines \invariantconfluence{} and causal consistency, similar to RedBlue
 consistency with invariant safety. To determine if a workload is amenable to
 explicitly consistent replication, Balegas et al.\ determine if all pairs of
 transactions can be concurrently executed on the same start state without
-violating the invariant~\cite{balegas2015towards}.  This is a sufficient
-condition for explicit consistency similar to criterion (3) in
-\thmref{LatticeProperty}. Balegas et al.\ also describe a variety of
-techniques---like conflict resolution, locking, and escrow
+violating the invariant~\cite{balegas2015towards}. Balegas et al.\ argue that
+this is a sufficient condition for explicit consistency. It is similar to
+criterion (3) in \thmref{LatticeProperty}. Balegas et al.\ also describe a
+variety of techniques---like conflict resolution, locking, and escrow
 transactions~\cite{o1986escrow}---that can be used to replicate workloads that
 do not meet their sufficient conditions. As discussed in \secref{Evaluation},
 simple forms of these techniques can be modelled with segmented
