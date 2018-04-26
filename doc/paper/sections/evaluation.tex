@@ -178,14 +178,15 @@ simple warehousing application~\cite{difallah2013oltp}. The TPC-C specification
 outlines twelve ``consistency requirements'' (read invariants) that govern the
 warehousing application. In~\cite{bailis2014coordination}, Bailis et al.\
 categorize the invariants into one of three types:
-\begin{enumerate}
-  \item
+
+% \begin{enumerate}
+%   \item
     Three of the twelve invariants are \textbf{foreign key constraints}.  As
     discussed in \exampleref{ForeignKeysEval}, our decision procedures can
     automatically verify conditions under which foreign key constraints are
     \invariantconfluent{}.
 
-  \item
+  % \item
     \newcommand{\ttt}[1]{{\smaller \texttt{#1}}} Seven of the twelve invariants
     involve \textbf{maintaining arithmetic relationships between relations}.
     Our decision procedures can correctly identify these as
@@ -199,16 +200,24 @@ categorize the invariants into one of three types:
     \ttt{D\_YTD}. We applied Lucy to this workload, and it determined that the
     workload was \invariantconfluent{} in less than a second.
 
-  \item
+  % \item
     Two of the twelve invariants involve generating \textbf{sequential and
-    unique identifiers}. This workload is \emph{not} \invariantconfluent{}, but
-    when the sequentiality requirement is dropped, it is \invariantconfluent{}.
-    Unfortunately, modelling unique key generation in our theoretical framework
-    (and in our prototype implementation) is not possible because we have thus
-    far tacitly assumed that transaction execution is deterministic. We leave a
-    generalization of our theory to non-deterministic transactions for future
-    work.
-\end{enumerate}
+    unique identifiers}. Consider, for example, invariant 2 which dictates that
+    a district's next order id \ttt{D\_NEXT\_O\_ID} is equal to the maximum
+    order id \ttt{O\_ID} of orders within the district. The New Order
+    transaction places an order with \ttt{O\_ID} equal to the current value of
+    \ttt{D\_NEXT\_O\_ID} and then increments \ttt{D\_NEXT\_O\_ID}. We model
+    this workload with three objects. \ttt{D\_NEXT\_O\_ID} is modeled as an
+    integer merged by $\max$. The order table is modelled as two objects. The
+    first is a set of all order ids used, merged by union. The second is a map
+    which maps order id to order. The map's merge function performs an id-by-id
+    merge of orders. If two different orders have the same id, the merge
+    function replaces them with a distinguished value to indicate that the
+    primary key constraint has been violated. We applied Lucy to this workload
+    and in less than a second, it produced a counterexample that---when
+    labelled as reachable---proved that the workload was not
+    \invariantconfluent{}.
+% \end{enumerate}
 
 \subsection{Segmented Invariant Confluence}%
 \seclabel{SegmentedInvariantConfluenceEval}
