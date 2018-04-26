@@ -264,6 +264,13 @@ class InteractiveChecker(Checker):
                 self.rhs_reachable()
             if (self.lhs_label == Label.REACHABLE and
                 self.rhs_label == Label.REACHABLE):
+                m = ('The following states are both reachable and satisfy ' +
+                     'the (refined) invariant, but their join does not. ' +
+                     'Their join is also reachable, so the object is not ' +
+                     'invariant confluent.')
+                self._wrap_print(m)
+                print(f'  lhs = {self.lhs}')
+                print(f'  rhs = {self.rhs}')
                 return Decision.NO
 
             m = ('The following two states (i.e. lhs and rhs) satisfy the ' +
@@ -310,6 +317,12 @@ class InteractiveChecker(Checker):
             # is reachable, then we are not invariant-confluent.
             if (self.lhs_label == Label.REACHABLE and
                 self.rhs_label == Label.REACHABLE):
+                m = ('The following states are both reachable and satisfy ' +
+                     'the (refined) invariant, but their join does not. ' +
+                     'Their join is also reachable, so the object is not ' +
+                     'invariant confluent.')
+                print(f'  lhs = {self.lhs}')
+                print(f'  rhs = {self.rhs}')
                 return Decision.NO
             else:
                 self.lhs = None
