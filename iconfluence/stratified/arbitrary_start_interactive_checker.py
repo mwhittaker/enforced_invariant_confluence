@@ -45,7 +45,7 @@ class ArbitraryStartInteractiveChecker(ArbitraryStartChecker):
     TODO(mwhittaker): Document.
     """
     def __init__(self, verbose: bool = False) -> None:
-        ArbitraryStartChecker.__init__(self)
+        ArbitraryStartChecker.__init__(self, verbose)
 
         self.verbose = verbose
         self.solver = z3.Solver()

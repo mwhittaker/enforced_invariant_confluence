@@ -64,7 +64,7 @@ class InteractiveChecker(Checker):
                  num_explored_states_per_step: int = 100,
                  verbose: bool = False) \
                  -> None:
-        Checker.__init__(self)
+        Checker.__init__(self, verbose)
 
         self.verbose = verbose
         self.solver = z3.Solver()

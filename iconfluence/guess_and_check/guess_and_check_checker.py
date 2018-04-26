@@ -14,7 +14,7 @@ class GuessAndCheckChecker(checker.Checker):
     doesn't satisfy the invariant, then it gives up and returns UNKNOWN.
     """
     def __init__(self, num_states: int = 100, verbose: bool = False) -> None:
-        checker.Checker.__init__(self)
+        checker.Checker.__init__(self, verbose)
         self.num_states = num_states
         self.verbose = verbose
         self.state_explorer = StateExplorer(self.crdt_env, self.s0_vals,
