@@ -372,6 +372,22 @@ def compile_expr(e: ast.Expr,
                     lambda a, b, c: z3.Store(a, b, Option.some(c)))
     elif isinstance(e, ast.EIf):
         return map3(e.a, e.b, e.c, z3.If)
+    elif isinstance(e, ast.ESetForall):
+        x_bound_tenv = tenv.copy()
+        x_bound_tenv[e.x.x] = e.x.typ
+        wrapped_phi = e.xs.contains(e.x) >> e.phi
+        wrapped_phi = typecheck.typecheck_expr(wrapped_phi, x_bound_tenv)
+        x_zss, x_ze = compile_expr(e.x, venv, x_bound_tenv, fresh)
+        phi_zss, phi_ze = compile_expr(wrapped_phi, venv, x_bound_tenv, fresh)
+        return x_zss | phi_zss, z3.ForAll(x_ze, phi_ze)
+    elif isinstance(e, ast.EMapForallKeys):
+        x_bound_tenv = tenv.copy()
+        x_bound_tenv[e.x.x] = e.x.typ
+        wrapped_phi = e.xs.contains_key(e.x) >> e.phi
+        wrapped_phi = typecheck.typecheck_expr(wrapped_phi, x_bound_tenv)
+        x_zss, x_ze = compile_expr(e.x, venv, x_bound_tenv, fresh)
+        phi_zss, phi_ze = compile_expr(wrapped_phi, venv, x_bound_tenv, fresh)
+        return x_zss | phi_zss, z3.ForAll(x_ze, phi_ze)
     else:
         raise ValueError(f'Unkown expression {e}.')
 

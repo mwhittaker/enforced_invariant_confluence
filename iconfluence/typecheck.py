@@ -210,6 +210,38 @@ def _typecheck_expr(e: ast.Expr, env: Dict[str, ast.Type]) -> ast.Expr:
         assert_type_eq(b_typ, ast.TBool(), e.a, e)
         assert_type_uniform(if_typ, else_typ, e.b, e.c, e)
         e.typ = if_typ
+    elif isinstance(e, ast.ESetForall):
+        # Typecheck the set.
+        xs_typ = _typecheck_expr(e.xs, env).typ
+        assert_type_instance(xs_typ, ast.TSet, e.xs, e)
+        xs_typ = cast(ast.TSet, xs_typ)
+
+        # Typecheck the variable.
+        e.x.typ = xs_typ.a
+        x_bound_env = env.copy()
+        x_bound_env[e.x.x] = e.x.typ
+
+        # Typecheck the formula.
+        phi_typ = _typecheck_expr(e.phi, x_bound_env).typ
+        assert_type_eq(phi_typ, ast.TBool(), e.phi, e)
+
+        e.typ = ast.TBool()
+    elif isinstance(e, ast.EMapForallKeys):
+        # Typecheck the map.
+        xs_typ = _typecheck_expr(e.xs, env).typ
+        assert_type_instance(xs_typ, ast.TMap, e.xs, e)
+        xs_typ = cast(ast.TMap, xs_typ)
+
+        # Typecheck the variable.
+        e.x.typ = xs_typ.a
+        x_bound_env = env.copy()
+        x_bound_env[e.x.x] = e.x.typ
+
+        # Typecheck the formula.
+        phi_typ = _typecheck_expr(e.phi, x_bound_env).typ
+        assert_type_eq(phi_typ, ast.TBool(), e.phi, e)
+
+        e.typ = ast.TBool()
     else:
         raise ValueError(f'Unkown expression {e}.')
 
