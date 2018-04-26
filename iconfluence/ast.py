@@ -133,6 +133,27 @@ class COption(Crdt):
     def to_type(self) -> Type:
         return TOption(self.a.to_type())
 
+class CTop(Crdt):
+    """
+    CTop is a set with discrete partial order and distinguished top element.
+    For example, CTop[Int] has the following Hasse diagram:
+
+                    top
+               /  /  |  \ \
+        ...  -2  -1  0  1  2  ...
+
+    Thus, the merge of any two unequal elements is top, and the merge of top
+    with anything is top.
+    """
+    def __init__(self, a: Type) -> None:
+        self.a = a
+
+    def __str__(self) -> str:
+        return f'Top[{self.a}]'
+
+    def to_type(self) -> Type:
+        return TOption(self.a)
+
 class CMap(Crdt):
     def __init__(self, a: Type, b: Crdt) -> None:
         self.a = a

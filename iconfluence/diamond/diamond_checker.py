@@ -85,7 +85,8 @@ class DiamondChecker(Checker):
     def _has_bottom(self, crdt: Crdt) -> bool:
         if (isinstance(crdt, ast.CIntMax) or
             isinstance(crdt, ast.CIntMin) or
-            isinstance(crdt, ast.CSetIntersect)):
+            isinstance(crdt, ast.CSetIntersect) or
+            isinstance(crdt, ast.CTop)):
             return False
         elif (isinstance(crdt, ast.CBoolOr) or
             isinstance(crdt, ast.CBoolAnd) or

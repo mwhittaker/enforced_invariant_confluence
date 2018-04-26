@@ -202,6 +202,8 @@ class StratifiedChecker(Checker):
                     checker.map(name, crdt.a, crdt.b, None)
                 elif isinstance(crdt, ast.COption):
                     checker.option(name, crdt.a, None)
+                elif isinstance(crdt, ast.CTop):
+                    checker.top(name, crdt.a, None)
                 else:
                     raise ValueError(f'Unrecognized CRDT {crdt}.')
             for name in stratum.transactions:
