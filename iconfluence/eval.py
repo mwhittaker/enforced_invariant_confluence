@@ -188,6 +188,13 @@ def _eval_join_vals(lhs: Any, rhs: Any, crdt: ast.Crdt) -> Any:
             return lhs
         else:
             return _eval_join_vals(lhs, rhs, crdt.a)
+    elif isinstance(crdt, ast.CTop):
+        if lhs is None or rhs is None:
+            return None
+        elif lhs == rhs:
+            return lhs
+        else:
+            return None
     else:
         raise ValueError(f'Unrecognized CRDT {crdt}.')
 

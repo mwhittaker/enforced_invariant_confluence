@@ -14,7 +14,7 @@ class Decision(Enum):
     UNKNOWN = "unknown"
 
 class Checker:
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False) -> None:
         self.crdt_env: CrdtEnv = dict()
         self.type_env: TypeEnv = dict()
         self.s0_exprs: ExprEnv = dict()
@@ -102,6 +102,9 @@ class Checker:
 
     def option(self, name: str, a: Crdt, val: Coercible) -> ast.EVar:
         return self._register_var(name, ast.COption(a), val)
+
+    def top(self, name: str, a: Type, val: Coercible) -> ast.EVar:
+        return self._register_var(name, ast.CTop(a), val)
 
     def add_transaction(self, name: str, txn: Transaction) -> None:
         assert name not in self.transactions, (name, self.transactions)

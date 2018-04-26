@@ -520,6 +520,9 @@ def _compile_z3_join(lhs: z3.ExprRef,
                 z3.If(Option.is_none(lhs), rhs,
                 z3.If(Option.is_none(rhs), lhs,
                 Option.some(j_ze))))
+    elif isinstance(crdt, ast.CTop):
+        Option = OptionSort(compile_type(crdt.to_type()))
+        return OrderedSet(), z3.If(lhs == rhs, lhs, Option.none())
     else:
         raise ValueError(f'Unkown CRDT {crdt}.')
 

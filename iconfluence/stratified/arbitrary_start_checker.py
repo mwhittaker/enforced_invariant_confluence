@@ -92,3 +92,7 @@ class ArbitraryStartChecker(Checker):
     def option(self, name: str, a: Crdt, val: Coercible) -> EVar:
         self._warn_if_not_none(val)
         return self._register_var_no_start_state(name, ast.COption(a))
+
+    def top(self, name: str, a: Type, val: Coercible) -> EVar:
+        self._warn_if_not_none(val)
+        return self._register_var_no_start_state(name, ast.CTop(a))
