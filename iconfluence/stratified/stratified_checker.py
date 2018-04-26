@@ -68,7 +68,7 @@ class Stratum:
 
 class StratifiedChecker(Checker):
     def __init__(self, verbose: bool = True) -> None:
-        Checker.__init__(self)
+        Checker.__init__(self, verbose)
 
         self.verbose = verbose
         self.solver = z3.Solver()

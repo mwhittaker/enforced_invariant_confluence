@@ -14,13 +14,14 @@ class Decision(Enum):
     UNKNOWN = "unknown"
 
 class Checker:
-    def __init__(self):
+    def __init__(self, verbose: bool = False):
         self.crdt_env: CrdtEnv = dict()
         self.type_env: TypeEnv = dict()
         self.s0_exprs: ExprEnv = dict()
         self.s0_vals: ValEnv = dict()
         self.transactions: Dict[str, Transaction] = dict()
         self.invariants: Dict[str, Invariant] = dict()
+        self.verbose = verbose
 
     def __str__(self):
         strings = []
@@ -119,5 +120,6 @@ class Checker:
         start = time.time()
         ret = self._check()
         stop = time.time()
-        print(f'Check took {stop - start} seconds.')
+        if self.verbose:
+            print(f'Check took {stop - start} seconds.')
         return ret

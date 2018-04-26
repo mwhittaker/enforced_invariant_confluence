@@ -15,6 +15,9 @@ class ArbitraryStartChecker(Checker):
     """
     TODO(mwhittaker): Document.
     """
+    def __init__(self, verbose: bool = False) -> None:
+        Checker.__init__(self, verbose)
+
     def __str__(self):
         strings = []
 
