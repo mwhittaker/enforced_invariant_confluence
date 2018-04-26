@@ -116,6 +116,21 @@ def eval_expr(e: ast.Expr, env: ValEnv) -> Any:
             return eval_expr(e.b, env)
         else:
             return eval_expr(e.c, env)
+    elif isinstance(e, ast.EForallOp):
+        xs = eval_expr(e.xs, env)
+        if isinstance(e, ast.ESetForall):
+            iter = xs
+        elif isinstance(e, ast.EMapForallKeys):
+            iter = xs.keys()
+        else:
+            raise ValueError(f'Unkown expression {e}.')
+
+        for x in iter:
+            x_bound_env = env.copy()
+            x_bound_env[e.x.x] = x
+            if not eval_expr(e.phi, x_bound_env):
+                return False
+        return True
     else:
         raise ValueError(f'Unkown expression {e}.')
 

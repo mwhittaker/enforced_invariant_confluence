@@ -10,6 +10,7 @@ class TestEval(unittest.TestCase):
     def test_eval_expr(self) -> None:
         venv: ValEnv = {'x': 42}
         tenv: TypeEnv = {'x': TInt()}
+        y: EVar = EVar('y')
         tests: List[Tuple[Expr, Any]] = [
             (EVar('x'), 42),
             (coerce(1), 1),
@@ -52,6 +53,10 @@ class TestEval(unittest.TestCase):
             (coerce(1) > 1, False),
             (EMapSet({1: True}, 1, False), {1: False}),
             (EIf(True, 1, 2), 1),
+            (coerce({1, 2, 3}).forall(y, y <= 10), True),
+            (coerce({1, 2, 3}).forall(y, y <= 2), False),
+            (coerce({2: 2, 3: 6}).forall_keys(y, y <= 10), True),
+            (coerce({2: 2, 3: 6}).forall_keys(y, y <= 2), False),
         ]
         for e, expected in tests:
             e = typecheck_expr(e, tenv)

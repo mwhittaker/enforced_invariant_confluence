@@ -68,6 +68,11 @@ class DiamondChecker(Checker):
             return all(self._var_free_expr(sube) for sube in [e.lhs, e.rhs])
         elif isinstance(e, ast.ETernaryOp):
             return all(self._var_free_expr(sube) for sube in [e.a, e.b, e.c])
+        elif isinstance(e, ast.EForallOp):
+            # Foralls are a bit trickier to handle. For a formula like forall
+            # x. phi(x), we have to make sure that phi doesn't have any
+            # variables, but of course it can contain x.
+            raise NotImplementedError()
         else:
             raise ValueError(f'Unkown expression {e}.')
 

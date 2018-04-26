@@ -296,6 +296,9 @@ class Expr(AstNode):
     def contains(self, x: Coercible) -> 'Expr':
         return ESetContains(self, coerce(x))
 
+    def forall(self, x: 'EVar', phi: Coercible) -> 'Expr':
+        return ESetForall(self, x, coerce(phi))
+
     def contains_key(self, x: Coercible) -> 'Expr':
         return EMapContainsKey(self, coerce(x))
 
@@ -304,6 +307,9 @@ class Expr(AstNode):
 
     def set(self, k: Coercible, v: Coercible) -> 'Expr':
         return EMapSet(self, k, v)
+
+    def forall_keys(self, x: 'EVar', phi: Coercible) -> 'Expr':
+        return EMapForallKeys(self, x, coerce(phi))
 
     def eq(self, lhs: Coercible) -> 'Expr':
         return EEq(self, coerce(lhs))
@@ -540,6 +546,20 @@ class EMapSet(ETernaryOp):
 class EIf(ETernaryOp):
     def __str__(self) -> str:
         return f'(if ({self.a}) then {self.b} else {self.c})'
+
+class EForallOp(Expr):
+    def __init__(self, xs: Coercible, x: EVar, phi: Coercible) -> None:
+        self.xs = coerce(xs)
+        self.x = x
+        self.phi = coerce(phi)
+
+class ESetForall(EForallOp):
+    def __str__(self) -> str:
+        return f'(forall {self.x} in {self.xs}. {self.phi})'
+
+class EMapForallKeys(EForallOp):
+    def __str__(self) -> str:
+        return f'(forall {self.x} in {self.xs}.keys(). {self.phi})'
 
 # Statements ###################################################################
 class Stmt(AstNode):
