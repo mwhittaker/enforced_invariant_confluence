@@ -206,17 +206,21 @@ categorize the invariants into one of three types:
     a district's next order id \ttt{D\_NEXT\_O\_ID} is equal to the maximum
     order id \ttt{O\_ID} of orders within the district. The New Order
     transaction places an order with \ttt{O\_ID} equal to the current value of
-    \ttt{D\_NEXT\_O\_ID} and then increments \ttt{D\_NEXT\_O\_ID}. We model
-    this workload with three objects. \ttt{D\_NEXT\_O\_ID} is modeled as an
-    integer merged by $\max$. The order table is modelled as two objects. The
-    first is a set of all order ids used, merged by union. The second is a map
-    which maps order id to order. The map's merge function performs an id-by-id
-    merge of orders. If two different orders have the same id, the merge
-    function replaces them with a distinguished value to indicate that the
-    primary key constraint has been violated. We applied Lucy to this workload
-    and in less than a second, it produced a counterexample that---when
-    labelled as reachable---proved that the workload was not
-    \invariantconfluent{}.
+    \ttt{D\_NEXT\_O\_ID} and then increments \ttt{D\_NEXT\_O\_ID}.
+    We model this workload with an integer for \ttt{D\_NEXT\_O\_ID} and a map
+    for \ttt{O\_ID} that maps order ids to order.
+    %
+    % We model this workload with three objects. \ttt{D\_NEXT\_O\_ID} is modeled
+    % as an integer merged by $\max$. The order table is modelled as two objects.
+    % The first is a set of all order ids used, merged by union. The second is a
+    % map which maps order id to order. The map's merge function performs an
+    % id-by-id merge of orders. If two different orders have the same id, the
+    % merge function replaces them with a distinguished value to indicate that
+    % the primary key constraint has been violated.
+    %
+    We applied Lucy to this workload and in less than a second, it produced a
+    counterexample that---when labelled as reachable---confirming that the
+    workload is \emph{not} \invariantconfluent{}~\cite{bailis2014coordination}.
 % \end{enumerate}
 
 \subsection{Segmented Invariant Confluence}%
