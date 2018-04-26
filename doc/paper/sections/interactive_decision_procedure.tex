@@ -62,6 +62,8 @@ We now describe \algoref{InteractiveDecisionProcedure} in detail. An example of
 how to use \algoref{InteractiveDecisionProcedure} on \exampleref{Z2} is given
 in \figref{DecisionProcedureExample}.
 
+{\input{figures/decision_procedure_example}}
+
 \IsInvConfluent{} assumes access to an \invariantclosure{} decision procedure
 \IsIclosed$(O, I)$ which returns a triple (closed, $s_1$, $s_2$). closed is a
 boolean indicating whether $O$ is \Iclosed{}. If closed is true, then $s_1$ and
@@ -127,8 +129,6 @@ augment $NR$ and eliminate a large number of unreachable states from the
 invariant. Once $NR$ has been sufficiently augmented to the point that $I - NR$
 is a subset of the reachable states, \thmref{IclosureEquivalentIconfluence}
 guarantees that the algorithm will terminate after one more call to \IsIclosed.
-
-{\input{figures/decision_procedure_example}}
 
 \subsection{Tolerating User Error}
 \algoref{InteractiveDecisionProcedure} is an \emph{interactive} decision
