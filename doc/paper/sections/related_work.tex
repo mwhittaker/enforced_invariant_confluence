@@ -5,10 +5,10 @@
 %   - The CISE Tool: Proving Weakly-Consistent Applications Correct
 %   - Declarative Programming over Eventually Consistent Data Stores
 %   - Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants
-In this section, we detail four alternate approaches to maintaining invariants
-without coordination: RedBlue consistency and Sieve, the homeostasis protocol,
-explicit consistency, and token based invariant confluence. We then survey
-other bodies of related work.
+% In this section, we detail four alternate approaches to maintaining invariants
+% without coordination: RedBlue consistency and Sieve, the homeostasis and
+% demarcation protocols, explicit consistency, and token based invariant
+% confluence. We then survey other bodies of related work.
 
 \newcommand{\sieve}{\textsc{SIEVE}}
 \textbf{RedBlue Consistency and \sieve.}
@@ -29,8 +29,9 @@ invariant safety that involve calculating weakest preconditions. These
 techniques are complementary to our work and can be used to improve the
 \invariantclosure{} subroutine used by our decision procedures.
 
-\textbf{The Homeostasis Protocol.}
-The homeostasis protocol~\cite{roy2015homeostasis} uses program analysis to
+\textbf{The Demarcation and Homeostasis Protocols.}
+The homeostasis protocol~\cite{roy2015homeostasis}, a generalization of the
+demarcation protocol~\cite{barbara1994demarcation}, uses program analysis to
 avoid unnecessary coordination between servers in a \emph{sharded} database
 (whereas \invariantconfluence{} targets \emph{replicated} databases).  The
 protocol guarantees that transactions are executed with observational
@@ -80,6 +81,17 @@ segment to acquire a single self-conflicting lock. However, segmented
 \invariantconfluence{} also introduces the notion of invariant segmentation,
 which cannot be emulated with the token based approach. For example, it is
 difficult to emulate escrow transactions with the token based approach.
+
+\textbf{Branch and Merge.}
+Bayou~\cite{terry1995managing}, Dynamo~\cite{decandia2007dynamo}, and
+TARDiS~\cite{crooks2016tardis} all take a branch and merge approach to
+maintaining distributed invariants without coordination. With this approach,
+servers execute transactions without any coordination but keep track of the
+causal dependencies between transactions. Periodically, two servers merge
+states and invoke a user defined merge function to reconcile the divergent
+states. This approach does \emph{not} provide any formal guarantees that
+invariants are maintained. Its correctness depends on the correctness of the
+potentially complex user defined merge functions.
 
 \textbf{CRDTs.}
 CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
