@@ -264,16 +264,18 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
 
 \subsection{Discussion}
 There are a couple of things worth noting about segmented
-\invariantconfluence{}, its system model, and its decision procedure. First,
-\invariantconfluence{} is a very coarse-grained property. If an object is
-\invariantconfluent{}, then we can replicate it with no coordination. If it is
-not \invariantconfluent{}, then we have no guarantees. There's no in-between.
-Segmented \invariantconfluence{}, on the other hand, is a much more
-fine-grained property that can be applied to applications with varying degrees
-of complexity. Segmented \invariantconfluence{} provides guarantees to complex
-applications that require a large number of segments and to simple applications
-with a smaller number of segments, whereas \invariantconfluence{} only provides
-guarantees to applications that can be segmented into a single segment.
+\invariantconfluence{}, its system model, and its decision procedure.
+%
+First, \invariantconfluence{} is a very coarse-grained property. If an object
+is \invariantconfluent{}, then we can replicate it with no coordination. If it
+is not \invariantconfluent{}, then we have no guarantees. There's no
+in-between.  Segmented \invariantconfluence{}, on the other hand, is a much
+more fine-grained property that can be applied to applications with varying
+degrees of complexity. Segmented \invariantconfluence{} provides guarantees to
+complex applications that require a large number of segments and to simple
+applications with a smaller number of segments, whereas \invariantconfluence{}
+only provides guarantees to applications that can be segmented into a single
+segment.
 
 Second, segmented \invariantconfluence{} naturally subsumes a distributed
 locking approach to replicating non-\invariantconfluent{} objects.  This
@@ -305,3 +307,9 @@ Fourth, a segmented \invariantconfluence{} decision procedure can also leverage
 \algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
 criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in
 I$.
+
+Fifth, while a segmented \invariantconfluence{} decision procedure can help
+decide whether or not an object is segmented \invariantconfluent{}, it cannot
+currently help construct the segmentation. In the future, we plan to explore
+ways by which we can automatically suggest segmentations to the application
+designer.
