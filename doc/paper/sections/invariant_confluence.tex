@@ -3,11 +3,20 @@ Informally, a replicated object is \defword{\invariantconfluent{}} with respect
 to an invariant if every replica of the object is guaranteed to satisfy the
 invariant despite the possibility of different replicas being concurrently
 modified or merged together~\cite{bailis2014coordination}. In this section, we
-make this informal notion of \invariantconfluence{} precise. We begin by
-introducing our system model of replicated objects and then present a formal
-definition of \invariantconfluence{}.
+make this informal notion of \invariantconfluence{} precise.
+
+We begin by introducing our system model of replicated objects in which a
+distributed object and accompanying invariant is replicated across a set of
+servers. Clients send transactions to servers, and a server executes a
+transaction so long as it maintains the invariant. Servers execute
+transactions without coordination, but to avoid state divergence, servers
+periodically gossip with one another and merge their replicas.
+%
+After we introduce the system model, we present a formal definition of
+\invariantconfluence{}.
 
 \subsection{System Model}
+
 A \defword{distributed object} $O = (S, \join)$ consists of a set $S$ of states
 and a binary merge operator $\join: S \times S \to S$ which merges two states
 into one. A \defword{transaction} $t: S \to S$ is a function which maps one
