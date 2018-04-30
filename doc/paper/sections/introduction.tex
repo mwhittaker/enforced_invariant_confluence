@@ -40,8 +40,8 @@ manually categorized a set of common objects, transactions, and invariants
 (e.g.\ foreign key constraints on relations, linear constraints on integers) as
 \invariantconfluent{} or not, but ideally we would have a general purpose
 program that can automatically determine \invariantconfluence{} for us.
-\textbf{The first main thrust of this paper is to make progress towards a
-general-purpose \invariantconfluence{} decision procedure.}
+\textbf{The first main thrust of this paper is to design a general-purpose
+\invariantconfluence{} decision procedure.}
 
 Designing a general-purpose \invariantconfluence{} decision procedure is
 difficult\footnote{Actually, it's impossible. Determining whether an object is
@@ -97,9 +97,10 @@ In closing, here is an outline of the paper and of our contributions:
     that is both formal and simple (\secref{InvariantConfluence}).
 
   \item
-    We develop an understanding of why \invariantclosure{} is not necessary and
-    use this understanding to develop conditions under which it is both
-    necessary and sufficient (\secref{InvariantClosure}).
+    We develop an understanding of why \invariantclosure{} is not necessary for
+    \invariantconfluence{} and use this understanding to develop conditions
+    under which it is both necessary and sufficient
+    (\secref{InvariantClosure}).
 
   \item
     We exploit these conditions to design a general-purpose interactive
@@ -108,8 +109,8 @@ In closing, here is an outline of the paper and of our contributions:
 
   \item
     We again exploit these conditions to design a novel non-trivial sufficient
-    condition for \invariantconfluence{}, \mergereducibility, that does not
-    depend on user interaction (\secref{MergeReduction}).
+    condition for \invariantconfluence{}, called \mergereducibility, that does
+    not depend on user interaction (\secref{MergeReduction}).
 
   \item
     We present segmented \invariantconfluence{}: a generalization of
