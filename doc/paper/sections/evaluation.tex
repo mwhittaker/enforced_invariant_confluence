@@ -21,21 +21,19 @@ counterexample witnessing the satisfiability of the formula.
 Lucy also includes an implementation of the \invariantconfluence{} and
 segmented-invariant confluence system models in roughly 3,500 lines of C++.
 Users specify objects, transactions, invariants, and segmentations in C++. Lucy
-then replicates the objects using segmented \invariantconfluence{} (or
-\invariantconfluence{} if the segmentation contains a single segment without
-any disallowed transactions). Clients send every transaction request to a
-randomly selected server. When a server receives a transaction request, it
-executes \algoref{TxnExecution} to attempt to execute the transaction locally.
-If the transaction requires global coordination, then the server forwards the
-transaction request to a predetermined leader. When the leader receives a
-transaction request, it sends a coordination request to all other servers. When
-a server receives a coordination request from the leader, it stops processing
-transactions and sends the leader its state in a coordination reply. When the
-leader receives coordination replies from all other servers, it executes the
-transaction, and then sends its state to the other servers. When a server
-receives a new state, it adopts the state, computes its new active segment, and
-resumes normal processing. After every 100 transactions processed, a server
-sends a merge request to a randomly selected server.
+then replicates the objects using segmented \invariantconfluence{}. Clients
+send every transaction request to a randomly selected server. When a server
+receives a transaction request, it executes \algoref{TxnExecution} to attempt
+to execute the transaction locally.  If the transaction requires global
+coordination, then the server forwards the transaction request to a
+predetermined leader. When the leader receives a transaction request, it
+broadcasts a coordination request to the other servers. When a server receives
+a coordination request from the leader, it stops processing transactions and
+sends the leader its state. When the leader receives the states of all other
+servers, it executes the transaction, and then sends its state to the other
+servers. When a server receives a new state, it adopts the state, computes its
+new active segment, and resumes normal processing. After every 100 transactions
+processed, a server sends a merge request to a randomly selected server.
 
 Lucy can also replicate an object with eventual consistency and with
 linearizability. With eventual consistency, clients send every transaction
