@@ -774,7 +774,8 @@
 
 }
 
-\def\endabstract{\if@twocolumn\else\endquotation\fi \@mkbibcitation}
+% \def\endabstract{\if@twocolumn\else\endquotation\fi \@mkbibcitation}
+\def\endabstract{\if@twocolumn\else\endquotation\fi}
 
 
 

@@ -93,19 +93,19 @@ states. This approach does \emph{not} provide any formal guarantees that
 invariants are maintained. Its correctness depends on the correctness of the
 potentially complex user defined merge functions.
 
-\textbf{CRDTs.}
-CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
-semilattices with inflationary update methods. Due to their algebraic
-properties, CRDTs can be replicated with strong eventual consistency without
-the need for any coordination. Our definition of distributed objects and our
-\invariantconfluence{} system model are inspired directly by the corresponding
-definitions and system models in~\cite{shapiro2011conflict}. Also, an
-\invariantconfluent{} object does not necessarily have to be eventually
-consistent, so it is natural (though not necessary) to use CRDTs as
-\invariantconfluent{} distributed objects, achieving a combination of eventual
-consistency and invariant preservation. Our criteria in
-\thmref{LatticeProperty} also borrow ideas from CRDTs, exploiting the nice
-algebraic properties of semilattices.
+% \textbf{CRDTs.}
+% CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
+% semilattices with inflationary update methods. Due to their algebraic
+% properties, CRDTs can be replicated with strong eventual consistency without
+% the need for any coordination. Our definition of distributed objects and our
+% \invariantconfluence{} system model are inspired directly by the corresponding
+% definitions and system models in~\cite{shapiro2011conflict}. Also, an
+% \invariantconfluent{} object does not necessarily have to be eventually
+% consistent, so it is natural (though not necessary) to use CRDTs as
+% \invariantconfluent{} distributed objects, achieving a combination of eventual
+% consistency and invariant preservation. Our criteria in
+% \thmref{LatticeProperty} also borrow ideas from CRDTs, exploiting the nice
+% algebraic properties of semilattices.
 
 \textbf{CALM Theorem.}
 Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
@@ -118,8 +118,8 @@ there exists a coordination-free implementation of the program.  The CALM
 theorem provides guarantees about the outputs of a program, but it does not
 guarantee that invariants are maintained throughout the duration of an
 execution. Moreover, Bloom and Dedalus are general purpose programming
-languages that can be used to implement a variety of distributed systems (e.g.
-a sharded database) which are outside of the scope of \invariantconfluence{}.
+languages that can be used to implement a variety of distributed systems which
+are outside of the scope of \invariantconfluence{}.
 
 % \textbf{Program Analysis in Database Systems.}
 % Using program analysis to improve the performance of database systems is not
