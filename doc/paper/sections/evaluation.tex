@@ -107,7 +107,7 @@ transactions that allow arbitrary insertions and deletions into $X$ and $Y$.
 After less than a tenth of a second, the decision procedure produced a
 reachable counterexample witnessing the fact that the object is not
 \invariantconfluent{}. A concurrent insertion into $X$ and deletion from $Y$
-can lead to a state which violates the invariant. This object is not
+can lead to a state that violates the invariant. This object is not
 \invariantconfluent{} and therefore not \invariantclosed{}. Thus, previous
 tools depending on \invariantclosure{} as a sufficient condition would be
 unable to conclude definitively that the object is \emph{not}
@@ -138,7 +138,7 @@ a bid in $B$ larger than $w$.
 We then segmented our object as follows. The first segment $(\setst{(B, w)}{w =
 \bot}, \setst{t_b}{b \in \ints})$ allows bidding so long as the bid is open.
 The second segment $(\setst{B, w}{w \neq \bot} \cap I, \emptyset)$ includes all
-auctions which have already been closed and forbids all transactions. This
+auctions that have already been closed and forbids all transactions. This
 segmentation captures the intuition that bids should be permitted only when the
 auction is open. We ran our segmented \invariantconfluence{} decision procedure
 on this example, and it was able to deduce without any human interaction that
@@ -234,20 +234,20 @@ There are two hypotheses about the performance of segmented
 \invariantconfluent{} replication that we aim to confirm.
 %
 First, segmented \invariantconfluent{} replication provides higher throughput
-and better scalability than linearizabile replication for workloads which
+and better scalability than linearizable replication for workloads that
 require little coordination (i.e.\ low-coordination workloads).
 %
 Second, the throughput and scalability of segmented \invariantconfluent{}
-replication decreases as we increase the fraction of transactions which require
+replication decreases as we increase the fraction of transactions that require
 coordination.
 
 These hypotheses state that segmented \invariantconfluent{} is more performant
-than linearizabile replication for low-coordination workloads. But by how much?
+than linearizable replication for low-coordination workloads. But by how much?
 We also aim to measure the absolute performance and scalability benefits of
 segmented \invariantconfluent{} replication and how they vary as we vary the
 coordination required by a workload. We perform two controlled microbenchmarks
 to confirm our hypotheses and discover the absolute performance benefits. The
-workloads themselves are trivial, but also not salient. Our objective is to
+workloads themselves are trivial, but also not salient. \jmh{Salient to what? I'm confused by the last sentence.} Our objective is to
 obtain a controlled measure of throughput and scalability as we vary workload
 contention.
 
@@ -291,9 +291,9 @@ contention.
   These results offer two insights.
   %
   First, the relationship between segmented \invariantconfluent{} and
-  linearizable replication is analogous to the relationship between pessimistic
-  and optimistic concurrency control protocols with coordination playing the
-  role of contention. Linearizable replication pessimistically assumes that
+  linearizable replication is analogous to the relationship between optimistic
+  and pessimistic concurrency control protocols with coordination playing the
+  role of contention \jmh{I didn't understand that last clause about ``coordination playing the role of contention.} Linearizable replication pessimistically assumes that
   concurrently executing \emph{any} pair of transactions will lead to an
   invariant violation. Thus, clients send transactions directly to a leader to
   be linearized. Conversely, segmented \invariantconfluent{} replication
@@ -302,7 +302,7 @@ contention.
   to be necessary. As a consequence, segmented \invariantconfluent{}
   replication can offer substantial performance benefits over linearizable
   replication for low-coordination workloads, but is inferior for medium to
-  high contention workloads.
+  high contention workloads. \jmh{say why}
 
   Second, throughput does not decrease linearly with the amount of
   coordination. Even infrequent coordination can drastically decrease
@@ -365,6 +365,7 @@ contention.
 \end{figure}
 
 \begin{benchmark}
+\jmh{Can you get the figures to color ``eventual'' and ``linearizable'' the same in both?}
   In this benchmark, we measure the scale-out of segmented
   \invariantconfluent{} replication. We repeat \benchref{VaryWithdraws} while
   we vary the number of servers that we use to replicate our object. When we

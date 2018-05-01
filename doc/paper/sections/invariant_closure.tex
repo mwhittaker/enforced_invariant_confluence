@@ -25,7 +25,7 @@ $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
 \end{theorem}
 
 \thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is
-sufficient for \invariantconfluence{}. Intuitively, our system model ensures
+sufficient for \invariantconfluence{}. Intuitively, recall that our system model ensures
 that transaction execution preserves the invariant, so if merging states also
 preserves the invariant and if our start state satisfies the invariant, then
 inductively it is impossible for us to reach a state that doesn't satisfy the
@@ -55,8 +55,8 @@ is best explained through an example.
 
   The invariant and the set of reachable states are illustrated in \figref{Z2}
   in which we draw each state $(x, y)$ as a point in space. The invariant
-  consists of the second and fourth quadrant, and the reachable states consist
-  of the fourth quadrant. From this, it's immediate that the reachable states
+  consists of the second and fourth quadrant, while the reachable states consist only
+  of the fourth quadrant. From this, it is immediate that the reachable states
   are a subset of the invariant, so $O$ is \invariantconfluent{}. However,
   letting $s_1 = (-1, 1)$ and $s_2 = (1, -1)$, we see that $O$ is not
   \invariantclosed{}. $I(s_1)$ and $I(s_2)$, but letting $s_3 = s_1 \join s_2 =
@@ -69,7 +69,7 @@ In \exampleref{Z2}, $s_1$ and $s_2$ witness the fact that $O$ is not
 \invariantclosure{} is not equivalent to \invariantconfluence{}.
 \Invariantconfluence{} is, at its core, a property of reachable states, but
 \invariantclosure{} is completely ignorant of reachability. As a result,
-invariant satisfying yet unreachable states like $s_1$ are the key hurdle
+invariant-satisfying yet unreachable states like $s_1$ are the key hurdle
 preventing \invariantclosure{} from being equivalent to \invariantconfluence{}.
 This is formalized by \thmref{IclosureEquivalentIconfluence}.
 

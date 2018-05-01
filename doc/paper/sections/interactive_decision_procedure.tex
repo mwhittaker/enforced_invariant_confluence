@@ -69,7 +69,7 @@ in \figref{DecisionProcedureExample}.
 boolean indicating whether $O$ is \Iclosed{}. If closed is true, then $s_1$ and
 $s_2$ are null. If closed is false, then $s_1$ and $s_2$ are a counterexample
 witnessing the fact that $O$ is not \Iclosed{}. That is, $I(s_1)$ and $I(s_2)$,
-but $\lnot I(s_1 \join s_2)$ (e.g. $s_1$ and $s_2$ from \exampleref{Z2}).  As
+but $\lnot I(s_1 \join s_2)$ (e.g., $s_1$ and $s_2$ from \exampleref{Z2}).  As
 we mentioned earlier, we can (and do) implement the \invariantclosure{}
 decision procedure using an SMT solver like Z3~\cite{de2008z3}.
 
@@ -122,7 +122,7 @@ s_2$, but $\lnot I(s_1 \join s_2)$. Thus, $O$ is not \sTIconfluent{}, so
 \Helper{} recurses only when one of $s_1$ or $s_2$ is unreachable, so $NR$
 grows after every recursive invocation of \Helper{}. Similarly, $R$ continues
 to grow as \Helper{} randomly explores the set of reachable states. As the user
-sees more and more examples of unreachable and reachable states, it becomes
+sees more and more examples of unreachable and reachable states, it often becomes
 easier and easier for them to recognize patterns that define which states are
 reachable and which are not. As a result, it becomes easier for a user to
 augment $NR$ and eliminate a large number of unreachable states from the
@@ -153,7 +153,7 @@ In this case, \IsIclosed$(O, I - NR)$ might return true, even though $O$ is not
 be \sTIconfluent{} even though it isn't, and eventually one replica of their
 distributed object might enter a state that violates the invariant.
 %
-We can mitigate this in two ways. First, we can aggressively expand $R$. If a
+We can mitigate this in two ways. First, we can aggressively expand $R$ automatically. If a
 user ever labels a state $s$ as unreachable, but $s \in R$, we can notify the
 user of their mistake. Second, \Helper{} returns true when $O$ is \iclosed{(I -
 NR)} for some $NR$, so $O$ \emph{is} \sticonfluent{s_0}{T}{I-NR} (even though

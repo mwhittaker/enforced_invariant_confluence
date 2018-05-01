@@ -89,7 +89,7 @@
     \caption{%
       \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
       counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. \Helper{} randomly
-      generates some \sTIreachable{} points and adds them to $R$. Lucky for
+      generates some \sTIreachable{} points and adds them to $R$. Luckily for
       us, $s_2 \in R$, so \Helper{} knows that it is \sTIreachable{}.
       \Helper{} is not sure about $s_1$, so it asks the user. After some
       thought, the user tells \Helper{} that $s_1$ is \sTIunreachable{}, so
@@ -187,10 +187,14 @@
     \figlabel{DecisionProcedureExampleD}
   \end{subfigure}
 
-  \caption{%
+  \vspace{1em}
+  \hrule
+  \vspace{1em}
+
+  \caption{%\vspace{1em}
     An example of a user interacting with
-    \algoref{InteractiveDecisionProcedure} on \exampleref{Z2}.  The
-    visualization shows $R$ (left), $NR$ (middle), and $I - NR$ (right) as the
+    \algoref{InteractiveDecisionProcedure} on \exampleref{Z2}.  Each step
+    of the visualization shows Reachable states $R$ (left), non-Reachable states $NR$ (middle), and the refined invariant $I - NR$ (right) as the
     algorithm executes.
   }
   \figlabel{DecisionProcedureExample}
