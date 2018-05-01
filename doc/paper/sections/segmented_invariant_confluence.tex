@@ -262,7 +262,10 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
   transactions. Applying, \algoref{ArbitraryStartInteractiveDecisionProcedure},
   \IsIclosed{} again returns false with same states $s_1$ and $s_2$. This time,
   however, the user recognizes that the two states are not
-  \ticoreachable{T^+}{I} \jmh{Clarify here how the user recognizes this ... I believe that you're saying that the definition of $\Sigma$ implies that decrement requires coordination hence $n_i$ are kept consistent hence disagreeing $n_i$ isn't possible.} The user refines $NR$ with the observation that two
+  \ticoreachable{T^+}{I} (all modifications of $(n_1, n_2, n_3)$ require global
+  coordination, so it is impossible for $s_1$ and $s_2$ to differ on these
+  values).
+  The user refines $NR$ with the observation that two
   states are coreachable if and only if they have the same values of $n_1, n_2,
   n_3$. After this, \IsIclosed{} and
   \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.

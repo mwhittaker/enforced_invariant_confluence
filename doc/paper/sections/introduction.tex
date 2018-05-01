@@ -2,9 +2,8 @@
 When an application designer decides to replicate a piece of data, they have to
 make a fundamental choice between weak and strong consistency. Replicating the
 data with strong consistency using a technique like distributed transactions (e.g., ~\cite{bernstein1981concurrency,mohan1986transaction}) or state machine
-replication~\cite{schneider1990implementing, lamport1998part,
-liskov2012viewstamped, ongaro2014search, moraru2013there, vincent2015designing,
-oki1988viewstamped, lamport2005generalized, lamport2006fast} \jmh{why so many citations? pick a few and say "e.g."} makes the
+replication (e.g., ~\cite{schneider1990implementing, lamport1998part,
+liskov2012viewstamped, ongaro2014search}) makes the
 application designer's life very easy. To the developer, a strongly
 consistent system behaves exactly like a single-threaded system running on a
 single node, so reasoning about the behavior of the system is
@@ -34,7 +33,7 @@ condition for when invariants can be maintained over replicated data without
 the need for any coordination~\cite{bailis2014coordination}. If an object is
 \invariantconfluent{} with respect to an invariant, we can replicate it with
 the performance benefits of weak consistency and (some of) the correctness
-benefits of strong consistency. 
+benefits of strong consistency.
 
 Unfortunately, to date, the task of identifying whether or not
 an object actually is \invariantconfluent{} has remained an exercise in human proof generation. Bailis et al.\
@@ -46,7 +45,7 @@ program that can automatically determine \invariantconfluence{} for us.
 \invariantconfluence{} decision procedure, and implement it in an interactive system.
 
 Designing such a general-purpose decision procedure is
-difficult\footnote{In fact it's impossible. Determining 
+difficult\footnote{In fact it's impossible. Determining
 \invariantconfluence{} of an object is undecidable in general. Still, we can develop a
 decision procedure that works well in the common case.}. Many prior
 efforts instead develop a decision procedure for \emph{\invariantclosure{}}, a
@@ -78,7 +77,7 @@ about reachability to develop a new sufficient condition for
 some cases that are not covered by \invariantclosure{}, and it can be
 automatically checked without any user interaction.
 
-\textbf{The second main thrust of this paper is to partially avoid coordination even in programs that require it}, by generalizing \invariantconfluence{} to a local property called \emph{segmented \invariantconfluence{}} over subsets of program states. While \invariantconfluence{}
+\textbf{The second main thrust of this paper is to partially avoid coordination even in programs that require it}, by generalizing \invariantconfluence{} to a local property called \emph{segmented \invariantconfluence{}}. While \invariantconfluence{}
 characterizes objects that can be replicated \emph{without any} coordination,
 segmented \invariantconfluence{} allows us to replicate
 non-\invariantconfluent{} objects with only \emph{occasional} coordination. The main
