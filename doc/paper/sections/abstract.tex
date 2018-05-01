@@ -1,5 +1,5 @@
 \begin{abstract}
-Strongly consistent systems are easy to reason about but face fundamental
+Strongly consistent distributed systems are easy to reason about but face fundamental
 limitations in availability and performance. Weakly consistent systems can be
 implemented with very high performance but place a burden on the application
 developer to reason about complex interleavings of execution.
@@ -15,9 +15,11 @@ sufficient condition that can be checked automatically. We then take a step
 beyond \invariantconfluence{} and introduce a generalization of
 \invariantconfluence{} called segmented \invariantconfluence{}, which allows us
 to replicate non-\invariantconfluent{} objects with a small amount of
-coordination. We implemented our theoretical findings in a prototype called
+coordination. 
+
+We implemented these formalisms in a prototype called
 Lucy and found that our decision procedures efficiently handle common real-world workloads
-including foreign key constraints, rollups, escrow transactions, and others.  We also
+including foreign keys, rollups, escrow transactions, and more.  We also
 found that segmented \invariantconfluent{} replication can deliver up to an
 order of magnitude more throughput than linearizable replication for low
 contention workloads and comparable throughput for medium to high contention
