@@ -79,8 +79,8 @@ def plot_bank_account(data):
 
         plt.figure(figsize=(8, 3))
         plt.semilogy(gossip_xs, gossip_ys, **EVENTUAL_FMT)
-        plt.semilogy(master_xs, master_ys, **IC_FMT)
         plt.semilogy(paxos_xs, paxos_ys, **LIN_FMT)
+        plt.semilogy(master_xs, master_ys, **IC_FMT)
         plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.2), prop={'size': 12})
         plt.xlabel('Decrement Frequency (fraction of workload)')
         plt.ylabel('Throughput (txns/s)')
@@ -104,8 +104,8 @@ def plot_bank_account(data):
 
         plt.figure(figsize=(8, 4))
         plt.semilogy(gossip_xs, gossip_ys, **EVENTUAL_FMT)
-        plt.semilogy(master_xs, master_ys, **IC_FMT)
         plt.semilogy(paxos_xs, paxos_ys, **LIN_FMT)
+        plt.semilogy(master_xs, master_ys, **IC_FMT)
         plt.legend(loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.15), prop={'size': 12})
         plt.xlabel('Number of Nodes')
         plt.ylabel('Throughput (txns/s)')
