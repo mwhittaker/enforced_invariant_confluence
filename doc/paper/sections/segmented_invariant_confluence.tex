@@ -87,36 +87,31 @@ involved. Consider a server $s_i$ with active segment $(I_i, T_i)$. A client
 can request that $p_i$ execute a transaction $t \in T$. We consider what
 happens when $t \in T_i$ and $t \notin T_i$ separately.
 
-\begin{itemize}
-  \item
-    If $t \notin T_i$, then $p_i$ initiates a round of global coordination to
-    execute $t$. During global coordination, every server temporarily stops
-    processing transactions and transitions to state $s = s_1 \join \ldots
-    \join s_n$, the join of every server's state. Then, every server
-    speculatively executes $t$ transitioning to state $t(s)$. If $t(s)$
-    violates the invariant (i.e.  $\lnot I(t(s))$), then every server aborts
-    $t$ and reverts to state $s$.  Then, $p_i$ replies to the client. If $t(s)$
-    satisfies the invariant (i.e.  $I(t(s))$), then every server commits $t$
-    and remains in state $t(s)$. Every server then chooses the first segment
-    $(I_i, T_i) \in \Sigma$ such that $I_i(t(s))$ to be the new active segment.
-    Note that such a segment is guaranteed to exist because the segment
-    invariants cover $I$. Moreover, $\Sigma$ is ordered, so every server will
-    deterministically pick the same active segment. In fact, an invariant of
-    the system model is that at any given point of normal processing, every
-    server has the same active segment.
+If $t \notin T_i$, then $p_i$ initiates a round of global coordination to
+execute $t$. During global coordination, every server temporarily stops
+processing transactions and transitions to state $s = s_1 \join \ldots \join
+s_n$, the join of every server's state. Then, every server speculatively
+executes $t$ transitioning to state $t(s)$. If $t(s)$ violates the invariant
+(i.e.  $\lnot I(t(s))$), then every server aborts $t$ and reverts to state $s$.
+Then, $p_i$ replies to the client. If $t(s)$ satisfies the invariant (i.e.
+$I(t(s))$), then every server commits $t$ and remains in state $t(s)$. Every
+server then chooses the first segment $(I_i, T_i) \in \Sigma$ such that
+$I_i(t(s))$ to be the new active segment.  Note that such a segment is
+guaranteed to exist because the segment invariants cover $I$. Moreover,
+$\Sigma$ is ordered, so every server will deterministically pick the same
+active segment. In fact, an invariant of the system model is that at any given
+point of normal processing, every server has the same active segment.
 
-  \item
-    If $t \in T_i$, then $p_i$ executes $t$ immediately and without
-    coordination.  If $t(s_i)$ satisfies the \emph{active} invariant (i.e.
-    $I_i(t(s_i))$), then $p_i$ commits $t$, stays in state $t(s_i)$, and
-    replies to the client. If $t(s_i)$ violates the \emph{global} invariant
-    (i.e. $\lnot I(t(s_i))$), then $p_i$ aborts $t$, reverts to state $s_i$,
-    and replies to the client. If $t(s_i)$ satisfies the global invariant but
-    violates the active invariant (i.e.  $I(t(s_i))$ but $\lnot I_i(t(s_i))$),
-    then $p_i$ reverts to state $s_i$ and initiates a round of global
-    coordination to execute $t$, as described in the previous paragraph.
-    Transaction execution is summarized in \algoref{TxnExecution}.
-\end{itemize}
+Otherwise, if $t \in T_i$, then $p_i$ executes $t$ immediately and without
+coordination.  If $t(s_i)$ satisfies the \emph{active} invariant (i.e.
+$I_i(t(s_i))$), then $p_i$ commits $t$, stays in state $t(s_i)$, and replies to
+the client. If $t(s_i)$ violates the \emph{global} invariant (i.e. $\lnot
+I(t(s_i))$), then $p_i$ aborts $t$, reverts to state $s_i$, and replies to the
+client. If $t(s_i)$ satisfies the global invariant but violates the active
+invariant (i.e.  $I(t(s_i))$ but $\lnot I_i(t(s_i))$), then $p_i$ reverts to
+state $s_i$ and initiates a round of global coordination to execute $t$, as
+described in the previous paragraph.  Transaction execution is summarized in
+\algoref{TxnExecution}.
 
 \begin{algorithm}[t]
   \caption{%
@@ -286,38 +281,43 @@ applications with a smaller number of segments, whereas \invariantconfluence{}
 only provides guarantees to applications that can be segmented into a single
 segment.
 
-Second, segmented \invariantconfluence{} naturally subsumes a distributed
-locking approach to replicating non-\invariantconfluent{} objects.  This
-approach first recognizes which transactions cannot be safely executed
-concurrently and then requires them to acquire a distributed lock before
-executing~\cite{balegas2015putting, gotsman2016cause}. For example, in a
-banking application with the invariant that all balances remain non-negative,
-concurrent deposits are permitted, but concurrent withdrawals can lead to
-invariant violations. Thus, we require that withdrawals acquire a distributed
-lock before executing. This example is exactly the same as
-\exampleref{CounreachableExample} which we handled by simply removing
-withdrawal transactions from our segmentation's set of transactions.
+% Second, segmented \invariantconfluence{} naturally subsumes a distributed
+% locking approach to replicating non-\invariantconfluent{} objects.  This
+% approach first recognizes which transactions cannot be safely executed
+% concurrently and then requires them to acquire a distributed lock before
+% executing~\cite{balegas2015putting, gotsman2016cause}. For example, in a
+% banking application with the invariant that all balances remain non-negative,
+% concurrent deposits are permitted, but concurrent withdrawals can lead to
+% invariant violations. Thus, we require that withdrawals acquire a distributed
+% lock before executing. This example is exactly the same as
+% \exampleref{CounreachableExample} which we handled by simply removing
+% withdrawal transactions from our segmentation's set of transactions.
 
-Third, we can integrate a couple of optimizations into our system model to
-further reduce the amount of coordination it requires. To begin, if a server with
-state $s_i$ and active segment $(I_i, T_i)$ receives a transaction $t \in I_i$
-to execute, and $t(s_i)$ violates the active invariant but not the global
-invariant, instead of initiating a round of global coordination, $p_i$ can
-simply buffer $t$ for re-execution at a later time. While this increases the
-latency required to execute $t$, it's possible that after other transactions
-are executed, re-executing $t$ may lead to a state that either satisfies the
-active invariant or violates the global invariant. In either case, a round of
-global coordination is avoided. Similarly, servers can buffer transactions that
-require global coordination, executing an entire batch of these transactions
-during a single round of global coordination.
+% Second, we can integrate a couple of optimizations into our system model to
+% further reduce the amount of coordination it requires. To begin, if a server with
+% state $s_i$ and active segment $(I_i, T_i)$ receives a transaction $t \in I_i$
+% to execute, and $t(s_i)$ violates the active invariant but not the global
+% invariant, instead of initiating a round of global coordination, $p_i$ can
+% simply buffer $t$ for re-execution at a later time. While this increases the
+% latency required to execute $t$, it's possible that after other transactions
+% are executed, re-executing $t$ may lead to a state that either satisfies the
+% active invariant or violates the global invariant. In either case, a round of
+% global coordination is avoided. Similarly, servers can buffer transactions that
+% require global coordination, executing an entire batch of these transactions
+% during a single round of global coordination.
 
-Fourth, a segmented \invariantconfluence{} decision procedure can also leverage
+Second, we can integrate a couple of optimizations into our system model to
+further reduce the amount of coordination it requires. For example, servers can
+buffer transactions that require global coordination, executing an entire batch
+of these transactions during a single round of global coordination.
+
+Third, a segmented \invariantconfluence{} decision procedure can also leverage
 \thmref{LatticeProperty} in addition to
 \algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
 criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in
 I$.
 
-Fifth, while a segmented \invariantconfluence{} decision procedure can help
+Fourth, while a segmented \invariantconfluence{} decision procedure can help
 decide whether or not an object is segmented \invariantconfluent{}, it cannot
 currently help construct a segmentation. In the future, we plan to explore
 ways by which we can automatically suggest segmentations to the application

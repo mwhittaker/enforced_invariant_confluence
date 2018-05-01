@@ -41,13 +41,10 @@ side effects and the final database state are consistent.  The observational
 equivalence guaranteed by the homeostasis protocol is stronger than the
 guarantees of \invariantconfluence{}. As a result, there are invariants and
 workloads that the homeostasis protocol would execute with more coordination
-than a segmented \invariantconfluent{} execution.  The protocol generates
-global invariants, called global treaties, and servers operate without
-coordination so long as they preserve the treaty. When the treaty is violated,
-the nodes perform a round of coordination and establish a new treaty.  This
-mechanism of establishing invariants and operating without coordination so long
-as the invariants are maintained is very similar to our design of segmented
-\invariantconfluence{}.
+than a segmented \invariantconfluent{} execution. Moreover, the homeostasis and
+demarcation protocols' mechanism of establishing global invariants and
+operating without coordination so long as the invariants are maintained is very
+similar to our design of segmented \invariantconfluence{}.
 
 \textbf{Explicit Consistency.}
 Explicit consistency~\cite{balegas2015towards} is a consistency model that
