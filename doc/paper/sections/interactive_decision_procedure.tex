@@ -1,11 +1,11 @@
 \section{Interactive Decision Procedure}\seclabel{InteractiveDecisionProcedure}
 \newcommand{\Helper}{\textsf{Helper}}
-\newcommand{\IsIclosed}{\textsf{IsIclosed}}
-\newcommand{\IsInvConfluent}{\textsf{IsInvConfluent}}
+\newcommand{\IsIclosed}{\textsc{IsIclosed}}
+\newcommand{\IsInvConfluent}{\textsc{IsInvConfluent}}
 
 \newcommand{\algocomment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
 \begin{algorithm}[t]
-  \caption{Interactive invariantconfluence{} decision procedure}%
+  \caption{Interactive \invariantconfluence{} decision procedure}%
   \algolabel{InteractiveDecisionProcedure}
   \begin{algorithmic}
     \algocomment{Return if $O$ is \sTIconfluent{}.}
@@ -36,8 +36,8 @@
 
 \thmref{IclosureEquivalentIconfluence} tells us that if all invariant
 satisfying points are reachable, then \invariantclosure{} and
-invariantconfluence{} are equivalent. In this section, we present the
-interactive invariantconfluence{} decision procedure shown in
+\invariantconfluence{} are equivalent. In this section, we present the
+interactive \invariantconfluence{} decision procedure shown in
 \algoref{InteractiveDecisionProcedure} which takes advantage of this result.
 
 \subsection{The Decision Procedure}
@@ -55,7 +55,7 @@ states from the invariant. Meanwhile, the algorithm leverages an
 not \sTIconfluent{} or (b) provide counterexamples to the user to help them
 eliminate unreachable states. After all unreachable states have been eliminated
 from the invariant, \thmref{IclosureEquivalentIconfluence} allows us to reduce
-the problem of invariantconfluence{} directly to the problem of
+the problem of \invariantconfluence{} directly to the problem of
 \invariantclosure{}, and the algorithm terminates.
 %
 We now describe \algoref{InteractiveDecisionProcedure} in detail. An example of
@@ -81,8 +81,8 @@ $s_0$, $T$, and $I$---takes as arguments a set $R$ of \sTIreachable{} states
 and a set $NR$ of \sTIunreachable{} states. Like \IsInvConfluent, \Helper$(O,
 s_0, T, I, R, NR)$ returns whether $O$ is \sTIconfluent{} (assuming $R$ and
 $NR$ are correct).  As \algoref{InteractiveDecisionProcedure} executes, $NR$ is
-iteratively increased, which removes unreachable states from $I$ until $I
-\subseteq \setst{s \in S}{\sTIreachablepredicate{s}}$.
+iteratively increased, which removes unreachable states from $I$ until $I$ is a
+subset of $\setst{s \in S}{\sTIreachablepredicate{s}}$.
 
 First, \Helper{} checks to see if $O$ is \iclosed{(I - NR)}.
 %

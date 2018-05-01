@@ -220,7 +220,7 @@ categorize the invariants into one of three types:
     % the primary key constraint has been violated.
     %
     We applied Lucy to this workload and in less than a second, it produced a
-    counterexample that---when labelled as reachable---confirming that the
+    counterexample that---when labelled as reachable---confirms that the
     workload is \emph{not} \invariantconfluent{}~\cite{bailis2014coordination}.
 % \end{enumerate}
 
@@ -309,8 +309,8 @@ contention.
   throughput. Increasing the fraction of decrements from 0\% to 1\% decreases
   throughput by a factor of 2. Increasing again to 3\%, the throughput
   decreases by another factor of 2. With 90\% coordination-free transactions
-  (i.e.\ 10\% decrements), we achieve only 10\% of the throughput of eventual
-  consistency.
+  (i.e.\ 10\% decrements), we achieve only 10\% of the throughput of eventually
+  consistent replication.
 
 %  %
 %  First, for low-decrement workloads, segmented \invariantconfluent{}
@@ -383,10 +383,10 @@ contention.
 
   These results echo the results of \benchref{VaryWithdraws}. For
   low-coordination workloads, segmented \invariantconfluent{} replication can
-  offer almost an order of magnitude better scalability of linearizable
-  replication, but coordination decreases scalability superlinearly. Even
-  infrequent coordination can drastically reduce the scalability of segmented
-  \invariantconfluent{} replication with segmented \invariantconfluent{}
-  replication ultimately scaling worse than linearizable replication for
-  high-coordination workloads.
+  offer almost an order of magnitude better scalability compared to
+  linearizable replication, but coordination decreases scalability
+  superlinearly. Even infrequent coordination can drastically reduce the
+  scalability of segmented \invariantconfluent{} replication with segmented
+  \invariantconfluent{} replication ultimately scaling worse than linearizable
+  replication for high-coordination workloads.
 \end{benchmark}

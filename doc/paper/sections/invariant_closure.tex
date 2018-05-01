@@ -71,7 +71,7 @@ In \exampleref{Z2}, $s_1$ and $s_2$ witness the fact that $O$ is not
 \invariantclosure{} is completely ignorant of reachability. As a result,
 invariant satisfying yet unreachable states like $s_1$ are the key hurdle
 preventing \invariantclosure{} from being equivalent to \invariantconfluence{}.
-This is formalized by \thmref{IclosureEquivalentIconfluence}
+This is formalized by \thmref{IclosureEquivalentIconfluence}.
 
 \begin{theorem}\thmlabel{IclosureEquivalentIconfluence}
   Consider an object $O = (S, \join)$, a start state $s_0 \in S$, a set of
@@ -79,7 +79,7 @@ This is formalized by \thmref{IclosureEquivalentIconfluence}
   reachable states (i.e. $I \subseteq \setst{s \in
   S}{\sTIreachablepredicate{s}}$), then
   \[
-    \text{$I(s_0)$ and $O$ is \Iclosed{}} \iff \text{$O$ is \sTIconfluent{}}
+    (\text{$I(s_0)$ and $O$ is \Iclosed{}}) \iff \text{$O$ is \sTIconfluent{}}
   \]
 \end{theorem}
 \begin{proof}

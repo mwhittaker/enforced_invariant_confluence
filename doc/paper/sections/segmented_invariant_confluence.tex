@@ -1,5 +1,5 @@
 \section{Segmented Invariant Confluence}\seclabel{SegmentedInvariantConfluence}
-\newcommand{\IsIclosed}{\textsf{IsIclosed}}
+\newcommand{\IsIclosed}{\textsc{IsIclosed}}
 
 If a distributed object is \invariantconfluent{}, then the object can be
 replicated without the need for any form of coordination to maintain the
@@ -47,7 +47,7 @@ abbreviated \defword{\sTISconfluent}, if the following conditions hold:
   Consider again the object $O = (\ints \times \ints, \join)$, transactions $T
   = \set{t_{x+1}, t_{y-1}}$, and invariant $I = \setst{(x, y)}{xy \leq 0}$ from
   \exampleref{Z2}, but now let the start state $s_0$ be $(-42, 42)$. $O$ is
-  \emph{not} \sTISconfluent{} because the points $(0, 42)$ and $(42, 0)$ are
+  \emph{not} \sTIconfluent{} because the points $(0, 42)$ and $(42, 0)$ are
   reachable, and merging these points yields $(42, 42)$ which violates the
   invariant. However, $O$ is \sTISconfluent{} for $\Sigma = (I_1, T_1)$, $(I_2,
   T_2)$, $(I_3, T_3)$, $(I_4, T_4)$ where
@@ -87,30 +87,36 @@ involved. Consider a server $s_i$ with active segment $(I_i, T_i)$. A client
 can request that $p_i$ execute a transaction $t \in T$. We consider what
 happens when $t \in T_i$ and $t \notin T_i$ separately.
 
-If $t \notin T_i$, then $p_i$ initiates a round of global coordination to
-execute $t$. During global coordination, every server temporarily stops
-processing and transitions to state $s = s_1 \join \ldots \join s_n$, the join
-of every server's state. Then, every server speculatively executes $t$
-transitioning to state $t(s)$. If $t(s)$ violates the invariant (i.e.  $\lnot
-I(t(s))$), then every server aborts $t$ and reverts to state $s$.  Then, $p_i$
-replies to the client. If $t(s)$ satisfies the invariant (i.e. $I(t(s))$), then
-every server commits $t$ and remains in state $t(s)$. Every server then chooses
-the first segment $(I_i, T_i) \in \Sigma$ such that $I_i(t(s))$ to be the new
-active segment. Note that such a segment is guaranteed to exist because the
-segment invariants cover $I$. Moreover, $\Sigma$ is ordered, so every server
-will deterministically pick the same active segment. In fact, an invariant of
-the system model is that at any given point of normal processing, every server
-has the same active segment.
+\begin{itemize}
+  \item
+    If $t \notin T_i$, then $p_i$ initiates a round of global coordination to
+    execute $t$. During global coordination, every server temporarily stops
+    processing transactions and transitions to state $s = s_1 \join \ldots
+    \join s_n$, the join of every server's state. Then, every server
+    speculatively executes $t$ transitioning to state $t(s)$. If $t(s)$
+    violates the invariant (i.e.  $\lnot I(t(s))$), then every server aborts
+    $t$ and reverts to state $s$.  Then, $p_i$ replies to the client. If $t(s)$
+    satisfies the invariant (i.e.  $I(t(s))$), then every server commits $t$
+    and remains in state $t(s)$. Every server then chooses the first segment
+    $(I_i, T_i) \in \Sigma$ such that $I_i(t(s))$ to be the new active segment.
+    Note that such a segment is guaranteed to exist because the segment
+    invariants cover $I$. Moreover, $\Sigma$ is ordered, so every server will
+    deterministically pick the same active segment. In fact, an invariant of
+    the system model is that at any given point of normal processing, every
+    server has the same active segment.
 
-If $t \in T_i$, then $p_i$ executes $t$ immediately and without coordination.
-If $t(s_i)$ satisfies the \emph{active} invariant (i.e. $I_i(t(s_i))$), then
-$p_i$ commits $t$, stays in state $t(s_i)$, and replies to the client. If
-$t(s_i)$ violates the invariant (i.e. $\lnot I(t(s_i))$), then $p_i$ aborts
-$t$, reverts to state $s_i$, and replies to the client. If $t(s_i)$ satisfies
-the invariant but violates the active invariant (i.e. $I(t(s_i))$ but $\lnot
-I_i(t(s_i))$), then $p_i$ reverts to state $s_i$ and initiates a round of
-global coordination to execute $t$, as described in the previous paragraph.
-Transaction execution is summarized in \algoref{TxnExecution}.
+  \item
+    If $t \in T_i$, then $p_i$ executes $t$ immediately and without
+    coordination.  If $t(s_i)$ satisfies the \emph{active} invariant (i.e.
+    $I_i(t(s_i))$), then $p_i$ commits $t$, stays in state $t(s_i)$, and
+    replies to the client. If $t(s_i)$ violates the \emph{global} invariant
+    (i.e. $\lnot I(t(s_i))$), then $p_i$ aborts $t$, reverts to state $s_i$,
+    and replies to the client. If $t(s_i)$ satisfies the global invariant but
+    violates the active invariant (i.e.  $I(t(s_i))$ but $\lnot I_i(t(s_i))$),
+    then $p_i$ reverts to state $s_i$ and initiates a round of global
+    coordination to execute $t$, as described in the previous paragraph.
+    Transaction execution is summarized in \algoref{TxnExecution}.
+\end{itemize}
 
 \begin{algorithm}[t]
   \caption{%
@@ -153,7 +159,7 @@ segment. Unfortunately, \algoref{InteractiveDecisionProcedure} can only be used
 to determine if $O$ is \sticonfluent{s}{T_i}{I_i} for a \emph{particular} state
 $s \in I_i$, not for \emph{every} state $s \in I_i$. Thus, we would have to
 invoke \algoref{InteractiveDecisionProcedure} $|I_i|$ times for every segment
-$(I_i, T_I)$, which is clearly infeasible given that $I_i$ can be large or even
+$(I_i, T_i)$, which is clearly infeasible given that $I_i$ can be large or even
 infinite.
 
 Instead, we develop a new decision procedure that can be used to determine if
@@ -198,7 +204,7 @@ is the same.\footnote{%
   \algoref{InteractiveDecisionProcedure} and
   \algoref{ArbitraryStartInteractiveDecisionProcedure}. In
   \algoref{ArbitraryStartInteractiveDecisionProcedure}, \IsIclosed{} returns a
-  triple (closed, $s_1$, $s_2$) where if closed is false, then $s_1, s_2 \in I$
+  triple (closed, $s_1$, $s_2$). If closed is false, then $s_1, s_2 \in I$
   are two states not in $NR$ such that $I(s_1)$ and $I(s_2)$ but $\lnot I(s_1
   \join s_2)$. If no such states exist, then closed is true, and $s_1$ and
   $s_2$ are null.
@@ -290,7 +296,7 @@ lock before executing. This example is exactly the same as
 withdrawal transactions from our segmentation's set of transactions.
 
 Third, we can integrate a couple of optimizations into our system model to
-further reduce the amount of coordination required. First, if a server with
+further reduce the amount of coordination it requires. First, if a server with
 state $s_i$ and active segment $(I_i, T_i)$ receives a transaction $t \in I_i$
 to execute, and $t(s_i)$ violates the active invariant but not the global
 invariant, instead of initiating a round of global coordination, $p_i$ can
