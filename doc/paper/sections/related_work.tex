@@ -112,13 +112,12 @@ Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
 formalism, Dedalus~\cite{alvaro2011dedalus, alvaro2013declarative}, are
 declarative Datalog-based programming languages that are designed to program
 distributed systems. The accompanying CALM
-theorem~\cite{hellerstein2010declarative, ameloot2013relational} states that if
+theorem~\cite{hellerstein2010declarative, ameloot2013relational} states that if and only if
 a program can be written in the monotone fragment of these languages, then
-there exists a coordination-free implementation of the program.  The CALM
-theorem provides guarantees about the outputs of a program, but it does not
-guarantee that invariants are maintained throughout the duration of an
-execution. Moreover, Bloom and Dedalus are general purpose programming
-languages that can be used to implement a variety of distributed systems which
+there exists a consistent, coordination-free implementation of the program.  The CALM
+theorem provides guarantees about the consistency of program outputs. It does not directly capture our notions of transactions or invariance maintenance during program execution.
+Moreover, Bloom and Dedalus are general purpose programming
+languages that can be used to implement a variety of distributed systems that
 are outside of the scope of \invariantconfluence{}.
 
 % \textbf{Program Analysis in Database Systems.}

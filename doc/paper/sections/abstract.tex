@@ -7,17 +7,17 @@ developer to reason about complex interleavings of execution.
 can get the best of both worlds. An \invariantconfluent{} object can be
 efficiently replicated with no coordination needed to preserve its invariants.
 However, actually determining whether or not an object is \invariantconfluent{}
-is challenging (undecidable). In this paper, we establish conditions under
+is challenging: undecidable in general. In this paper, we establish conditions under
 which a commonly used sufficient condition for \invariantconfluence{} is both
 necessary and sufficient and use this condition to design (a) a general-purpose
 interactive \invariantconfluence{} decision procedure and (b) a novel
-sufficient condition which can be checked automatically. We then take a step
+sufficient condition that can be checked automatically. We then take a step
 beyond \invariantconfluence{} and introduce a generalization of
 \invariantconfluence{} called segmented \invariantconfluence{}, which allows us
 to replicate non-\invariantconfluent{} objects with a small amount of
 coordination. We implemented our theoretical findings in a prototype called
-Lucy and found that our decision procedures efficiently handle workloads
-including foreign key constraints, rollups, escrow transactions, etc.  We also
+Lucy and found that our decision procedures efficiently handle common real-world workloads
+including foreign key constraints, rollups, escrow transactions, and others.  We also
 found that segmented \invariantconfluent{} replication can deliver up to an
 order of magnitude more throughput than linearizable replication for low
 contention workloads and comparable throughput for medium to high contention
