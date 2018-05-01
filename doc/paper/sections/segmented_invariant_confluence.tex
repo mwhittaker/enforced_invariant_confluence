@@ -7,7 +7,10 @@ object's invariant. But what if the object is \emph{not} \invariantconfluent{}?
 In this section, we present a generalization of \invariantconfluence{} called
 \defword{segmented \invariantconfluence{}} that can be used to maintain the
 invariants of non-\invariantconfluent{} objects, requiring only a small amount
-of coordination.
+of coordination. In \secref{Evaluation}, we see that replicating a
+non-\invariantconfluent{} object with segmented \invariantconfluence{} can
+achieve between 100x and 10x more throughput than linearizable replication for
+certain workloads.
 
 The main idea behind segmented \invariantconfluence{} is to segment the state
 space into a number of segments and restrict the set of allowable transactions

@@ -105,7 +105,16 @@ highlights the trade-off between application complexity and
 coordination-freedom; more complex applications require more segments which
 require more coordination, and vice-versa.
 
-% TODO: add bit on performance.
+Finally, we present Lucy: an implementation of our decision procedures and a
+system for replicating \invariantconfluent{} and segmented
+\invariantconfluent{} objects. Using Lucy, we find that our decision
+procedures can efficiently handle a wide range of common workloads. For
+example, in \secref{Evaluation}, we apply Lucy to foreign key constraints,
+escrow transactions, an auction application, and the TPC-C benchmark. Lucy
+processes these workloads in less than half a second, and no workload requires
+more than 66 lines of code to specify. Moreover, we find that segmented
+\invariantconfluent{} replication can achieve 100x to 10x more throughput than
+linearizable replication for low-coordination workloads.
 
 In closing, here is an outline of the paper and of our contributions:
 %
@@ -127,6 +136,5 @@ We present segmented \invariantconfluence{}: a generalization of
 invariants for replicated objects that are otherwise not \invariantconfluent{}
 (\secref{SegmentedInvariantConfluence}).
 %
-We implement our decision procedures and sufficient conditions for both
-\invariantconfluence{} and segmented \invariantconfluence{} in a system called
-Lucy, then use Lucy to evaluate our methods (\secref{Evaluation}).
+We evaluate our methods using a prototype implementation called Lucy
+(\secref{Evaluation}).
