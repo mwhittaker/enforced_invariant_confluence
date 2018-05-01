@@ -44,8 +44,6 @@ abbreviated \defword{\sTISconfluent}, if the following conditions hold:
     \sticonfluent{s}{T_i}{I_i}.
 \end{itemize}
 
-{\input{figures/segmented_z2}}
-
 \begin{example}\examplelabel{SegmentedZ2}
   Consider again the object $O = (\ints \times \ints, \join)$, transactions $T
   = \set{t_{x+1}, t_{y-1}}$, and invariant $I = \setst{(x, y)}{xy \leq 0}$ from
@@ -66,6 +64,9 @@ abbreviated \defword{\sTISconfluent}, if the following conditions hold:
   \sticonfluent{s}{T_i}{I_I} for every $s \in I_i$. Thus, $O$ is
   \sTISconfluent{}.
 \end{example}
+
+{\input{figures/segmented_z2}}
+
 
 \subsection{System Model}
 Now, we describe the system model used to replicate a segmented
@@ -144,7 +145,7 @@ transaction that leads to a state outside the active segment) triggers a global
 coordination. Globally coordinated transactions are only executed if they
 maintain the invariant. Moreover, if a globally coordinated transaction leads
 to another segment, the coordination ensures that all servers begin in the same
-start state and with the same active replica, reestablishing the assumptions of
+start state and with the same active segment, reestablishing the assumptions of
 the \invariantconfluence{} system model.
 
 \subsection{Interactive Decision Procedure}

@@ -19,7 +19,7 @@ Otherwise, if the object is not \invariantclosed{}, then Z3 produces a
 counterexample witnessing the satisfiability of the formula.
 
 Lucy also includes an implementation of the \invariantconfluence{} and
-segmented-invariant confluence system models in roughly 3,500 lines of C++.
+segmented \invariantconfluence{} system models in roughly 3,500 lines of C++.
 Users specify objects, transactions, invariants, and segmentations in C++. Lucy
 then replicates the objects using segmented \invariantconfluence{}. Clients
 send every transaction request to a randomly selected server. When a server
@@ -241,15 +241,15 @@ Second, the throughput and scalability of segmented \invariantconfluent{}
 replication decreases as we increase the fraction of transactions that require
 coordination.
 
-These hypotheses state that segmented \invariantconfluent{} is more performant
-than linearizable replication for low-coordination workloads. But by how much?
-We also aim to measure the absolute performance and scalability benefits of
-segmented \invariantconfluent{} replication and how they vary as we vary the
-coordination required by a workload. We perform two controlled microbenchmarks
-to confirm our hypotheses and discover the absolute performance benefits. The
-workloads themselves are trivial but are not the focus of our experiments. Our objective is to
-obtain a controlled measure of throughput and scalability as we vary workload
-contention.
+These hypotheses state that segmented \invariantconfluent{} replication is more
+performant than linearizable replication for low-coordination workloads. But by
+how much?  We also aim to measure the absolute performance and scalability
+benefits of segmented \invariantconfluent{} replication and how they vary as we
+vary the coordination required by a workload. We perform two controlled
+microbenchmarks to confirm our hypotheses and discover the absolute performance
+benefits. The workloads themselves are trivial but are not the focus of our
+experiments. Our objective is to obtain a controlled measure of throughput and
+scalability as we vary workload contention.
 
 \begin{figure}[t]
   \centering
