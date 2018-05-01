@@ -247,7 +247,7 @@ We also aim to measure the absolute performance and scalability benefits of
 segmented \invariantconfluent{} replication and how they vary as we vary the
 coordination required by a workload. We perform two controlled microbenchmarks
 to confirm our hypotheses and discover the absolute performance benefits. The
-workloads themselves are trivial, but also not salient. \jmh{Salient to what? I'm confused by the last sentence.} Our objective is to
+workloads themselves are trivial but are not the focus of our experiments. Our objective is to
 obtain a controlled measure of throughput and scalability as we vary workload
 contention.
 
@@ -292,8 +292,7 @@ contention.
   %
   First, the relationship between segmented \invariantconfluent{} and
   linearizable replication is analogous to the relationship between optimistic
-  and pessimistic concurrency control protocols with coordination playing the
-  role of contention \jmh{I didn't understand that last clause about ``coordination playing the role of contention.} Linearizable replication pessimistically assumes that
+  and pessimistic concurrency control protocols. Linearizable replication pessimistically assumes that
   concurrently executing \emph{any} pair of transactions will lead to an
   invariant violation. Thus, clients send transactions directly to a leader to
   be linearized. Conversely, segmented \invariantconfluent{} replication
@@ -301,8 +300,11 @@ contention.
   coordination. A server only initiates a round of coordination if it is found
   to be necessary. As a consequence, segmented \invariantconfluent{}
   replication can offer substantial performance benefits over linearizable
-  replication for low-coordination workloads, but is inferior for medium to
-  high contention workloads. \jmh{say why}
+  replication for low-coordination workloads. However, it is inferior for
+  medium to high contention workloads because the majority of transactions that
+  are sent to a server are eventually aborted and relayed to the leader. This
+  additional latency is avoided by linearizable replication which sends
+  transactions directly to the leader.
 
   Second, throughput does not decrease linearly with the amount of
   coordination. Even infrequent coordination can drastically decrease
@@ -365,7 +367,6 @@ contention.
 \end{figure}
 
 \begin{benchmark}
-\jmh{Can you get the figures to color ``eventual'' and ``linearizable'' the same in both?}
   In this benchmark, we measure the scale-out of segmented
   \invariantconfluent{} replication. We repeat \benchref{VaryWithdraws} while
   we vary the number of servers that we use to replicate our object. When we
