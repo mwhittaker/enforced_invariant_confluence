@@ -774,8 +774,7 @@
 
 }
 
-% \def\endabstract{\if@twocolumn\else\endquotation\fi \@mkbibcitation}
-\def\endabstract{\if@twocolumn\else\endquotation\fi}
+\def\endabstract{\if@twocolumn\else\endquotation\fi \@mkbibcitation}
 
 
 
@@ -1368,7 +1367,11 @@
 \baselineskip=11pt
 \let\thepage\relax % For NO page numbers - GM Nov. 30th. 1999 and July 2000
 \def\setpagenumber#1{\global\setcounter{page}{#1}}
-\pagenumbering{arabic}  % Arabic page numbers GM July 2000
+% For the first iteration of the camera ready version, VLDB asks us to remove
+% page numbers. Thus, we change "arabic" to "gobble" as instructed by [1].
+%
+% [1]: https://tex.stackexchange.com/a/7357
+\pagenumbering{gobble}  % Arabic page numbers GM July 2000
 \twocolumn             % Double column.
 \flushbottom           % Even bottom -- alas, does not balance columns at end of document
 \pagestyle{plain}
@@ -1415,7 +1418,10 @@
 \global\conf{Proceedings of the VLDB Endowment,}
 \global\confinfo{Vol. \@vldbVolume, No. \@vldbNumber}
 \newtoks\copyrightetc
-\global\copyrightetc{Copyright 2018 VLDB Endowment 2150-8097/18/10... \$ 10.00}
+% By default, the following line has copyright 2150-8097/18/10. The email we
+% received from the VLDB chairs tells us to change it to 2150-8097/18/09 ("09"
+% instead of "10").
+\global\copyrightetc{Copyright 2018 VLDB Endowment 2150-8097/18/09... \$ 10.00}
 
 
 \toappear{\the\boilerplate\par
