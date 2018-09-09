@@ -2,7 +2,7 @@
 @article{bailis2014coordination,
   title={Coordination avoidance in database systems},
   author={Bailis, Peter and Fekete, Alan and Franklin, Michael J and Ghodsi, Ali and Hellerstein, Joseph M and Stoica, Ion},
-  journal={Proceedings of the VLDB Endowment},
+  journal={PVLDB},
   volume={8},
   number={3},
   pages={185--196},
@@ -29,7 +29,7 @@
 @article{bailis2013highly,
   title={Highly available transactions: Virtues and limitations},
   author={Bailis, Peter and Davidson, Aaron and Fekete, Alan and Ghodsi, Ali and Hellerstein, Joseph M and Stoica, Ion},
-  journal={Proceedings of the VLDB Endowment},
+  journal={PVLDB},
   volume={7},
   number={3},
   pages={181--192},
@@ -50,7 +50,6 @@
   title={Putting consistency back into eventual consistency},
   author={Balegas, Valter and Duarte, S{\'e}rgio and Ferreira, Carla and Rodrigues, Rodrigo and Pregui{\c{c}}a, Nuno and Najafzadeh, Mahsa and Shapiro, Marc},
   booktitle={Proceedings of the Tenth European Conference on Computer Systems},
-  pages={6},
   year={2015},
   organization={ACM}
 }
@@ -123,10 +122,14 @@
   publisher={ACM}
 }
 
-@article{liskov2012viewstamped,
-  title={Viewstamped replication revisited},
-  author={Liskov, Barbara and Cowling, James},
-  year={2012}
+@techreport{liskov2012viewstamped,
+    Author = {Liskov, Barbara and Cowling, James},
+    Title = {Viewstamped Replication Revisited},
+    Institution = {CSAIL, Massachusetts Institute of Technology},
+    Year = {2012},
+    Month = {July},
+    URL = {https://dspace.mit.edu/handle/1721.1/71763},
+    Number = {MIT-CSAIL-TR-2012-021},
 }
 
 @inproceedings{ongaro2014search,
@@ -264,11 +267,14 @@
   publisher={AcM}
 }
 
-@book{lipton1988pram,
-  title={PRAM: A scalable shared memory},
-  author={Lipton, Richard J and Sandberg, Jonathan S},
-  year={1988},
-  publisher={Princeton University, Department of Computer Science}
+@techreport{lipton1988pram,
+    Author = {Lipton, Richard J and Sandberg, Jonathan S},
+    Title = {PRAM: A Scalable Shared Memory},
+    Institution = {Computer Science Department, Princeton University},
+    Year = {1988},
+    Month = {August},
+    URL = {https://www.cs.princeton.edu/research/techreps/TR-180-88},
+    Number = {TR-180-88},
 }
 
 @article{ahamad1995causal,
@@ -354,16 +360,19 @@
   booktitle={CIDR},
   pages={249--260},
   year={2011},
-  organization={Citeseer}
 }
 
-@inproceedings{conway2012logic,
-  title={Logic and lattices for distributed programming},
-  author={Conway, Neil and Marczak, William R and Alvaro, Peter and Hellerstein, Joseph M and Maier, David},
-  booktitle={Proceedings of the Third ACM Symposium on Cloud Computing},
-  pages={1},
-  year={2012},
-  organization={ACM}
+@techreport{conway2012logic,
+    Author = {Conway, Neil and Marczak, William and Alvaro, Peter and Hellerstein, Joseph M. and Maier, David},
+    Title = {Logic and Lattices for Distributed Programming},
+    Institution = {EECS Department, University of California, Berkeley},
+    Year = {2012},
+    Month = {Jun},
+    URL = {http://www2.eecs.berkeley.edu/Pubs/TechRpts/2012/EECS-2012-167.html},
+    Number = {UCB/EECS-2012-167},
+    Abstract = {In recent years there has been interest in achieving application-level consistency criteria without the latency and availability costs of strongly consistent storage infrastructure. A standard technique is to adopt a vocabulary of commutative operations; this avoids the risk of inconsistency due to message reordering.  A more powerful approach was recently captured by the <i>CALM theorem</i>, which proves that logically monotonic programs are guaranteed to be eventually consistent. In logic languages such as Bloom, CALM analysis can automatically verify that program modules achieve consistency without coordination.
+<p>
+In this paper we present Bloom<sup><i>L</i></sup>, an extension to Bloom that takes inspiration from both these traditions. Bloom<sup><i>L</i></sup> generalizes Bloom to support lattices and extends the power of CALM analysis to whole programs containing arbitrary lattices. We show how the Bloom interpreter can be generalized to support efficient evaluation of lattice-based code using well-known strategies from logic programming.  Finally, we use Bloom<sup><i>L</i></sup> to develop several practical distributed programs, including a key-value store similar to Amazon Dynamo, and show how Bloom<sup><i>L</i></sup> encourages the safe composition of small, easy-to-analyze lattices into larger programs.}
 }
 
 @incollection{alvaro2011dedalus,
@@ -386,11 +395,17 @@
   publisher={Now Publishers, Inc.}
 }
 
-@article{alvaro2013declarative,
-  title={A declarative semantics for Dedalus},
-  author={Alvaro, Peter and Ameloot, Tom J and Hellerstein, Joseph M and Marczak, William R and Van den Bussche, Jan},
-  year={2013}
+@techreport{alvaro2013declarative,
+    Author = {Alvaro, Peter and Ameloot, Tom J. and Hellerstein, Joseph M. and Marczak, William and Van den Bussche, Jan},
+    Title = {A Declarative Semantics for Dedalus},
+    Institution = {EECS Department, University of California, Berkeley},
+    Year = {2011},
+    Month = {Nov},
+    URL = {http://www2.eecs.berkeley.edu/Pubs/TechRpts/2011/EECS-2011-120.html},
+    Number = {UCB/EECS-2011-120},
+    Abstract = {The language Dedalus is a Datalog-like language in which distributed computations and networking protocols can be programmed, in the spirit of the Declarative Networking paradigm. Whereas recently formal, operational, semantics for Dedalus-like languages have been developed, a purely declarative semantics has been lacking so far. The challenge is to capture precisely the amount of nondeterminism that is inherent to distributed computations due to concurrency, networking delays, and asynchronous communication. This paper shows how a declarative semantics can be obtained by simply using the well-known stable model semantics for Datalog with negation. This semantics is applied to the orig- inal Dedalus rules, modified to account for nondeterministic choices, and augmented with control rules which model causality. The main result then is that, as far as fair runs are concerned, the proposed declarative semantics matches exactly the previously proposed formal operational semantics.}
 }
+
 
 @article{ameloot2013relational,
   title={Relational transducers for declarative networking},
@@ -584,7 +599,7 @@
 @article{difallah2013oltp,
     title={Oltp-bench: An extensible testbed for benchmarking relational databases},
     author={Difallah, Djellel Eddine and Pavlo, Andrew and Curino, Carlo and Cudre-Mauroux, Philippe},
-    journal={Proceedings of the VLDB Endowment},
+    journal={PVLDB},
     volume={7},
     number={4},
     pages={277--288},
