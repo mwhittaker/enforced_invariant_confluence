@@ -18,19 +18,26 @@ After we introduce the system model, we present a formal definition of
 \subsection{System Model}
 
 A \defword{distributed object} $O = (S, \join)$ consists of a set $S$ of states
-and a binary merge operator $\join: S \times S \to S$ which merges two states
-into one. A \defword{transaction} $t: S \to S$ is a function which maps one
-state to another. An \defword{invariant} $I$ is a subset of $S$.  Notationally,
-we write $I(s)$ to denote that $s$ satisfies the invariant (i.e.  $s \in I$)
+and a binary merge operator $\join: S \times S \to S$ that merges two states
+into one. A \defword{transaction} $t: S \to S$ is a function that maps one
+state to another. An \defword{invariant} $I$ is a subset of $S$. Notationally,
+we write $I(s)$ to denote that $s$ satisfies the invariant (i.e. $s \in I$)
 and $\lnot I(s)$ to denote that $s$ does not satisfy the invariant (i.e. $s
 \notin I$).
 
 \begin{example}\examplelabel{Ints}
   $O = (\ints, \max)$ is a distributed object consisting of integers merged by the
-  $\max$ function; $t(x) = x + 1$ is a transaction which adds one to a state; and
+  $\max$ function; $t(x) = x + 1$ is a transaction that adds one to a state; and
   $\setst{x \in \ints}{x \geq 0}$ is the invariant that states $x$ are
   non-negative.
 \end{example}
+
+Note that by modelling a transaction $t$ as a function $S \to S$, we focus
+exclusively on the effects that a transaction has on the object (i.e.\
+``writes'' to the object). Transactions are also free to read the value of the
+object, but these reads are not captured by our model because, as we'll see,
+they do not affect \invariantconfluence{}. For example, we could model any
+read-only transaction as a function $t$ where $t(s) = s$ for every $s \in S$.
 
 In our system model, a distributed object $O$ is replicated across a set $p_1,
 \ldots, p_n$ of $n$ servers. Each server $p_i$ manages a replica $s_i \in S$ of
