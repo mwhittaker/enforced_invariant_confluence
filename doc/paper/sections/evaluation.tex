@@ -8,10 +8,14 @@ in \algoref{InteractiveDecisionProcedure}, an implementation of a decision
 procedure which checks criteria (1) - (4) from \thmref{LatticeProperty}, and an
 implementation of the decision procedure described in
 \algoref{ArbitraryStartInteractiveDecisionProcedure}. The decision procedures
-are implemented in roughly 2,500 lines of Python. Users specify objects,
+are implemented in roughly 2,500 lines of Python. Programmers specify objects,
 transactions, and invariants in a small Python DSL and interact with the
-interactive decision procedures using an interactive Python console. We use
-Z3~\cite{de2008z3} to implement our \invariantclosure{} decision procedure,
+interactive decision procedures using an interactive Python console. Note that
+a programmer only has to run the decision procedures offline a single time to
+check the \invariantconfluence{} of their distributed object. The decision
+procedures do not have to be run online when transactions are being processed.
+
+We use Z3~\cite{de2008z3} to implement our \invariantclosure{} decision procedure,
 compiling an object and invariant into a formula that is satisfiable if and
 only if the object is \emph{not} \invariantclosed{}. If the object is
 \invariantclosed{}, then Z3 concludes that the formula is unsatisfiable.
