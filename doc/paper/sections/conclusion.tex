@@ -1,16 +1,28 @@
 \section{Conclusion}
-This paper revolved around two major contributions.  First, we developed a
-deeper understanding of \invariantclosure{} and \invariantconfluence{} by
-looking at the two criteria with reachability in mind. We found that
-\invariantclosure{} fails to incorporate a notion of reachability, and using
-this intuition, we developed conditions under which \invariantclosure{} and
-\invariantconfluence{} are equivalent.  Second, we proposed a new consistency
-model and generalization of \invariantconfluence{}, segmented
-\invariantconfluence{}, that can be used to replicate non-\invariantconfluent{}
-objects with a small amount of coordination while still preserving their
-invariants. We also found that segmented \invariantconfluence{} naturally
-subsumes existing techniques for maintaining invariants of replicated objects
-(e.g.\ locking and escrow transactions).
+This paper revolved around two major contributions.
+%
+First, we developed a deeper understanding of \invariantclosure{} and
+\invariantconfluence{} by looking at the two criteria with reachability in
+mind. We found that \invariantclosure{} fails to incorporate a notion of
+reachability, and using this intuition, we developed conditions under which
+\invariantclosure{} and \invariantconfluence{} are equivalent. We implemented
+this insight in an interactive \invariantconfluence{} decision procedure
+that automatically checks whether an object is \invariantconfluent{}, with the
+assistance of a programmer.
+
+Second, we proposed a new consistency model and generalization of
+\invariantconfluence{}, segmented \invariantconfluence{}, that can be used to
+replicate non-\invariantconfluent{} objects with a small amount of coordination
+while still preserving their invariants. We found that segmented
+\invariantconfluence{} naturally subsumes existing techniques for maintaining
+invariants of replicated objects (e.g.\ locking and escrow transactions), and
+we developed an interactive decision procedure for segmented
+\invariantconfluence{}.
+
+Through our evaluation, we found that our decision procedures could analyze a
+number of realistic workloads, each in less than a second. We also showed that
+segmented \invariantconfluence{} can significantly outperform linearizable
+replication for low-coordination workloads.
 
 \textbf{Acknowledgments.}
 The authors would like to thank Alan Fekete, Peter Alvaro, Alvin Cheung,
