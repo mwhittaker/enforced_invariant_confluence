@@ -48,16 +48,18 @@ to make \invariantconfluence{} checkable:} to design a general-purpose
 \invariantconfluence{} decision procedure, and implement it in an interactive
 system.
 
-Designing such a general-purpose decision procedure is difficult\footnote{In
-fact it's impossible. Determining \invariantconfluence{} of an object is
+Unfortunately, designing such a general-purpose decision procedure is
+impossible because determining the \invariantconfluence{} of an object is
 undecidable in general. Still, we can develop a decision procedure that works
-well in the common case.}. Many prior efforts instead develop a decision
-procedure for \emph{\invariantclosure{}}, a sufficient (but not necessary)
-condition for \invariantconfluence{}~\cite{li2012making, li2014automating}. The
-existing approaches check whether an object is \invariantclosed{}. If it is,
-then they conclude that it is also \invariantconfluent{}. If it's not, then the
-current approaches are unable to conclude anything about whether or not the
-object is \invariantconfluent{}.
+well in the common case.
+%
+For example, many prior efforts have developed decision procedures for
+\emph{\invariantclosure{}}, a sufficient (but not necessary) condition for
+\invariantconfluence{}~\cite{li2012making, li2014automating}. The existing
+approaches check whether an object is \invariantclosed{}. If it is, then they
+conclude that it is also \invariantconfluent{}. If it's not, then the current
+approaches are unable to conclude anything about whether or not the object is
+\invariantconfluent{}.
 
 In this paper, we take a step back and study the underlying reason \emph{why}
 \invariantclosure{} is not necessary for \invariantconfluence{}.
