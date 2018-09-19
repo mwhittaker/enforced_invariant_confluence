@@ -110,19 +110,24 @@ states. This approach does \emph{not} provide any formal guarantees that
 invariants are maintained. Its correctness depends on the correctness of the
 potentially complex user defined merge functions.
 
-% \textbf{CRDTs.}
-% CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
-% semilattices with inflationary update methods. Due to their algebraic
-% properties, CRDTs can be replicated with strong eventual consistency without
-% the need for any coordination. Our definition of distributed objects and our
-% \invariantconfluence{} system model are inspired directly by the corresponding
-% definitions and system models in~\cite{shapiro2011conflict}. Also, an
-% \invariantconfluent{} object does not necessarily have to be eventually
-% consistent, so it is natural (though not necessary) to use CRDTs as
-% \invariantconfluent{} distributed objects, achieving a combination of eventual
-% consistency and invariant preservation. Our criteria in
-% \thmref{LatticeProperty} also borrow ideas from CRDTs, exploiting the nice
-% algebraic properties of semilattices.
+\textbf{CRDTs.}
+CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
+semilattices with inflationary update methods. Due to their algebraic
+properties, CRDTs can be replicated with strong eventual consistency without
+the need for any coordination. Our definition of distributed objects and our
+\invariantconfluence{} system model are inspired directly by the corresponding
+definitions and system models in~\cite{shapiro2011conflict}.
+%
+CRDTs are eventually consistent but may not preserve invariants. Conversely,
+\invariantconfluent{} objects preserve invariants but may not be eventually
+consistent. Thus, it is natural (though not necessary) to use CRDTs as
+distributed objects. If a CRDT is determined to be \invariantconfluent{} with
+respect to a particular invariant and set of transactions, then it achieves a
+combination of strong eventual consistency and invariant preservation. Any CRDT
+(e.g., counters, sets, graphs, sequences) can be used for this purpose.
+%
+Finally, our criteria in \thmref{LatticeProperty} also borrow ideas from CRDTs,
+exploiting the nice algebraic properties of semilattices.
 
 \textbf{CALM Theorem.}
 Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
