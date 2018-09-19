@@ -209,12 +209,12 @@ categorize the invariants into one of three types:
   % \item
     Two of the twelve invariants involve generating \textbf{sequential and
     unique identifiers}. Consider, for example, invariant 2 which dictates that
-    a district's next order id \ttt{D\_NEXT\_O\_ID} is equal to the maximum
+    a district's next order ID \ttt{D\_NEXT\_O\_ID} is equal to the maximum
     order id \ttt{O\_ID} of orders within the district. The New Order
     transaction places an order with \ttt{O\_ID} equal to the current value of
     \ttt{D\_NEXT\_O\_ID} and then increments \ttt{D\_NEXT\_O\_ID}.
     We model this workload with an integer for \ttt{D\_NEXT\_O\_ID} and a map
-    for \ttt{O\_ID} that maps order ids to order.
+    for \ttt{O\_ID} that maps order IDs to order.
     %
     % We model this workload with three objects. \ttt{D\_NEXT\_O\_ID} is modeled
     % as an integer merged by $\max$. The order table is modelled as two objects.
@@ -225,8 +225,13 @@ categorize the invariants into one of three types:
     % the primary key constraint has been violated.
     %
     We applied Lucy to this workload and in less than a second, it produced a
-    counterexample that---when labelled as reachable---confirms that the
-    workload is \emph{not} \invariantconfluent{}~\cite{bailis2014coordination}.
+    counterexample that---when labelled as reachable---confirms Bailis et al.'s
+    finding that the workload is \emph{not}
+    \invariantconfluent{}~\cite{bailis2014coordination}. Thus, the TPC-C
+    benchmark requires some form of coordination to ensure unique and
+    sequential IDs. Alternatively, as Bailis et al. describe
+    in~\cite{bailis2014coordination}, the workload can be run coordination free
+    if we drop the requirement that IDs are assigned sequentially.
 % \end{enumerate}
 
 \subsection{Segmented Invariant Confluence}%
