@@ -270,8 +270,8 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
   \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.
 \end{example}
 
-\subsection{Discussion}
-There are a few things worth noting about segmented
+\subsection{Discussion and Limitations}
+There are a couple of things worth noting about segmented
 \invariantconfluence{}, its system model, and its decision procedure.
 %
 First, \invariantconfluence{} is a very coarse-grained property. If an object
@@ -310,19 +310,21 @@ segment.
 % require global coordination, executing an entire batch of these transactions
 % during a single round of global coordination.
 
-Second, we can integrate a couple of optimizations into our system model to
-further reduce the amount of coordination it requires. For example, servers can
-buffer transactions that require global coordination, executing an entire batch
-of these transactions during a single round of global coordination.
+% Second, we can integrate a couple of optimizations into our system model to
+% further reduce the amount of coordination it requires. For example, servers can
+% buffer transactions that require global coordination, executing an entire batch
+% of these transactions during a single round of global coordination.
+%
+% Third, a segmented \invariantconfluence{} decision procedure can also leverage
+% \thmref{LatticeProperty} in addition to
+% \algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
+% criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in
+% I$.
 
-Third, a segmented \invariantconfluence{} decision procedure can also leverage
-\thmref{LatticeProperty} in addition to
-\algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
-criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in
-I$.
-
-Fourth, while a segmented \invariantconfluence{} decision procedure can help
+Second, while a segmented \invariantconfluence{} decision procedure can help
 decide whether or not an object is segmented \invariantconfluent{}, it cannot
-currently help construct a segmentation. In the future, we plan to explore
-ways by which we can automatically suggest segmentations to the application
-designer.
+currently help construct a segmentation. It is the responsibility of the
+programmer to think of a segmentation that is amenable to segmented
+\invariantconfluence{}, and this can be an onerous process. In the future, we
+plan to explore ways by which we can automatically suggest segmentations to the
+application designer to ease this process.
