@@ -1,27 +1,27 @@
 \begin{abstract}
-Strongly consistent distributed systems are easy to reason about but face fundamental
-limitations in availability and performance. Weakly consistent systems can be
-implemented with very high performance but place a burden on the application
-developer to reason about complex interleavings of execution.
+Strongly consistent distributed systems are easy to reason about but face
+fundamental limitations in availability and performance. Weakly consistent
+systems can be implemented with very high performance but place a burden on the
+application developer to reason about complex interleavings of execution.
 \Invariantconfluence{} provides a formal framework for understanding when we
 can get the best of both worlds. An \invariantconfluent{} object can be
 efficiently replicated with no coordination needed to preserve its invariants.
 However, actually determining whether or not an object is \invariantconfluent{}
-is challenging: undecidable in general. In this paper, we establish conditions under
-which a commonly used sufficient condition for \invariantconfluence{} is both
-necessary and sufficient and use this condition to design (a) a general-purpose
-interactive \invariantconfluence{} decision procedure and (b) a novel
-sufficient condition that can be checked automatically. We then take a step
-beyond \invariantconfluence{} and introduce a generalization of
-\invariantconfluence{} called segmented \invariantconfluence{}, which allows us
-to replicate non-\invariantconfluent{} objects with a small amount of
-coordination.
+is challenging: undecidable in general.
 
-We implemented these formalisms in a prototype called
-Lucy and found that our decision procedures efficiently handle common real-world workloads
-including foreign keys, rollups, escrow transactions, and more.  We also
-found that segmented \invariantconfluent{} replication can deliver up to an
-order of magnitude more throughput than linearizable replication for low
-contention workloads and comparable throughput for medium to high contention
-workloads.
+In this paper, we establish conditions under which a commonly used sufficient
+condition for \invariantconfluence{} is both necessary and sufficient and use
+this condition to design (a) a general-purpose interactive
+\invariantconfluence{} decision procedure and (b) a novel sufficient condition
+that can be checked automatically. We then take a step beyond
+\invariantconfluence{} and introduce a generalization of \invariantconfluence{}
+called segmented \invariantconfluence{}, which allows us to replicate
+non-\invariantconfluent{} objects with a small amount of coordination.
+
+We implemented these formalisms in a prototype called Lucy and found that our
+decision procedures efficiently handle common real-world workloads including
+foreign keys, rollups, escrow transactions, and more.  We also found that
+segmented \invariantconfluent{} replication can deliver up to an order of
+magnitude more throughput than linearizable replication for low contention
+workloads and comparable throughput for medium to high contention workloads.
 \end{abstract}

@@ -27,6 +27,7 @@
 
 \begin{document}
   \title{\thetitle}
+  \iftoggle{techreportenabled}{\subtitle{Technical Report. \today}}{}
 
   \numberofauthors{2}
   \author{
@@ -48,7 +49,7 @@
 
   % Force a column break so that the introduction section title isn't by itself
   % at the bottom of the first column.
-  % \vfill\null
+  \vfill\null
 
   {\input{sections/introduction}}
   {\input{sections/invariant_confluence}}
@@ -60,6 +61,7 @@
   {\input{sections/related_work}}
   {\input{sections/conclusion}}
 
+  \iftoggle{techreportenabled}{}{\vfill\null}
   \balance{}
 
   \bibliographystyle{abbrv}

@@ -130,37 +130,76 @@ invariant. Once $NR$ has been sufficiently augmented to the point that $I - NR$
 is a subset of the reachable states, \thmref{IclosureEquivalentIconfluence}
 guarantees that the algorithm will terminate after one more call to \IsIclosed.
 
-\subsection{Tolerating User Error}
-\algoref{InteractiveDecisionProcedure} is an \emph{interactive} decision
-procedure. It requires that a user classify states as reachable or unreachable.
-To err is human, so what happens when a user incorrectly classifies a state?
-There are two possible errors that can be made, and
-\algoref{InteractiveDecisionProcedure} can be made robust to both.
-
-\textbf{A user can label an unreachable state as reachable.}
-In this case, \Helper{} might erroneously find $s_1$ and $s_2 \in R$ and return
-false, concluding that $O$ is not \sTIconfluent{} even when it is.  This is
-inconvenient, but not catastrophic. We can modify
-\algoref{InteractiveDecisionProcedure} so that \Helper{} requires that whenever
-a user labels a state $s$ as \sTIreachable{}, they must also provide an
-\sTIreachable{} expression $e$ that evaluates to $s$. Here, $e$ acts a proof
-that certifies that $s$ is indeed reachable. This increases the burden on the
-user but completely eliminates this type of user error.
-
-\textbf{A user can label a reachable state as unreachable.}
-In this case, \IsIclosed$(O, I - NR)$ might return true, even though $O$ is not
-\sTIconfluent. Thus, a user might falsely believe their distributed object to
-be \sTIconfluent{} even though it isn't, and eventually one replica of their
-distributed object might enter a state that violates the invariant.
+\subsection{Limitations}
+Our interactive \invariantconfluence{} decision procedure has two main
+limitations. First, \algoref{InteractiveDecisionProcedure} requires an
+\invariantclosure{} decision procedure, but determining \invariantclosure{} is
+undecidable in general.
 %
-We can mitigate this in two ways. First, we can aggressively expand $R$ automatically. If a
-user ever labels a state $s$ as unreachable, but $s \in R$, we can notify the
-user of their mistake. Second, \Helper{} returns true when $O$ is \iclosed{(I -
-NR)} for some $NR$, so $O$ \emph{is} \sticonfluent{s_0}{T}{I-NR} (even though
-it might not be \sTIconfluent{}). Thus, when a user replicates their
-distributed object across a set of servers, they can deploy with the invariant
-$I - NR$ instead of $I$. If $NR$ is correct and only contains unreachable
-states, then deploying with $I - NR$ is equivalent to deploying with $I$. If
-$NR$ is incorrect and contains some \sTIreachable{} states, then some of these
-states are artificially made unreachable, but the system is still guaranteed to
-never produce a state which violates $I$.
+\begin{techreport}
+
+  For example, let $O_p = (S, \join)$ where $S$ is the set of all programs and
+  $s_1 \join s_2 = p$ for some fixed program $p$. Letting $I$ be the set of all
+  programs that terminate, determining if $O_p$ is \Iclosed{} is tantamount to
+  determining if $p$ terminates.
+\end{techreport}
+%
+In practice, we can implement an \invariantclosure{} decision procedure using
+an SMT solver like Z3 that works well on simple objects, invariants, and merge
+functions (e.g., integers, tuples, infinite sets, bit vectors, linear
+constraints, basic arithmetic, tuple projection, basic set operations, bit
+arithmetic). But, SMT solvers are mostly unable to analyze more complex
+constructs (e.g., finite lists~\cite{kroning2009proposal}, graphs, recursive
+algebraic data types, nonlinear constraints, merge functions that contain loops
+or recursion).
+
+Second, \algoref{InteractiveDecisionProcedure} relies on a user to identify
+unreachable states. As we saw in \figref{DecisionProcedureExample}, the set of
+unreachable states can sometimes be clear, especially if there's a noticeable
+pattern in the set of reachable states. However, if the set of transactions is
+large or complex or if the merge function is complex, then reasoning about
+unreachable states can be difficult.  Unlike with reachable states---where
+verifying that a state is reachable only requires thinking of a single way to
+reach the state---verifying that a state is unreachable requires a programmer
+to reason about a large number of system executions and conclude that
+\emph{none} of them can lead to the state. In the future, we plan on exploring
+ways to assist a user reason about unreachable states and discover some
+unreachable states automatically.
+
+\begin{techreport}
+  \subsection{Tolerating User Error}
+  \algoref{InteractiveDecisionProcedure} is an \emph{interactive} decision
+  procedure. It requires that a user classify states as reachable or
+  unreachable.  To err is human, so what happens when a user incorrectly
+  classifies a state?  There are two possible errors that can be made, and
+  \algoref{InteractiveDecisionProcedure} can be made robust to both.
+
+  \textbf{A user can label an unreachable state as reachable.}
+  In this case, \Helper{} might erroneously find $s_1$ and $s_2 \in R$ and
+  return false, concluding that $O$ is not \sTIconfluent{} even when it is.
+  This is inconvenient, but not catastrophic. We can modify
+  \algoref{InteractiveDecisionProcedure} so that \Helper{} requires that
+  whenever a user labels a state $s$ as \sTIreachable{}, they must also provide
+  an \sTIreachable{} expression $e$ that evaluates to $s$. Here, $e$ acts a
+  proof that certifies that $s$ is indeed reachable. This increases the burden
+  on the user but completely eliminates this type of user error.
+
+  \textbf{A user can label a reachable state as unreachable.}
+  In this case, \IsIclosed$(O, I - NR)$ might return true, even though $O$ is
+  not \sTIconfluent. Thus, a user might falsely believe their distributed
+  object to be \sTIconfluent{} even though it isn't, and eventually one replica
+  of their distributed object might enter a state that violates the invariant.
+  %
+  We can mitigate this in two ways. First, we can aggressively expand $R$
+  automatically. If a user ever labels a state $s$ as unreachable, but $s \in
+  R$, we can notify the user of their mistake. Second, \Helper{} returns true
+  when $O$ is \iclosed{(I - NR)} for some $NR$, so $O$ \emph{is}
+  \sticonfluent{s_0}{T}{I-NR} (even though it might not be \sTIconfluent{}).
+  Thus, when a user replicates their distributed object across a set of
+  servers, they can deploy with the invariant $I - NR$ instead of $I$. If $NR$
+  is correct and only contains unreachable states, then deploying with $I - NR$
+  is equivalent to deploying with $I$. If $NR$ is incorrect and contains some
+  \sTIreachable{} states, then some of these states are artificially made
+  unreachable, but the system is still guaranteed to never produce a state
+  which violates $I$.
+\end{techreport}
