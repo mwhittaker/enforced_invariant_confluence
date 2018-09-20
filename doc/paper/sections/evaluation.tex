@@ -179,15 +179,15 @@ our decision procedure on this example and it concluded that it was segmented
 interaction.
 
 \example[TPC-C]\examplelabel{TpccEval}
-TPC-C is a ubiquitous OLTP database benchmark with a workload that models a
-simple warehousing application~\cite{difallah2013oltp}. The TPC-C specification
+TPC-C is a ubiquitous OLTP benchmark with a workload that models a simple
+warehousing application~\cite{difallah2013oltp}. The TPC-C specification
 outlines twelve ``consistency requirements'' (read invariants) that govern the
 warehousing application. In~\cite{bailis2014coordination}, Bailis et al.\
 categorize the invariants into one of three types:
 
 % \begin{enumerate}
 %   \item
-    Three of the twelve invariants are \textbf{foreign key constraints}.  As
+    Three of the twelve invariants involve \textbf{foreign key constraints}.  As
     discussed in \exampleref{ForeignKeysEval}, our decision procedures can
     automatically verify conditions under which foreign key constraints are
     \invariantconfluent{}.

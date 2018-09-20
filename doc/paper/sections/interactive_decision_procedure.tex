@@ -60,13 +60,14 @@ in \figref{DecisionProcedureExample}.
 {\input{figures/decision_procedure_example}}
 
 \IsInvConfluent{} assumes access to an \invariantclosure{} decision procedure
-\IsIclosed$(O, I)$ that returns a triple (closed, $s_1$, $s_2$). closed is a
-boolean indicating whether $O$ is \Iclosed{}. If closed is true, then $s_1$ and
-$s_2$ are null. If closed is false, then $s_1$ and $s_2$ are a counterexample
-witnessing the fact that $O$ is not \Iclosed{}. That is, $I(s_1)$ and $I(s_2)$,
-but $\lnot I(s_1 \join s_2)$ (e.g., $s_1$ and $s_2$ from \exampleref{Z2}).  As
-we mentioned earlier, we can (and do) implement the \invariantclosure{}
-decision procedure using an SMT solver like Z3~\cite{de2008z3}.
+\IsIclosed$(O, I)$. \IsIclosed$(O, I)$ returns a triple (closed, $s_1$, $s_2$).
+closed is a boolean indicating whether $O$ is \Iclosed{}. If closed is true,
+then $s_1$ and $s_2$ are null. If closed is false, then $s_1$ and $s_2$ are a
+counterexample witnessing the fact that $O$ is not \Iclosed{}. That is,
+$I(s_1)$ and $I(s_2)$, but $\lnot I(s_1 \join s_2)$ (e.g., $s_1$ and $s_2$ from
+\exampleref{Z2}).  As we mentioned earlier, we can (and do) implement the
+\invariantclosure{} decision procedure using an SMT solver like
+Z3~\cite{de2008z3}.
 
 \IsInvConfluent{} first checks that $s_0$ satisfies the invariant. $s_0$ is
 reachable, so if it does not satisfy the invariant, then $O$ is not
