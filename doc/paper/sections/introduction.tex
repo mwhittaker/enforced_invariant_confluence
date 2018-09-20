@@ -42,7 +42,7 @@ generation. Bailis et al.\ manually categorized a set of common objects,
 transactions, and invariants (e.g.\ foreign key constraints on relations,
 linear constraints on integers) as \invariantconfluent{} or not. Hand-written
 proofs of this sort are unreasonable to expect from programmers. Ideally we
-would have a general purpose program that can automatically determine
+would have a general-purpose program that can automatically determine
 \invariantconfluence{} for us.  \textbf{The first main thrust of this paper is
 to make \invariantconfluence{} checkable:} to design a general-purpose
 \invariantconfluence{} decision procedure, and implement it in an interactive
@@ -95,7 +95,7 @@ checked automatically.
 
 \textbf{The second main thrust of this paper is to partially avoid coordination
 even in programs that require it}, by generalizing \invariantconfluence{} to a
-local property called \emph{segmented \invariantconfluence{}}. While
+property called \emph{segmented \invariantconfluence{}}. While
 \invariantconfluence{} characterizes objects that can be replicated
 \emph{without any} coordination, segmented \invariantconfluence{} allows us to
 replicate non-\invariantconfluent{} objects with only \emph{occasional}
@@ -115,7 +115,7 @@ example, in \secref{Evaluation}, we apply Lucy to foreign key constraints,
 escrow transactions, an auction application, and the TPC-C benchmark. Lucy
 processes these workloads in less than half a second, and no workload requires
 more than 66 lines of code to specify. Moreover, we find that segmented
-\invariantconfluent{} replication can achieve 100x to 10x more throughput than
+\invariantconfluent{} replication can achieve 10x to 100x more throughput than
 linearizable replication for low-coordination workloads.
 
 In closing, here is an outline of the paper and of our contributions:

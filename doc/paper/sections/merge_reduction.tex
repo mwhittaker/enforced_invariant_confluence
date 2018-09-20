@@ -48,10 +48,10 @@ to determine automatically.
 \begin{theorem}\thmlabel{LatticeProperty}
   Given an object $O = (S, \join)$, a start state $s_0 \in S$, a set of
   transactions $T$, and an invariant $I$, if the following criteria are met,
-  then $O$ is \sTIconfluent{}.
+  then $O$ is \sTImergereducible{} (and therefore \sTIconfluent{}).
   \begin{enumerate}
     \item
-      $O$ is a semilattice.
+      $O$ is a join-semilattice.
 
     \item
       For every $t \in T$, there exists some $s_t \in S$ such that for all $s
@@ -69,11 +69,8 @@ to determine automatically.
 \end{theorem}
 
 \begin{techreport}
-  The proof of \thmref{LatticeProperty} involves proving that if criteria (1)
-  through (4) are met, then $O$ is \sTImergereducible{}. From this, it's
-  immediate that $O$ is \sTIconfluent{} by
-  \thmref{ReducibilityImpliesIconfluence}. To show that $O$ is
-  \sTImergereducible, we consider two merge-free reachable expressions
+  To show that $O$ is \sTImergereducible, we consider two merge-free reachable
+  expressions
   \[
     e_1 = t_1(\ldots(t_n(s_0))\ldots)
     \quad\text{and}\quad
@@ -94,13 +91,13 @@ states that criteria (1) -- (4) are sufficient conditions for
 \invariantconfluence{}. How do these sufficient conditions relate to one
 another?  Clearly, not all \invariantclosed{} objects are semilattices, so
 \invariantclosure{} does not imply criteria (1) -- (4). Conversely, there are
-some objects which satisfy criteria (1) -- (4) which are not
+some objects that satisfy criteria (1) -- (4) that are not
 \invariantclosed{}. Here's one example.
 
 \begin{example}\examplelabel{TwoSets}
   Let $O = (\mathcal{P}(\nats), \cup)$ where $\mathcal{P}(\nats)$ is the power
   set of the natural numbers. Our start state $s_0 = \set{0}$ is the set of
-  $0$. Let $t_Y(X) = X \cup Y$ be the transaction which unions $Y$ with its
+  $0$. Let $t_Y(X) = X \cup Y$ be the transaction that unions $Y$ with its
   argument $X$. Our set $T = \setst{t_Y}{Y \subseteq \nats}$ of transactions
   consists of all possible $t_Y$. Our invariant $I$ consists of all non-empty
   sets $X$ that contain only even or only odd elements. That is, $I = \setst{X
@@ -131,7 +128,7 @@ objects are \invariantconfluent{} because the criteria \emph{do} incorporate
 notions of reachability. In particular, criterion (3) is a slight variant of
 \invariantclosure{}; it also states that invariant satisfying states should be
 closed under merge. The fundamental difference is that criterion (3) restricts
-its attention to the merge of two states which are \emph{reachable} from a
+its attention to the merge of two states that are \emph{reachable} from a
 common ancestor state.
 
 In \exampleref{TwoSets}, we saw this fundamental difference rear its head. $O$

@@ -76,10 +76,9 @@ tokens conflict, and transactions acquire some subset of the tokens when they
 execute. This allows the application designer to specify which transactions
 conflict with one another.  Gotsman et al.\ develop sufficient conditions to
 determine whether a given token scheme is sufficient to guarantee that a global
-invariant is never broken. This model of consistency is very similar to
-segmented \invariantconfluence{}. The token based approach allows users to
+invariant is never broken. The token based approach allows users to
 specify certain conflicts that are not possible with segmented
-\invariantconfluence{}. A segmentation only allows transactions within a
+\invariantconfluence{} because a segmentation only allows transactions within a
 segment to acquire a single self-conflicting lock. However, segmented
 \invariantconfluence{} also introduces the notion of invariant segmentation,
 which cannot be emulated with the token based approach. For example, it is
@@ -127,7 +126,7 @@ combination of strong eventual consistency and invariant preservation. Any CRDT
 (e.g., counters, sets, graphs, sequences) can be used for this purpose.
 %
 Finally, our criteria in \thmref{LatticeProperty} also borrow ideas from CRDTs,
-exploiting the nice algebraic properties of semilattices.
+exploiting the algebraic properties of semilattices.
 
 \textbf{CALM Theorem.}
 Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
@@ -140,7 +139,7 @@ languages, then there exists a consistent, coordination-free implementation of
 the program.  The CALM theorem provides guarantees about the consistency of
 program outputs. It does not directly capture our notions of transactions or
 invariant maintenance during program execution.  Moreover, Bloom and Dedalus
-are general purpose programming languages that can be used to implement a
+are general-purpose programming languages that can be used to implement a
 variety of distributed systems that are outside of the scope of
 \invariantconfluence{}.
 

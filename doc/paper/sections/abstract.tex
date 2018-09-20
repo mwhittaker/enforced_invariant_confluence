@@ -7,15 +7,15 @@ application developer to reason about complex interleavings of execution.
 can get the best of both worlds. An \invariantconfluent{} object can be
 efficiently replicated with no coordination needed to preserve its invariants.
 However, actually determining whether or not an object is \invariantconfluent{}
-is challenging: undecidable in general.
+is challenging.
 
 In this paper, we establish conditions under which a commonly used sufficient
-condition for \invariantconfluence{} is both necessary and sufficient and use
+condition for \invariantconfluence{} is both necessary and sufficient, and we use
 this condition to design (a) a general-purpose interactive
 \invariantconfluence{} decision procedure and (b) a novel sufficient condition
 that can be checked automatically. We then take a step beyond
-\invariantconfluence{} and introduce a generalization of \invariantconfluence{}
-called segmented \invariantconfluence{}, which allows us to replicate
+\invariantconfluence{} and introduce a generalization of \invariantconfluence{},
+called segmented \invariantconfluence{}, that allows us to replicate
 non-\invariantconfluent{} objects with a small amount of coordination.
 
 We implemented these formalisms in a prototype called Lucy and found that our

@@ -9,7 +9,7 @@ In this section, we present a generalization of \invariantconfluence{} called
 invariants of non-\invariantconfluent{} objects, requiring only a small amount
 of coordination. In \secref{Evaluation}, we see that replicating a
 non-\invariantconfluent{} object with segmented \invariantconfluence{} can
-achieve between 100x and 10x more throughput than linearizable replication for
+achieve between 10x and 100x more throughput than linearizable replication for
 certain workloads.
 
 The main idea behind segmented \invariantconfluence{} is to segment the state
@@ -26,9 +26,10 @@ introduce a segmented \invariantconfluence{} decision procedure.
 Consider a distributed object $O = (S, \join)$, a start state $s_0 \in S$, a
 set of transitions $T$, and an invariant $I$. A segmentation $\Sigma = (I_1,
 T_1), \ldots, (I_n, T_n)$ is a sequence (not a set) of $n$ segments $(I_i,
-T_i)$ where every $T_i$ is a subset of $T$. $O$ is \defword{segmented
-\invariantconfluent{}} with respect to $s_0$, $T$, $I$, and $\Sigma$,
-abbreviated \defword{\sTISconfluent}, if the following conditions hold:
+T_i)$ where every $T_i$ is a subset of $T$ and every $I_i \subseteq S$ is an
+invariant. $O$ is \defword{segmented \invariantconfluent{}} with respect to
+$s_0$, $T$, $I$, and $\Sigma$, abbreviated \defword{\sTISconfluent}, if the
+following conditions hold:
 \begin{itemize}
   \item
     The start state satisfies the invariant (i.e. $I(s_0)$).
@@ -179,17 +180,16 @@ $s_1$ and $s_2$ are both \sTIreachable{}.
     \text{$O$ is \sticonfluent{s}{T}{I} for every $s \in I$}
   \]
 \end{theorem}
-\begin{proof}
-  The proof of the forward direction is exactly the same as the proof of
-  \thmref{IclosureImpliesIconfluence}. Transactions always maintain the
-  invariant, so if merge does as well, then every reachable state must satisfy
-  the invariant.
-  %
-  For the reverse direction, consider two arbitrary states $s_1, s_2 \in I$.
-  The two points are \TIcoreachable{}, so there exists some state $s_0$ from
-  which they can be reached. $O$ is \sTIconfluent{} and $s_1 \join s_2$ is
-  \sTIreachable{}, so it satisfies the invariant.
-\end{proof}
+
+The proof of the forward direction is exactly the same as the proof of
+\thmref{IclosureImpliesIconfluence}. Transactions always maintain the
+invariant, so if merge does as well, then every reachable state must satisfy
+the invariant.
+%
+For the reverse direction, consider two arbitrary states $s_1, s_2 \in I$.
+The two points are \TIcoreachable{}, so there exists some state $s_0$ from
+which they can be reached. $O$ is \sTIconfluent{} and $s_1 \join s_2$ is
+\sTIreachable{}, so it satisfies the invariant.
 
 Using \thmref{ExtendedIclosureEquivalentIconfluence}, we develop
 \algoref{ArbitraryStartInteractiveDecisionProcedure}: a natural generalization
@@ -259,7 +259,7 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
   concurrent decrements, which we can forbid in a simple one-segment
   segmentation $\Sigma = (I, T^+)$ where $T^+$ consists only of increment
   transactions. Applying, \algoref{ArbitraryStartInteractiveDecisionProcedure},
-  \IsIclosed{} again returns false with same states $s_1$ and $s_2$. This time,
+  \IsIclosed{} again returns false with the same states $s_1$ and $s_2$. This time,
   however, the user recognizes that the two states are not
   \ticoreachable{T^+}{I} (all modifications of $(n_1, n_2, n_3)$ require global
   coordination, so it is impossible for $s_1$ and $s_2$ to differ on these
@@ -285,11 +285,11 @@ applications with a smaller number of segments, whereas \invariantconfluence{}
 only provides guarantees to applications that can be segmented into a single
 segment.
 
-Second, while a segmented \invariantconfluence{} decision procedure can help
+Second, while our segmented \invariantconfluence{} decision procedure can help
 decide whether or not an object is segmented \invariantconfluent{}, it cannot
 currently help construct a segmentation. It is the responsibility of the
 programmer to think of a segmentation that is amenable to segmented
-\invariantconfluence{}, and this can be an onerous process. In the future, we
+\invariantconfluence{}. This can be an onerous process. In the future, we
 plan to explore ways by which we can automatically suggest segmentations to the
 application designer to ease this process.
 

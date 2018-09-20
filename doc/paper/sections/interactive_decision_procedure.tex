@@ -38,25 +38,20 @@
 satisfying points are reachable, then \invariantclosure{} and
 \invariantconfluence{} are equivalent. In this section, we present the
 interactive \invariantconfluence{} decision procedure shown in
-\algoref{InteractiveDecisionProcedure} which takes advantage of this result.
+\algoref{InteractiveDecisionProcedure}, that takes advantage of this result.
 
 \subsection{The Decision Procedure}
 A user provides \algoref{InteractiveDecisionProcedure} with an object $O = (S,
 \join)$, a start state $s_0$, a set of transactions $T$, and an invariant
-$I$\footnote{%
-  Formally, $I$ is a (possibly infinite) set of states (e.g. $\setst{(x, y) \in
-  \ints \times \ints}{xy \leq 0}$), but in practice, our implementation of
-  \IsInvConfluent{} takes in $I$ as a finite logical formula (e.g., $xy \leq
-  0$).
-}. The user then interacts with
-\algoref{InteractiveDecisionProcedure} to iteratively eliminate unreachable
-states from the invariant. Meanwhile, the algorithm leverages an
-\invariantclosure{} decision procedure to either (a) conclude that $O$ is or is
-not \sTIconfluent{} or (b) provide counterexamples to the user to help them
-eliminate unreachable states. After all unreachable states have been eliminated
-from the invariant, \thmref{IclosureEquivalentIconfluence} allows us to reduce
-the problem of \invariantconfluence{} directly to the problem of
-\invariantclosure{}, and the algorithm terminates.
+$I$. The user then interacts with \algoref{InteractiveDecisionProcedure} to
+iteratively eliminate unreachable states from the invariant. Meanwhile, the
+algorithm leverages an \invariantclosure{} decision procedure to either (a)
+conclude that $O$ is or is not \sTIconfluent{} or (b) provide counterexamples
+to the user to help them eliminate unreachable states. After all unreachable
+states have been eliminated from the invariant,
+\thmref{IclosureEquivalentIconfluence} allows us to reduce the problem of
+\invariantconfluence{} directly to the problem of \invariantclosure{}, and the
+algorithm terminates.
 %
 We now describe \algoref{InteractiveDecisionProcedure} in detail. An example of
 how to use \algoref{InteractiveDecisionProcedure} on \exampleref{Z2} is given
@@ -65,7 +60,7 @@ in \figref{DecisionProcedureExample}.
 {\input{figures/decision_procedure_example}}
 
 \IsInvConfluent{} assumes access to an \invariantclosure{} decision procedure
-\IsIclosed$(O, I)$ which returns a triple (closed, $s_1$, $s_2$). closed is a
+\IsIclosed$(O, I)$ that returns a triple (closed, $s_1$, $s_2$). closed is a
 boolean indicating whether $O$ is \Iclosed{}. If closed is true, then $s_1$ and
 $s_2$ are null. If closed is false, then $s_1$ and $s_2$ are a counterexample
 witnessing the fact that $O$ is not \Iclosed{}. That is, $I(s_1)$ and $I(s_2)$,
@@ -76,7 +71,7 @@ decision procedure using an SMT solver like Z3~\cite{de2008z3}.
 \IsInvConfluent{} first checks that $s_0$ satisfies the invariant. $s_0$ is
 reachable, so if it does not satisfy the invariant, then $O$ is not
 \sTIconfluent{} and \IsInvConfluent{} returns false. Otherwise,
-\IsInvConfluent{} calls a helper function \Helper{} which---in addition to $O$,
+\IsInvConfluent{} calls a helper function \Helper{} that---in addition to $O$,
 $s_0$, $T$, and $I$---takes as arguments a set $R$ of \sTIreachable{} states
 and a set $NR$ of \sTIunreachable{} states. Like \IsInvConfluent, \Helper$(O,
 s_0, T, I, R, NR)$ returns whether $O$ is \sTIconfluent{} (assuming $R$ and
@@ -96,7 +91,7 @@ If \IsIclosed{} determines that $O$ is \iclosed{(I - NR)}, then by
 Because $NR$ only contains \sTIunreachable{} states, then the set of
 \sTIreachable{} states is equal to set of \stireachable{s_0}{T}{I-NR}{} states
 which, as we just showed, is a subset of $I$.  Thus, $O$ is \sTIconfluent{}, so
-\Helper{} return true.
+\Helper{} returns true.
 
 If \IsIclosed{} determines that $O$ is \emph{not} \iclosed{(I - NR)}, then we
 have a counterexample $s_1, s_2$. We want to determine whether $s_1$ and $s_2$
@@ -131,7 +126,7 @@ is a subset of the reachable states, \thmref{IclosureEquivalentIconfluence}
 guarantees that the algorithm will terminate after one more call to \IsIclosed.
 
 \subsection{Limitations}
-Our interactive \invariantconfluence{} decision procedure has two main
+Our interactive \invariantconfluence{} decision procedure has two
 limitations. First, \algoref{InteractiveDecisionProcedure} requires an
 \invariantclosure{} decision procedure, but determining \invariantclosure{} is
 undecidable in general.
@@ -146,24 +141,24 @@ undecidable in general.
 %
 In practice, we can implement an \invariantclosure{} decision procedure using
 an SMT solver like Z3 that works well on simple objects, invariants, and merge
-functions (e.g., integers, tuples, infinite sets, bit vectors, linear
+operators (e.g., integers, tuples, infinite sets, bit vectors, linear
 constraints, basic arithmetic, tuple projection, basic set operations, bit
 arithmetic). But, SMT solvers are mostly unable to analyze more complex
 constructs (e.g., finite lists~\cite{kroning2009proposal}, graphs, recursive
-algebraic data types, nonlinear constraints, merge functions that contain loops
+algebraic data types, nonlinear constraints, merge operators that contain loops
 or recursion).
 
 Second, \algoref{InteractiveDecisionProcedure} relies on a user to identify
 unreachable states. As we saw in \figref{DecisionProcedureExample}, the set of
 unreachable states can sometimes be clear, especially if there's a noticeable
 pattern in the set of reachable states. However, if the set of transactions is
-large or complex or if the merge function is complex, then reasoning about
+large or complex or if the merge operator is complex, then reasoning about
 unreachable states can be difficult.  Unlike with reachable states---where
 verifying that a state is reachable only requires thinking of a single way to
 reach the state---verifying that a state is unreachable requires a programmer
 to reason about a large number of system executions and conclude that
 \emph{none} of them can lead to the state. In the future, we plan on exploring
-ways to assist a user reason about unreachable states and discover some
+ways to help a user reason about unreachable states and ways to discover sets of
 unreachable states automatically.
 
 \begin{techreport}
@@ -201,5 +196,5 @@ unreachable states automatically.
   is equivalent to deploying with $I$. If $NR$ is incorrect and contains some
   \sTIreachable{} states, then some of these states are artificially made
   unreachable, but the system is still guaranteed to never produce a state
-  which violates $I$.
+  that violates $I$.
 \end{techreport}
