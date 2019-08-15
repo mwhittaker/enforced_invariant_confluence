@@ -278,3 +278,187 @@
     \setst{s \in S}{\sTIreachablepredicate{s}} \subseteq I
   \]
 \end{frame}
+
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
+    \item $O = (\ints \times \ints, \max \times \max)$
+    \pause \item $t_x((x, y)) = (x + 1, y)$
+    \pause \item $t_y((x, y)) = (x, y + 1)$
+    \pause \item $T = \set{t_x, t_y}$
+    \pause \item $I = \setst{(x, y)}{xy \leq 0}$
+    \pause \item $s_0 = (0, 0)$
+  \end{itemize}
+  Is $O$ \sTIconfluent{}?
+\end{frame}
+
+\newcommand{\xmin}{-2}
+\newcommand{\xmax}{2}
+\newcommand{\ymin}{-2}
+\newcommand{\ymax}{2}
+
+% Axes.
+\newcommand{\xyaxes}{
+  \draw[] (\xmin.5, 0) to (\xmax.5, 0);
+  \draw[] (0, \ymin.5) to (0, \ymax.5);
+  \node at (\xmax + 1, 0) {$x$};
+  \node at (0, \ymax + 1) {$y$};
+}
+
+% Quadrant 1.
+\newcommand{\quadi}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {0, ..., \argxmax} {
+    \foreach \y in {0, ..., \argymax} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+% Quadrant 2.
+\newcommand{\quadii}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {\argxmin, ..., 0} {
+    \foreach \y in {0, ..., \argymax} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+% Quadrant 3.
+\newcommand{\quadiii}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {\argxmin, ..., 0} {
+    \foreach \y in {\argymin, ..., 0} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+% Quadrant 4.
+\newcommand{\quadiv}[5]{{
+  \newcommand{\argstyle}{#1}
+  \newcommand{\argxmin}{#2}
+  \newcommand{\argxmax}{#3}
+  \newcommand{\argymin}{#4}
+  \newcommand{\argymax}{#5}
+  \foreach \x in {0, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., 0} {
+      \node[\argstyle] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+% State labels.
+\newcommand{\statelabels}{
+  \node[statelabel] at (0, 0) {$s_0$};
+  \node[statelabel] at (-1, 1) {$s_1$};
+  \node[statelabel] at (1, -1) {$s_2$};
+  \node[statelabel] at (1, 1) {$s_3$};
+}
+
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=3pt]
+\tikzstyle{inv}=[line width=0.75pt, draw=black]
+\tikzstyle{pointinv}=[point, inv]
+\tikzstyle{invregion}=[rounded corners, fill=flatgreen!50, draw=none]
+\tikzstyle{reachableregion}=[rounded corners, fill=flatblue!50, draw=none]
+\tikzstyle{statelabel}=[anchor=south west, inner sep=1pt]
+
+\begin{frame}
+  \begin{center}
+    \begin{tikzpicture}
+      \xyaxes{}
+      \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiv{point}{\xmin}{\xmax}{\ymin}{\ymax}
+
+      \pause
+      \draw[-latex, ultra thick] (0,0) to node[below] {$t_x$} (1, 0);
+      \pause
+      \draw[-latex, ultra thick] (0,0) to node[left] {$t_y$} (0, 1);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \begin{tikzpicture}
+      \xyaxes{}
+      \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiv{point}{\xmin}{\xmax}{\ymin}{\ymax}
+
+      \node[pointinv] at (0, -1) {};
+      \node[pointinv] at (2, -2) {};
+      \draw[-latex, ultra thick] (0,-1) to (2, -1);
+      \draw[-latex, ultra thick] (2,-2) to (2, -1);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=1]
+        \begin{scope}
+          \clip (\xmin.5, \ymax.5) rectangle (\xmax.5, \ymin.5);
+          \draw[invregion] (\xmin.9, \ymax.9) rectangle (0.5, -0.5);
+          \draw[invregion] (-0.5, 0.5) rectangle (\xmax.9, \ymin.9);
+          \draw (0.5, 0.5) to (0.5, \ymax.5);
+          \draw (0.5, 0.5) to (\xmax.5, 0.5);
+          \draw (-0.5, -0.5) to (-0.5, \ymin.5);
+          \draw (-0.5, -0.5) to (\xmin.5, -0.5);
+        \end{scope}
+
+        \xyaxes{}
+        \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
+        \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+        \quadii{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
+        \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
+      \end{tikzpicture}
+
+      {\Huge Invariant}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \pause
+      \centering
+      \begin{tikzpicture}[scale=1]
+        \begin{scope}
+          \clip (-1, 1) rectangle (\xmax.5, \ymin.5);
+          \draw[reachableregion, draw=black] (-0.5, 0.5) rectangle (\xmax.9, \ymin.9);
+        \end{scope}
+
+        \xyaxes{}
+        \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
+        \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+        \quadii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+        \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
+      \end{tikzpicture}
+
+      {\Huge Reachable}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \Huge
+  \begin{center}
+    Goal: develop an invariant-confluence decision procedure.
+  \end{center}
+\end{frame}
