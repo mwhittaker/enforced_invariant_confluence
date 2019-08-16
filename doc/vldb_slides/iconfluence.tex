@@ -9,6 +9,7 @@
 \usepackage{mathpartir}
 \usepackage{mathtools}
 \usepackage{pervasives}
+\usepackage{pgfpages}
 \usepackage{python}
 \usepackage{slides}
 \usepackage{stmaryrd}
@@ -23,6 +24,12 @@
 \author{Michael Whittaker, Joseph M. Hellerstein}
 \date{}
 
+% https://gist.github.com/andrejbauer/ac361549ac2186be0cdb
+% \setbeameroption{hide notes} % Only slides
+% \setbeameroption{show only notes} % Only notes
+\setbeameroption{show notes on second screen=right} % Both
+\setbeamertemplate{note page}{\pagecolor{yellow!10}\insertnote}
+
 \begin{document}
 \begin{frame}
   \maketitle
@@ -30,9 +37,9 @@
 
 {\input{sections/four_wise_men.tex}}
 {\input{sections/bank_example.tex}}
-{\input{sections/iconfluence.tex}}
-{\input{sections/iclosure.tex}}
-{\input{sections/decision_procedure.tex}}
-{\input{sections/segmented_iconfluence.tex}}
-{\input{sections/evaluation.tex}}
+% {\input{sections/iconfluence.tex}}
+% {\input{sections/iclosure.tex}}
+% {\input{sections/decision_procedure.tex}}
+% {\input{sections/segmented_iconfluence.tex}}
+% {\input{sections/evaluation.tex}}
 \end{document}
