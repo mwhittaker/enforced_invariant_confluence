@@ -1,0 +1,35 @@
+\documentclass[a0paper, landscape]{tikzposter}
+
+\title{Interactive Checks for Coordination Avoidance}
+\author{%
+  Michael Whittaker, %
+  Joseph M. Hellerstein%
+}
+
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{invariantconfluence}
+\usepackage{mathpartir}
+\usepackage{multicol}
+\usepackage{pervasives}
+\usepackage{riseposter}
+\usetikzlibrary{snakes}
+
+\begin{document}
+\maketitle
+
+\begin{columns}
+\column{0.33333}
+\block{Invariant Confluence}{{\input{sections/iconfluence.tex}}}
+
+\column{0.33333}
+\block{Invariant Closure}{{\input{sections/iclosure.tex}}}
+\block{Decision Procedure}{{\input{sections/decision_procedure.tex}}}
+
+\column{0.33333}
+\block{Segmented Invariant Confluence}{{\input{sections/segmented_invariant_confluence.tex}}}
+\block{Evaluation}{{\input{sections/evaluation.tex}}}
+\end{columns}
+\end{document}

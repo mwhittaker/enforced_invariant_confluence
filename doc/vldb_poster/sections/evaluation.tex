@@ -1,0 +1,24 @@
+\begin{verbatim}
+  checker = InteractiveInvariantConfluenceChecker()
+  x = checker.int_max('x', 0) # An int, x, merged by max.
+  y = checker.int_max('y', 0) # An int, y, merged by max.
+  checker.add_transaction('increment_x', [x.assign(x + 1)])
+  checker.add_transaction('decrement_y', [y.assign(y - 1)])
+  checker.add_invariant(x * y <= 0)
+  checker.check()
+\end{verbatim}
+
+\begin{center}
+  \begin{tabular}{lrr}
+    \toprule
+    Example                             & Run time (s) & Lines of code \\\midrule
+    $\ints^2$                           & 0.09         & 7 \\
+    Foreign Keys (all transactions)     & 0.06         & 8 \\
+    Foreign Keys (limited transactions) & 0.09         & 10 \\
+    Aucition                            & 0.04         & 21 \\
+    Escrow Transactions                 & 0.09         & 49 \\
+    TPC-C (Invariant 1)                 & 0.46         & 66 \\
+    TPC-C (Invariant 2)                 & 0.44         & 33 \\
+    \bottomrule
+  \end{tabular}
+\end{center}

@@ -1,0 +1,90 @@
+Consider a distributed object $O = (S, \join)$, a start state $s_0 \in S$, a
+set of transitions $T$, and an invariant $I$. A segmentation $\Sigma = (I_1,
+T_1), \ldots, (I_n, T_n)$ is a sequence (not a set) of $n$ segments $(I_i,
+T_i)$ where every $T_i$ is a subset of $T$ and every $I_i \subseteq S$ is an
+invariant. $O$ is \defword{segmented \invariantconfluent{}} with respect to
+$s_0$, $T$, $I$, and $\Sigma$, abbreviated \defword{\sTISconfluent}, if the
+following conditions hold:
+\begin{itemize}
+  \item
+    The start state satisfies the invariant (i.e. $I(s_0)$).
+
+  \item
+    $I$ is covered by the invariants in $\Sigma$ (i.e. $I = \cup_{i=1}^n I_i$).
+    Note that invariants in $\Sigma$ do \emph{not} have to be disjoint. That
+    is, they do not have to partition $I$; they just have to cover $I$.
+
+  \item
+    $O$ is \invariantconfluent{} within each segment. That is, for every $(I_i,
+    T_i) \in \Sigma$ and for every state $s \in I_i$, $O$ is
+    \sticonfluent{s}{T_i}{I_i}.
+\end{itemize}
+
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=9pt, draw=black]
+\tikzstyle{region}=[draw=none]
+\tikzstyle{region1}=[region, fill=flatred!50]
+\tikzstyle{region2}=[region, fill=flatgreen!50]
+\tikzstyle{region3}=[region, fill=flatblue!50]
+\tikzstyle{region4}=[region, fill=flatpurple!50]
+
+\newcommand{\pointgrid}[4]{{
+  \newcommand{\argxmin}{#1}
+  \newcommand{\argxmax}{#2}
+  \newcommand{\argymin}{#3}
+  \newcommand{\argymax}{#4}
+
+  \draw[] (\argxmin, 0) to (\argxmax, 0);
+  \draw[] (0, \argymin) to (0, \argymax);
+  \foreach \x in {\argxmin, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., \argymax} {
+      \node[point] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+\newcommand{\subfigwidth}{0.24\columnwidth}
+\newcommand{\subfighspace}{0.3cm}
+\newcommand{\tikzhspace}{0.4cm}
+\newcommand{\tikzscale}{1.5}
+\newcommand{\xmin}{-2}
+\newcommand{\xmax}{2}
+\newcommand{\ymin}{-2}
+\newcommand{\ymax}{2}
+
+\begin{center}
+  \begin{tikzpicture}[scale=\tikzscale]
+    \draw[region1] (\xmin.5, \ymax.5) rectangle (-0.5, 0.5);
+    \draw (-0.5, 0.5) to (\xmin.5, 0.5);
+    \draw (-0.5, 0.5) to (-0.5, \ymax.5);
+    \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+  \end{tikzpicture}\hspace{0.75in}%
+  \begin{tikzpicture}[scale=\tikzscale]
+    \draw[region2] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+    \draw (-0.5, 0.5) to (\xmax.5, 0.5);
+    \draw (-0.5, 0.5) to (-0.5, \ymin.5);
+    \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+  \end{tikzpicture}\hspace{0.75in}%
+  \begin{tikzpicture}[scale=\tikzscale]
+    \draw[region3] (-0.5, \ymax.5) rectangle (0.5, \ymin.5);
+    \draw (-0.5, \ymax.5) to (-0.5, \ymin.5);
+    \draw (0.5, \ymax.5) to (0.5, \ymin.5);
+    \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+  \end{tikzpicture}\hspace{0.75in}%
+  \begin{tikzpicture}[scale=\tikzscale]
+    \draw[region4] (\xmin.5, 0.5) rectangle (\xmax.5, -0.5);
+    \draw (\xmax.5, -0.5) to (\xmin.5, -0.5);
+    \draw (\xmax.5, 0.5) to (\xmin.5, 0.5);
+    \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+  \end{tikzpicture}
+\end{center}
+
+\begin{algorithmic}
+  \If{$t \notin T_i$}
+    \State Execute $t$ with global coordination
+  \Else{}
+    \If{$I_i(t(s_i))$} Commit $t$
+    \ElsIf{$\lnot I(t(s_i))$} Abort $t$
+    \Else{} Execute $t$ with global coordination
+    \EndIf{}
+  \EndIf{}
+\end{algorithmic}

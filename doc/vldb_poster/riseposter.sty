@@ -1,0 +1,65 @@
+% https://brand.berkeley.edu/colors/
+\definecolor{BerkeleyBlue}{HTML}{003262}
+\definecolor{FoundersRock}{HTML}{3B7EA1}
+\definecolor{CaliforniaGold}{HTML}{FDB515}
+\definecolor{Medalist}{HTML}{C4820E}
+
+% Use Helvetica instead of the default latex font. It looks a bit nicer on a
+% poster, especially in the titles.
+\RequirePackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% Increase the font size. By default, tikzposter only allows a 25pt font. We
+% have to do some tricks [1] to increase the font size.
+%
+% https://tex.stackexchange.com/a/243715
+\makeatletter
+\input{biggerfont28pt.clo}
+\makeatother
+
+% Format the poster title.
+\settitle{
+  \color{titlefgcolor}
+  {\Huge \textbf{\@title}}
+
+  \vspace*{1em}
+
+  {\Large \@author \par}
+}
+
+
+% Set the poster's color scheme.
+\definecolorstyle{RisePosterColorStyle}{
+  \colorlet{colorOne}{black}
+  \colorlet{colorTwo}{black}
+  \colorlet{colorThree}{black}
+}{
+  % Background Colors
+  \colorlet{backgroundcolor}{white}
+  \colorlet{framecolor}{black}
+  % Title Colors
+  \colorlet{titlefgcolor}{white}
+  \colorlet{titlebgcolor}{BerkeleyBlue}
+  % Block Colors
+  \colorlet{blocktitlebgcolor}{CaliforniaGold}
+  \colorlet{blocktitlefgcolor}{black}
+  \colorlet{blockbodybgcolor}{white}
+  \colorlet{blockbodyfgcolor}{black}
+  % Innerblock Colors
+  \colorlet{innerblocktitlebgcolor}{green}
+  \colorlet{innerblocktitlefgcolor}{green}
+  \colorlet{innerblockbodybgcolor}{green}
+  \colorlet{innerblockbodyfgcolor}{green}
+  % Note colors
+  \colorlet{notefgcolor}{black}
+  \colorlet{notebgcolor}{white}
+  \colorlet{notefrcolor}{white}
+}
+\usecolorstyle{RisePosterColorStyle}
+
+% Set the title and block styles.
+\usetitlestyle{Filled}
+\useblockstyle{Basic}
+
+% Remove the tikzposter symbol on the bottom right corner.
+\tikzposterlatexaffectionproofoff{}
