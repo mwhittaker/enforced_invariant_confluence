@@ -43,30 +43,16 @@
     talking about ``Interactive Checks for Coordination Avoidance''. This is
     joint work with my advisor at UC Berkeley, Joe Hellerstein.
 
-    Imagine you're an application developer and you're trying to decide what
-    kind of consistency you'd like to use to replicate some of your data.
+    I'd like to begin my talk, if you don't mind, with a short fairy tale. The
+    fairy tale involves an application developer who has some data they need to
+    replicate. Unfortunately, the application developer cannot decide whether
+    to replicate with weak consistency or strong consistency. The application
+    developer stays up all night trying to decide but eventually falls asleep
+    at their desk. In their sleep, they are visited by four wise men.
 
+    % Imagine you're an application developer and you're trying to decide what
+    % kind of consistency you'd like to use to replicate some of your data.
 
-    % ``Weak. Weak. It's weak that you're seeking'', squeaked Werner Vogels.
-    % His voice trembled, creaking, as he kept speaking.
-    % ``Please learn that if you yearn your performance to peak,
-    % then turn no further than weak.'' critiqued Werner.
-    %
-    % ``No, no, no more'' groaned Tony Hoare.
-    % He moaned, he lamented, his soul was tormented
-    % ``Weak is not easy. Weak is just treason.
-    % Please, these anomalies, make it so hard to reason.''
-    %
-    % ``You see, I agree'', says he, the ever mesmerizing Leslie.
-    % ``Weak is just wrong, not right for long.
-    % To defend your end users, you must go with strong.''
-    %
-    % ``Alas, not so fast'', Brewer the dapper chap clapped back.
-    % ``Consistency weak but not weary, strong but not nearly
-    % as fast as you think when you know my CAP theory.''
-    %
-    % But then out strutted Peter, he teetered with swagger demeanor.
-    % ``Why not have both?'' quoth Peter.
   }
 \end{frame}
 
@@ -82,9 +68,18 @@
   \end{center}
 
   \note{%
-    Someone like Werner Vogels would probably tell you to use weak consistency.
-    You can implement weak consistency super duper fast, and for many
-    applications, weak consistency is good enough.
+    % Someone like Werner Vogels would probably tell you to use weak consistency.
+    % You can implement weak consistency super duper fast, and for many
+    % applications, weak consistency is good enough.
+
+    ``Weak. Weak. It's weak that you're seeking'', squeaked Werner Vogels.
+    His voice trembled, creaking, as he kept speaking.
+    ``Please learn that if you yearn your performance to peak,
+    then turn no further than weak.'' critiqued Werner.
+
+    Werner Vogels has a good point. You can implement weak consistency super
+    duper fast, and for many applications, weak consistency is good enough. But
+    anyway, let's continue.
   }
 \end{frame}
 
@@ -101,12 +96,20 @@
   \end{center}
 
   \note{%
-    But then Tony Hoare laments, ``no no no''. Hoare encourages us not to
-    settle for weak consistency because a weakly consistent system is hard to
-    reason about. It robs us of a fundamental way we use to reason about
-    programs: application invariants. Even if every transaction in a weakly
-    consistent system preserves application invariants, the whole system may
-    not.
+    % But then Tony Hoare laments, ``no no no''. Hoare encourages us not to
+    % settle for weak consistency because a weakly consistent system is hard to
+    % reason about. It robs us of a fundamental way we use to reason about
+    % programs: application invariants. Even if every transaction in a weakly
+    % consistent system preserves application invariants, the whole system may
+    % not.
+
+    ``No, no, no more'' groaned Tony Hoare.
+    He moaned, he lamented, his soul was tormented
+    ``Weak is not easy. Weak is just treason.
+    Please, these anomalies, make it so hard to reason.''
+
+    You see, Hoare encourages us not to settle for weak consistency because a
+    weakly consistent system is very hard to reason about.
   }
 \end{frame}
 
@@ -124,10 +127,19 @@
   \end{center}
 
   \note{%
-    Leslie Lamport chimes in agreeingly. He encourages us to choose strong
-    consistency. Strongly consistent systems are much easier to reason about.
-    After all a strongly consistent system to end users looks exactly like a
-    system that's not even distributed.
+    % Leslie Lamport chimes in agreeingly. He encourages us to choose strong
+    % consistency. Strongly consistent systems are much easier to reason about.
+    % After all a strongly consistent system to end users looks exactly like a
+    % system that's not even distributed.
+
+    ``You see, I agree'', says he, the ever mesmerizing Leslie.
+    ``Weak is just wrong, not right for long.
+    To defend your end users, you must go with strong.''
+
+    Leslie Lamport encourages us to choose strong consistency. Strongly
+    consistent systems are much easier to reason about. After all a strongly
+    consistent system to end users looks exactly like a system that's not even
+    distributed.
   }
 \end{frame}
 
@@ -146,12 +158,21 @@
   \end{center}
 
   \note{%
-    ``Aha, not so fast'' counters Eric Brewer! Consistency and availability and
-    partition tolerance, oh my. Surely, strong consistency comes at the price
-    of availability and performance.
+    % ``Aha, not so fast'' counters Eric Brewer! Consistency and availability and
+    % partition tolerance, oh my. Surely, strong consistency comes at the price
+    % of availability and performance.
+    %
+    % So we're in a bit of a pickle. Weak consistency is too confusing and strong
+    % consistency is too heavy handed.
 
-    So we're in a bit of a pickle. Weak consistency is too confusing and strong
-    consistency is too heavy handed.
+    ``Alas, not so fast'', Brewer the dapper chap clapped back.
+    ``Consistency weak but not weary, strong but not nearly
+    as fast as you think when you know my CAP theory.''
+
+    Eric Brewer is right. Surely, strong consistency comes at the price of
+    availability and performance. So our application developer is in a bit of a
+    pickle. Weak consistency is too confusing and strong consistency is too
+    heavy handed. Fortunately, a hero emerges to save the day.
   }
 \end{frame}
 
@@ -167,12 +188,15 @@
   \end{center}
 
   \note{%
-    Thankfully, Peter Bailis comes to save the day and reminds us that perhaps
-    we can have the best of both worlds. In 2014, Peter and some other smart
-    folks including Alan defined invariant confluence as a condition under
-    which we can replicate a piece of data without the need for strongly
-    consistent coordination while maintaining the data's application
-    invariants.
+    But then out teetered Peter, with swagger demeanor.
+    ``Why not have both?'' quoth Peter.
+    The end.
+
+    Peter Bailis comes to save the day and reminds us that perhaps we can have
+    the best of both worlds. In 2014, Peter and some other smart folks
+    including Alan defined invariant confluence as a condition under which we
+    can replicate a piece of data without the need for strongly consistent
+    coordination while maintaining the data's application invariants.
 
     Invariant confluence will be the topic of this talk. In particular, I'll
     define invariant confluence and then discuss how we can check invariant

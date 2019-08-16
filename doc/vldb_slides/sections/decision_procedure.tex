@@ -4,6 +4,14 @@
     Main idea: prune the invariant until it's a subset of reachable states.
     Then check for invariant closure.
   \end{center}
+
+  \note{%
+    With this result in hand, we're now ready to develop an invariant
+    confluence decision procedure. The main idea is to prune the invariant
+    until it's a subset of reachable states. Once it is, invariant closure and
+    invariant confluence are identical, so we can check for invariant
+    confluence by checking for invariant closure.
+  }
 \end{frame}
 
 \newcommand{\algocomment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
@@ -34,6 +42,11 @@
       \State \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
     \EndFunction
   \end{algorithmic}
+
+  \note{%
+    Unfortunately, I don't have time to walk through the decision procedure in
+    full, but you can find all the details in our paper.
+  }
 \end{frame}
 
 \tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt, draw=black]
@@ -105,6 +118,12 @@
       \end{tikzpicture}
     \end{column}
   \end{columns}
+
+  \note{%
+    The gist of it though is that our decision procedure maintains a set of
+    reachable states $R$, a set of non reachable states $NR$, and the set $I -
+    NR$.
+  }
 \end{frame}
 
 \begin{frame}
@@ -141,6 +160,12 @@
       \end{tikzpicture}
     \end{column}
   \end{columns}
+
+  \note{%
+    The decision procedure then repeatedly finds pairs of points that violate
+    invariant closure and grows the set of reachable and not reachable points
+    by random search and by asking the user.
+  }
 \end{frame}
 
 \begin{frame}
@@ -229,32 +254,10 @@
       \end{tikzpicture}
     \end{column}
   \end{columns}
-\end{frame}
 
-\begin{frame}
-  \begin{algorithmic}
-    \algocomment{Return if $O$ is \sTIconfluent{}.}
-    \Function{IsInvConfluent}{$O$, $s_0$, $T$, $I$}
-      \State
-      \Return $I(s_0)$ and
-      \Call{Helper}{$O$, $s_0$, $T$, $I$, $\set{s_0}$, $\emptyset$}
-    \EndFunction
-
-    \State
-
-    \algocomment{$R$ is a set of \sTIreachable{} states.}
-    \algocomment{$NR$ is a set of \sTIunreachable{} states.}
-    \algocomment{$I(s_0)$ is a precondition.}
-    \Function{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
-      \State closed, $s_1$, $s_2$ $\gets$ \Call{IsIclosed}{$O$, $I - NR$}
-      \If {closed}
-        \Return true
-      \EndIf
-      \State Augment $R, NR$ with random search and user input
-      \If{$s_1, s_2 \in R$}
-        \Return false
-      \EndIf
-      \State \Return \Call{Helper}{$O$, $s_0$, $T$, $I$, $R$, $NR$}
-    \EndFunction
-  \end{algorithmic}
+  \note{%
+    Eventually, all the non reachable states are pruned from the invariant and
+    the algorithm and invariant closure and invariant confluence are identical.
+    At this point, the algorithm checks for invariant closure and terminates.
+  }
 \end{frame}

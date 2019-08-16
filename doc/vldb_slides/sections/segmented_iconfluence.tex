@@ -8,6 +8,15 @@
     \pause\item
       If it's not, then...? \pause deploy with strong consistency?
   \end{enumerate}
+
+  \note{%
+    With our decision procedure in hand, here's how we deploy a distributed
+    object. First, we use the decision procdure to check if the object is
+    invariant confluent. If it is, then we deploy it with weak consistency
+    knowing its invariant will be maintained. If it's not, then we'll what can
+    we do? I mean, we can deploy the object with strong consistency, but it
+    seems like overkill.
+  }
 \end{frame}
 
 \newcommand{\dy}{0.2}
@@ -36,6 +45,16 @@
       \node[align=center] at (4, 1.5) {Strong\\Consistency};
     \end{tikzpicture}
   \end{center}
+
+  \note{%
+    If we look at a spectrum of invariant confluence-ness, we have objects that
+    are invariant confluent, objects that are kinda invariant confluent, and
+    objects that are not at all invariant confluent.
+
+    If our object is completely invariant confluent, then we can deploy it with
+    weak consistency. But if it's even just a smidge not invariant confluent,
+    then we're forced to use strong consistency.
+  }
 \end{frame}
 
 \begin{frame}
@@ -58,6 +77,14 @@
       \node[align=center, fill=white] at (1, 1.5) {Strong\\Consistency};
     \end{tikzpicture}
   \end{center}
+
+  \note{%
+    This is not ideal. Ideally, invariant confluent objects can use weak
+    consistency. Objects that are kinda invariant confluent can use weakish
+    consistency, and objects that are not at all invariant confluent can use
+    strong consistency. We should have a spectrum of coordination to match our
+    spectrum of invariant confluence-ness.
+  }
 \end{frame}
 
 \begin{frame}
@@ -67,161 +94,16 @@
     operate with weak consistency within segments and strong consistency across
     segments.
   \end{center}
+
+  \note{%
+    Well, we can accomplish such a thing using a technique called segmented
+    invariant confluence. I don't have time to go into the details, but the
+    main idea is to divide the state space into segments. Within each segment,
+    replicas can operate without coordination, but when transitioning across
+    segment boundaries, replicas have to coordinate.
+  }
 \end{frame}
 
-\begin{frame}
-  A \defword{segmentation} $\Sigma = (I_1, T_1), \ldots, (I_n, T_n)$ is a
-  sequence (not a set) of $n$ segments $(I_i, T_i)$.
-  \pause
-  $O$ is \defword{segmented \invariantconfluent{}} with respect to $s_0$, $T$,
-  $I$, and $\Sigma$, abbreviated \defword{\sTISconfluent}, if the following
-  conditions hold:
-  \begin{itemize}
-    \pause\item
-      The start state satisfies the invariant (i.e. $I(s_0)$).
-
-    \pause\item
-      $I$ is covered by the invariants in $\Sigma$.
-
-    \pause\item
-      $O$ is \invariantconfluent{} within each segment. That is, for every $(I_i,
-      T_i) \in \Sigma$ and for every state $s \in I_i$, $O$ is
-      \sticonfluent{s}{T_i}{I_i}.
-  \end{itemize}
-\end{frame}
-
-{
-\newcommand{\xmin}{-2}
-\newcommand{\xmax}{2}
-\newcommand{\ymin}{-2}
-\newcommand{\ymax}{2}
-
-% Axes.
-\newcommand{\xyaxes}{
-  \draw[] (\xmin.5, 0) to (\xmax.5, 0);
-  \draw[] (0, \ymin.5) to (0, \ymax.5);
-  \node at (\xmax + 1, 0) {$x$};
-  \node at (0, \ymax + 1) {$y$};
-}
-
-% Quadrant 1.
-\newcommand{\quadi}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {0, ..., \argxmax} {
-    \foreach \y in {0, ..., \argymax} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% Quadrant 2.
-\newcommand{\quadii}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {\argxmin, ..., 0} {
-    \foreach \y in {0, ..., \argymax} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% Quadrant 3.
-\newcommand{\quadiii}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {\argxmin, ..., 0} {
-    \foreach \y in {\argymin, ..., 0} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% Quadrant 4.
-\newcommand{\quadiv}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {0, ..., \argxmax} {
-    \foreach \y in {\argymin, ..., 0} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% State labels.
-\newcommand{\statelabels}{
-  \node[statelabel] at (0, 0) {$s_0$};
-  \node[statelabel] at (-1, 1) {$s_1$};
-  \node[statelabel] at (1, -1) {$s_2$};
-  \node[statelabel] at (1, 1) {$s_3$};
-}
-
-\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=3pt]
-\tikzstyle{inv}=[line width=0.75pt, draw=black]
-\tikzstyle{pointinv}=[point, inv]
-\tikzstyle{invregion}=[rounded corners, fill=flatgreen!50, draw=none]
-\tikzstyle{reachableregion}=[rounded corners, fill=flatblue!50, draw=none]
-\tikzstyle{statelabel}=[anchor=south west, inner sep=1pt]
-
-\begin{frame}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \centering
-      \begin{tikzpicture}[scale=1]
-        \begin{scope}
-          \clip (\xmin.5, \ymax.5) rectangle (\xmax.5, \ymin.5);
-          \draw[invregion] (\xmin.9, \ymax.9) rectangle (0.5, -0.5);
-          \draw[invregion] (-0.5, 0.5) rectangle (\xmax.9, \ymin.9);
-          \draw (0.5, 0.5) to (0.5, \ymax.5);
-          \draw (0.5, 0.5) to (\xmax.5, 0.5);
-          \draw (-0.5, -0.5) to (-0.5, \ymin.5);
-          \draw (-0.5, -0.5) to (\xmin.5, -0.5);
-        \end{scope}
-
-        \xyaxes{}
-        \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
-        \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
-        \quadii{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-        \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-      \end{tikzpicture}
-
-      {\Huge Invariant}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \pause
-      \centering
-      \begin{tikzpicture}[scale=1]
-        \begin{scope}
-          \clip (-3, 3) rectangle (\xmax.5, \ymin.5);
-          \draw[reachableregion, draw=black] (-2.5, 2.5) rectangle (\xmax.9, \ymin.9);
-        \end{scope}
-
-        \xyaxes{}
-        \quadi{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-        \quadiii{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-        \quadii{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-        \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
-      \end{tikzpicture}
-
-      {\Huge Reachable}
-    \end{column}
-  \end{columns}
-\end{frame}
-}
-
-{
 \tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt, draw=black]
 \tikzstyle{region}=[draw=none]
 \tikzstyle{region1}=[region, fill=flatred!50]
@@ -287,5 +169,10 @@
       \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
   \end{center}
+
+  \note{%
+    Returning to our example from before, we can divide our state space into
+    the second quadrant, the fourth quadrant, the y-axis and the x-axis. I
+    encourage you to read the paper for more details.
+  }
 \end{frame}
-}
