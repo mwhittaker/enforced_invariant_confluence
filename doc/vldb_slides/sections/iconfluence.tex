@@ -12,6 +12,22 @@
     \pause\item
       Example: $O = (\setst{X}{X \subseteq \nats}, \cup)$.
   \end{itemize}
+
+  \note{%
+    Now that we have some intuition on invariant confluence, let's define
+    invariant confluence formally.
+
+    First, we say a distributed object $O$ is a pair of a set $S$ of states and
+    a binary merge operator that I'll pronounce ``join''.
+
+    For example, the set of natural numbers of joined by max is a distributed
+    object. And the powerset of the natural numbers joined by set union is a
+    distributed object.
+
+    For those of you familiar with lattices or CRDTs, you might instinctually
+    assume that join has to be associative or commutative or idempotent,
+    something like that, but here we're not making any of those assumptions.
+  }
 \end{frame}
 
 \begin{frame}
@@ -24,6 +40,12 @@
     \pause\item
       Example: $t(x) = x + 1 : \nats \to \nats$.
   \end{itemize}
+
+  \note{%
+    Next, we define a transaction as a function that maps one state to another.
+    For example, the function $t$ that maps an integer $x$ to $x + 1$ is a
+    transaction.
+  }
 \end{frame}
 
 \begin{frame}
@@ -38,6 +60,16 @@
     \pause\item
       Notation: $I(s)$ and $\lnot I(s)$.
   \end{itemize}
+
+  \note{%
+    Finally, we say an invariant is a subset of the set of states $S$. For
+    example, if our set of states is the set of integers, then the set of
+    non-negative integers is an invariant. Notationally, we say $I(s)$ to mean
+    $s$ is in the invariant or $s$ satisfies the invariant. And similarly, we
+    say $\lnot I(s)$ to mean $s$ does not satisfy the invariant.
+
+    Any questions?
+  }
 \end{frame}
 
 \newcommand{\internaltext}[1]{$\boldsymbol #1$}
@@ -125,13 +157,55 @@
       \draw[txnline] (s33) to node[txntext]{} (s31);
     \end{tikzpicture}
   \end{center}
+
+  \note{%
+    \footnotesize
+
+    We'll consider the scenario in which we replica our distributed object
+    across some number replicas. Here, we show three replicas $p_1$, $p_2$, and
+    $p_3$.
+
+    Each replica is initialized with an initial state $s_0$ as well as a set of
+    transactions and an invariant.
+
+    Replicas repeatedly perform one of two actions. First, a replica can
+    execute a transaction. For example, here, replica $p_1$ executes
+    transaction $t$ taking it from state $s_0$ to state $s_1$. One very
+    important thing to note about transactions is that if a replica executes a
+    transaction and the new state does not satisfy the invariant, then the
+    replica aborts the transaction and rolls back its state. Replicas only
+    execute transactions if they maintain the invariant.
+
+    Here, we see that replica $p_2$ and $p_3$ both execute transaction $u$
+    leading to state $s_2$.
+
+    In addition to executing transactions, replicas can also periodically send
+    their state to another replica to get merged. For example, here we see that
+    replica $p_1$ sends its state $s_1$ to replica $p_2$. $p_2$ merges the two
+    states using the join operator to get state $s_4$. Here, it's critical to
+    note that unlike with transactions, replicas cannot abort a merge. They
+    can abort transactions, but they cannot abort a merge.
+
+    And here, we see that the replicas continue to execute transactions and
+    merge their states with one another. Informally, a distributed object is
+    invariant confluent with respect to a start state, a set of transactions,
+    and an invariant if the replicas are guaranteed to never end up in a state
+    that violates the invariant.
+  }
 \end{frame}
 
 \begin{frame}{Expression-Based Formalism}
-\Huge
-\[
-  e ::= s \mid t(e) \mid e_1 \join e_2
-\]
+  \Huge
+  \[
+    e ::= s \mid t(e) \mid e_1 \join e_2
+  \]
+
+  \note{%
+    We can formalize all this very neatly using an expression based formalism.
+    Given a distributed object and a set of transactions, we define the grammar
+    shown here. Every expression in the grammar is a state, a transaction
+    applied to an expression, or the merge of two expressions.
+  }
 \end{frame}
 
 \begin{frame}
@@ -241,6 +315,26 @@
       s_7 = (v(t(s_0)) \join (t(s_0) \join u(s_0))) \join w(u(s_0))
     \]
   }
+
+  \note{%
+    Using this grammar, instead of reasoning about invariant confluence by
+    thinking about complex interleavings of operations on a set of replicas, we
+    can abstract everything away and instead just focus on simple expressions
+    of our grammar.
+
+    For example, consider state $s_7$ in the execution shown here. We can
+    express the same state more simply with the expression shown at the bottom
+    of the slide. The abstract syntax tree of the expression is shown on the
+    right.
+
+    We see that $s_7$ is the merge of two states, $s_6$ and $s_5$. $s_5$ is the
+    result of applying transactions $w$ and $u$ to the start state. $s_6$ is
+    the result of merging two other states, and so on. If you tilt your head
+    and look at the abstract syntax tree, you'll see that kind of like a
+    sideways version of the execution diagram, with states fully expanded.
+
+    Any questions?
+  }
 \end{frame}
 
 \begin{frame}
@@ -254,6 +348,18 @@
     \inferrule{\sTIreachablepredicate{e_1} \\ \sTIreachablepredicate{e_2}}
               {\sTIreachablepredicate{e_1 \join e_2}}
   \end{mathpar}
+
+  \note{%
+    Now, our grammar can express expressions that are not actually reachable in
+    our system model. So, we can define a predicate reachable that specifies
+    which expressions are actually reachable.
+
+    The top rule here shows that the start state is reachable. The middle rule
+    says that if some expression $e$ is reachable and if $t(e)$ satisfies the
+    invariant, then $t(e)$ is reachable. The bottom rule says that the merge of
+    two reachable states is reachable. This definition simply formalizes our
+    informal notion of how replicas execute transactions and merge commands.
+  }
 \end{frame}
 
 \begin{frame}
@@ -267,6 +373,18 @@
   \end{itemize}
 
   What states are reachable?
+
+  \note{%
+    As an example, consider the set of integers merged by max. We have a single
+    transaction that increments numbers, and our invariant is that the number
+    is non-negative. If our start state is $42$, what is the set of reachable
+    states?
+
+    Does anyone in the audience know?
+
+    That's right, the set of all integers greater than or equal to 42 can be
+    reached from 42 by incrementing and taking maxes.
+  }
 \end{frame}
 
 \begin{frame}
@@ -277,6 +395,16 @@
   \[
     \setst{s \in S}{\sTIreachablepredicate{s}} \subseteq I
   \]
+
+  \note{%
+    With all these definitions in hand, we can formalize invariant confluence
+    very neatly. An object is invariant confluent with respect to some start
+    state $s_0$, set of transactions $T$, and invariant $I$ which I'll
+    abbreviate to \sTIconfluent{} if the set of reachable states is a subset
+    of the invariant.
+
+    Any questions?
+  }
 \end{frame}
 
 \begin{frame}
@@ -285,12 +413,22 @@
   \begin{itemize}
     \item $O = (\ints \times \ints, \max \times \max)$
     \pause \item $t_x((x, y)) = (x + 1, y)$
-    \pause \item $t_y((x, y)) = (x, y + 1)$
-    \pause \item $T = \set{t_x, t_y}$
+    \item $t_y((x, y)) = (x, y - 1)$
+    \item $T = \set{t_x, t_y}$
     \pause \item $I = \setst{(x, y)}{xy \leq 0}$
     \pause \item $s_0 = (0, 0)$
   \end{itemize}
   Is $O$ \sTIconfluent{}?
+
+  \note{%
+    To help the definition seep into our bones, let's take a look at an
+    example. Consider the distributed object conisting of pairs of integers
+    $(x, y)$ merged pairwise by max. We consider a transaction $t_x$ that
+    increments $x$ part of a pair, and a transaction $t_y$ that decrements the
+    $y$ part. Our invariant is that the product of $x$ and $y$ is non-positive.
+    Our start state is the pair $(0, 0)$. Is $O$ invariant confluent with
+    respect to this start state, set of transactions, and invariant?
+  }
 \end{frame}
 
 \newcommand{\xmin}{-2}
@@ -387,11 +525,21 @@
       \quadiv{point}{\xmin}{\xmax}{\ymin}{\ymax}
 
       \pause
-      \draw[-latex, ultra thick] (0,0) to node[below] {$t_x$} (1, 0);
+      \draw[-latex, ultra thick] (0,0) to node[above] {$t_x$} (1, 0);
       \pause
-      \draw[-latex, ultra thick] (0,0) to node[left] {$t_y$} (0, 1);
+      \draw[-latex, ultra thick] (0,0) to node[left] {$t_y$} (0, -1);
     \end{tikzpicture}
   \end{center}
+
+  \note{%
+    Well, it's a little bit abstract and hard to think about. We can make the
+    example more concrete if we think about it geometrically. Every state is a
+    pair of integers, which we can think of as a point on a plane.
+
+    The transaction $t_x$ takes in a point and spits out the point one to the
+    right. The transaction $t_y$ takes in a point and spits out the point one
+    above.
+  }
 \end{frame}
 
 \begin{frame}
@@ -409,6 +557,12 @@
       \draw[-latex, ultra thick] (2,-2) to (2, -1);
     \end{tikzpicture}
   \end{center}
+
+  \note{%
+    The merge function, pairwise max, takes two points and spits out the upper
+    right corner of the rectangle formed by the two points. Here, we see the
+    point $(0, -1)$ and $(2, -2)$ merge to the point $(2, -1)$.
+  }
 \end{frame}
 
 \begin{frame}
@@ -454,4 +608,24 @@
       {\Huge Reachable}
     \end{column}
   \end{columns}
+
+  \note{%
+    Our invariant was the set of points whose product is non-positive. Now, we
+    see that this is just the second and fourth quadrant of the plane where one
+    of $x$ or $y$ is negative but not both.
+
+    Our state is the origin, so we start at the origin. We can walk right using
+    $t_x$, we can walk down using $t_y$, and we can merge two points together.
+    Thus, the set of reachable points is the entire fourth quadrant. We can
+    reach every point in the fourth quadrant by walking right, down, and
+    merging.
+
+    Now, we see the set of points that satisfy the invariant and the set of
+    points that reachable, and the set of reachable points is a subset of the
+    invariant satisfying points. Thus, our object is invariant confluent. We
+    can only reach points that satisfy the invariant. We can never reach a
+    point that does not satisfy the invariant.
+
+    Any questions?
+  }
 \end{frame}
