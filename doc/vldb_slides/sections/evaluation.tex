@@ -10,8 +10,15 @@ checker.check()\end{verbatim}
 
   \note{%
     Finally, I'll give a teaser of our evaluation. We implemented our decision
-    procedure in Python. You can specify objects, transactions, and invariants
-    with code that looks like this.
+    procedure in Python and leveraged the Z3 decision procedure. You can
+    specify objects, transactions, and invariants with code that looks like
+    this. \\[12pt]
+
+    This code specifies the running example that we've been looking at
+    throughout the talk. $x$ is an integer merged by max that is initially 0.
+    $y$ is an integer merged by max that is initially 0. We have a transaction
+    incx that increments x and a function decy that decrements y. And, our
+    invariant is that the product of $x$ and $y$ is less than or equal to zero.
   }
 \end{frame}
 
@@ -28,10 +35,11 @@ checker.check()\end{verbatim}
   specification.
 
   \note{%
-    We specified a bunch of examples including things involving foreign keys,
-    an auction application, something involving escrow transactions, and TPC-C.
-    All the examples verify with a runtime of less then a second and every one
-    is implemented in fewer than 75 lines of specification.
+    In our paper, we specified a bunch of examples including things involving
+    foreign keys, an auction application, something involving escrow
+    transactions, and TPC-C.  All the examples verify with a runtime of less
+    then a second and every one is implemented in fewer than 75 lines of
+    specification.
   }
 \end{frame}
 

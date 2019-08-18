@@ -79,11 +79,11 @@
   \end{center}
 
   \note{%
-    This is not ideal. Ideally, invariant confluent objects can use weak
-    consistency. Objects that are kinda invariant confluent can use weakish
-    consistency, and objects that are not at all invariant confluent can use
-    strong consistency. We should have a spectrum of coordination to match our
-    spectrum of invariant confluence-ness.
+    This is not ideal.  Ideally, we would have a spectrum of coordination to
+    match our spectrum of invariant confluence-ness.  Invariant confluent
+    objects could use weak consistency. Objects that are kinda invariant
+    confluent could use weakish consistency. And, objects that are not at all
+    invariant confluent could use strong consistency.
   }
 \end{frame}
 
@@ -172,7 +172,12 @@
 
   \note{%
     Returning to our example from before, we can divide our state space into
-    the second quadrant, the fourth quadrant, the y-axis and the x-axis. I
-    encourage you to read the paper for more details.
+    the second quadrant, the fourth quadrant, the y-axis and the x-axis. Within
+    each of these segments, replicas do not have to coordinate. Only when they
+    transition from one segment to another do they have to coordinate. In our
+    paper, we formalize segmented invariant confluence, explain how to deploy
+    segmented invariant confluent objects, and develop another decision
+    procedure for segmented invariant confluence. If you're interested in those
+    details, I encourage you to check out our paper.
   }
 \end{frame}
