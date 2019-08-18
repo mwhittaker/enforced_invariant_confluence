@@ -49,7 +49,10 @@ checker.check()\end{verbatim}
   \note{%
     We have some graphs showing that no coordination vastly outperforms
     replicating with strong consistency, and how segmented invariant confluence
-    allows a smooth tradeoff between the two.
+    allows a smooth tradeoff between the two. Fully invariant confluent objects
+    don't require any coordination, partly invariant confluent objects require
+    some coordination, and not at all invariant confluent objects require a lot
+    of coordination.
   }
 \end{frame}
 

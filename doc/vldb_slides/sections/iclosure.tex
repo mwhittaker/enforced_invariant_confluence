@@ -7,10 +7,10 @@
   \note{%
     Now that we've defined invariant confluence, we can turn our attention to
     the main goal of our paper. And that is to develop an invariant-confluence
-    decision procedure. Determining whether or not a distributed object is
-    invariant confluent is not easy to do by hand, so we'd like to develop a
-    decision procedure that can automatically check whether something is
-    invariant confluent for us.
+    decision procedure. As you saw in the previos example, determining whether
+    or not a distributed object is invariant confluent is not easy to do by
+    hand, so we'd like to develop a decision procedure that can automatically
+    check whether something is invariant confluent for us.
   }
 \end{frame}
 
@@ -410,8 +410,9 @@
   \note{%
     Turns out, this is not a coincidence. An invariant confluent object may not
     be invariant closed but only because we're merging points that are
-    unreachable. If the invariant is a subset of the reachable states, then
-    invariant closure and invariant confluence are equivalent. \\[12pt]
+    unreachable. If the invariant is a subset of the reachable states---that
+    is, if every invariant satisfying point is reachable---then invariant
+    closure and invariant confluence are equivalent. \\[12pt]
 
     Why? Well, the forward direction here is what we proved before. For the
     backwards direction, we have that the invariant is a subset of the set of
