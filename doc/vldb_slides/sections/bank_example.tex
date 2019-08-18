@@ -50,7 +50,7 @@
   \end{center}
 
   \note{%
-    So, what is invariant confluence? Well, let's begin with an example.
+    We'll begin with an example.
 
     Let's say we want to replicate the database shown here. This database is
     the world's simplest database. It contains only a single number, which
@@ -60,8 +60,7 @@
     Users can issue transactions to the database, and every transacation is
     either a deposit or a withdrawal. And, I have one critical invariant that I
     want to maintain over my database. And that invariant is that my bank
-    account balance should be non-negative at all times. I'm not allowed to go
-    in the hole.
+    account balance should never be negative. My balance must be non-negative at all times.
   }
 \end{frame}
 
@@ -143,9 +142,8 @@
   \end{center}
 
   \note{%
-    Now, instead of implementing our bank with strong consistency, we could
-    instead implement it with weak consistency and avoid coordination
-    altogether.
+    Alternatively, instead of implementing our bank with strong consistency, we
+    could implement it with weak consistency and avoid coordination altogether.
 
     Now, when two clients issue concurrent deposit transactions, the two
     replicas execute the transactions immediately without consulting one
@@ -192,15 +190,21 @@
   \end{center}
 
   \note{%
-    Now, these are just two examples, but if you think about it long enough,
-    they are representative of a trend. We can implement deposit transactions
-    without any coordination and we're guaranteed to never violate the
-    invariant. Withdrawal transactions, on the other hand, do require
+    We can learn a lot from these examples.
+
+    First, if we implement our bank with strong consistency, we never violate
+    our invariant.
+
+    Second, we can implement deposit transactions without any coordination and
+    we're still guaranteed to never violate the invariant.
+
+    Third, withdrawal transactions, unlike deposit transactions, do require
     coordination to avoid violating the invariant.
 
-    At a very high level, this is exactly the notion that invariant confluence
-    captures. We'll see that deposit transactions are invariant confluent and
-    thus do not require coordination while withdrawal transactions are not
-    invariant confluent and thus do require coordination.
+    At a very high level, invariant confluence tries to capture exactly which
+    transactions require coordination to maintain invariants and which do not.
+    In this example, deposit transactions are invariant confluent and thus do
+    not require coordination while withdrawal transactions are not invariant
+    confluent and thus do require coordination.
   }
 \end{frame}

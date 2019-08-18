@@ -24,8 +24,7 @@
     Unfortunately, developing an invariant confluence decision procedure
     straight up is not easy. Invariant confluence is fundamentally a property
     about reachable states but reasoning automatically about reachable states
-    is hard. I'm not saying it's impossible, but certainly I don't know how to
-    do it.
+    is hard.
 
     Instead of reasoning about invariant confluence directly then, let's look
     at a sufficient condition for invariant confluence called invariant
@@ -43,11 +42,12 @@
   \end{itemize}
 
   \note{%
-    First, a quick refresher on terminology. We say a set $S$ is closed under a
-    binary operator $f$ if for every $x$ and $y$ in $S$, $f(x, y)$ is also in
-    $S$. For example, even numbers are closed under addition because the sum of
-    any two even numbers is even. But odd numbers are not closed under addition
-    because the sum of two odd numbers is even.
+    First, a quick refresher on what it meas for a set to be closed. We say a
+    set $S$ is closed under a binary operator $f$ if for every $x$ and $y$ in
+    $S$, $f(x, y)$ is also in $S$. For example, even numbers are closed under
+    addition because the sum of any two even numbers is even. But odd numbers
+    are not closed under addition because the sum of two odd numbers may not
+    be odd.
   }
 \end{frame}
 
@@ -77,8 +77,12 @@
 
   \note{%
     Invariant closure is a sufficient condition for invariant confluence. Why
-    is that? Well, transactions already preserve invariants. So if merging does
-    as well, then every reachable state always maintains the invariant.
+    is that? Well for an object to be invariant confluent, every reachable
+    state must satisfy the invariant. A state is reachable if it can be reached
+    by executing transactions merging states. Transactions are already
+    guarnateed to preserve invariants, so if merging is also guaranteed to
+    preserve the invariant, then every reachable state always satisfies the
+    invariant.
   }
 \end{frame}
 
@@ -94,10 +98,12 @@
 
   \note{%
     The good thing about invariant closure is that it's much easier to check
-    automatically. for example, remember that example we had with pairs of
+    automatically. Remember that example we had with pairs of
     integers? We can pose whether or not that object is invariant closed as
     this formula, and we can pass this formula directly to an SMT solver to
-    figure out whether it's invariant closed.
+    figure out whether it's invariant closed. This is not something we can do
+    with invariant confluence because it's hard to express reachability as a
+    simple formula like this one.
   }
 \end{frame}
 
@@ -108,7 +114,7 @@
   \]
 
   \note{%
-    So to decide whether an object is invariant confluent, we can take the
+    To decide whether an object is invariant confluent, we can take the
     object and ask if it's invariant closed. If it is, then it's also invariant
     confluent and we're done. If it's not invariant closed, then what do we
     know?
@@ -258,7 +264,8 @@
 
   \note{%
     To see if it does, let's revisit the example from before. Recall that in
-    this example, our object is invariant confluent.
+    this example, our object is invariant confluent. The set of reachable
+    states is a subset of the invariant.
   }
 \end{frame}
 
@@ -310,7 +317,8 @@
 
   \note{%
     But, note that our object is not invariant closed. The points $(-1, 2)$ and
-    $(2, -1)$ both satisfy the invariant, but their merge does not.
+    $(2, -1)$ both satisfy the invariant, but if we merge them we get the point
+    $(2, 2)$, and the point $(2, 2)$ does not satisfy the invariant.
   }
 \end{frame}
 
@@ -400,19 +408,22 @@
   \end{itemize}
 
   \note{%
-    This example is actually representative of the overall trend. An invariant
-    confluent object may not be invariant closed but only because we're merging
-    points that are unreachable. If the invariant is a subset of the reachable
-    states, then invariant closure and invariant confluence are identical.
+    Turns out, this is not a coincidence. An invariant confluent object may not
+    be invariant closed but only because we're merging points that are
+    unreachable. If the invariant is a subset of the reachable states, then
+    invariant closure and invariant confluence are equivalent. \\[12pt]
 
     Why? Well, the forward direction here is what we proved before. For the
-    backwards direction, we have that the invariant and the set of reachable
-    points are identical. The set of reachable states is closed under merge, so
-    so is the invariant, so the object is invariant closed.
+    backwards direction, we have that the invariant is a subset of the set of
+    reachable points, and because our object is invariant confluent, the set of
+    reachable points is a subset of the invariant. So the invariant and the set
+    of reachable points are the same. The set of reachable states is closed
+    under merge, so the invariant is also, so the object is invariant closed.
+    \\[12pt]
 
     I know I've walked through a lot of theory pretty quickly, but if you
     remember one slide, remember this one. If the invariant is a subset of the
     reachable states, then invariant closure and invariant confluence are
-    identical.
+    equivalent. \\[12pt]
   }
 \end{frame}

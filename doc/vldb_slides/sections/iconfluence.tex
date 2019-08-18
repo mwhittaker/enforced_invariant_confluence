@@ -20,13 +20,14 @@
     First, we say a distributed object $O$ is a pair of a set $S$ of states and
     a binary merge operator that I'll pronounce ``join''.
 
-    For example, the set of natural numbers of joined by max is a distributed
-    object. And the powerset of the natural numbers joined by set union is a
-    distributed object.
+    For example, the set of natural numbers of merged by the join operator max
+    is a distributed object. And the powerset of the natural numbers merged by
+    join operator union is a distributed object.
 
     For those of you familiar with lattices or CRDTs, you might instinctually
     assume that join has to be associative or commutative or idempotent,
-    something like that, but here we're not making any of those assumptions.
+    something like that, but here we're not assuming any special properties
+    about the join operator.
   }
 \end{frame}
 
@@ -42,9 +43,8 @@
   \end{itemize}
 
   \note{%
-    Next, we define a transaction as a function that maps one state to another.
-    For example, the function $t$ that maps an integer $x$ to $x + 1$ is a
-    transaction.
+    A transaction as a function that maps one state to another. For example,
+    the function $t$ that maps an integer $x$ to $x + 1$ is a transaction.
   }
 \end{frame}
 
@@ -56,17 +56,12 @@
 
     \pause\item
       Example: $I = \setst{x \in \ints}{x \geq 0}$.
-
-    \pause\item
-      Notation: $I(s)$ and $\lnot I(s)$.
   \end{itemize}
 
   \note{%
-    Finally, we say an invariant is a subset of the set of states $S$. For
-    example, if our set of states is the set of integers, then the set of
-    non-negative integers is an invariant. Notationally, we say $I(s)$ to mean
-    $s$ is in the invariant or $s$ satisfies the invariant. And similarly, we
-    say $\lnot I(s)$ to mean $s$ does not satisfy the invariant.
+    An invariant $I$ is a subset of the set of states $S$. For example, if our
+    set of states is the set of integers, then the set of non-negative integers
+    is an invariant.
 
     Any questions?
   }
@@ -159,14 +154,14 @@
   \end{center}
 
   \note{%
-    \footnotesize
+    \tiny
 
-    We'll consider the scenario in which we replica our distributed object
+    We'll consider the scenario in which we replicate our distributed object
     across some number replicas. Here, we show three replicas $p_1$, $p_2$, and
-    $p_3$.
+    $p_3$. \\[12pt]
 
     Each replica is initialized with an initial state $s_0$ as well as a set of
-    transactions and an invariant.
+    transactions and an invariant. \\[12pt]
 
     Replicas repeatedly perform one of two actions. First, a replica can
     execute a transaction. For example, here, replica $p_1$ executes
@@ -174,193 +169,198 @@
     important thing to note about transactions is that if a replica executes a
     transaction and the new state does not satisfy the invariant, then the
     replica aborts the transaction and rolls back its state. Replicas only
-    execute transactions if they maintain the invariant.
+    execute transactions if they maintain the invariant. We saw this in the
+    bank account example when a replica aborted a withdrawal if there were
+    insufficient funds. \\[12pt]
 
     Here, we see that replica $p_2$ and $p_3$ both execute transaction $u$
-    leading to state $s_2$.
+    leading to state $s_2$. \\[12pt]
 
     In addition to executing transactions, replicas can also periodically send
     their state to another replica to get merged. For example, here we see that
     replica $p_1$ sends its state $s_1$ to replica $p_2$. $p_2$ merges the two
     states using the join operator to get state $s_4$. Here, it's critical to
     note that unlike with transactions, replicas cannot abort a merge. They
-    can abort transactions, but they cannot abort a merge.
+    can abort transactions, but they cannot abort a merge. \\[12pt]
 
     And here, we see that the replicas continue to execute transactions and
-    merge their states with one another. Informally, a distributed object is
-    invariant confluent with respect to a start state, a set of transactions,
-    and an invariant if the replicas are guaranteed to never end up in a state
-    that violates the invariant.
+    merge their states with one another. \\[12pt]
+
+    We say that a state is reachable if there is some execution in which a
+    replica ends up with that state. For example, here we see states $s_0$,
+    $s_1$, $s_2$, all the way to $s_7$ are all reachable. However, not all
+    states are reachable.
+
   }
 \end{frame}
 
-\begin{frame}{Expression-Based Formalism}
-  \Huge
-  \[
-    e ::= s \mid t(e) \mid e_1 \join e_2
-  \]
-
-  \note{%
-    We can formalize all this very neatly using an expression based formalism.
-    Given a distributed object and a set of transactions, we define the grammar
-    shown here. Every expression in the grammar is a state, a transaction
-    applied to an expression, or the merge of two expressions.
-  }
-\end{frame}
-
-\begin{frame}
-  \tikzstyle{s0color}=[fill=flatred]
-  \tikzstyle{s1color}=[fill=flatgreen]
-  \tikzstyle{s2color}=[fill=flatdenim]
-  \tikzstyle{s3color}=[fill=flatorange]
-  \tikzstyle{s4color}=[fill=flatyellow]
-  \tikzstyle{s5color}=[fill=flatcyan]
-  \tikzstyle{s6color}=[fill=flatpurple]
-  \tikzstyle{s7color}=[fill=flatblue]
-  \tikzstyle{txnline}=[black, thick, -latex]
-  \tikzstyle{phantomstate}=[%
-    shape=circle, inner sep=1pt, draw=white, line width=1pt, fill=white]
-  \tikzstyle{state}=[%
-    shape=circle, inner sep=1pt, draw=black, line width=1pt, text opacity=1,
-    fill opacity=0.6]
-
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \centering
-      \Large
-      \begin{tikzpicture}[xscale=1.25, yscale=1.25]
-        \node (p3) at (0.5, 3) {$p_1$};
-        \node (p2) at (0.5, 2) {$p_2$};
-        \node (p1) at (0.5, 1) {$p_3$};
-
-        \tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
-        \draw[pline] (p3) to (4.75, 3);
-        \draw[pline] (p2) to (4.75, 2);
-        \draw[pline] (p1) to (4.75, 1);
-
-        % Top line.
-        \node[phantomstate] (s03) at (1, 3) {$\phantom{s_0}$};
-        \node[phantomstate] (s13) at (2, 3) {$\phantom{s_1}$};
-        \node[phantomstate] (s23) at (3, 3) {$\phantom{s_3}$};
-        \node[phantomstate] (s33) at (3.75, 3) {$\phantom{s_6}$};
-        \node[state, s0color] (s03) at (1, 3) {\internaltext{s_0}};
-        \node[state, s1color] (s13) at (2, 3) {\internaltext{s_1}};
-        \node[state, s3color] (s23) at (3, 3) {\internaltext{s_3}};
-        \node[state, s6color] (s33) at (3.75, 3) {\internaltext{s_6}};
-
-        % Middle line.
-        \node[phantomstate] (s02) at (1, 2) {$\phantom{s_0}$};
-        \node[phantomstate] (s12) at (2, 2) {$\phantom{s_2}$};
-        \node[phantomstate] (s22) at (3, 2) {$\phantom{s_4}$};
-        \node[state, s0color] (s02) at (1, 2) {\internaltext{s_0}};
-        \node[state, s2color] (s12) at (2, 2) {\internaltext{s_2}};
-        \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
-
-        % Bottom line.
-        \node[phantomstate] (s01) at (1, 1) {$\phantom{s_0}$};
-        \node[phantomstate] (s11) at (2, 1) {$\phantom{s_2}$};
-        \node[phantomstate] (s21) at (3, 1) {$\phantom{s_5}$};
-        \node[phantomstate] (s31) at (4.25, 1) {$\phantom{s_7}$};
-        \node[state, s0color] (s01) at (1, 1) {\internaltext{s_0}};
-        \node[state, s2color] (s11) at (2, 1) {\internaltext{s_2}};
-        \node[state, s5color] (s21) at (3, 1) {\internaltext{s_5}};
-        \node[state, s7color] (s31) at (4.25, 1) {\internaltext{s_7}};
-
-        \tikzstyle{txntext}=[sloped, above]
-        \draw[txnline] (s03) to node[txntext]{$t$} (s13);
-        \draw[txnline] (s13) to node[txntext]{$v$} (s23);
-        \draw[txnline] (s02) to node[txntext]{$u$} (s12);
-        \draw[txnline] (s01) to node[txntext]{$u$} (s11);
-        \draw[txnline] (s11) to node[txntext]{$w$} (s21);
-
-        \draw[txnline] (s13) to node[txntext]{} (s22);
-        \draw[txnline] (s12) to node[txntext]{} (s22);
-        \draw[txnline] (s22) to node[txntext]{} (s33);
-        \draw[txnline] (s23) to node[txntext]{} (s33);
-        \draw[txnline] (s21) to node[txntext]{} (s31);
-        \draw[txnline] (s33) to node[txntext]{} (s31);
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \centering
-      \Large
-      \pause
-      \begin{tikzpicture}[scale=1.25]
-                           \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (j1) at (0, 0) {\internaltext{\join}};
-        \draw (j1)++(-30:1) node[state, s5color, label={[label distance=-0.1cm] 90:$s_5$}] (w)            {\internaltext{w}};
-        \draw (j1)++(210:1) node[state, s6color, label={[label distance=-0.1cm] 90:$s_6$}] (j2)           {\internaltext{\join}};
-        \draw (w)++(-90:1)  node[state, s2color, label={[label distance=-0.2cm] 60:$s_2$}] (u1)           {\internaltext{u}};
-        \draw (u1)++(-90:1) node[state, s0color]                                           (s4)           {\internaltext{s_0}};
-        \draw (j2)++(225:1) node[state, s3color, label={[label distance=-0.1cm] 90:$s_3$}] (v)            {\internaltext{v}};
-        \draw (v)++(-90:1)  node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t2)           {\internaltext{t}};
-        \draw (t2)++(-90:1) node[state, s0color]                                           (s1)           {\internaltext{s_0}};
-        \draw (j2)++(-45:1) node[state, s4color, label={[label distance=-0.1cm] 90:$s_4$}] (j3)           {\internaltext{\join}};
-        \draw (j3)++(240:1) node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t3)           {\internaltext{t}};
-        \draw (t3)++(-90:1) node[state, s0color]                                           (s2)           {\internaltext{s_0}};
-        \draw (j3)++(-60:1) node[state, s2color, label={[label distance=-0.1cm] 90:$s_2$}] (u3)           {\internaltext{u}};
-        \draw (u3)++(-90:1) node[state, s0color]                                           (s3)           {\internaltext{s_0}};
-
-        \tikzstyle{astedge}=[thick]
-        \draw[astedge] (j1) to (w) to (u1) to (s4);
-        \draw[astedge] (j1) to (j2) to (v) to (t2) to (s1);
-        \draw[astedge] (j1) to (j2) to (j3) to (t3) to (s2);
-        \draw[astedge] (j1) to (j2) to (j3) to (u3) to (s3);
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
-
-  {
-    \Large
-    \[
-      s_7 = (v(t(s_0)) \join (t(s_0) \join u(s_0))) \join w(u(s_0))
-    \]
-  }
-
-  \note{%
-    Using this grammar, instead of reasoning about invariant confluence by
-    thinking about complex interleavings of operations on a set of replicas, we
-    can abstract everything away and instead just focus on simple expressions
-    of our grammar.
-
-    For example, consider state $s_7$ in the execution shown here. We can
-    express the same state more simply with the expression shown at the bottom
-    of the slide. The abstract syntax tree of the expression is shown on the
-    right.
-
-    We see that $s_7$ is the merge of two states, $s_6$ and $s_5$. $s_5$ is the
-    result of applying transactions $w$ and $u$ to the start state. $s_6$ is
-    the result of merging two other states, and so on. If you tilt your head
-    and look at the abstract syntax tree, you'll see that kind of like a
-    sideways version of the execution diagram, with states fully expanded.
-
-    Any questions?
-  }
-\end{frame}
-
-\begin{frame}
-  \Large
-  \begin{mathpar}
-    \inferrule{ }{\sTIreachablepredicate{s_0}}
-
-    \inferrule{\sTIreachablepredicate{e} \\ I(t(e))}
-              {\sTIreachablepredicate{t(e)}}
-
-    \inferrule{\sTIreachablepredicate{e_1} \\ \sTIreachablepredicate{e_2}}
-              {\sTIreachablepredicate{e_1 \join e_2}}
-  \end{mathpar}
-
-  \note{%
-    Now, our grammar can express expressions that are not actually reachable in
-    our system model. So, we can define a predicate reachable that specifies
-    which expressions are actually reachable.
-
-    The top rule here shows that the start state is reachable. The middle rule
-    says that if some expression $e$ is reachable and if $t(e)$ satisfies the
-    invariant, then $t(e)$ is reachable. The bottom rule says that the merge of
-    two reachable states is reachable. This definition simply formalizes our
-    informal notion of how replicas execute transactions and merge commands.
-  }
-\end{frame}
+% \begin{frame}{Expression-Based Formalism}
+%   \Huge
+%   \[
+%     e ::= s \mid t(e) \mid e_1 \join e_2
+%   \]
+%
+%   \note{%
+%     We can formalize all this very neatly using an expression based formalism.
+%     Given a distributed object and a set of transactions, we define the grammar
+%     shown here. Every expression in the grammar is a state, a transaction
+%     applied to an expression, or the merge of two expressions.
+%   }
+% \end{frame}
+%
+% \begin{frame}
+%   \tikzstyle{s0color}=[fill=flatred]
+%   \tikzstyle{s1color}=[fill=flatgreen]
+%   \tikzstyle{s2color}=[fill=flatdenim]
+%   \tikzstyle{s3color}=[fill=flatorange]
+%   \tikzstyle{s4color}=[fill=flatyellow]
+%   \tikzstyle{s5color}=[fill=flatcyan]
+%   \tikzstyle{s6color}=[fill=flatpurple]
+%   \tikzstyle{s7color}=[fill=flatblue]
+%   \tikzstyle{txnline}=[black, thick, -latex]
+%   \tikzstyle{phantomstate}=[%
+%     shape=circle, inner sep=1pt, draw=white, line width=1pt, fill=white]
+%   \tikzstyle{state}=[%
+%     shape=circle, inner sep=1pt, draw=black, line width=1pt, text opacity=1,
+%     fill opacity=0.6]
+%
+%   \begin{columns}
+%     \begin{column}{0.5\textwidth}
+%       \centering
+%       \Large
+%       \begin{tikzpicture}[xscale=1.25, yscale=1.25]
+%         \node (p3) at (0.5, 3) {$p_1$};
+%         \node (p2) at (0.5, 2) {$p_2$};
+%         \node (p1) at (0.5, 1) {$p_3$};
+%
+%         \tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
+%         \draw[pline] (p3) to (4.75, 3);
+%         \draw[pline] (p2) to (4.75, 2);
+%         \draw[pline] (p1) to (4.75, 1);
+%
+%         % Top line.
+%         \node[phantomstate] (s03) at (1, 3) {$\phantom{s_0}$};
+%         \node[phantomstate] (s13) at (2, 3) {$\phantom{s_1}$};
+%         \node[phantomstate] (s23) at (3, 3) {$\phantom{s_3}$};
+%         \node[phantomstate] (s33) at (3.75, 3) {$\phantom{s_6}$};
+%         \node[state, s0color] (s03) at (1, 3) {\internaltext{s_0}};
+%         \node[state, s1color] (s13) at (2, 3) {\internaltext{s_1}};
+%         \node[state, s3color] (s23) at (3, 3) {\internaltext{s_3}};
+%         \node[state, s6color] (s33) at (3.75, 3) {\internaltext{s_6}};
+%
+%         % Middle line.
+%         \node[phantomstate] (s02) at (1, 2) {$\phantom{s_0}$};
+%         \node[phantomstate] (s12) at (2, 2) {$\phantom{s_2}$};
+%         \node[phantomstate] (s22) at (3, 2) {$\phantom{s_4}$};
+%         \node[state, s0color] (s02) at (1, 2) {\internaltext{s_0}};
+%         \node[state, s2color] (s12) at (2, 2) {\internaltext{s_2}};
+%         \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
+%
+%         % Bottom line.
+%         \node[phantomstate] (s01) at (1, 1) {$\phantom{s_0}$};
+%         \node[phantomstate] (s11) at (2, 1) {$\phantom{s_2}$};
+%         \node[phantomstate] (s21) at (3, 1) {$\phantom{s_5}$};
+%         \node[phantomstate] (s31) at (4.25, 1) {$\phantom{s_7}$};
+%         \node[state, s0color] (s01) at (1, 1) {\internaltext{s_0}};
+%         \node[state, s2color] (s11) at (2, 1) {\internaltext{s_2}};
+%         \node[state, s5color] (s21) at (3, 1) {\internaltext{s_5}};
+%         \node[state, s7color] (s31) at (4.25, 1) {\internaltext{s_7}};
+%
+%         \tikzstyle{txntext}=[sloped, above]
+%         \draw[txnline] (s03) to node[txntext]{$t$} (s13);
+%         \draw[txnline] (s13) to node[txntext]{$v$} (s23);
+%         \draw[txnline] (s02) to node[txntext]{$u$} (s12);
+%         \draw[txnline] (s01) to node[txntext]{$u$} (s11);
+%         \draw[txnline] (s11) to node[txntext]{$w$} (s21);
+%
+%         \draw[txnline] (s13) to node[txntext]{} (s22);
+%         \draw[txnline] (s12) to node[txntext]{} (s22);
+%         \draw[txnline] (s22) to node[txntext]{} (s33);
+%         \draw[txnline] (s23) to node[txntext]{} (s33);
+%         \draw[txnline] (s21) to node[txntext]{} (s31);
+%         \draw[txnline] (s33) to node[txntext]{} (s31);
+%       \end{tikzpicture}
+%     \end{column}
+%     \begin{column}{0.5\textwidth}
+%       \centering
+%       \Large
+%       \pause
+%       \begin{tikzpicture}[scale=1.25]
+%                            \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (j1) at (0, 0) {\internaltext{\join}};
+%         \draw (j1)++(-30:1) node[state, s5color, label={[label distance=-0.1cm] 90:$s_5$}] (w)            {\internaltext{w}};
+%         \draw (j1)++(210:1) node[state, s6color, label={[label distance=-0.1cm] 90:$s_6$}] (j2)           {\internaltext{\join}};
+%         \draw (w)++(-90:1)  node[state, s2color, label={[label distance=-0.2cm] 60:$s_2$}] (u1)           {\internaltext{u}};
+%         \draw (u1)++(-90:1) node[state, s0color]                                           (s4)           {\internaltext{s_0}};
+%         \draw (j2)++(225:1) node[state, s3color, label={[label distance=-0.1cm] 90:$s_3$}] (v)            {\internaltext{v}};
+%         \draw (v)++(-90:1)  node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t2)           {\internaltext{t}};
+%         \draw (t2)++(-90:1) node[state, s0color]                                           (s1)           {\internaltext{s_0}};
+%         \draw (j2)++(-45:1) node[state, s4color, label={[label distance=-0.1cm] 90:$s_4$}] (j3)           {\internaltext{\join}};
+%         \draw (j3)++(240:1) node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t3)           {\internaltext{t}};
+%         \draw (t3)++(-90:1) node[state, s0color]                                           (s2)           {\internaltext{s_0}};
+%         \draw (j3)++(-60:1) node[state, s2color, label={[label distance=-0.1cm] 90:$s_2$}] (u3)           {\internaltext{u}};
+%         \draw (u3)++(-90:1) node[state, s0color]                                           (s3)           {\internaltext{s_0}};
+%
+%         \tikzstyle{astedge}=[thick]
+%         \draw[astedge] (j1) to (w) to (u1) to (s4);
+%         \draw[astedge] (j1) to (j2) to (v) to (t2) to (s1);
+%         \draw[astedge] (j1) to (j2) to (j3) to (t3) to (s2);
+%         \draw[astedge] (j1) to (j2) to (j3) to (u3) to (s3);
+%       \end{tikzpicture}
+%     \end{column}
+%   \end{columns}
+%
+%   {
+%     \Large
+%     \[
+%       s_7 = (v(t(s_0)) \join (t(s_0) \join u(s_0))) \join w(u(s_0))
+%     \]
+%   }
+%
+%   \note{%
+%     Using this grammar, instead of reasoning about invariant confluence by
+%     thinking about complex interleavings of operations on a set of replicas, we
+%     can abstract everything away and instead just focus on simple expressions
+%     of our grammar.
+%
+%     For example, consider state $s_7$ in the execution shown here. We can
+%     express the same state more simply with the expression shown at the bottom
+%     of the slide. The abstract syntax tree of the expression is shown on the
+%     right.
+%
+%     We see that $s_7$ is the merge of two states, $s_6$ and $s_5$. $s_5$ is the
+%     result of applying transactions $w$ and $u$ to the start state. $s_6$ is
+%     the result of merging two other states, and so on. If you tilt your head
+%     and look at the abstract syntax tree, you'll see that kind of like a
+%     sideways version of the execution diagram, with states fully expanded.
+%
+%     Any questions?
+%   }
+% \end{frame}
+%
+% \begin{frame}
+%   \Large
+%   \begin{mathpar}
+%     \inferrule{ }{\sTIreachablepredicate{s_0}}
+%
+%     \inferrule{\sTIreachablepredicate{e} \\ I(t(e))}
+%               {\sTIreachablepredicate{t(e)}}
+%
+%     \inferrule{\sTIreachablepredicate{e_1} \\ \sTIreachablepredicate{e_2}}
+%               {\sTIreachablepredicate{e_1 \join e_2}}
+%   \end{mathpar}
+%
+%   \note{%
+%     Now, our grammar can express expressions that are not actually reachable in
+%     our system model. So, we can define a predicate reachable that specifies
+%     which expressions are actually reachable.
+%
+%     The top rule here shows that the start state is reachable. The middle rule
+%     says that if some expression $e$ is reachable and if $t(e)$ satisfies the
+%     invariant, then $t(e)$ is reachable. The bottom rule says that the merge of
+%     two reachable states is reachable. This definition simply formalizes our
+%     informal notion of how replicas execute transactions and merge commands.
+%   }
+% \end{frame}
 
 \begin{frame}
   \Large
@@ -372,18 +372,40 @@
     \item $s_0 = 42$
   \end{itemize}
 
-  What states are reachable?
+  What states are reachable? \pause $\setst{x \in \ints}{x \geq 42}$
 
   \note{%
-    As an example, consider the set of integers merged by max. We have a single
-    transaction that increments numbers, and our invariant is that the number
-    is non-negative. If our start state is $42$, what is the set of reachable
-    states?
-
-    Does anyone in the audience know?
+    For instance, consider this example. We have the set of integers merged by
+    max, we have a single transaction that increments numbers, and our
+    invariant is that $x$ is non-negative. If our start state is $42$, can
+    anyone tell me what is the set of reachable states is?
 
     That's right, the set of all integers greater than or equal to 42 can be
     reached from 42 by incrementing and taking maxes.
+  }
+\end{frame}
+
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
+    \item $O = (\ints, \max)$
+    \item $T = \set{t(x) = x + 1, u(x) = x - 1}$
+    \item $I = \setst{x \in \ints}{x \geq 0}$
+    \item $s_0 = 42$
+  \end{itemize}
+
+  What states are reachable? \pause $\setst{x \in \ints}{x \geq 0}$
+
+  \note{%
+    What about if we take the same example but add a new transaction $u$ that
+    decrements the integer. Now, what states are reachable?
+
+    That's right, the set of all non-negative integers. We can't actually reach
+    a negative number. We can try executing the transaction that decrements a
+    number, but replicas won't execute a transaction if it leads to a state
+    that violates the invariant. And merging two states with max doesn't make
+    them go down.
   }
 \end{frame}
 
@@ -397,11 +419,10 @@
   \]
 
   \note{%
-    With all these definitions in hand, we can formalize invariant confluence
-    very neatly. An object is invariant confluent with respect to some start
-    state $s_0$, set of transactions $T$, and invariant $I$ which I'll
-    abbreviate to \sTIconfluent{} if the set of reachable states is a subset
-    of the invariant.
+    Finally, an object is invariant confluent with respect to some start state
+    $s_0$, set of transactions $T$, and invariant $I$ which I'll abbreviate to
+    \sTIconfluent{} if the set of reachable states is a subset of the
+    invariant.
 
     Any questions?
   }
@@ -421,13 +442,13 @@
   Is $O$ \sTIconfluent{}?
 
   \note{%
-    To help the definition seep into our bones, let's take a look at an
-    example. Consider the distributed object conisting of pairs of integers
-    $(x, y)$ merged pairwise by max. We consider a transaction $t_x$ that
-    increments $x$ part of a pair, and a transaction $t_y$ that decrements the
-    $y$ part. Our invariant is that the product of $x$ and $y$ is non-positive.
-    Our start state is the pair $(0, 0)$. Is $O$ invariant confluent with
-    respect to this start state, set of transactions, and invariant?
+    Let's take a look at another example. Consider the distributed object
+    conisting of pairs of integers $(x, y)$ merged pairwise by max. We consider
+    a transaction $t_x$ that increments $x$ part of a pair, and a transaction
+    $t_y$ that decrements the $y$ part. Our invariant is that the product of
+    $x$ and $y$ is non-positive.  Our start state is the pair $(0, 0)$. Is $O$
+    invariant confluent with respect to this start state, set of transactions,
+    and invariant?
   }
 \end{frame}
 
@@ -532,13 +553,13 @@
   \end{center}
 
   \note{%
-    Well, it's a little bit abstract and hard to think about. We can make the
-    example more concrete if we think about it geometrically. Every state is a
-    pair of integers, which we can think of as a point on a plane.
+    Well, it's a little bit abstract and hard to think about, but we can make
+    the example more concrete if we think about it geometrically. Every state
+    is a pair of integers, which we can think of as a point on a plane like this.
 
     The transaction $t_x$ takes in a point and spits out the point one to the
     right. The transaction $t_y$ takes in a point and spits out the point one
-    above.
+    below.
   }
 \end{frame}
 
@@ -614,16 +635,16 @@
     see that this is just the second and fourth quadrant of the plane where one
     of $x$ or $y$ is negative but not both.
 
-    Our state is the origin, so we start at the origin. We can walk right using
-    $t_x$, we can walk down using $t_y$, and we can merge two points together.
-    Thus, the set of reachable points is the entire fourth quadrant. We can
-    reach every point in the fourth quadrant by walking right, down, and
-    merging.
+    Our start state is the origin. Starting at the origin, walk right using
+    $t_x$, walking down using $t_y$, and merging points together, what states
+    can we reach?  We can reach every point in the fourth quadrant. We can
+    reach every point in the fourth quadrant from the origin by walking right,
+    down, and merging points.
 
     Now, we see the set of points that satisfy the invariant and the set of
-    points that reachable, and the set of reachable points is a subset of the
-    invariant satisfying points. Thus, our object is invariant confluent. We
-    can only reach points that satisfy the invariant. We can never reach a
+    points that are reachable, and the set of reachable points is a subset of
+    the invariant satisfying points. Thus, our object is invariant confluent.
+    We can only reach points that satisfy the invariant. We can never reach a
     point that does not satisfy the invariant.
 
     Any questions?
