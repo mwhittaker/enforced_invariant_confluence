@@ -8,9 +8,6 @@
 
     \pause\item
       Example: $O = (\nats, \max)$.
-
-    \pause\item
-      Example: $O = (\setst{X}{X \subseteq \nats}, \cup)$.
   \end{itemize}
 
   \note{%
@@ -21,13 +18,12 @@
     a binary merge operator that I'll pronounce ``join''.
 
     For example, the set of natural numbers of merged by the join operator max
-    is a distributed object. And the powerset of the natural numbers merged by
-    join operator union is a distributed object.
+    is a distributed object.
 
-    For those of you familiar with lattices or CRDTs, you might instinctually
-    assume that join has to be associative or commutative or idempotent,
-    something like that, but here we're not assuming any special properties
-    about the join operator.
+    % For those of you familiar with lattices or CRDTs, you might instinctually
+    % assume that join has to be associative or commutative or idempotent,
+    % something like that, but here we're not assuming any special properties
+    % about the join operator.
   }
 \end{frame}
 
