@@ -120,11 +120,18 @@
   \end{columns}
 
   \note{%
-    I will give you a very high level overview of the decision procedure
-    though. Our decision procedure maintains two sets: $R$, a set of reachable
-    states, and $NR$, a set of non reachable states. It also implicitly
-    maintains $I - NR$, which is the pruned invariant. It's the invariant with
-    non-reachable states pruned from it.
+    At a high level, our decision procedure maintains a set of reachable states
+    and a set of unreachable states. It grows the two sets using random search
+    and user feedback until the pruned invariant is a subset of reachable
+    states. At this point, invariant closure and invariant confluence are
+    identical, the decision procedure uses an SMT solver to check for invariant
+    closure, and terminates.
+
+    % I will give you a very high level overview of the decision procedure
+    % though. Our decision procedure maintains two sets: $R$, a set of reachable
+    % states, and $NR$, a set of non reachable states. It also implicitly
+    % maintains $I - NR$, which is the pruned invariant. It's the invariant with
+    % non-reachable states pruned from it.
   }
 \end{frame}
 
@@ -164,10 +171,10 @@
   \end{columns}
 
   \note{%
-    The decision procedure then repeatedly finds pairs of points that violate
-    invariant closure and grows the set of reachable and not reachable points
-    by random search and by asking the user. Here, for example, we see the sets
-    $R$ and $NR$ growing each iteration of the algorithm.
+    % The decision procedure then repeatedly finds pairs of points that violate
+    % invariant closure and grows the set of reachable and not reachable points
+    % by random search and by asking the user. Here, for example, we see the sets
+    % $R$ and $NR$ growing each iteration of the algorithm.
   }
 \end{frame}
 
@@ -259,9 +266,9 @@
   \end{columns}
 
   \note{%
-    Eventually, the set of nonreachable points is large enough that the pruned
-    invariant is a subset of the reachable states. At this point, invariant
-    closure and invariant confluence are identical, so the algorithm checks for
-    invariant closure and terminates.
+    % Eventually, the set of nonreachable points is large enough that the pruned
+    % invariant is a subset of the reachable states. At this point, invariant
+    % closure and invariant confluence are identical, so the algorithm checks for
+    % invariant closure and terminates.
   }
 \end{frame}

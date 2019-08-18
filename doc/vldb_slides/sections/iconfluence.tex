@@ -190,8 +190,7 @@
 
     We say that a state is reachable if there is some execution in which a
     replica ends up with that state. For example, here we see states $s_0$,
-    $s_1$, $s_2$, all the way to $s_7$ are all reachable. However, not all
-    states are reachable.
+    $s_1$, $s_2$, all the way to $s_7$ are all reachable.
 
   }
 \end{frame}
@@ -364,29 +363,29 @@
 %   }
 % \end{frame}
 
-\begin{frame}
-  \Large
-  An example:
-  \begin{itemize}
-    \item $O = (\ints, \max)$
-    \item $T = \set{t(x) = x + 1}$
-    \item $I = \setst{x \in \ints}{x \geq 0}$
-    \item $s_0 = 42$
-  \end{itemize}
-
-  What states are reachable? \pause $\setst{x \in \ints}{x \geq 42}$
-
-  \note{%
-    For instance, consider this example. We have the set of integers merged by
-    max, we have a single transaction that increments numbers, and our
-    invariant is that $x$ is non-negative. If our start state is $42$, can
-    anyone tell me what is the set of reachable states is?
-
-    That's right, the set of all integers greater than or equal to 42 can be
-    reached from 42 by incrementing and taking maxes. Note that the set of
-    reachable states is a subset of the set of all states.
-  }
-\end{frame}
+% \begin{frame}
+%   \Large
+%   An example:
+%   \begin{itemize}
+%     \item $O = (\ints, \max)$
+%     \item $T = \set{t(x) = x + 1}$
+%     \item $I = \setst{x \in \ints}{x \geq 0}$
+%     \item $s_0 = 42$
+%   \end{itemize}
+%
+%   What states are reachable? \pause $\setst{x \in \ints}{x \geq 42}$
+%
+%   \note{%
+%     For instance, consider this example. We have the set of integers merged by
+%     max, we have a single transaction that increments numbers, and our
+%     invariant is that $x$ is non-negative. If our start state is $42$, can
+%     anyone tell me what is the set of reachable states is?
+%
+%     That's right, the set of all integers greater than or equal to 42 can be
+%     reached from 42 by incrementing and taking maxes. Note that the set of
+%     reachable states is a subset of the set of all states.
+%   }
+% \end{frame}
 
 % \begin{frame}
 %   \Large
@@ -434,30 +433,30 @@
   }
 \end{frame}
 
-\begin{frame}
-  \Large
-  \begin{itemize}
-    \item $O = (\ints, \max)$
-    \item $T = \set{t(x) = x + 1}$
-    \item $I = \setst{x \in \ints}{x \geq 0}$
-    \item $s_0 = 42$
-    \item $\setst{x \in \ints}{x \geq 42}$ reachable
-  \end{itemize}
-
-  Is $O$ invariant confluent? \pause Yes!
-
-  \note{%
-    Let's return to our example with integers, and a single increment
-    transaction. We figured out earlier that all integers greater than or equal
-    to 42 are reachable. Is this object invariant confluent? Yes, because the
-    set of reachable states (the integers larger than 42) is a subset of the
-    invariant (the set of integers greater than or equal to zero). \\[12pt]
-
-    This example formalizes the bank account example that we saw earlier where
-    deposit transactions didn't require coordination to maintain the invariant.
-    \\[12pt]
-  }
-\end{frame}
+% \begin{frame}
+%   \Large
+%   \begin{itemize}
+%     \item $O = (\ints, \max)$
+%     \item $T = \set{t(x) = x + 1}$
+%     \item $I = \setst{x \in \ints}{x \geq 0}$
+%     \item $s_0 = 42$
+%     \item $\setst{x \in \ints}{x \geq 42}$ reachable
+%   \end{itemize}
+%
+%   Is $O$ invariant confluent? \pause Yes!
+%
+%   \note{%
+%     Let's return to our example with integers, and a single increment
+%     transaction. We figured out earlier that all integers greater than or equal
+%     to 42 are reachable. Is this object invariant confluent? Yes, because the
+%     set of reachable states (the integers larger than 42) is a subset of the
+%     invariant (the set of integers greater than or equal to zero). \\[12pt]
+%
+%     This example formalizes the bank account example that we saw earlier where
+%     deposit transactions didn't require coordination to maintain the invariant.
+%     \\[12pt]
+%   }
+% \end{frame}
 
 % \begin{frame}
 %   \Large
@@ -493,13 +492,13 @@
   Is $O$ \sTIconfluent{}?
 
   \note{%
-    Let's take a look at a slightly harder example. Consider the distributed
-    object conisting of pairs of integers $(x, y)$ merged pairwise by max. We
-    consider a transaction $t_x$ that increments $x$ part of a pair, and a
-    transaction $t_y$ that decrements the $y$ part. Our invariant is that the
-    product of $x$ and $y$ is non-positive.  Our start state is the pair $(0,
-    0)$. Is $O$ invariant confluent with respect to this start state, set of
-    transactions, and invariant?
+    Let's take a look at an example. Consider the distributed object conisting
+    of pairs of integers $(x, y)$ merged pairwise by max. We consider a
+    transaction $t_x$ that increments $x$ part of a pair, and a transaction
+    $t_y$ that decrements the $y$ part. Our invariant is that the product of
+    $x$ and $y$ is non-positive.  Our start state is the pair $(0, 0)$. Is $O$
+    invariant confluent with respect to this start state, set of transactions,
+    and invariant?
   }
 \end{frame}
 

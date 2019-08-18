@@ -145,8 +145,6 @@
   \note{%
     Leslie Lamport would agree. He would encourage us to choose strong
     consistency. Strongly consistent systems are much easier to reason about.
-    After all a strongly consistent system to end users looks exactly like a
-    system that's not even distributed.
 
     % ``You see, I agree'', says he, the ever mesmerizing Leslie.
     % ``Weak is just wrong, not right for long.
@@ -215,9 +213,7 @@
 
     Fortunately, Peter Bailis can save the and reminding us of when in 2014, he
     and some other smart folks including Alan defined invariant confluence as a
-    way to get the benefits of both weak and strong consistency. An invariant
-    confluent object can be replicated without coordination while maintaining
-    its application invariants.
+    way to get the benefits of both weak and strong consistency.
 
     Invariant confluence will be the topic of this talk, so let's build some
     intuition on what invariant confluence is.

@@ -14,11 +14,11 @@ checker.check()\end{verbatim}
     specify objects, transactions, and invariants with code that looks like
     this. \\[12pt]
 
-    This code specifies the running example that we've been looking at
-    throughout the talk. $x$ is an integer merged by max that is initially 0.
-    $y$ is an integer merged by max that is initially 0. We have a transaction
-    incx that increments x and a function decy that decrements y. And, our
-    invariant is that the product of $x$ and $y$ is less than or equal to zero.
+    % This code specifies the running example that we've been looking at
+    % throughout the talk. $x$ is an integer merged by max that is initially 0.
+    % $y$ is an integer merged by max that is initially 0. We have a transaction
+    % incx that increments x and a function decy that decrements y. And, our
+    % invariant is that the product of $x$ and $y$ is less than or equal to zero.
   }
 \end{frame}
 
@@ -49,10 +49,11 @@ checker.check()\end{verbatim}
   \note{%
     We have some graphs showing that no coordination vastly outperforms
     replicating with strong consistency, and how segmented invariant confluence
-    allows a smooth tradeoff between the two. Fully invariant confluent objects
-    don't require any coordination, partly invariant confluent objects require
-    some coordination, and not at all invariant confluent objects require a lot
-    of coordination.
+    allows a smooth tradeoff between the two.
+
+    % Fully invariant confluent objects don't require any coordination, partly
+    % invariant confluent objects require some coordination, and not at all
+    % invariant confluent objects require a lot of coordination.
   }
 \end{frame}
 

@@ -60,7 +60,8 @@
     Users can issue transactions to the database, and every transacation is
     either a deposit or a withdrawal. And, I have one critical invariant that I
     want to maintain over my database. And that invariant is that my bank
-    account balance should never be negative. My balance must be non-negative at all times.
+    account balance should never be negative. My balance must be non-negative
+    at all times.
   }
 \end{frame}
 
@@ -88,8 +89,7 @@
     dollars to replica B. The two replicas can coordinate, for example by
     running Paxos, and agree on a single total order in which to execute the
     two transactions. Here, the replicas agree to deposit 10 dollars and then
-    deposit 20 dollars. Both transactions succeed, and the replicas send back OK
-    messages to the clients letting them know everything went smoothly.
+    deposit 20 dollars. Both transactions succeed.
   }
 \end{frame}
 
@@ -112,15 +112,13 @@
 
   \note{%
     Now, assume two clients issue concurrent withdrawal transactions of 30
-    dollars and 40 dollars. Again, the two replicas coordinate and agree to
-    execute the withdrawal of 30 dollars and then the withdrawal of 40 dollars.
+    dollars and 40 dollars. Again, the two replicas coordinate and agree an a
+    total order in which to execute transactions.
 
-    The withdrawal of 30 dollars executes fine, brining my bank account balance
-    to 20 dollars, but the withdrawal of 40 dollars fails because I only have
-    20 dollars left. So replica A sends back an OK message to the client, but
-    replica B sends back a NO message letting the client know the transaction
-    failed. And while the transaction failed, you'll note that we never
-    violated our application invariant.
+    They first withdraw 30 dollars, bringing my bank account balance to 20
+    dollars. They then try to withdraw of 40 dollars but abort the transaction
+    because I only have 40 dollars left. And while the transaction failed,
+    you'll note that we never violated our application invariant.
   }
 \end{frame}
 
@@ -148,12 +146,9 @@
     Now, when two clients issue concurrent deposit transactions, the two
     replicas execute the transactions immediately without consulting one
     another. And every once in a while, the two replicas communicate and fill
-    each other in on the transactions they missed.
-
-    Here, for example, replica A lets replica B know to deposit 10 dollars and
-    replica B lets replica A know to deposit 20 dollars. Notice that even
-    though we didn't perform any coordination, the two replicas never violate
-    my critical invariant of a non-negative balance.
+    each other in on the transactions they missed. Notice that even though we
+    didn't perform any coordination, the two replicas never violate my critical
+    invariant of a non-negative balance.
   }
 \end{frame}
 
