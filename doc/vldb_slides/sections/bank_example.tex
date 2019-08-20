@@ -1,44 +1,14 @@
 \newcommand{\bankdistance}{4}
-\tikzstyle{bank}=[
-  draw,
-  minimum width=1.5cm,
-  minimum height=1cm,
-  font=\huge
-]
-\tikzstyle{op}=[
-  -latex,
-  ultra thick
-]
-
-\newcommand{\drawbanks}[6]{{
-  \newcommand{\banka}{#1}
-  \newcommand{\bankb}{#2}
-  \newcommand{\bankaa}{#3}
-  \newcommand{\bankbb}{#4}
-  \newcommand{\bankaaa}{#5}
-  \newcommand{\bankbbb}{#6}
-
-  \node[bank, label=above:{Replica $A$}] (a1) at (0,              0) {\banka};
-  \node[bank                           ] (a2) at (0,             -3) {\bankaa};
-  \node[bank                           ] (a3) at (0,             -6) {\bankaaa};
-  \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\bankb};
-  \node[bank                           ] (b2) at (\bankdistance, -3) {\bankbb};
-  \node[bank                           ] (b3) at (\bankdistance, -6) {\bankbbb};
-
-  \draw[op] (a1) -- (a2);
-  \draw[op] (a2) -- (a3);
-  \draw[op] (b1) -- (b2);
-  \draw[op] (b2) -- (b3);
-}}
+\tikzstyle{bank}=[draw, minimum width=1.5cm, minimum height=1cm, font=\huge]
+\tikzstyle{op}=[-latex, ultra thick]
 
 \newcommand{\zigzag}[2]{{
   \newcommand{\banka}{#1}
   \newcommand{\bankb}{#2}
-
-  \draw[red, op] ($(\banka) + (0, -0.7)$) -- ($(\bankb) + (0, -1.0)$);
-  \draw[red, op] ($(\bankb) + (0, -1.0)$) -- ($(\banka) + (0, -1.3)$);
-  \draw[red, op] ($(\banka) + (0, -1.3)$) -- ($(\bankb) + (0, -1.6)$);
-  \draw[red, op] ($(\bankb) + (0, -1.6)$) -- ($(\banka) + (0, -1.9)$);
+  \draw[gray, op] ($(\banka) + (0, -0.7)$) -- ($(\bankb) + (0, -1.0)$);
+  \draw[gray, op] ($(\bankb) + (0, -1.0)$) -- ($(\banka) + (0, -1.3)$);
+  \draw[gray, op] ($(\banka) + (0, -1.3)$) -- ($(\bankb) + (0, -1.6)$);
+  \draw[gray, op] ($(\bankb) + (0, -1.6)$) -- ($(\banka) + (0, -1.9)$);
 }}
 
 \begin{frame}{Replicated Bank Account}
@@ -50,90 +20,109 @@
   \end{center}
 
   \note{%
-    We'll begin with an example.
+    We'll begin with an example. \\[12pt]
 
-    Let's say we want to replicate the database shown here. This database is
-    the world's simplest database. It contains only a single number, which
-    represents my bank account balance. We decide to replicate this database
-    across two machines, replica A and replica B.
+    Let's say we have an object that we want to replicate. The object can be
+    something complex like a database or a key-value store, but to keep things
+    simple, let's say we want to replicate a single integer that represents my
+    bank account balance. We decide to replicate the integer across two
+    machines, replica A and replica B. \\[12pt]
 
-    Users can issue transactions to the database, and every transacation is
-    either a deposit or a withdrawal. And, I have one critical invariant that I
-    want to maintain over my database. And that invariant is that my bank
-    account balance should never be negative. My balance must be non-negative
-    at all times.
+    Users can issue transactions to our replicate object, and every
+    transacation is either a deposit or a withdrawal. And, I have one critical
+    invariant that I want to maintain at all times. And that invariant is that
+    my bank account balance should never be negative. \\[12pt]
   }
 \end{frame}
 
 \begin{frame}{Coordinating}
   \begin{center}
     \begin{tikzpicture}
-      \drawbanks{\$50}{\$50}
-                {\$60}{\$60}
-                {\$80}{\$80}
-
+      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
+      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
       \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$+\$10$};
       \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$+\$20$};
-      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
-      \draw[op] (b3) -- ($(b3) + (+2, 0)$) node[midway, above] {OK};
+      \pause
 
       \zigzag{a1}{b1}
+      \node[bank] (a2) at (0, -3) {\$60};
+      \node[bank] (b2) at (\bankdistance, -3) {\$60};
+      \draw[op] (a1) to node[left] {$+\$10$} (a2);
+      \draw[op] (b1) to node[right] {$+\$10$} (b2);
+      \pause
+
       \zigzag{a2}{b2}
+      \node[bank] (a3) at (0, -6) {\$80};
+      \node[bank] (b3) at (\bankdistance, -6) {\$80};
+      \draw[op] (a2) to node[left] {$+\$20$} (a3);
+      \draw[op] (b2) to node[right] {$+\$20$} (b3);
     \end{tikzpicture}
   \end{center}
 
   \note{%
-    One way to replicate our database is by using coordination to implement
+    One way to replicate our object is by using coordination to implement
     strong consistency. For example, imagine a user issues a deposit of 10
-    dollars to replica A, and simultaneously, a user issues a deposit of 20
-    dollars to replica B. The two replicas can coordinate, for example by
-    running Paxos, and agree on a single total order in which to execute the
-    two transactions. Here, the replicas agree to deposit 10 dollars and then
-    deposit 20 dollars. Both transactions succeed.
+    dollars to replica A, and simultaneously, another user issues a deposit of
+    20 dollars to replica B. The two replicas can coordinate and agree on a
+    single total order in which to execute the two transactions. Here, the
+    replicas deposit 10 dollars and then deposit 20 dollars. Both transactions
+    succeed and our invariant is maintained.
   }
 \end{frame}
 
 \begin{frame}{Coordinating}
   \begin{center}
     \begin{tikzpicture}
-      \drawbanks{\$50}{\$50}
-                {\$20}{\$20}
-                {\$20}{\$20}
-
+      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
+      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
       \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$-\$30$};
       \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$-\$40$};
-      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
-      \draw[op] (b3) -- ($(b3) + (+2, 0)$) node[midway, above] {NO};
+      \pause
 
       \zigzag{a1}{b1}
+      \node[bank] (a2) at (0, -3) {\$20};
+      \node[bank] (b2) at (\bankdistance, -3) {\$20};
+      \draw[op] (a1) to node[left] {$-\$30$} (a2);
+      \draw[op] (b1) to node[right] {$-\$30$} (b2);
+      \pause
+
       \zigzag{a2}{b2}
+      \node[bank] (a3) at (0, -6) {\$20};
+      \node[bank] (b3) at (\bankdistance, -6) {\$20};
+      \draw[op] (a2) to node[left] {$-\$40$} (a3);
+      \draw[op] (b2) to node[right] {$-\$40$} (b3);
     \end{tikzpicture}
   \end{center}
 
   \note{%
-    Now, assume two clients issue concurrent withdrawal transactions of 30
-    dollars and 40 dollars. Again, the two replicas coordinate and agree an a
-    total order in which to execute transactions.
-
-    They first withdraw 30 dollars, bringing my bank account balance to 20
-    dollars. They then try to withdraw of 40 dollars but abort the transaction
-    because I only have 40 dollars left. And while the transaction failed,
-    you'll note that we never violated our application invariant.
+    Now, consider what happens when two clients issue concurrent withdrawal
+    transactions of 30 dollars and 40 dollars. Again, the two replicas
+    coordinate. They first withdraw 30 dollars, bringing my bank account
+    balance to 20 dollars. They then try to withdraw of 40 dollars but abort
+    the transaction because I only have 20 dollars left. Note that even though
+    the withdrawal of 40 dollars failed, our invariant is always maintained.
   }
 \end{frame}
 
 \begin{frame}{Avoiding Coordination}
   \begin{center}
     \begin{tikzpicture}
-      \drawbanks{\$50}{\$50}
-                {\$60}{\$70}
-                {\$80}{\$80}
-
+      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
+      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
       \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$+\$10$};
       \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$+\$20$};
-      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
-      \draw[op] (b2) -- ($(b2) + (+2, 0)$) node[midway, above] {OK};
+      \pause
 
+      \node[bank] (a2) at (0, -3) {\$60};
+      \node[bank] (b2) at (\bankdistance, -3) {\$70};
+      \draw[op] (a1) to node[left] {$+\$10$} (a2);
+      \draw[op] (b1) to node[right] {$+\$20$} (b2);
+      \pause
+
+      \node[bank] (a3) at (0, -6) {\$80};
+      \node[bank] (b3) at (\bankdistance, -6) {\$80};
+      \draw[op] (a2) to (a3);
+      \draw[op] (b2) to (b3);
       \draw[dashed, op] (a2) -- (b3) node[near start, sloped, above] {$+\$10$};
       \draw[dashed, op] (b2) -- (a3) node[near start, sloped, above] {$+\$20$};
     \end{tikzpicture}
@@ -141,36 +130,46 @@
 
   \note{%
     Alternatively, instead of implementing our bank with strong consistency, we
-    could implement it with weak consistency and avoid coordination altogether.
+    can implement it with weak consistency and avoid coordination altogether.
+    \\[12pt]
 
     Now, when two clients issue concurrent deposit transactions, the two
     replicas execute the transactions immediately without consulting one
-    another. And every once in a while, the two replicas communicate and fill
-    each other in on the transactions they missed. Notice that even though we
-    didn't perform any coordination, the two replicas never violate my critical
-    invariant of a non-negative balance.
+    another. \\[12pt]
+
+    And every once in a while, the two replicas communicate and fill each other
+    in on the transactions they missed. Notice that even though we didn't
+    perform any coordination, the two replicas never violate the invariant.
+    \\[12pt]
   }
 \end{frame}
 
 \begin{frame}{Avoiding Coordination}
   \begin{center}
     \begin{tikzpicture}
-      \drawbanks{\$50}{\$50}
-                {\$20}{\$10}
-                {-\$20}{-\$20}
-
+      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
+      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
       \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$-\$30$};
       \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$-\$40$};
-      \draw[op] (a2) -- ($(a2) + (-2, 0)$) node[midway, above] {OK};
-      \draw[op] (b2) -- ($(b2) + (+2, 0)$) node[midway, above] {OK};
+      \pause
 
+      \node[bank] (a2) at (0, -3) {\$20};
+      \node[bank] (b2) at (\bankdistance, -3) {\$10};
+      \draw[op] (a1) to node[left] {$-\$30$} (a2);
+      \draw[op] (b1) to node[right] {$-\$40$} (b2);
+      \pause
+
+      \node[bank] (a3) at (0, -6) {-\$20};
+      \node[bank] (b3) at (\bankdistance, -6) {-\$20};
+      \draw[op] (a2) to (a3);
+      \draw[op] (b2) to (b3);
       \draw[dashed, op] (a2) -- (b3) node[near start, sloped, above] {$-\$30$};
       \draw[dashed, op] (b2) -- (a3) node[near start, sloped, above] {$-\$40$};
     \end{tikzpicture}
   \end{center}
 
   \note{%
-    However, let's look what happens when two clients issue concurrent
+    However, let's look at what happens when two clients issue concurrent
     withdrawals. Both withdrawals are executed locally and both succeed.
     However, when the two replicas exchange transactions with one another, they
     both enter an invariant violating state of negative twenty dollars!
@@ -178,28 +177,35 @@
 \end{frame}
 
 \begin{frame}
+  \Large
+
   \begin{center}
-    \Huge
-    Deposits don't require coordination to maintain invariants, but withdrawals
-    do.
+    \begin{enumerate}
+      \item
+        Strong consistency preserves the invariant.
+      \pause \item
+        Deposits don't require coordination.
+      \pause \item
+        Withdrawals do require coordination.
+    \end{enumerate}
   \end{center}
 
   \note{%
-    We can learn a lot from these examples.
+    We can learn a lot from these examples. \\[12pt]
 
     First, if we implement our bank with strong consistency, we never violate
-    our invariant.
+    our invariant. \\[12pt]
 
     Second, we can implement deposit transactions without any coordination and
-    we're still guaranteed to never violate the invariant.
+    we're still guaranteed to never violate the invariant. \\[12pt]
 
     Third, withdrawal transactions, unlike deposit transactions, do require
-    coordination to avoid violating the invariant.
+    coordination to avoid violating the invariant. \\[12pt]
 
     At a very high level, invariant confluence tries to capture exactly which
     transactions require coordination to maintain invariants and which do not.
     In this example, deposit transactions are invariant confluent and thus do
-    not require coordination while withdrawal transactions are not invariant
-    confluent and thus do require coordination.
+    not require coordination, while withdrawal transactions not invariant
+    confluent and thus do require coordination. \\[12pt]
   }
 \end{frame}
