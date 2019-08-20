@@ -2,86 +2,61 @@
   \Large
   \begin{itemize}
     \item
-      A \defword{distributed object} $O = (S, \join)$ consists of a set $S$ of
-      states and a binary merge operator $\join: S \times S \to S$ that merges
-      two states into one.
-
+      A \defword{distributed object} $O = (S, \join)$.
     \pause\item
-      Example: $O = (\nats, \max)$.
-  \end{itemize}
-
-  \note{%
-    Now that we have some intuition on invariant confluence, let's define
-    invariant confluence formally.
-
-    First, we say a distributed object $O$ is a pair of a set $S$ of states and
-    a binary merge operator that I'll pronounce ``join''.
-
-    For example, the set of natural numbers of merged by the join operator max
-    is a distributed object.
-
-    % For those of you familiar with lattices or CRDTs, you might instinctually
-    % assume that join has to be associative or commutative or idempotent,
-    % something like that, but here we're not assuming any special properties
-    % about the join operator.
-  }
-\end{frame}
-
-\begin{frame}
-  \Large
-  \begin{itemize}
-    \item
-      A \defword{transaction} $t: S \to S$ is a function that maps one state to
-      another.
-
+      Example: $O = (\ints, \max)$
     \pause\item
-      Example: $t(x) = x + 1 : \nats \to \nats$.
-  \end{itemize}
-
-  \note{%
-    A transaction as a function that maps one state to another. For example,
-    the function $t$ that maps an integer $x$ to $x + 1$ is a transaction.
-  }
-\end{frame}
-
-\begin{frame}
-  \Large
-  \begin{itemize}
-    \item
+      A \defword{transaction} $t: S \to S$.
+    \pause\item
+      Example: $t(x) = x + 1 : \ints \to \ints$.
+    \pause\item
       An \defword{invariant} $I$ is a subset of $S$.
-
     \pause\item
       Example: $I = \setst{x \in \ints}{x \geq 0}$.
   \end{itemize}
 
   \note{%
-    An invariant $I$ is a subset of the set of states $S$. For example, if our
-    set of states is the set of integers, then the set of non-negative integers
-    is an invariant.
+    Now that we have some intuition on invariant confluence, let's define
+    invariant confluence carefully. \\[12pt]
 
-    Any questions?
+    Intuitively, a distributed object is some object that we want to replicate.
+    It can be something complex like a database or something simple like a
+    list, a set, or an integer. Formally, we say a distributed object $O$ is a
+    pair of a set $S$ of states and a binary merge operator that I'll pronounce
+    ``join''. \\[12pt]
+
+    For example, the set of integers merged by the join operator max is
+    a distributed object. \\[12pt]
+
+    Next, a transaction as a function that maps one state to another. For
+    example, if our set of states is the set of integers, then the function $t$
+    that maps an integer $x$ to the integer $x + 1$ is a transaction. \\[12pt]
+
+    Finally, an invariant $I$ is a subset of the set of states $S$. For
+    example, if our set of states is the set of integers, then the set of
+    integers greater than or equal to zero is an invariant. \\[12pt]
   }
 \end{frame}
 
 \newcommand{\internaltext}[1]{$\boldsymbol #1$}
+\tikzstyle{s0color}=[fill=flatred]
+\tikzstyle{s1color}=[fill=flatgreen]
+\tikzstyle{s2color}=[fill=flatdenim]
+\tikzstyle{s3color}=[fill=flatorange]
+\tikzstyle{s4color}=[fill=flatyellow]
+\tikzstyle{s5color}=[fill=flatcyan]
+\tikzstyle{s6color}=[fill=flatpurple]
+\tikzstyle{s7color}=[fill=flatblue]
+\tikzstyle{txnline}=[black, thick, -latex]
+\tikzstyle{phantomstate}=[%
+  shape=circle, inner sep=2pt, draw=white, line width=1pt, fill=white]
+\tikzstyle{state}=[%
+  shape=circle, inner sep=2pt, draw=black, line width=1pt, text opacity=1,
+  fill opacity=0.6]
+\tikzstyle{txntext}=[sloped, above]
+\tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
 
 \begin{frame}
-  \tikzstyle{s0color}=[fill=flatred]
-  \tikzstyle{s1color}=[fill=flatgreen]
-  \tikzstyle{s2color}=[fill=flatdenim]
-  \tikzstyle{s3color}=[fill=flatorange]
-  \tikzstyle{s4color}=[fill=flatyellow]
-  \tikzstyle{s5color}=[fill=flatcyan]
-  \tikzstyle{s6color}=[fill=flatpurple]
-  \tikzstyle{s7color}=[fill=flatblue]
-  \tikzstyle{txnline}=[black, thick, -latex]
-  \tikzstyle{phantomstate}=[%
-    shape=circle, inner sep=2pt, draw=white, line width=1pt, fill=white]
-  \tikzstyle{state}=[%
-    shape=circle, inner sep=2pt, draw=black, line width=1pt, text opacity=1,
-    fill opacity=0.6]
-  \tikzstyle{txntext}=[sloped, above]
-
   \begin{center}
     \Large
     \begin{tikzpicture}[yscale=2, xscale=2]
@@ -89,7 +64,6 @@
       \node (p2) at (0.5, 2) {$p_2$};
       \node (p1) at (0.5, 1) {$p_3$};
 
-      \tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
       \draw[pline] (p3) to (4.75, 3);
       \draw[pline] (p2) to (4.75, 2);
       \draw[pline] (p1) to (4.75, 1);
@@ -103,14 +77,25 @@
       \node[state, s0color] (s02) at (1, 2) {\internaltext{s_0}};
       \node[phantomstate] (s01) at (1, 1) {$\phantom{s_0}$};
       \node[state, s0color] (s01) at (1, 1) {\internaltext{s_0}};
-
       \pause
 
       % Top line t.
       \node[phantomstate] (s13) at (2, 3) {$\phantom{s_1}$};
       \node[state, s1color] (s13) at (2, 3) {\internaltext{s_1}};
       \draw[txnline] (s03) to node[txntext]{$t$} (s13);
+      \pause
 
+      % Note about aborting.
+      \tikzstyle{fade}=[%
+        fill=white, opacity=0.5, minimum width=4.5in, minimum height=3in]
+      \tikzstyle{callout}=[%
+        draw, ultra thick, fill=white, align=center, text width=4in]
+      \only<4>{
+        \node[fade] at (3, 2) {};
+        \node[callout] at (3, 2) {
+          \Huge Replicas abort transactions that violate the invariant.
+        };
+      }
       \pause
 
       % Middle and bottom u.
@@ -120,7 +105,6 @@
       \node[state, s2color] (s11) at (2, 1) {\internaltext{s_2}};
       \draw[txnline] (s02) to node[txntext]{$u$} (s12);
       \draw[txnline] (s01) to node[txntext]{$u$} (s11);
-
       \pause
 
       % Merge.
@@ -128,7 +112,15 @@
       \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
       \draw[txnline] (s13) to node[txntext]{} (s22);
       \draw[txnline] (s12) to node[txntext]{} (s22);
+      \pause
 
+      % Note about merging.
+      \only<7>{
+        \node[fade] at (3, 2) {};
+        \node[callout] at (3, 2) {
+          \Huge Replicas cannot abort merges.
+        };
+      }
       \pause
 
       % The rest.
@@ -150,14 +142,14 @@
   \end{center}
 
   \note{%
-    \tiny
+    \scriptsize
 
     We'll consider the scenario in which we replicate our distributed object
     across some number replicas. Here, we show three replicas $p_1$, $p_2$, and
     $p_3$. \\[12pt]
 
     Each replica is initialized with an initial state $s_0$ as well as a set of
-    transactions and an invariant. \\[12pt]
+    transactions $T$ and an invariant $I$. \\[12pt]
 
     Replicas repeatedly perform one of two actions. First, a replica can
     execute a transaction. For example, here, replica $p_1$ executes
@@ -183,235 +175,78 @@
     merge their states with one another. You'll note that in our model,
     replicas communicate with each other every so often to merge, but otherwise
     do not coordinate. \\[12pt]
-
-    We say that a state is reachable if there is some execution in which a
-    replica ends up with that state. For example, here we see states $s_0$,
-    $s_1$, $s_2$, all the way to $s_7$ are all reachable.
-
   }
 \end{frame}
 
-% \begin{frame}{Expression-Based Formalism}
-%   \Huge
-%   \[
-%     e ::= s \mid t(e) \mid e_1 \join e_2
-%   \]
-%
-%   \note{%
-%     We can formalize all this very neatly using an expression based formalism.
-%     Given a distributed object and a set of transactions, we define the grammar
-%     shown here. Every expression in the grammar is a state, a transaction
-%     applied to an expression, or the merge of two expressions.
-%   }
-% \end{frame}
-%
-% \begin{frame}
-%   \tikzstyle{s0color}=[fill=flatred]
-%   \tikzstyle{s1color}=[fill=flatgreen]
-%   \tikzstyle{s2color}=[fill=flatdenim]
-%   \tikzstyle{s3color}=[fill=flatorange]
-%   \tikzstyle{s4color}=[fill=flatyellow]
-%   \tikzstyle{s5color}=[fill=flatcyan]
-%   \tikzstyle{s6color}=[fill=flatpurple]
-%   \tikzstyle{s7color}=[fill=flatblue]
-%   \tikzstyle{txnline}=[black, thick, -latex]
-%   \tikzstyle{phantomstate}=[%
-%     shape=circle, inner sep=1pt, draw=white, line width=1pt, fill=white]
-%   \tikzstyle{state}=[%
-%     shape=circle, inner sep=1pt, draw=black, line width=1pt, text opacity=1,
-%     fill opacity=0.6]
-%
-%   \begin{columns}
-%     \begin{column}{0.5\textwidth}
-%       \centering
-%       \Large
-%       \begin{tikzpicture}[xscale=1.25, yscale=1.25]
-%         \node (p3) at (0.5, 3) {$p_1$};
-%         \node (p2) at (0.5, 2) {$p_2$};
-%         \node (p1) at (0.5, 1) {$p_3$};
-%
-%         \tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
-%         \draw[pline] (p3) to (4.75, 3);
-%         \draw[pline] (p2) to (4.75, 2);
-%         \draw[pline] (p1) to (4.75, 1);
-%
-%         % Top line.
-%         \node[phantomstate] (s03) at (1, 3) {$\phantom{s_0}$};
-%         \node[phantomstate] (s13) at (2, 3) {$\phantom{s_1}$};
-%         \node[phantomstate] (s23) at (3, 3) {$\phantom{s_3}$};
-%         \node[phantomstate] (s33) at (3.75, 3) {$\phantom{s_6}$};
-%         \node[state, s0color] (s03) at (1, 3) {\internaltext{s_0}};
-%         \node[state, s1color] (s13) at (2, 3) {\internaltext{s_1}};
-%         \node[state, s3color] (s23) at (3, 3) {\internaltext{s_3}};
-%         \node[state, s6color] (s33) at (3.75, 3) {\internaltext{s_6}};
-%
-%         % Middle line.
-%         \node[phantomstate] (s02) at (1, 2) {$\phantom{s_0}$};
-%         \node[phantomstate] (s12) at (2, 2) {$\phantom{s_2}$};
-%         \node[phantomstate] (s22) at (3, 2) {$\phantom{s_4}$};
-%         \node[state, s0color] (s02) at (1, 2) {\internaltext{s_0}};
-%         \node[state, s2color] (s12) at (2, 2) {\internaltext{s_2}};
-%         \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
-%
-%         % Bottom line.
-%         \node[phantomstate] (s01) at (1, 1) {$\phantom{s_0}$};
-%         \node[phantomstate] (s11) at (2, 1) {$\phantom{s_2}$};
-%         \node[phantomstate] (s21) at (3, 1) {$\phantom{s_5}$};
-%         \node[phantomstate] (s31) at (4.25, 1) {$\phantom{s_7}$};
-%         \node[state, s0color] (s01) at (1, 1) {\internaltext{s_0}};
-%         \node[state, s2color] (s11) at (2, 1) {\internaltext{s_2}};
-%         \node[state, s5color] (s21) at (3, 1) {\internaltext{s_5}};
-%         \node[state, s7color] (s31) at (4.25, 1) {\internaltext{s_7}};
-%
-%         \tikzstyle{txntext}=[sloped, above]
-%         \draw[txnline] (s03) to node[txntext]{$t$} (s13);
-%         \draw[txnline] (s13) to node[txntext]{$v$} (s23);
-%         \draw[txnline] (s02) to node[txntext]{$u$} (s12);
-%         \draw[txnline] (s01) to node[txntext]{$u$} (s11);
-%         \draw[txnline] (s11) to node[txntext]{$w$} (s21);
-%
-%         \draw[txnline] (s13) to node[txntext]{} (s22);
-%         \draw[txnline] (s12) to node[txntext]{} (s22);
-%         \draw[txnline] (s22) to node[txntext]{} (s33);
-%         \draw[txnline] (s23) to node[txntext]{} (s33);
-%         \draw[txnline] (s21) to node[txntext]{} (s31);
-%         \draw[txnline] (s33) to node[txntext]{} (s31);
-%       \end{tikzpicture}
-%     \end{column}
-%     \begin{column}{0.5\textwidth}
-%       \centering
-%       \Large
-%       \pause
-%       \begin{tikzpicture}[scale=1.25]
-%                            \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (j1) at (0, 0) {\internaltext{\join}};
-%         \draw (j1)++(-30:1) node[state, s5color, label={[label distance=-0.1cm] 90:$s_5$}] (w)            {\internaltext{w}};
-%         \draw (j1)++(210:1) node[state, s6color, label={[label distance=-0.1cm] 90:$s_6$}] (j2)           {\internaltext{\join}};
-%         \draw (w)++(-90:1)  node[state, s2color, label={[label distance=-0.2cm] 60:$s_2$}] (u1)           {\internaltext{u}};
-%         \draw (u1)++(-90:1) node[state, s0color]                                           (s4)           {\internaltext{s_0}};
-%         \draw (j2)++(225:1) node[state, s3color, label={[label distance=-0.1cm] 90:$s_3$}] (v)            {\internaltext{v}};
-%         \draw (v)++(-90:1)  node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t2)           {\internaltext{t}};
-%         \draw (t2)++(-90:1) node[state, s0color]                                           (s1)           {\internaltext{s_0}};
-%         \draw (j2)++(-45:1) node[state, s4color, label={[label distance=-0.1cm] 90:$s_4$}] (j3)           {\internaltext{\join}};
-%         \draw (j3)++(240:1) node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t3)           {\internaltext{t}};
-%         \draw (t3)++(-90:1) node[state, s0color]                                           (s2)           {\internaltext{s_0}};
-%         \draw (j3)++(-60:1) node[state, s2color, label={[label distance=-0.1cm] 90:$s_2$}] (u3)           {\internaltext{u}};
-%         \draw (u3)++(-90:1) node[state, s0color]                                           (s3)           {\internaltext{s_0}};
-%
-%         \tikzstyle{astedge}=[thick]
-%         \draw[astedge] (j1) to (w) to (u1) to (s4);
-%         \draw[astedge] (j1) to (j2) to (v) to (t2) to (s1);
-%         \draw[astedge] (j1) to (j2) to (j3) to (t3) to (s2);
-%         \draw[astedge] (j1) to (j2) to (j3) to (u3) to (s3);
-%       \end{tikzpicture}
-%     \end{column}
-%   \end{columns}
-%
-%   {
-%     \Large
-%     \[
-%       s_7 = (v(t(s_0)) \join (t(s_0) \join u(s_0))) \join w(u(s_0))
-%     \]
-%   }
-%
-%   \note{%
-%     Using this grammar, instead of reasoning about invariant confluence by
-%     thinking about complex interleavings of operations on a set of replicas, we
-%     can abstract everything away and instead just focus on simple expressions
-%     of our grammar.
-%
-%     For example, consider state $s_7$ in the execution shown here. We can
-%     express the same state more simply with the expression shown at the bottom
-%     of the slide. The abstract syntax tree of the expression is shown on the
-%     right.
-%
-%     We see that $s_7$ is the merge of two states, $s_6$ and $s_5$. $s_5$ is the
-%     result of applying transactions $w$ and $u$ to the start state. $s_6$ is
-%     the result of merging two other states, and so on. If you tilt your head
-%     and look at the abstract syntax tree, you'll see that kind of like a
-%     sideways version of the execution diagram, with states fully expanded.
-%
-%     Any questions?
-%   }
-% \end{frame}
-%
-% \begin{frame}
-%   \Large
-%   \begin{mathpar}
-%     \inferrule{ }{\sTIreachablepredicate{s_0}}
-%
-%     \inferrule{\sTIreachablepredicate{e} \\ I(t(e))}
-%               {\sTIreachablepredicate{t(e)}}
-%
-%     \inferrule{\sTIreachablepredicate{e_1} \\ \sTIreachablepredicate{e_2}}
-%               {\sTIreachablepredicate{e_1 \join e_2}}
-%   \end{mathpar}
-%
-%   \note{%
-%     Now, our grammar can express expressions that are not actually reachable in
-%     our system model. So, we can define a predicate reachable that specifies
-%     which expressions are actually reachable.
-%
-%     The top rule here shows that the start state is reachable. The middle rule
-%     says that if some expression $e$ is reachable and if $t(e)$ satisfies the
-%     invariant, then $t(e)$ is reachable. The bottom rule says that the merge of
-%     two reachable states is reachable. This definition simply formalizes our
-%     informal notion of how replicas execute transactions and merge commands.
-%   }
-% \end{frame}
+\begin{frame}
+  \Huge
+  A state is \defword{reachable} if there exists some execution of our system
+  in which some replica enters the state.
 
-% \begin{frame}
-%   \Large
-%   An example:
-%   \begin{itemize}
-%     \item $O = (\ints, \max)$
-%     \item $T = \set{t(x) = x + 1}$
-%     \item $I = \setst{x \in \ints}{x \geq 0}$
-%     \item $s_0 = 42$
-%   \end{itemize}
-%
-%   What states are reachable? \pause $\setst{x \in \ints}{x \geq 42}$
-%
-%   \note{%
-%     For instance, consider this example. We have the set of integers merged by
-%     max, we have a single transaction that increments numbers, and our
-%     invariant is that $x$ is non-negative. If our start state is $42$, can
-%     anyone tell me what is the set of reachable states is?
-%
-%     That's right, the set of all integers greater than or equal to 42 can be
-%     reached from 42 by incrementing and taking maxes. Note that the set of
-%     reachable states is a subset of the set of all states.
-%   }
-% \end{frame}
+  \note{%
+    We say that a state is reachable if there exists some execution in which
+    some replica enters the state.
+  }
+\end{frame}
 
-% \begin{frame}
-%   \Large
-%   An example:
-%   \begin{itemize}
-%     \item $O = (\ints, \max)$
-%     \item $T = \set{t(x) = x + 1, u(x) = x - 1}$
-%     \item $I = \setst{x \in \ints}{x \geq 0}$
-%     \item $s_0 = 42$
-%   \end{itemize}
-%
-%   What states are reachable? \pause $\setst{x \in \ints}{x \geq 0}$
-%
-%   \note{%
-%     What about if we take the same example but add a new transaction $u$ that
-%     decrements the integer. Now, what states are reachable?
-%
-%     That's right, the set of all non-negative integers. We can't actually reach
-%     a negative number. We can try executing the transaction that decrements a
-%     number, but replicas won't execute a transaction if it leads to a state
-%     that violates the invariant. And merging two states with max doesn't make
-%     them go down.
-%   }
-% \end{frame}
+\begin{frame}
+  \begin{center}
+    \Large
+    \begin{tikzpicture}[yscale=2, xscale=2]
+      \node (p3) at (0.5, 3) {$p_1$};
+      \node (p2) at (0.5, 2) {$p_2$};
+      \node (p1) at (0.5, 1) {$p_3$};
+
+      \draw[pline] (p3) to (4.75, 3);
+      \draw[pline] (p2) to (4.75, 2);
+      \draw[pline] (p1) to (4.75, 1);
+
+      \node[phantomstate] (s01) at (1, 1) {$\phantom{s_0}$};
+      \node[phantomstate] (s02) at (1, 2) {$\phantom{s_0}$};
+      \node[phantomstate] (s03) at (1, 3) {$\phantom{s_0}$};
+      \node[phantomstate] (s11) at (2, 1) {$\phantom{s_2}$};
+      \node[phantomstate] (s12) at (2, 2) {$\phantom{s_2}$};
+      \node[phantomstate] (s13) at (2, 3) {$\phantom{s_1}$};
+      \node[phantomstate] (s21) at (3, 1) {$\phantom{s_5}$};
+      \node[phantomstate] (s22) at (3, 2) {$\phantom{s_4}$};
+      \node[phantomstate] (s23) at (3, 3) {$\phantom{s_3}$};
+      \node[phantomstate] (s31) at (4.25, 1) {$\phantom{s_7}$};
+      \node[phantomstate] (s33) at (3.75, 3) {$\phantom{s_6}$};
+      \node[state, s0color] (s01) at (1, 1) {\internaltext{s_0}};
+      \node[state, s0color] (s02) at (1, 2) {\internaltext{s_0}};
+      \node[state, s0color] (s03) at (1, 3) {\internaltext{s_0}};
+      \node[state, s1color] (s13) at (2, 3) {\internaltext{s_1}};
+      \node[state, s2color] (s11) at (2, 1) {\internaltext{s_2}};
+      \node[state, s2color] (s12) at (2, 2) {\internaltext{s_2}};
+      \node[state, s3color] (s23) at (3, 3) {\internaltext{s_3}};
+      \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
+      \node[state, s5color] (s21) at (3, 1) {\internaltext{s_5}};
+      \node[state, s6color] (s33) at (3.75, 3) {\internaltext{s_6}};
+      \node[state, s7color] (s31) at (4.25, 1) {\internaltext{s_7}};
+      \draw[txnline] (s01) to node[txntext]{$u$} (s11);
+      \draw[txnline] (s02) to node[txntext]{$u$} (s12);
+      \draw[txnline] (s03) to node[txntext]{$t$} (s13);
+      \draw[txnline] (s11) to node[txntext]{$w$} (s21);
+      \draw[txnline] (s12) to node[txntext]{} (s22);
+      \draw[txnline] (s13) to node[txntext]{$v$} (s23);
+      \draw[txnline] (s13) to node[txntext]{} (s22);
+      \draw[txnline] (s21) to node[txntext]{} (s31);
+      \draw[txnline] (s22) to node[txntext]{} (s33);
+      \draw[txnline] (s23) to node[txntext]{} (s33);
+      \draw[txnline] (s33) to node[txntext]{} (s31);
+    \end{tikzpicture}
+  \end{center}
+
+  \note{%
+    For example, in this diagram, we see states $s_0$, $s_1$, $s_2$, all the
+    way to $s_7$ are all reachable.
+  }
+\end{frame}
 
 \begin{frame}
   \Large
-  $O$ is \defword{\invariantconfluent} with respect to $s_0$, $T$, and $I$,
-  abbreviated \defword{\sTIconfluent{}}, if all reachable states satisfy the
-  invariant:
+  $O$ is \defword{\invariantconfluent} with respect to $s_0$, $T$, and $I$ if
+  all reachable states satisfy the invariant:
   \[
     \setst{s \in S}{\sTIreachablepredicate{s}} \subseteq I
   \]
@@ -429,50 +264,7 @@
   }
 \end{frame}
 
-% \begin{frame}
-%   \Large
-%   \begin{itemize}
-%     \item $O = (\ints, \max)$
-%     \item $T = \set{t(x) = x + 1}$
-%     \item $I = \setst{x \in \ints}{x \geq 0}$
-%     \item $s_0 = 42$
-%     \item $\setst{x \in \ints}{x \geq 42}$ reachable
-%   \end{itemize}
-%
-%   Is $O$ invariant confluent? \pause Yes!
-%
-%   \note{%
-%     Let's return to our example with integers, and a single increment
-%     transaction. We figured out earlier that all integers greater than or equal
-%     to 42 are reachable. Is this object invariant confluent? Yes, because the
-%     set of reachable states (the integers larger than 42) is a subset of the
-%     invariant (the set of integers greater than or equal to zero). \\[12pt]
-%
-%     This example formalizes the bank account example that we saw earlier where
-%     deposit transactions didn't require coordination to maintain the invariant.
-%     \\[12pt]
-%   }
-% \end{frame}
-
-% \begin{frame}
-%   \Large
-%   An example:
-%   \begin{itemize}
-%     \item $O = (\ints, \max)$
-%     \item $T = \set{t(x) = x + 1, u(x) = x - 1}$
-%     \item $I = \setst{x \in \ints}{x \geq 0}$
-%     \item $s_0 = 42$
-%     \item $\setst{x \in \ints}{x \geq 0}$ reachable
-%   \end{itemize}
-%
-%   Is $O$ invariant confluent? \pause Yes!
-%
-%   \note{%
-%     If we add back our decrement transaction, is our object still invariant
-%     confluent? Yes. Again, the reachable states (integers greater than or equal
-%     to zero) is a subset of the invariant.
-%   }
-% \end{frame}
+\input{runningexample.tex}
 
 \begin{frame}
   \Large
@@ -497,90 +289,6 @@
     and invariant?
   }
 \end{frame}
-
-\newcommand{\xmin}{-2}
-\newcommand{\xmax}{2}
-\newcommand{\ymin}{-2}
-\newcommand{\ymax}{2}
-
-% Axes.
-\newcommand{\xyaxes}{
-  \draw[] (\xmin.5, 0) to (\xmax.5, 0);
-  \draw[] (0, \ymin.5) to (0, \ymax.5);
-  \node at (\xmax + 1, 0) {$x$};
-  \node at (0, \ymax + 1) {$y$};
-}
-
-% Quadrant 1.
-\newcommand{\quadi}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {0, ..., \argxmax} {
-    \foreach \y in {0, ..., \argymax} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% Quadrant 2.
-\newcommand{\quadii}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {\argxmin, ..., 0} {
-    \foreach \y in {0, ..., \argymax} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% Quadrant 3.
-\newcommand{\quadiii}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {\argxmin, ..., 0} {
-    \foreach \y in {\argymin, ..., 0} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% Quadrant 4.
-\newcommand{\quadiv}[5]{{
-  \newcommand{\argstyle}{#1}
-  \newcommand{\argxmin}{#2}
-  \newcommand{\argxmax}{#3}
-  \newcommand{\argymin}{#4}
-  \newcommand{\argymax}{#5}
-  \foreach \x in {0, ..., \argxmax} {
-    \foreach \y in {\argymin, ..., 0} {
-      \node[\argstyle] (\x-\y) at (\x, \y) {};
-    }
-  }
-}}
-
-% State labels.
-\newcommand{\statelabels}{
-  \node[statelabel] at (0, 0) {$s_0$};
-  \node[statelabel] at (-1, 1) {$s_1$};
-  \node[statelabel] at (1, -1) {$s_2$};
-  \node[statelabel] at (1, 1) {$s_3$};
-}
-
-\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=3pt]
-\tikzstyle{inv}=[line width=0.75pt, draw=black]
-\tikzstyle{pointinv}=[point, inv]
-\tikzstyle{invregion}=[rounded corners, fill=flatgreen!50, draw=none]
-\tikzstyle{reachableregion}=[rounded corners, fill=flatblue!50, draw=none]
-\tikzstyle{statelabel}=[anchor=south west, inner sep=1pt]
 
 \begin{frame}
   \begin{center}

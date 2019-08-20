@@ -47,9 +47,12 @@
   \end{center}
 
   \note{%
-    If we look at a spectrum of invariant confluence-ness, we have objects that
-    are invariant confluent, objects that are kinda invariant confluent, and
-    objects that are not at all invariant confluent.
+    If we think about it long enough, we'll realize that invariant
+    confluence-ness is actually a spectrum. We have fully invariant confluent
+    objects like, our bank account example with deposits. We have kinda
+    invariant conluent objects, like our bank account with deposits and
+    withdrawals. And we have objects that are not at all invariant confluent,
+    like our bank account with only withdrawals.
 
     If our object is completely invariant confluent, then we can deploy it with
     weak consistency. But if it's even just a smidge not invariant confluent,
@@ -98,9 +101,7 @@
   \note{%
     Well, we can accomplish such a thing using a technique called segmented
     invariant confluence. I don't have time to go into the details, but the
-    main idea is to divide the state space into segments. Within each segment,
-    replicas can operate without coordination, but when transitioning across
-    segment boundaries, replicas have to coordinate.
+    main idea is to divide the state space into segments.
   }
 \end{frame}
 
@@ -173,14 +174,15 @@
   \note{%
     Returning to our example from before, we can divide our state space into
     the second quadrant, the fourth quadrant, the y-axis and the x-axis.
+    \\[12pt]
 
-    % Within each of these segments, replicas do not have to coordinate. Only
-    % when they transition from one segment to another do they have to
-    % coordinate.
+    Within each segment, replicas can operate without coordination, but when
+    transitioning across segment boundaries, replicas have to coordinate.
+    \\[12pt]
 
     In our paper, we formalize segmented invariant confluence, explain how to
     deploy segmented invariant confluent objects, and develop another decision
     procedure for segmented invariant confluence. If you're interested in those
-    details, I encourage you to check out our paper.
+    details, I encourage you to check out our paper. \\[12pt]
   }
 \end{frame}

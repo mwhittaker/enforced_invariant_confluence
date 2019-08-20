@@ -111,10 +111,6 @@
         \draw (-0.5, -0.5) to (\xmin.5, -0.5);
         \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
         \node at (0, \ymax + 1) {$I - NR$};
-
-        \pause
-        \node[fill opacity=0.75, text opacity=1, fill=white] at (-1, 1) {$s_1$};
-        \node[fill opacity=0.75, text opacity=1, fill=white] at (1, -1) {$s_2$};
       \end{tikzpicture}
     \end{column}
   \end{columns}
@@ -126,97 +122,7 @@
     states. At this point, invariant closure and invariant confluence are
     identical, the decision procedure uses an SMT solver to check for invariant
     closure, and terminates.
-
-    % I will give you a very high level overview of the decision procedure
-    % though. Our decision procedure maintains two sets: $R$, a set of reachable
-    % states, and $NR$, a set of non reachable states. It also implicitly
-    % maintains $I - NR$, which is the pruned invariant. It's the invariant with
-    % non-reachable states pruned from it.
   }
-\end{frame}
-
-\begin{frame}
-  \begin{columns}
-    \begin{column}{0.3\textwidth}
-      \begin{tikzpicture}[scale=\tikzscale]
-        \draw[reachable, draw=black] (-0.5, 0.5) rectangle (1.5, -1.5);
-        \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-        \node at (0, \ymax + 1) {$R$};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.3\textwidth}
-      \begin{tikzpicture}[scale=\tikzscale]
-        \pointrect{unreachable, draw=black}{(-1, 1)}
-        \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-        \node at (0, \ymax + 1) {$NR$};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.3\textwidth}
-      \begin{tikzpicture}[scale=\tikzscale]
-        \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
-        \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
-        \draw (0.5, 0.5) to (0.5, \ymax.5);
-        \draw (0.5, 0.5) to (\xmax.5, 0.5);
-        \draw (-0.5, -0.5) to (-0.5, \ymin.5);
-        \draw (-0.5, -0.5) to (\xmin.5, -0.5);
-        \pointrect{nothing, draw=black}{(-1, 1)}
-        \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-        \node at (0, \ymax + 1) {$I - NR$};
-
-        \pause
-        \node[fill opacity=0.75, text opacity=1, fill=white] at (-1, 2) {$s_1$};
-        \node[fill opacity=0.75, text opacity=1, fill=white] at (3, -3) {$s_2$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
-
-  \note{%
-    % The decision procedure then repeatedly finds pairs of points that violate
-    % invariant closure and grows the set of reachable and not reachable points
-    % by random search and by asking the user. Here, for example, we see the sets
-    % $R$ and $NR$ growing each iteration of the algorithm.
-  }
-\end{frame}
-
-\begin{frame}
-  \begin{columns}
-    \begin{column}{0.3\textwidth}
-      \begin{tikzpicture}[scale=\tikzscale]
-        \draw[reachable, draw=black] (-0.5, 0.5) rectangle (2.5, -2.5);
-        \pointrect{reachable, draw=black}{(3, -3)}
-        \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-        \node at (0, \ymax + 1) {$R$};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.3\textwidth}
-      \begin{tikzpicture}[scale=\tikzscale]
-        \pointrect{unreachable}{(-1, 1)}
-        \pointrect{unreachable}{(-1, 2)}
-        \draw (-1.5, 0.5) rectangle (-0.5, 2.5);
-        \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-        \node at (0, \ymax + 1) {$NR$};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.3\textwidth}
-      \begin{tikzpicture}[scale=\tikzscale]
-        \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
-        \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
-        \draw (0.5, 0.5) to (0.5, \ymax.5);
-        \draw (0.5, 0.5) to (\xmax.5, 0.5);
-        \draw (-0.5, -0.5) to (-0.5, \ymin.5);
-        \draw (-0.5, -0.5) to (\xmin.5, -0.5);
-        \pointrect{nothing}{(-1, 1)}
-        \pointrect{nothing}{(-1, 2)}
-        \draw (-1.5, 0.5) rectangle (-0.5, 2.5);
-        \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
-        \node at (0, \ymax + 1) {$I - NR$};
-
-        \pause
-        \node[fill opacity=0.75, text opacity=1, fill=white] at (-2, 1) {$s_1$};
-        \node[fill opacity=0.75, text opacity=1, fill=white] at (1, -1) {$s_2$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -264,11 +170,4 @@
       \end{tikzpicture}
     \end{column}
   \end{columns}
-
-  \note{%
-    % Eventually, the set of nonreachable points is large enough that the pruned
-    % invariant is a subset of the reachable states. At this point, invariant
-    % closure and invariant confluence are identical, so the algorithm checks for
-    % invariant closure and terminates.
-  }
 \end{frame}
