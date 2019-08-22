@@ -3,16 +3,21 @@
   \begin{itemize}
     \item
       A \defword{distributed object} $O = (S, \join)$.
-    \pause\item
+    \pause\only<2>{\item
       Example: $O = (\ints, \max)$
+    }
+
     \pause\item
       A \defword{transaction} $t: S \to S$.
-    \pause\item
+    \pause\only<4>{\item
       Example: $t(x) = x + 1 : \ints \to \ints$.
+    }
+
     \pause\item
       An \defword{invariant} $I$ is a subset of $S$.
-    \pause\item
+    \pause\only<6>{\item
       Example: $I = \setst{x \in \ints}{x \geq 0}$.
+    }
   \end{itemize}
 
   \note{%
@@ -111,7 +116,7 @@
       \node[phantomstate] (s22) at (3, 2) {$\phantom{s_4}$};
       \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
       \draw[txnline] (s13) to node[txntext]{} (s22);
-      \draw[txnline] (s12) to node[txntext]{} (s22);
+      \draw[txnline] (s12) to node[txntext]{$\join$} (s22);
       \pause
 
       % Note about merging.
@@ -135,8 +140,8 @@
       \draw[txnline] (s13) to node[txntext]{$v$} (s23);
       \draw[txnline] (s11) to node[txntext]{$w$} (s21);
       \draw[txnline] (s22) to node[txntext]{} (s33);
-      \draw[txnline] (s23) to node[txntext]{} (s33);
-      \draw[txnline] (s21) to node[txntext]{} (s31);
+      \draw[txnline] (s23) to node[txntext]{$\join$} (s33);
+      \draw[txnline] (s21) to node[txntext]{$\join$} (s31);
       \draw[txnline] (s33) to node[txntext]{} (s31);
     \end{tikzpicture}
   \end{center}
@@ -271,22 +276,55 @@
   An example:
   \begin{itemize}
     \item $O = (\ints \times \ints, \max \times \max)$
-    \pause \item $t_x((x, y)) = (x + 1, y)$
-    \item $t_y((x, y)) = (x, y - 1)$
-    \item $T = \set{t_x, t_y}$
-    \pause \item $I = \setst{(x, y)}{xy \leq 0}$
-    \pause \item $s_0 = (0, 0)$
   \end{itemize}
-  Is $O$ \sTIconfluent{}?
 
   \note{%
     Let's take a look at an example. Consider the distributed object conisting
-    of pairs of integers $(x, y)$ merged pairwise by max. We consider a
-    transaction $t_x$ that increments $x$ part of a pair, and a transaction
-    $t_y$ that decrements the $y$ part. Our invariant is that the product of
-    $x$ and $y$ is non-positive.  Our start state is the pair $(0, 0)$. Is $O$
-    invariant confluent with respect to this start state, set of transactions,
-    and invariant?
+    of pairs of integers $(x, y)$ merged pairwise by max.
+  }
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \begin{tikzpicture}
+      \xyaxes{}
+      \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadii{point}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiv{point}{\xmin}{\xmax}{\ymin}{\ymax}
+
+      \pause
+      \node[pointinv] at (0, -1) {};
+      \node[pointinv] at (2, -2) {};
+      \draw[-latex, ultra thick] (0,-1) to (2, -1);
+      \draw[-latex, ultra thick] (2,-2) to (2, -1);
+    \end{tikzpicture}
+  \end{center}
+
+  \note{%
+    We can think of this object geometrically. Every state is a pair of
+    integers which we can think of as a point on this two-dimensional grid of
+    integers. \\[12pt]
+
+    The merge function takes in two points and spits out the upper right corner
+    of the rectangle formed from the two points. For example, here we see that
+    the points $(0, -1)$ and $(2, -2)$ merge to form point $(2, -1)$.
+  }
+\end{frame}
+
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
+    \item $O = (\ints \times \ints, \max \times \max)$
+    \item $t_x((x, y)) = (x + 1, y)$
+    \item $t_y((x, y)) = (x, y - 1)$
+    \item $T = \set{t_x, t_y}$
+  \end{itemize}
+
+  \note{%
+    We consider a transaction $t_x$ that increments $x$ part of a pair, and a
+    transaction $t_y$ that decrements the $y$ part.
   }
 \end{frame}
 
@@ -307,36 +345,75 @@
   \end{center}
 
   \note{%
-    Well, this one is a bit hard to think about, but we can make the example
-    more concrete if we think about it geometrically. Every state is a pair of
-    integers, which we can think of as a point on a plane like this.
+    Geometrically, the transaction $t_x$ takes in a point and spits out the
+    point one to the right. The transaction $t_y$ takes in a point and spits
+    out the point one below.
+  }
+\end{frame}
 
-    The transaction $t_x$ takes in a point and spits out the point one to the
-    right. The transaction $t_y$ takes in a point and spits out the point one
-    below.
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
+    \item $O = (\ints \times \ints, \max \times \max)$
+    \item $t_x((x, y)) = (x + 1, y)$
+    \item $t_y((x, y)) = (x, y - 1)$
+    \item $T = \set{t_x, t_y}$
+    \item $I = \setst{(x, y)}{xy \leq 0}$
+  \end{itemize}
+
+  \note{%
+    Our invariant is the set of points $(x, y)$ where the product of $x$ and
+    $y$ is less than or equal to $0$.
   }
 \end{frame}
 
 \begin{frame}
   \begin{center}
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=1]
+      \begin{scope}
+        \clip (\xmin.5, \ymax.5) rectangle (\xmax.5, \ymin.5);
+        \draw[invregion] (\xmin.9, \ymax.9) rectangle (0.5, -0.5);
+        \draw[invregion] (-0.5, 0.5) rectangle (\xmax.9, \ymin.9);
+        \draw (0.5, 0.5) to (0.5, \ymax.5);
+        \draw (0.5, 0.5) to (\xmax.5, 0.5);
+        \draw (-0.5, -0.5) to (-0.5, \ymin.5);
+        \draw (-0.5, -0.5) to (\xmin.5, -0.5);
+      \end{scope}
+
       \xyaxes{}
       \quadi{point}{\xmin}{\xmax}{\ymin}{\ymax}
       \quadiii{point}{\xmin}{\xmax}{\ymin}{\ymax}
-      \quadii{point}{\xmin}{\xmax}{\ymin}{\ymax}
-      \quadiv{point}{\xmin}{\xmax}{\ymin}{\ymax}
-
-      \node[pointinv] at (0, -1) {};
-      \node[pointinv] at (2, -2) {};
-      \draw[-latex, ultra thick] (0,-1) to (2, -1);
-      \draw[-latex, ultra thick] (2,-2) to (2, -1);
+      \quadii{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
+      \quadiv{pointinv}{\xmin}{\xmax}{\ymin}{\ymax}
     \end{tikzpicture}
+
+    {\Huge Invariant} \\
+    $\setst{(x, y)}{xy \leq 0}$
   \end{center}
 
   \note{%
-    The merge function, pairwise max, takes two points and spits out the upper
-    right corner of the rectangle formed by the two points. Here, we see the
-    point $(0, -1)$ and $(2, -2)$ merge to the point $(2, -1)$.
+    Geometrically, this is the second and fourth quadrant of the plane where
+    one of $x$ or $y$ is negative but not both.
+  }
+\end{frame}
+
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
+    \item $O = (\ints \times \ints, \max \times \max)$
+    \item $t_x((x, y)) = (x + 1, y)$
+    \item $t_y((x, y)) = (x, y - 1)$
+    \item $T = \set{t_x, t_y}$
+    \item $I = \setst{(x, y)}{xy \leq 0}$
+    \item $s_0 = (0, 0)$
+  \end{itemize}
+  Is $O$ invariant confluent?
+
+  \note{%
+    Finally, our start state is the point $(0, 0)$, which is the origin. Is our
+    object invariant confluent?
   }
 \end{frame}
 
@@ -386,22 +463,16 @@
   \end{columns}
 
   \note{%
-    Our invariant was the set of points whose product is non-positive. Now, we
-    see that this is just the second and fourth quadrant of the plane where one
-    of $x$ or $y$ is negative but not both.
-
-    Our start state is the origin. Starting at the origin, walk right using
-    $t_x$, walking down using $t_y$, and merging points together, what states
-    can we reach?  We can reach every point in the fourth quadrant. We can
-    reach every point in the fourth quadrant from the origin by walking right,
-    down, and merging points.
+    To answer this, we have to compute the set of reachable points.  Our start
+    state is the origin, so starting at the origin, walking right using $t_x$,
+    walking down using $t_y$, and merging points together, what states can we
+    reach? We can reach every point in the fourth quadrant. We can reach every
+    point in the fourth quadrant from the origin by walking right, down, and
+    merging points. \\[12pt]
 
     Now, we see the set of points that satisfy the invariant and the set of
     points that are reachable, and the set of reachable points is a subset of
     the invariant satisfying points. Thus, our object is invariant confluent.
-    We can only reach points that satisfy the invariant. We can never reach a
-    point that does not satisfy the invariant.
-
-    Any questions?
+    \\[12pt]
   }
 \end{frame}

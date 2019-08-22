@@ -1,21 +1,29 @@
-\newcommand{\bankdistance}{4}
-\tikzstyle{bank}=[draw, minimum width=1.5cm, minimum height=1cm, font=\huge]
+\newcommand{\bankdistance}{3}
+\tikzstyle{bank}=[draw, minimum width=1.5cm, minimum height=1cm, font=\huge,
+                  fill=white, rounded corners]
 \tikzstyle{op}=[-latex, ultra thick]
+\tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
+\newcommand{\plusten}{\textcolor{flatgreen}{+\$10}}
+\newcommand{\plustwenty}{\textcolor{flatblue}{+\$20}}
+\newcommand{\minusthirty}{\textcolor{flatgreen}{-\$30}}
+\newcommand{\minusforty}{\textcolor{flatblue}{-\$40}}
 
 \newcommand{\zigzag}[2]{{
   \newcommand{\banka}{#1}
   \newcommand{\bankb}{#2}
-  \draw[gray, op] ($(\banka) + (0, -0.7)$) -- ($(\bankb) + (0, -1.0)$);
-  \draw[gray, op] ($(\bankb) + (0, -1.0)$) -- ($(\banka) + (0, -1.3)$);
-  \draw[gray, op] ($(\banka) + (0, -1.3)$) -- ($(\bankb) + (0, -1.6)$);
-  \draw[gray, op] ($(\bankb) + (0, -1.6)$) -- ($(\banka) + (0, -1.9)$);
+  \draw[gray, op] ($(\banka) + (1.0, 0)$) -- ($(\bankb) + (1.5, 0)$);
+  \draw[gray, op] ($(\bankb) + (1.6, 0)$) -- ($(\banka) + (2.0, 0)$);
+  \draw[gray, op] ($(\banka) + (2.1, 0)$) -- ($(\bankb) + (2.5, 0)$);
+  \draw[gray, op] ($(\bankb) + (2.6, 0)$) -- ($(\banka) + (3.0, 0)$);
 }}
 
 \begin{frame}{Replicated Bank Account}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
-      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance, 0) {\$50};
+      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \draw[pline] (a1) to (9, \bankdistance);
+      \draw[pline] (b1) to (9, 0);
     \end{tikzpicture}
   \end{center}
 
@@ -38,24 +46,26 @@
 \begin{frame}{Coordinating}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
-      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
-      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$+\$10$};
-      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$+\$20$};
+      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_1$}] (b1) at (0,  0) {\$50};
+      \draw[pline] (a1) to (9, \bankdistance);
+      \draw[pline] (b1) to (9, 0);
+      \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\plusten$};
+      \draw[op] ($(b1) + (0, -2)$) -- (b1) node[midway, left] {$\plustwenty$};
       \pause
 
       \zigzag{a1}{b1}
-      \node[bank] (a2) at (0, -3) {\$60};
-      \node[bank] (b2) at (\bankdistance, -3) {\$60};
-      \draw[op] (a1) to node[left] {$+\$10$} (a2);
-      \draw[op] (b1) to node[right] {$+\$10$} (b2);
+      \node[bank] (a2) at (4, \bankdistance) {\$60};
+      \node[bank] (b2) at (4, 0) {\$60};
+      \draw[op] (a1) to node[above] {$\plusten$} (a2);
+      \draw[op] (b1) to node[below] {$\plusten$} (b2);
       \pause
 
       \zigzag{a2}{b2}
-      \node[bank] (a3) at (0, -6) {\$80};
-      \node[bank] (b3) at (\bankdistance, -6) {\$80};
-      \draw[op] (a2) to node[left] {$+\$20$} (a3);
-      \draw[op] (b2) to node[right] {$+\$20$} (b3);
+      \node[bank] (a3) at (8, \bankdistance) {\$80};
+      \node[bank] (b3) at (8, 0) {\$80};
+      \draw[op] (a2) to node[above] {$\plustwenty$} (a3);
+      \draw[op] (b2) to node[below] {$\plustwenty$} (b3);
     \end{tikzpicture}
   \end{center}
 
@@ -73,24 +83,26 @@
 \begin{frame}{Coordinating}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
-      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
-      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$-\$30$};
-      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$-\$40$};
+      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \draw[pline] (a1) to (9, \bankdistance);
+      \draw[pline] (b1) to (9, 0);
+      \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\minusthirty$};
+      \draw[op] ($(b1) + (0, -2)$) -- (b1) node[midway, left] {$\minusforty$};
       \pause
 
       \zigzag{a1}{b1}
-      \node[bank] (a2) at (0, -3) {\$20};
-      \node[bank] (b2) at (\bankdistance, -3) {\$20};
-      \draw[op] (a1) to node[left] {$-\$30$} (a2);
-      \draw[op] (b1) to node[right] {$-\$30$} (b2);
+      \node[bank] (a2) at (4, \bankdistance) {\$20};
+      \node[bank] (b2) at (4, 0) {\$20};
+      \draw[op] (a1) to node[above] {$\minusthirty$} (a2);
+      \draw[op] (b1) to node[below] {$\minusthirty$} (b2);
       \pause
 
       \zigzag{a2}{b2}
-      \node[bank] (a3) at (0, -6) {\$20};
-      \node[bank] (b3) at (\bankdistance, -6) {\$20};
-      \draw[op] (a2) to node[left] {$-\$40$} (a3);
-      \draw[op] (b2) to node[right] {$-\$40$} (b3);
+      \node[bank] (a3) at (8, \bankdistance) {\$20};
+      \node[bank] (b3) at (8, 0) {\$20};
+      \draw[op] (a2) to node[above] {$\minusforty$} (a3);
+      \draw[op] (b2) to node[below] {$\minusforty$} (b3);
     \end{tikzpicture}
   \end{center}
 
@@ -107,24 +119,26 @@
 \begin{frame}{Avoiding Coordination}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
-      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
-      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$+\$10$};
-      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$+\$20$};
+      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \draw[pline] (a1) to (9, \bankdistance);
+      \draw[pline] (b1) to (9, 0);
+      \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\plusten$};
+      \draw[op] ($(b1) + (0, -2)$) -- (b1) node[midway, left] {$\plustwenty$};
       \pause
 
-      \node[bank] (a2) at (0, -3) {\$60};
-      \node[bank] (b2) at (\bankdistance, -3) {\$70};
-      \draw[op] (a1) to node[left] {$+\$10$} (a2);
-      \draw[op] (b1) to node[right] {$+\$20$} (b2);
+      \node[bank] (a2) at (4, \bankdistance) {\$60};
+      \node[bank] (b2) at (4, 0) {\$70};
+      \draw[op] (a1) to node[above] {$\plusten$} (a2);
+      \draw[op] (b1) to node[below] {$\plustwenty$} (b2);
       \pause
 
-      \node[bank] (a3) at (0, -6) {\$80};
-      \node[bank] (b3) at (\bankdistance, -6) {\$80};
-      \draw[op] (a2) to (a3);
-      \draw[op] (b2) to (b3);
-      \draw[dashed, op] (a2) -- (b3) node[near start, sloped, above] {$+\$10$};
-      \draw[dashed, op] (b2) -- (a3) node[near start, sloped, above] {$+\$20$};
+      \node[bank] (a3) at (8, \bankdistance) {\$80};
+      \node[bank] (b3) at (8, 0) {\$80};
+      \draw[op] (a2) to node[midway, above] {$\plustwenty$} (a3);
+      \draw[op] (b2) to node[midway, below] {$\plusten$} (b3);
+      \draw[dashed, op] (a2) -- ($(b3) + (-2, 0)$);
+      \draw[dashed, op] (b2) -- ($(a3) + (-2, 0)$);
     \end{tikzpicture}
   \end{center}
 
@@ -147,24 +161,26 @@
 \begin{frame}{Avoiding Coordination}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=above:{Replica $A$}] (a1) at (0, 0) {\$50};
-      \node[bank, label=above:{Replica $B$}] (b1) at (\bankdistance,  0) {\$50};
-      \draw[op] ($(a1) + (-2, 0)$) -- (a1) node[midway, above] {$-\$30$};
-      \draw[op] ($(b1) + (+2, 0)$) -- (b1) node[midway, above] {$-\$40$};
+      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \draw[pline] (a1) to (9, \bankdistance);
+      \draw[pline] (b1) to (9, 0);
+      \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\minusthirty$};
+      \draw[op] ($(b1) + (0, -2)$) -- (b1) node[midway, left] {$\minusforty$};
       \pause
 
-      \node[bank] (a2) at (0, -3) {\$20};
-      \node[bank] (b2) at (\bankdistance, -3) {\$10};
-      \draw[op] (a1) to node[left] {$-\$30$} (a2);
-      \draw[op] (b1) to node[right] {$-\$40$} (b2);
+      \node[bank] (a2) at (4, \bankdistance) {\$20};
+      \node[bank] (b2) at (4, 0) {\$10};
+      \draw[op] (a1) to node[above] {$\minusthirty$} (a2);
+      \draw[op] (b1) to node[below] {$\minusforty$} (b2);
       \pause
 
-      \node[bank] (a3) at (0, -6) {-\$20};
-      \node[bank] (b3) at (\bankdistance, -6) {-\$20};
-      \draw[op] (a2) to (a3);
-      \draw[op] (b2) to (b3);
-      \draw[dashed, op] (a2) -- (b3) node[near start, sloped, above] {$-\$30$};
-      \draw[dashed, op] (b2) -- (a3) node[near start, sloped, above] {$-\$40$};
+      \node[bank] (a3) at (8, \bankdistance) {-\$20};
+      \node[bank] (b3) at (8, 0) {-\$20};
+      \draw[op] (a2) to node[above] {$\minusforty$} (a3);
+      \draw[op] (b2) to node[below] {$\minusthirty$} (b3);
+      \draw[dashed, op] (a2) -- ($(b3) + (-2, 0)$);
+      \draw[dashed, op] (b2) -- ($(a3) + (-2, 0)$);
     \end{tikzpicture}
   \end{center}
 
