@@ -15,9 +15,22 @@
 \end{frame}
 
 \begin{frame}
-  \Huge
   \begin{center}
-    Reasoning about reachable states is hard.
+    \begin{tikzpicture}[xscale=3, yscale=2]
+      \node (confluence) at (2, 0) {\Large invariant confluence};
+      \pause
+
+      \node (hard) at (2, 1) {hard to check :(};
+      \draw[-latex, thick] (hard) to (confluence);
+      \pause
+
+      \node (closure) at (0, 0) {\Large invariant closure};
+      \node at ($(confluence)!0.5!(closure)$) {\Large $\implies$};
+      \pause
+
+      \node (easy) at (0, 1) {easy to check :)};
+      \draw[-latex, thick] (easy) to (closure);
+    \end{tikzpicture}
   \end{center}
 
   \note{%
@@ -26,9 +39,12 @@
     about reachable states but reasoning automatically about reachable states
     is hard. \\[12pt]
 
-    Instead of reasoning about invariant confluence directly then, let's look
+    Instead of reasoning about invariant confluence directly then, we'll look
     at a sufficient condition for invariant confluence called invariant
     closure. \\[12pt]
+
+    Unlike invariant confluence, we'll see that invariant closure is easy to
+    check. \\[12pt]
   }
 \end{frame}
 
@@ -77,8 +93,9 @@
   \]
 
   \note{%
-    Invariant closure is a sufficient condition for invariant confluence. I'll
-    refer you to the paper for the proof, but it's a very simple proof.
+    As I mentioned earlier, invariant closure is a sufficient condition for
+    invariant confluence. I'll refer you to the paper for the proof, but it's a
+    very simple proof.
   }
 \end{frame}
 
@@ -114,10 +131,17 @@
 \end{frame}
 
 \begin{frame}
-  \Large
-  \[
-    \text{invariant closure} \implies \text{invariant confluence}
-  \]
+  \begin{center}
+    \begin{tikzpicture}[xscale=3, yscale=2]
+      \node (confluence) at (2, 0) {\Large invariant confluence};
+      \node (closure) at (0, 0) {\Large invariant closure};
+      \node at ($(confluence)!0.5!(closure)$) {\Large $\implies$};
+      \node (hard) at (2, 1) {hard to check :(};
+      \draw[-latex, thick] (hard) to (confluence);
+      \node (easy) at (0, 1) {easy to check :)};
+      \draw[-latex, thick] (easy) to (closure);
+    \end{tikzpicture}
+  \end{center}
 
   \note{%
     To decide whether an object is invariant confluent, then, we can take the
@@ -131,7 +155,7 @@
   \Large
   \[
     \text{invariant closure}
-    \xLeftarrow{\phantom{a}?\phantom{a}}
+    \xLeftarrow{\phantom{aa}?\phantom{aa}}
     \text{invariant confluence}
   \]
 
@@ -247,10 +271,17 @@
 \end{frame}
 
 \begin{frame}
-  \Large
-  \[
-    \text{invariant closure} \centernot\impliedby \text{invariant confluence}
-  \]
+  \begin{center}
+    \begin{tikzpicture}[xscale=3, yscale=2]
+      \node (confluence) at (2, 0) {\Large invariant confluence};
+      \node (closure) at (0, 0) {\Large invariant closure};
+      \node at ($(confluence)!0.5!(closure)$) {\Large $\centernot\impliedby$};
+      \node (hard) at (2, 1) {hard to check :(};
+      \draw[-latex, thick] (hard) to (confluence);
+      \node (easy) at (0, 1) {easy to check :)};
+      \draw[-latex, thick] (easy) to (closure);
+    \end{tikzpicture}
+  \end{center}
 
   \note{%
     Thus, our object is invariant confluent but not invariant closed, so
@@ -332,5 +363,28 @@
     closure and invariant confluence are equivalent. \\[12pt]
 
     Again, I'll refer you to the paper for a proof. \\[12pt]
+  }
+\end{frame}
+
+\begin{frame}
+  \Large
+  If $I$ is a subset of reachable states, then
+  \begin{center}
+    \begin{tikzpicture}[xscale=3, yscale=2]
+      \node (confluence) at (2, 0) {\Large invariant confluence};
+      \node (closure) at (0, 0) {\Large invariant closure};
+      \node at ($(confluence)!0.5!(closure)$) {\Large $\iff$};
+      \node (hard) at (2, 1) {hard to check :(};
+      \draw[-latex, thick] (hard) to (confluence);
+      \node (easy) at (0, 1) {easy to check :)};
+      \draw[-latex, thick] (easy) to (closure);
+    \end{tikzpicture}
+  \end{center}
+
+  \note{%
+    This is good news. Invariant confluence is hard to check, but invariant
+    closure is easy to check. And when the invariant is a subset of the
+    reachable states, the two are equivalent. In this case, invariant
+    confluence also becomes easy to check.
   }
 \end{frame}
