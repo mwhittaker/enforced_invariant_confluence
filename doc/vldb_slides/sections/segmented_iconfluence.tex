@@ -186,3 +186,22 @@
     details, I encourage you to check out our paper. \\[12pt]
   }
 \end{frame}
+
+\begin{frame}
+  A segmentation $\Sigma = (I_1, T_1), \ldots, (I_n, T_n)$ is a sequence (not a
+  set) of $n$ segments $(I_i, T_i)$ where every $T_i$ is a subset of $T$ and
+  every $I_i \subseteq S$ is an invariant.
+\end{frame}
+
+\begin{frame}
+  \begin{algorithmic}
+    \If{$t \notin T_i$}
+      \State Execute $t$ with global coordination
+    \Else{}
+      \If{$I_i(t(s_i))$} Commit $t$
+      \ElsIf{$\lnot I(t(s_i))$} Abort $t$
+      \Else{} Execute $t$ with global coordination
+      \EndIf{}
+    \EndIf{}
+  \end{algorithmic}
+\end{frame}

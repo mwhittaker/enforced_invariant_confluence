@@ -275,6 +275,54 @@
   \Large
   An example:
   \begin{itemize}
+    \item $O = (\ints, \max)$
+    \item $T = \set{t(x) = x + 1}$
+    \item $I = \setst{x}{x \geq 0}$
+    \item $s_0 = 42$.
+  \end{itemize}
+
+  \pause
+
+  $\setst{x}{x \geq 42}$ reachable, which is a subset of the invariant, so our
+  object is invariant confluent.
+\end{frame}
+
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
+    \item $O = (\ints, +)$
+    \item $T = \set{t(x) = x + 1}$
+    \item $I = \setst{x}{x \leq 100}$
+    \item $s_0 = 0$.
+  \end{itemize}
+
+  \pause
+
+  $\setst{x}{x \geq 0}$ reachable, which is not a subset of the invariant, so
+  our object is not invariant confluent.
+\end{frame}
+
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
+    \item $O = (\ints, \max)$
+    \item $T = \set{t(x) = x - 1}$
+    \item $I = \setst{x}{x \geq 0}$
+    \item $s_0 = 42$.
+  \end{itemize}
+
+  \pause
+
+  $\setst{x}{x \geq 0}$ reachable, which is a subset of the invariant, so our
+  object is invariant confluent.
+\end{frame}
+
+\begin{frame}
+  \Large
+  An example:
+  \begin{itemize}
     \item $O = (\ints \times \ints, \max \times \max)$
   \end{itemize}
 

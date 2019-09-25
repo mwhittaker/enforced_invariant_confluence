@@ -92,6 +92,14 @@
     \text{invariant closure} \implies \text{invariant confluence}
   \]
 
+  \pause
+
+  Why?
+
+  \pause
+  Transactions maintain the invariant. If merging does as well, then the
+  invariant is always maintained.
+
   \note{%
     As I mentioned earlier, invariant closure is a sufficient condition for
     invariant confluence. I'll refer you to the paper for the proof, but it's a
@@ -354,6 +362,16 @@
   \[
     \text{invariant closure} \iff \text{invariant confluence}
   \]
+
+  \pause
+
+  Why?
+
+  \pause
+
+  Forward direction is the same as before. For backwards direction, $I$ and
+  reachable states are equal. Reachable states are closed under merge, so
+  therefore so is $I$.
 
   \note{%
     Turns out, this is not a coincidence. An invariant confluent object may not
