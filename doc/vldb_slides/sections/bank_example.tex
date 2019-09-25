@@ -20,8 +20,8 @@
 \begin{frame}{Replicated Bank Account}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
-      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \node[bank, label=left:{$p_1$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_2$}] (b1) at (0, 0) {\$50};
       \draw[pline] (a1) to (9, \bankdistance);
       \draw[pline] (b1) to (9, 0);
     \end{tikzpicture}
@@ -34,9 +34,9 @@
     something complex like a database or a key-value store, but to keep things
     simple, let's say we want to replicate a single integer that represents my
     bank account balance. We decide to replicate the integer across two
-    machines, replica A and replica B. \\[12pt]
+    machines, $p_1$ and $p_2$. \\[12pt]
 
-    Users can issue transactions to our replicate object, and every
+    Users can issue transactions to our replicated bank, and every
     transacation is either a deposit or a withdrawal. And, I have one critical
     invariant that I want to maintain at all times. And that invariant is that
     my bank account balance should never be negative. \\[12pt]
@@ -46,8 +46,8 @@
 \begin{frame}{Coordinating}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
-      \node[bank, label=left:{$p_1$}] (b1) at (0,  0) {\$50};
+      \node[bank, label=left:{$p_1$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_2$}] (b1) at (0,  0) {\$50};
       \draw[pline] (a1) to (9, \bankdistance);
       \draw[pline] (b1) to (9, 0);
       \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\plusten$};
@@ -72,8 +72,8 @@
   \note{%
     One way to replicate our object is by using coordination to implement
     strong consistency. For example, imagine a user issues a deposit of 10
-    dollars to replica A, and simultaneously, another user issues a deposit of
-    20 dollars to replica B. The two replicas can coordinate and agree on a
+    dollars to $p_1$, and simultaneously, another user issues a deposit of
+    20 dollars to $p_2$. The two replicas can coordinate and agree on a
     single total order in which to execute the two transactions. Here, the
     replicas deposit 10 dollars and then deposit 20 dollars. Both transactions
     succeed and our invariant is maintained.
@@ -83,8 +83,8 @@
 \begin{frame}{Coordinating}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
-      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \node[bank, label=left:{$p_1$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_2$}] (b1) at (0, 0) {\$50};
       \draw[pline] (a1) to (9, \bankdistance);
       \draw[pline] (b1) to (9, 0);
       \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\minusthirty$};
@@ -119,8 +119,8 @@
 \begin{frame}{Avoiding Coordination}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
-      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \node[bank, label=left:{$p_1$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_2$}] (b1) at (0, 0) {\$50};
       \draw[pline] (a1) to (9, \bankdistance);
       \draw[pline] (b1) to (9, 0);
       \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\plusten$};
@@ -161,8 +161,8 @@
 \begin{frame}{Avoiding Coordination}
   \begin{center}
     \begin{tikzpicture}
-      \node[bank, label=left:{$p_0$}] (a1) at (0, \bankdistance) {\$50};
-      \node[bank, label=left:{$p_1$}] (b1) at (0, 0) {\$50};
+      \node[bank, label=left:{$p_1$}] (a1) at (0, \bankdistance) {\$50};
+      \node[bank, label=left:{$p_2$}] (b1) at (0, 0) {\$50};
       \draw[pline] (a1) to (9, \bankdistance);
       \draw[pline] (b1) to (9, 0);
       \draw[op] ($(a1) + (0, +2)$) -- (a1) node[midway, left] {$\minusthirty$};
