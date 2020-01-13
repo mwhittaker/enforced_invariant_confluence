@@ -12,7 +12,7 @@ Unfortunately, strong consistency is at odds with performance. The CAP theorem
 and PACELC theorem tell us that strongly consistent systems suffer from higher
 latency at best and unavailability at worst~\cite{gilbert2002brewer,
 brewer2012cap, abadi2012consistency}. On the other hand, weak consistency
-models like eventual consistency~\cite{vogels2009eventually}, PRAM
+models like eventual consistency \cite{vogels2009eventually}, PRAM
 consistency~\cite{lipton1988pram}, causal consistency~\cite{ahamad1995causal},
 and others~\cite{lloyd2011don, mehdi2017can} allow data to be replicated with
 high availability and low latency, but they put a tremendous burden on the
@@ -28,7 +28,7 @@ invariant-violating states.
 
 Is it possible for us to have our strongly consistent cake and eat it with high
 availability too? Can we replicate a piece of data with weak consistency but
-still ensure that its invariants are maintained? Yes... sometimes. Bailis et
+still ensure that its invariants are maintained? Yes...\ sometimes. Bailis et
 al.\ introduced the notion of \emph{\invariantconfluence{}} as a necessary and
 sufficient condition for when invariants can be maintained over replicated data
 without the need for any coordination~\cite{bailis2014coordination}. If an
@@ -101,7 +101,7 @@ property called \emph{segmented \invariantconfluence{}}. While
 replicate non-\invariantconfluent{} objects with only \emph{occasional}
 coordination. The main idea is to divide the set of invariant-satisfying states
 into \emph{segments}, with a restricted set of transactions allowed in each
-segment.  Within a segment servers act without any coordination; they
+segment. Within a segment, servers act without any coordination; they
 synchronize only to transition across segment boundaries. This design
 highlights the trade-off between application complexity and
 coordination-freedom; more complex applications require more segments which
@@ -115,28 +115,34 @@ example, in \secref{Evaluation}, we apply Lucy to foreign key constraints,
 escrow transactions, an auction application, and the TPC-C benchmark. Lucy
 processes these workloads in less than half a second, and no workload requires
 more than 66 lines of code to specify. Moreover, we find that segmented
-\invariantconfluent{} replication can achieve 10x to 100x more throughput than
-linearizable replication for low-coordination workloads.
+\invariantconfluent{} replication can achieve 10$\times$ to 100$\times$ more
+throughput than linearizable replication for low-coordination workloads.
 
-In closing, here is an outline of the paper and of our contributions:
-%
-We propose a novel expression-oriented definition of \invariantconfluence{}
-that is both formal and simple (\secref{InvariantConfluence}).
-%
-We develop an understanding of why \invariantclosure{} is not necessary for
-\invariantconfluence{} and use this understanding to develop conditions under
-which it is both necessary and sufficient (\secref{InvariantClosure}).
-%
-We exploit these conditions to design a general-purpose interactive decision
-procedure for \invariantconfluence{} (\secref{InteractiveDecisionProcedure}).
-%
-We again exploit these conditions to design a novel non-trivial sufficient
-condition for \invariantconfluence{}, called \mergereducibility.
-%
-We present segmented \invariantconfluence{}: a generalization of
-\invariantconfluence{} that uses a small amount of coordination to maintain
-invariants for replicated objects that are otherwise not \invariantconfluent{}
-(\secref{SegmentedInvariantConfluence}).
-%
-We evaluate our methods using a prototype implementation called Lucy
-(\secref{Evaluation}).
+In closing, here is a summary of our contributions:
+\begin{itemize}
+  \item
+    We propose a novel expression-oriented definition of \invariantconfluence{}
+    that is both formal and simple (\secref{InvariantConfluence}).
+  \item
+    We develop an understanding of why \invariantclosure{} is not necessary for
+    \invariantconfluence{} and use this understanding to develop conditions
+    under which it is both necessary and sufficient
+    (\secref{InvariantClosure}).
+  \item
+    We exploit these conditions to design a general-purpose interactive
+    decision procedure for \invariantconfluence{}
+    (\secref{InteractiveDecisionProcedure}).
+  \item
+    We again exploit these conditions to design a novel non-trivial sufficient
+    condition for \invariantconfluence{}, called \mergereducibility{}
+    (\secref{MergeReduction}).
+  \item
+    We present segmented \invariantconfluence{}: a generalization of
+    \invariantconfluence{} that uses a small amount of coordination to maintain
+    invariants for replicated objects that are otherwise not
+    \invariantconfluent{} (\secref{SegmentedInvariantConfluence}).
+
+  % \item
+  %   We evaluate our methods using a prototype implementation called Lucy
+  %   (\secref{Evaluation}).
+\end{itemize}
