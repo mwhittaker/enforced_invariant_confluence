@@ -1,0 +1,55 @@
+\documentclass[twocolumn]{svjour3}
+
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\usepackage{booktabs}
+\usepackage{invariantconfluence}
+\usepackage{subcaption}
+% We get an error if we don't include this line. Don't know why.
+\captionsetup{compatibility=false}
+\usepackage{listings}
+\usepackage{natbib}
+\usepackage{pervasives}
+\usepackage{printlen}
+\usepackage{python}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
+\usetikzlibrary{patterns}
+
+\journalname{The VLDB Journal}
+
+\begin{document}
+  \title{Interactive Checks for Coordination Avoidance}
+
+  \author{Michael Whittaker \and Joseph M. Hellerstein}
+
+  \institute{%
+    Michael Whittaker \at %
+    UC Berkeley \\ %
+    \email{mjwhittaker@berkeley.edu} %
+    \and %
+    Joseph M. Hellerstein \at %
+    UC Berkeley \\ %
+    \email{hellerstein@berkeley.edu}%
+  }
+
+  % The correct dates will be entered by the editor.
+  \date{Received: date / Accepted: date}
+
+  \maketitle
+  {\input{sections/abstract}}
+
+  {\input{sections/introduction}}
+  {\input{sections/invariant_confluence}}
+  {\input{sections/invariant_closure}}
+  {\input{sections/interactive_decision_procedure}}
+  {\input{sections/merge_reduction}}
+  {\input{sections/segmented_invariant_confluence.tex}}
+  {\input{sections/evaluation}}
+  {\input{sections/related_work}}
+  {\input{sections/conclusion}}
+
+  \bibliographystyle{abbrv}
+  \bibliography{references}
+\end{document}

@@ -1,0 +1,156 @@
+\section{Related Work}
+% Other possibilities:
+%   - Towards Fast Invariant Preservation in Geo-replicated Systems
+%   - Feral Concurrency Control
+%   - The CISE Tool: Proving Weakly-Consistent Applications Correct
+%   - Declarative Programming over Eventually Consistent Data Stores
+%   - Extending Eventually Consistent Cloud Databases for Enforcing Numeric Invariants
+% In this section, we detail four alternate approaches to maintaining invariants
+% without coordination: RedBlue consistency and Sieve, the homeostasis and
+% demarcation protocols, explicit consistency, and token based invariant
+% confluence. We then survey other bodies of related work.
+
+\newcommand{\sieve}{\textsc{SIEVE}}
+\textbf{RedBlue Consistency and \sieve.}
+RedBlue consistency is a consistency model that sits between causal consistency
+and linearizability~\cite{li2012making}.
+%
+With RedBlue consistency, every operation is manually labelled as either red or
+blue. All operations are executed with causal consistency, but with the added
+restrictions that red operations are executed in a single total order embedded
+within the causal ordering.
+%
+In~\cite{li2012making}, Li et al.\ introduce invariant safety as a
+sufficient (but not necessary) condition for RedBlue consistent objects to be
+\invariantconfluent{}. Invariant safety is an analog of \invariantclosure{}.
+In~\cite{li2014automating}, Li et al.\ develop sophisticated techniques for
+deciding invariant safety that involve calculating weakest preconditions. These
+techniques are complementary to our work and can be used to improve the
+\invariantclosure{} subroutine used by our decision procedures.
+%
+In contrast with these techniques, our \invariantconfluence{} decision
+procedures can determine the \invariantconfluence{} of objects that are
+\emph{not} invariant safe.
+
+\textbf{The Demarcation and Homeostasis Protocols.}
+The homeostasis protocol~\cite{roy2015homeostasis}, a generalization of the
+demarcation protocol~\cite{barbara1994demarcation}, uses program analysis to
+avoid unnecessary coordination between servers in a \emph{sharded} database
+(whereas \invariantconfluence{} targets \emph{replicated} databases).  The
+protocol guarantees that transactions are executed with observational
+equivalence with respect to some serial execution of the transactions. This
+means that intermediate states may be inconsistent, but externally observable
+side effects and the final database state are consistent.  The observational
+equivalence guaranteed by the homeostasis protocol is stronger than the
+guarantees of \invariantconfluence{}. As a result, there are invariants and
+workloads that the homeostasis protocol would execute with more coordination
+than a segmented \invariantconfluent{} execution. Moreover, the homeostasis and
+demarcation protocols' mechanism of establishing global invariants and
+operating without coordination so long as the invariants are maintained is very
+similar to our design of segmented \invariantconfluence{}.
+
+\textbf{Explicit Consistency.}
+Explicit consistency~\cite{balegas2015towards} is a consistency model that
+combines \invariantconfluence{} and causal consistency, similar to RedBlue
+consistency with invariant safety. To determine if a workload is amenable to
+explicitly consistent replication, Balegas et al.\ determine if all pairs of
+transactions can be concurrently executed on the same start state without
+violating the invariant~\cite{balegas2015towards}. Balegas et al.\ argue that
+this is a sufficient condition for explicit consistency. It is similar to
+criterion (3) in \thmref{LatticeProperty}. In our work, we take a step further
+and explore sufficient \emph{and necessary} conditions for
+\invariantconfluence{}.
+%
+Balegas et al.\ also describe a variety of techniques---like conflict
+resolution, locking, and escrow transactions~\cite{o1986escrow}---that can be
+used to replicate workloads that do not meet their sufficient conditions.
+Segmented \invariantconfluence{} is a general-purpose formalism that can be
+used to model simple forms of these techniques.
+
+\textbf{Token Based Invariant Confluence.}
+In~\cite{gotsman2016cause}, Gotsman et al.\ discuss a hybrid token based
+consistency model that generalizes a family of consistency models including
+causal consistency, sequential consistency, and RedBlue consistency. An
+application designer defines a set of tokens and specifies which pairs of
+tokens conflict, and transactions acquire some subset of the tokens when they
+execute. This allows the application designer to specify which transactions
+conflict with one another.  Gotsman et al.\ develop sufficient conditions to
+determine whether a given token scheme is sufficient to guarantee that a global
+invariant is never broken. The token based approach allows users to
+specify certain conflicts that are not possible with segmented
+\invariantconfluence{} because a segmentation only allows transactions within a
+segment to acquire a single self-conflicting lock. However, segmented
+\invariantconfluence{} also introduces the notion of invariant segmentation,
+which cannot be emulated with the token based approach. For example, it is
+difficult to emulate escrow transactions with the token based approach.
+
+\textbf{Serializable Distributed Databases.}
+In \secref{Evaluation}, we saw that segmented \invariantconfluent{} replication
+vastly outperforms linearizable replication for low coordination workloads, and
+it performs comparably or worse for medium and high coordination workloads.
+Distributed databases like Calvin~\cite{thomson2012calvin},
+Janus~\cite{mu2016consolidating}, and TAPIR~\cite{zhang2015building} employ
+algorithmic optimizations to implement serializable transactions with high
+throughput and low latency.
+%
+While segmented \invariantconfluent{} replication will likely always outperform
+serializable replication for low coordination workloads, these databases make
+serializable replication the most performant option for executing workloads
+that require a modest amount of coordination.
+
+\textbf{Branch and Merge.}
+Bayou~\cite{terry1995managing}, Dynamo~\cite{decandia2007dynamo}, and
+TARDiS~\cite{crooks2016tardis} all take a branch and merge approach to
+maintaining distributed invariants without coordination. With this approach,
+servers execute transactions without any coordination but keep track of the
+causal dependencies between transactions. Periodically, two servers merge
+states and invoke a user defined merge function to reconcile the divergent
+states. This approach does \emph{not} provide any formal guarantees that
+invariants are maintained. Its correctness depends on the correctness of the
+potentially complex user defined merge functions.
+
+\textbf{CRDTs.}
+CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
+semilattices with inflationary update methods. Due to their algebraic
+properties, CRDTs can be replicated with strong eventual consistency without
+the need for any coordination. Our definition of distributed objects and our
+\invariantconfluence{} system model are inspired directly by the corresponding
+definitions and system models in~\cite{shapiro2011conflict}.
+%
+CRDTs are eventually consistent but may not preserve invariants. Conversely,
+\invariantconfluent{} objects preserve invariants but may not be eventually
+consistent. Thus, it is natural (though not necessary) to use CRDTs as
+distributed objects. If a CRDT is determined to be \invariantconfluent{} with
+respect to a particular invariant and set of transactions, then it achieves a
+combination of strong eventual consistency and invariant preservation. Any CRDT
+(e.g., counters, sets, graphs, sequences) can be used for this purpose.
+%
+Finally, our criteria in \thmref{LatticeProperty} also borrow ideas from CRDTs,
+exploiting the algebraic properties of semilattices.
+
+\textbf{CALM Theorem.}
+Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
+formalism, Dedalus~\cite{alvaro2011dedalus, alvaro2013declarative}, are
+declarative Datalog-based programming languages that are designed to program
+distributed systems. The accompanying CALM
+theorem~\cite{hellerstein2010declarative, ameloot2013relational} states that if
+and only if a program can be written in the monotone fragment of these
+languages, then there exists a consistent, coordination-free implementation of
+the program.  The CALM theorem provides guarantees about the consistency of
+program outputs. It does not directly capture our notions of transactions or
+invariant maintenance during program execution.  Moreover, Bloom and Dedalus
+are general-purpose programming languages that can be used to implement a
+variety of distributed systems that are outside of the scope of
+\invariantconfluence{}.
+
+\begin{techreport}
+
+  \textbf{Program Analysis in Database Systems.} Using program analysis to
+  improve the performance of database systems is not new. For example, it has
+  been used to improve the performance of database-backed web
+  applications~\cite{cheung2014using, wu2016transaction,
+  ramachandra2012program} and used to improve the performance of optimistic
+  concurrency control on multi-core machines~\cite{wu2016transaction}. Our work
+  on \invariantconfluence{} continues the theme of using program analysis to
+  reap the performance benefits gained from understanding program semantics.
+\end{techreport}

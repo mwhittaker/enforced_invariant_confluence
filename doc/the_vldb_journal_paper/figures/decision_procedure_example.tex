@@ -1,0 +1,202 @@
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=1.2pt, draw=black]
+\tikzstyle{reachable}=[fill=flatgreen!50, draw=none]
+\tikzstyle{unreachable}=[fill=flatred!50, draw=none]
+\tikzstyle{invariant}=[fill=flatblue!50, draw=none]
+\tikzstyle{nothing}=[fill=white, draw=none]
+
+\newcommand{\pointgrid}[4]{{
+  \newcommand{\argxmin}{#1}
+  \newcommand{\argxmax}{#2}
+  \newcommand{\argymin}{#3}
+  \newcommand{\argymax}{#4}
+
+  \draw[] (\argxmin, 0) to (\argxmax, 0);
+  \draw[] (0, \argymin) to (0, \argymax);
+  \foreach \x in {\argxmin, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., \argymax} {
+      \node[point] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+\newcommand{\pointrect}[2]{
+  \draw[#1] ($#2 + (-0.51, 0.51)$) rectangle ($#2 + (0.51, -0.51)$);
+}
+
+\newcommand{\subfigwidth}{0.48\textwidth}
+\newcommand{\subfighspace}{0.3cm}
+\newcommand{\tikzhspace}{0.4cm}
+\newcommand{\tikzscale}{0.25}
+\newcommand{\xmin}{-3}
+\newcommand{\xmax}{3}
+\newcommand{\ymin}{-3}
+\newcommand{\ymax}{3}
+
+\begin{figure*}[ht]
+  \centering
+
+  \begin{subfigure}[t]{0.38\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable, draw=black] (-0.5, 0.5) rectangle (0.5, -0.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \draw (0.5, 0.5) to (0.5, \ymax.5);
+      \draw (0.5, 0.5) to (\xmax.5, 0.5);
+      \draw (-0.5, -0.5) to (-0.5, \ymin.5);
+      \draw (-0.5, -0.5) to (\xmin.5, -0.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
+    \end{tikzpicture}
+    \caption{%
+      \IsInvConfluent{} determines $I(s_0)$ and then calls \Helper{} with $R =
+      \set{s_0}$, $NR = \emptyset{}$, and $I = \setst{(x, y)}{xy \leq 0}$.
+    }
+    \figlabel{DecisionProcedureExampleA}
+  \end{subfigure}
+  \hspace{\subfighspace}
+  \begin{subfigure}[t]{0.58\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable, draw=black] (-0.5, 0.5) rectangle (1.5, -1.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \pointrect{unreachable, draw=black}{(-1, 1)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \draw (0.5, 0.5) to (0.5, \ymax.5);
+      \draw (0.5, 0.5) to (\xmax.5, 0.5);
+      \draw (-0.5, -0.5) to (-0.5, \ymin.5);
+      \draw (-0.5, -0.5) to (\xmin.5, -0.5);
+      \pointrect{nothing, draw=black}{(-1, 1)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
+    \end{tikzpicture}
+    \caption{%
+      \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
+      counterexample $s_1 = (-1, 1)$ and $s_2 = (1, -1)$. \Helper{} randomly
+      generates some \sTIreachable{} points and adds them to $R$. Luckily for
+      us, $s_2 \in R$, so \Helper{} knows that it is \sTIreachable{}.
+      \Helper{} is not sure about $s_1$, so it asks the user. After some
+      thought, the user tells \Helper{} that $s_1$ is \sTIunreachable{}, so
+      \Helper{} adds $s_1$ to $NR$ and then recurses.
+    }
+    \figlabel{DecisionProcedureExampleB}
+  \end{subfigure}
+
+  \begin{subfigure}[t]{0.38\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable, draw=black] (-0.5, 0.5) rectangle (2.5, -2.5);
+      \pointrect{reachable, draw=black}{(3, -3)}
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \pointrect{unreachable}{(-1, 1)}
+      \pointrect{unreachable}{(-1, 2)}
+      \draw (-1.5, 0.5) rectangle (-0.5, 2.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[invariant] (\xmin.5, \ymax.5) rectangle (0.5, -0.5);
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \draw (0.5, 0.5) to (0.5, \ymax.5);
+      \draw (0.5, 0.5) to (\xmax.5, 0.5);
+      \draw (-0.5, -0.5) to (-0.5, \ymin.5);
+      \draw (-0.5, -0.5) to (\xmin.5, -0.5);
+      \pointrect{nothing}{(-1, 1)}
+      \pointrect{nothing}{(-1, 2)}
+      \draw (-1.5, 0.5) rectangle (-0.5, 2.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
+    \end{tikzpicture}
+    \caption{%
+      \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
+      counterexample $s_1 = (-1, 2)$ and $s_2 = (3, -3)$. \Helper{} randomly
+      generates some \sTIreachable{} points and adds them to $R$. $s_1, s_2
+      \notin R, NR$, so \Helper{} ask the user to label them. The user puts
+      $s_1$ in $NR$ and $s_2$ in $R$. Then, \Helper{} recurses.
+    }
+    \figlabel{DecisionProcedureExampleC}
+  \end{subfigure}
+  \hspace{\subfighspace}
+  \begin{subfigure}[t]{0.58\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[reachable] (-0.5, 0.5) rectangle (2.5, -2.5);
+      \pointrect{reachable}{(3, 0)}
+      \pointrect{reachable}{(3, -1)}
+      \pointrect{reachable}{(0, -3)}
+      \pointrect{reachable}{(2, -3)}
+      \pointrect{reachable}{(3, -3)}
+      \draw (-0.5, 0.5) to (\xmax.5, 0.5);
+      \draw (-0.5, 0.5) to (-0.5, \ymin.5);
+      \draw (-0.5, -3.5) to ++(1, 0)
+                         to ++(0, 1)
+                         to ++(1, 0)
+                         to ++(0, -1)
+                         to ++(2, 0)
+                         to ++(0, 1)
+                         to ++(-1, 0)
+                         to ++(0, 1)
+                         to ++(1, 0)
+                         to ++(0, 2);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$R$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[unreachable] (\xmin.5, \ymax.5) rectangle (-0.5, \ymin.5);
+      \draw (\xmin.5, \ymax.5) to (-0.5, \ymax.5) to
+            (-0.5, \ymin.5) to (\xmin.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$NR$};
+    \end{tikzpicture}\hspace{\tikzhspace}
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[invariant] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \draw (-0.5, 0.5) to (\xmax.5, 0.5);
+      \draw (-0.5, 0.5) to (-0.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+      \node at (0, \ymax + 1) {$I - NR$};
+    \end{tikzpicture}
+    \caption{%
+      \Helper{} determines that $O$ is not \iclosed{(I - NR)} with
+      counterexample $s_1 = (-2, 1)$ and $s_2 = (1, -1)$. \Helper{} randomly
+      generates some \sTIreachable{} points and adds them to $R$. $s_2 \in R$
+      but $s_1 \notin R, NR$, so \Helper{} asks the user to label $s_1$. The
+      user notices a pattern in $R$ and $NR$ and after some thought, concludes
+      that every point with negative $x$-coordinate is \sTIunreachable{}.
+      They update $NR$ to $-\ints \times \ints$. Then, \Helper{} recurses.
+      \Helper{} determines that $O$ is \iclosed{(I - NR)} and returns true!
+    }
+    \figlabel{DecisionProcedureExampleD}
+  \end{subfigure}
+
+  \vspace{1em}
+  \hrule
+  \vspace{1em}
+
+  \caption{%\vspace{1em}
+    An example of a user interacting with
+    \algoref{InteractiveDecisionProcedure} on \exampleref{Z2}.  Each step of
+    the visualization shows reachable states $R$ (left), non-reachable states
+    $NR$ (middle), and the refined invariant $I - NR$ (right) as the algorithm
+    executes.
+  }
+  \figlabel{DecisionProcedureExample}
+\end{figure*}

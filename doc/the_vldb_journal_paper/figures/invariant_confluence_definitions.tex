@@ -1,0 +1,110 @@
+\begin{figure}[ht]
+  \centering
+
+  \tikzstyle{s0color}=[fill=flatred]
+  \tikzstyle{s1color}=[fill=flatgreen]
+  \tikzstyle{s2color}=[fill=flatdenim]
+  \tikzstyle{s3color}=[fill=flatorange]
+  \tikzstyle{s4color}=[fill=flatyellow]
+  \tikzstyle{s5color}=[fill=flatcyan]
+  \tikzstyle{s6color}=[fill=flatpurple]
+  \tikzstyle{s7color}=[fill=flatblue]
+  \tikzstyle{txnline}=[black, thick, -latex]
+
+  \newcommand{\internaltext}[1]{$\boldsymbol #1$}
+
+  \tikzstyle{phantomstate}=[%
+    shape=circle, inner sep=1pt, draw=white, line width=1pt, fill=white]
+  \tikzstyle{state}=[%
+    shape=circle, inner sep=1pt, draw=black, line width=1pt, text opacity=1,
+    fill opacity=0.6]
+
+  \begin{subfigure}[c]{0.5\columnwidth}
+    \centering
+
+    \begin{tikzpicture}[yscale=0.7, xscale=1]
+      \node (p3) at (0.5, 3) {$p_1$};
+      \node (p2) at (0.5, 2) {$p_2$};
+      \node (p1) at (0.5, 1) {$p_3$};
+
+      \tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
+      \draw[pline] (p3) to (4.75, 3);
+      \draw[pline] (p2) to (4.75, 2);
+      \draw[pline] (p1) to (4.75, 1);
+
+      % Top line.
+      \node[phantomstate] (s03) at (1, 3) {$\phantom{s_0}$};
+      \node[phantomstate] (s13) at (2, 3) {$\phantom{s_1}$};
+      \node[phantomstate] (s23) at (3, 3) {$\phantom{s_3}$};
+      \node[phantomstate] (s33) at (3.75, 3) {$\phantom{s_6}$};
+      \node[state, s0color] (s03) at (1, 3) {\internaltext{s_0}};
+      \node[state, s1color] (s13) at (2, 3) {\internaltext{s_1}};
+      \node[state, s3color] (s23) at (3, 3) {\internaltext{s_3}};
+      \node[state, s6color] (s33) at (3.75, 3) {\internaltext{s_6}};
+
+      % Middle line.
+      \node[phantomstate] (s02) at (1, 2) {$\phantom{s_0}$};
+      \node[phantomstate] (s12) at (2, 2) {$\phantom{s_2}$};
+      \node[phantomstate] (s22) at (3, 2) {$\phantom{s_4}$};
+      \node[state, s0color] (s02) at (1, 2) {\internaltext{s_0}};
+      \node[state, s2color] (s12) at (2, 2) {\internaltext{s_2}};
+      \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
+
+      % Bottom line.
+      \node[phantomstate] (s01) at (1, 1) {$\phantom{s_0}$};
+      \node[phantomstate] (s11) at (2, 1) {$\phantom{s_2}$};
+      \node[phantomstate] (s21) at (3, 1) {$\phantom{s_5}$};
+      \node[phantomstate] (s31) at (4.25, 1) {$\phantom{s_7}$};
+      \node[state, s0color] (s01) at (1, 1) {\internaltext{s_0}};
+      \node[state, s2color] (s11) at (2, 1) {\internaltext{s_2}};
+      \node[state, s5color] (s21) at (3, 1) {\internaltext{s_5}};
+      \node[state, s7color] (s31) at (4.25, 1) {\internaltext{s_7}};
+
+      \tikzstyle{txntext}=[sloped, above]
+      \draw[txnline] (s03) to node[txntext]{$t$} (s13);
+      \draw[txnline] (s13) to node[txntext]{$v$} (s23);
+      \draw[txnline] (s02) to node[txntext]{$u$} (s12);
+      \draw[txnline] (s01) to node[txntext]{$u$} (s11);
+      \draw[txnline] (s11) to node[txntext]{$w$} (s21);
+
+      \draw[txnline] (s13) to node[txntext]{} (s22);
+      \draw[txnline] (s12) to node[txntext]{} (s22);
+      \draw[txnline] (s22) to node[txntext]{} (s33);
+      \draw[txnline] (s23) to node[txntext]{} (s33);
+      \draw[txnline] (s21) to node[txntext]{} (s31);
+      \draw[txnline] (s33) to node[txntext]{} (s31);
+    \end{tikzpicture}
+
+    \caption{System Execution}\figlabel{SystemExecution}
+  \end{subfigure}%
+  \begin{subfigure}[c]{0.5\columnwidth}
+    \centering
+
+    \begin{tikzpicture}[scale=0.7]
+                         \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (j1) at (0, 0) {\internaltext{\join}};
+      \draw (j1)++(-30:1) node[state, s5color, label={[label distance=-0.1cm] 90:$s_5$}] (w)            {\internaltext{w}};
+      \draw (j1)++(210:1) node[state, s6color, label={[label distance=-0.1cm] 90:$s_6$}] (j2)           {\internaltext{\join}};
+      \draw (w)++(-90:1)  node[state, s2color, label={[label distance=-0.2cm] 60:$s_2$}] (u1)           {\internaltext{u}};
+      \draw (u1)++(-90:1) node[state, s0color]                                           (s4)           {\internaltext{s_0}};
+      \draw (j2)++(225:1) node[state, s3color, label={[label distance=-0.1cm] 90:$s_3$}] (v)            {\internaltext{v}};
+      \draw (v)++(-90:1)  node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t2)           {\internaltext{t}};
+      \draw (t2)++(-90:1) node[state, s0color]                                           (s1)           {\internaltext{s_0}};
+      \draw (j2)++(-45:1) node[state, s4color, label={[label distance=-0.1cm] 90:$s_4$}] (j3)           {\internaltext{\join}};
+      \draw (j3)++(240:1) node[state, s1color, label={[label distance=-0.2cm]120:$s_1$}] (t3)           {\internaltext{t}};
+      \draw (t3)++(-90:1) node[state, s0color]                                           (s2)           {\internaltext{s_0}};
+      \draw (j3)++(-60:1) node[state, s2color, label={[label distance=-0.1cm] 90:$s_2$}] (u3)           {\internaltext{u}};
+      \draw (u3)++(-90:1) node[state, s0color]                                           (s3)           {\internaltext{s_0}};
+
+      \tikzstyle{astedge}=[thick]
+      \draw[astedge] (j1) to (w) to (u1) to (s4);
+      \draw[astedge] (j1) to (j2) to (v) to (t2) to (s1);
+      \draw[astedge] (j1) to (j2) to (j3) to (t3) to (s2);
+      \draw[astedge] (j1) to (j2) to (j3) to (u3) to (s3);
+    \end{tikzpicture}
+
+    \caption{Expression}\figlabel{Expression}
+  \end{subfigure}
+
+  \caption{A system execution and corresponding expression}
+  \figlabel{ExampleExpression}
+\end{figure}
