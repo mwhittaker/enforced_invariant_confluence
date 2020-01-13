@@ -122,3 +122,71 @@ satisfy the invariant:
   \setst{s \in S}{\sTIreachablepredicate{s}} \subseteq I
   \hfill
 \]
+
+\subsection{Equivalence to Existing Definition}
+Our definition of invariant confluence is different than the original
+definition given in~\cite{bailis2014coordination}, but the difference is merely
+cosmetic. We now prove that the two definitions are equivalent.
+
+We say an expression $e$ \defword{recursively satisfies $I$}, denoted
+$\Irec{e}$, if $e$ and all of $e$'s children satisfy $I$. That is,
+\begin{itemize}
+  \item
+    $\Irec{s}$ if $I(s)$,
+
+  \item
+    $\Irec{t(e)}$ if $\Irec{e}$ and $I(t(e))$, and
+
+  \item
+    $\Irec{e_1 \join e_2}$ if $\Irec{e_1}$, $\Irec{e_2}$, and $I(e_1 \join
+    e_2)$.
+\end{itemize}
+
+In~\cite{bailis2014coordination}, Bailis et al.\ define \sTIconfluence{} to
+mean that (a) the start state $s_0$ satisfies the invariant and (b) all
+\sTIreachable{} expressions recursively satisfying $I$ are closed under join.
+That is, $O$ is \sTIconfluent{} if $I(s_0)$ and
+\begin{gather*}
+  \hspace{0.75in} \forall e_1, e_2 \in \setst{e}{\sTIreachablepredicate{e}}.\; \\
+  \hspace{0.75in} \Irec{e_1} \land \Irec{e_2} \implies I(e_1 \join e_2)
+\end{gather*}
+
+\begin{theorem}\thmlabel{TwoIconfluenceDefs}
+  Consider a state based object $O = (S, \join)$, a start state $s_0$, a set of
+  transactions $T$, and an invariant $I$. The following two are equivalent:
+  \begin{enumerate}
+    \item
+      $\setst{s \in S}{\sTIreachablepredicate{s}} \subseteq I$
+
+    \item
+      $I(s_0)$ and
+      $\forall e_1, e_2 \in \setst{e}{\sTIreachablepredicate{e}}.\;
+         \Irec{e_1} \land \Irec{e_2} \implies I(e_1 \join e_2)$
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  First, we show that (1) implies (2). Trivially,
+  $\sTIreachablepredicate{s_0}$, so by (1), $I(s_0)$. Let $e_1$ and $e_2$ be
+  arbitrary \sTIreachable{} expressions. Then $e_1 \join e_2$ is also
+  reachable, so by (1), $I(e_1 \join e_2)$.
+
+  Next, we show that (2) implies (1). We prove by structural induction that for
+  all $e$, $\sTIreachablepredicate{e} \implies \Irec{e}$. From this, (1) is
+  immediate.
+  \begin{itemize}
+    \item \textbf{Case $s_0$.}
+      $I(s_0)$ by (2), so $\Irec{s_0}$
+
+    \item \textbf{Case $t(e)$.}
+      Let $t(e)$ be \sTIreachable{}. Then, $\sTIreachablepredicate{e}$ and
+      $I(t(e))$. By the inductive hypothesis, $\Irec{e}$, so by the definition
+      of $\Irec{\cdot}$, $\Irec{t(e)}$.
+
+    \item \textbf{Case $e_1 \join e_2$.}
+      Let $e_1 \join e_2$ be \sTIreachable{}. Then,
+      $\sTIreachablepredicate{e_1}$ and $\sTIreachablepredicate{e_2}$. By the
+      inductive hypothesis, $\Irec{e_1}$ and $\Irec{e_2}$. By $(2)$, $I(e_1
+      \join e_2)$. Thus, by the definition of $\Irec{\cdot}$, $\Irec{e_1 \join
+      e_2}$.
+  \end{itemize}
+\end{proof}
