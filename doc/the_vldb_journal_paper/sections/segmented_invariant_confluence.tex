@@ -293,36 +293,33 @@ programmer to think of a segmentation that is amenable to segmented
 plan to explore ways by which we can automatically suggest segmentations to the
 application designer to ease this process.
 
-\begin{techreport}
+Third, segmented \invariantconfluence{} naturally subsumes a distributed
+locking approach to replicating non-\invariantconfluent{} objects. This
+approach first recognizes which transactions cannot be safely executed
+concurrently and then requires them to acquire a distributed lock before
+executing~\cite{balegas2015putting, gotsman2016cause}. For example, in a
+banking application with the invariant that all balances remain non-negative,
+concurrent deposits are permitted, but concurrent withdrawals can lead to
+invariant violations. Thus, we require that withdrawals acquire a distributed
+lock before executing. This example is exactly the same as
+\exampleref{CounreachableExample} which we handled by simply removing
+withdrawal transactions from our segmentation's set of transactions.
 
-  Third, segmented \invariantconfluence{} naturally subsumes a distributed
-  locking approach to replicating non-\invariantconfluent{} objects. This
-  approach first recognizes which transactions cannot be safely executed
-  concurrently and then requires them to acquire a distributed lock before
-  executing~\cite{balegas2015putting, gotsman2016cause}. For example, in a
-  banking application with the invariant that all balances remain non-negative,
-  concurrent deposits are permitted, but concurrent withdrawals can lead to
-  invariant violations. Thus, we require that withdrawals acquire a distributed
-  lock before executing. This example is exactly the same as
-  \exampleref{CounreachableExample} which we handled by simply removing
-  withdrawal transactions from our segmentation's set of transactions.
+Fourth, we can integrate a couple of optimizations into our system model to
+further reduce the amount of coordination it requires. To begin, if a server
+with state $s_i$ and active segment $(I_i, T_i)$ receives a transaction $t
+\in I_i$ to execute, and $t(s_i)$ violates the active invariant but not the
+global invariant, instead of initiating a round of global coordination, $p_i$
+can simply buffer $t$ for re-execution at a later time. While this increases
+the latency required to execute $t$, it's possible that after other
+transactions are executed, re-executing $t$ may lead to a state that either
+satisfies the active invariant or violates the global invariant. In either
+case, a round of global coordination is avoided. Similarly, servers can
+buffer transactions that require global coordination, executing an entire
+batch of these transactions during a single round of global coordination.
 
-  Fourth, we can integrate a couple of optimizations into our system model to
-  further reduce the amount of coordination it requires. To begin, if a server
-  with state $s_i$ and active segment $(I_i, T_i)$ receives a transaction $t
-  \in I_i$ to execute, and $t(s_i)$ violates the active invariant but not the
-  global invariant, instead of initiating a round of global coordination, $p_i$
-  can simply buffer $t$ for re-execution at a later time. While this increases
-  the latency required to execute $t$, it's possible that after other
-  transactions are executed, re-executing $t$ may lead to a state that either
-  satisfies the active invariant or violates the global invariant. In either
-  case, a round of global coordination is avoided. Similarly, servers can
-  buffer transactions that require global coordination, executing an entire
-  batch of these transactions during a single round of global coordination.
-
-  Fifth, a segmented \invariantconfluence{} decision procedure can also
-  leverage \thmref{LatticeProperty} in addition to
-  \algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
-  criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in
-  I$.
-\end{techreport}
+Fifth, a segmented \invariantconfluence{} decision procedure can also
+leverage \thmref{LatticeProperty} in addition to
+\algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
+criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in
+I$.

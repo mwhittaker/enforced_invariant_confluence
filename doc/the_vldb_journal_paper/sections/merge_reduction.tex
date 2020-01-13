@@ -26,18 +26,15 @@ expression with fewer merges.
   \sTImergereducible{}, then $O$ is \sTIconfluent{}.
 \end{theorem}
 
-\begin{techreport}
-  The proof of \thmref{ReducibilityImpliesIconfluence} is a straightforward
-  induction. We begin with an \sTIreachable{} expression $e$ and repeatedly
-  replace any subexpression that merges two merge-free subexpressions with an
-  equivalent merge-free reachable subexpression (which we can do because $O$ is
-  merge-reducible). We repeat this process until $e$ has been completely
-  replaced with an equivalent merge-free reachable expression $e'$. Because
-  $I(s_0)$ and because our system model only executes transactions that
-  preserve the invariant, $e'$ (and hence $e$) is guaranteed to satisfy the
-  invariant. Thus, all reachable states satisfy the invariant, so $O$ is
-  \invariantconfluent{}.
-\end{techreport}
+The proof of \thmref{ReducibilityImpliesIconfluence} is a straightforward
+induction. We begin with an \sTIreachable{} expression $e$ and repeatedly
+replace any subexpression that merges two merge-free subexpressions with an
+equivalent merge-free reachable subexpression (which we can do because $O$ is
+merge-reducible). We repeat this process until $e$ has been completely replaced
+with an equivalent merge-free reachable expression $e'$. Because $I(s_0)$ and
+because our system model only executes transactions that preserve the
+invariant, $e'$ (and hence $e$) is guaranteed to satisfy the invariant. Thus,
+all reachable states satisfy the invariant, so $O$ is \invariantconfluent{}.
 
 Merge-reducibility is a sufficient condition for \invariantconfluence{}, but
 unlike with \invariantclosure{}, it is not straightforward to automatically
@@ -68,22 +65,20 @@ to determine automatically.
   \end{enumerate}
 \end{theorem}
 
-\begin{techreport}
-  To show that $O$ is \sTImergereducible, we consider two merge-free reachable
-  expressions
-  \[
-    e_1 = t_1(\ldots(t_n(s_0))\ldots)
-    \quad\text{and}\quad
-    e_2 = u_1(\ldots(u_m(s_0))\ldots)
-  \]
-  Then, we inductively use criterion (3) with criteria (1) and (2) to show that
-  \[
-    e_3 = t_1(\ldots(
-    t_n(u_1(\ldots(u_m(s_0))\ldots))
-    )\ldots)
-  \]
-  is reachable and evaluates to $e_1 \join e_2$.
-\end{techreport}
+To show that $O$ is \sTImergereducible, we consider two merge-free reachable
+expressions
+\[
+  e_1 = t_1(\ldots(t_n(s_0))\ldots)
+  \quad\text{and}\quad
+  e_2 = u_1(\ldots(u_m(s_0))\ldots)
+\]
+Then, we inductively use criterion (3) with criteria (1) and (2) to show that
+\[
+  e_3 = t_1(\ldots(
+  t_n(u_1(\ldots(u_m(s_0))\ldots))
+  )\ldots)
+\]
+is reachable and evaluates to $e_1 \join e_2$.
 
 \thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is a
 sufficient condition for \invariantconfluence{}, and \thmref{LatticeProperty}
@@ -108,15 +103,12 @@ some objects that satisfy criteria (1) -- (4) that are not
   \Iclosed{}. Let $s_1 = \set{0}$ and $s_2 = \set{1}$. Then, $I(s_1)$ and
   $I(s_2)$, but letting $s_3 = s_1 \cup s_2 = \set{0, 1}$, $\lnot I(s_3)$.
 
-  \begin{techreport}
-
-    Here's why criterion (3) is satisfied. If $s$ is an arbitrary state that
-    satisfies $I$, then it is non-empty and contains, without loss of generality,
-    only even integers. If $t_1$ and $t_2$ are arbitrary transactions such that
-    $I(t_1(s))$ and $I(t_2(s))$, then $t_1(s)$ and $t_1(s)$ are also non-empty
-    and contain only even integers. Thus, $t_1(s) \cup t_2(s)$ is clearly
-    non-empty and contains only even integers, so $I(t_1(s) \join t_2(s))$.
-  \end{techreport}
+  Here's why criterion (3) is satisfied. If $s$ is an arbitrary state that
+  satisfies $I$, then it is non-empty and contains, without loss of generality,
+  only even integers. If $t_1$ and $t_2$ are arbitrary transactions such that
+  $I(t_1(s))$ and $I(t_2(s))$, then $t_1(s)$ and $t_1(s)$ are also non-empty
+  and contain only even integers. Thus, $t_1(s) \cup t_2(s)$ is clearly
+  non-empty and contains only even integers, so $I(t_1(s) \join t_2(s))$.
 \end{example}
 
 % {\input{figures/merge_reducible}}
