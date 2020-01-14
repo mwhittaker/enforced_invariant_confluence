@@ -24,37 +24,59 @@ $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
   then $O$ is \sTIconfluent{}.
 \end{theorem}
 
+\begin{proof}
 \thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is
-sufficient for \invariantconfluence{}. Intuitively, recall that our system model ensures
-that transaction execution preserves the invariant, so if merging states also
-preserves the invariant and if our start state satisfies the invariant, then
-inductively it is impossible for us to reach a state that doesn't satisfy the
-invariant.
+sufficient for \invariantconfluence{}. To prove this informally, recall that
+our system model ensures that transaction execution preserves the invariant, so
+if merging states also preserves the invariant and if our start state satisfies
+the invariant, then inductively it is impossible for us to reach a state that
+doesn't satisfy the invariant.
 
-This is good news because checking if an object is \invariantclosed{} is more
-straightforward than checking if it is \invariantconfluent{}. Existing systems
-typically use an SMT solver like Z3 to check if an object is
-\invariantclosed{}~\cite{de2008z3, balegas2015putting, gotsman2016cause}. If it
-is, then by \thmref{IclosureImpliesIconfluence}, it is \invariantconfluent{}.
-Unfortunately, \invariantclosure{} is \emph{not} necessary for
-\invariantconfluence{}, so if an object is \emph{not} \invariantclosed{}, these
-systems cannot conclude that the object is \emph{not} \invariantconfluent{}.
-The reason why \invariantclosure{} is not necessary for \invariantconfluence{}
-is best explained through an example.
+More formally, consider an arbitrary state $s$ that is reachable via expression
+$e$. We prove by structural induction that for every expression $e$, if $e$ is
+\sTIreachable{} then $I(e)$.
+\begin{itemize}
+  \item \textbf{Case $s_0$.}
+    $s_0$ is reachable and satisfies the invariant by assumption.
+
+  \item \textbf{Case $t(e)$.}
+    If $t(e)$ is reachable, then it satisfies the invariant by definition.
+
+  \item \textbf{Case $e_1 \join e_2$.}
+    Let $e_1 \join e_2$ be \sTIreachable{}. Then, $\sTIreachablepredicate{e_1}$
+    and $\sTIreachablepredicate{e_2}$. By the inductive hypothesis, $I(e_1)$
+    and $I(e_2)$. By \invariantclosure{}, $I(e_1 \join e_2)$.
+\end{itemize}
+\end{proof}
+
+\thmref{IclosureImpliesIconfluence} is good news because checking if an object
+is \invariantclosed{} is more straightforward than checking if it is
+\invariantconfluent{}. Existing systems typically use an SMT solver like Z3 to
+check if an object is \invariantclosed{}~\cite{de2008z3, balegas2015putting,
+gotsman2016cause}. If it is, then by \thmref{IclosureImpliesIconfluence}, it is
+\invariantconfluent{}.  Unfortunately, \invariantclosure{} is \emph{not}
+necessary for \invariantconfluence{}, so if an object is \emph{not}
+\invariantclosed{}, these systems cannot conclude that the object is \emph{not}
+\invariantconfluent{}. The reason why \invariantclosure{} is not necessary for
+\invariantconfluence{} is best explained through an example.
 
 {\input{figures/z2}}
 
 \begin{example}\examplelabel{Z2}
   Let $O = (\ints \times \ints, \join)$ consist of pairs $(x, y)$ of integers
-  where $(x_1, y_1) \join (x_2, y_2) = (\max(x_1, x_2), \max(y_1, y_2))$. Our
-  start state $s_0 \in \ints \times \ints$ is the point $(0, 0)$. Our set $T$
-  of transactions consists of two transactions: $t_{x+1}((x, y)) = (x + 1, y)$
-  which increments $x$ and $t_{y-1}((x, y)) = (x, y - 1)$ which decrements $y$.
-  Our invariant $I = \setst{(x, y) \in \ints \times \ints}{xy \leq 0}$ consists
-  of all points $(x, y)$ where the product of $x$ and $y$ is non-positive.
+  where
+  \[
+    \hfill (x_1, y_1) \join (x_2, y_2) = (\max(x_1, x_2), \max(y_1, y_2)) \hfill
+  \]
+  Our start state $s_0 \in \ints \times \ints$ is the point $(0, 0)$. Our set
+  $T$ of transactions consists of two transactions: $t_{x+1}((x, y)) = (x + 1,
+  y)$ which increments $x$ and $t_{y-1}((x, y)) = (x, y - 1)$ which decrements
+  $y$.  Our invariant $I = \setst{(x, y) \in \ints \times \ints}{xy \leq 0}$
+  consists of all points $(x, y)$ where the product of $x$ and $y$ is
+  non-positive.
 
   The invariant and the set of reachable states are illustrated in \figref{Z2}
-  in which we draw each state $(x, y)$ as a point in space. The invariant
+  in which we draw each state $(x, y)$ as a point in $\ints^2$. The invariant
   consists of the second and fourth quadrant, while the reachable states consist only
   of the fourth quadrant. From this, it is immediate that the reachable states
   are a subset of the invariant, so $O$ is \invariantconfluent{}. However,
@@ -83,9 +105,12 @@ This is formalized by \thmref{IclosureEquivalentIconfluence}.
   \]
 \end{theorem}
 
-The forward direction of \thmref{IclosureEquivalentIconfluence} follows
-immediately from \thmref{IclosureImpliesIconfluence}. The backward direction
-holds because any two invariant satisfying states $s_1$ and $s_2$ must be
-reachable (by assumption), so their join $s_1 \join s_2$ is also reachable.
-And because $O$ is \sTIconfluent{}, all reachable points, including $s_1
-\join s_2$, satisfy the invariant.
+\begin{proof}
+  The forward direction of \thmref{IclosureEquivalentIconfluence} follows
+  immediately from \thmref{IclosureImpliesIconfluence}. The backward direction
+  holds because any two invariant satisfying states $s_1$ and $s_2$ must be
+  reachable (by assumption), so their join $s_1 \join s_2$ is also reachable.
+  And because $O$ is \sTIconfluent{}, all reachable points, including $s_1
+  \join s_2$, satisfy the invariant. Moreover $s_0$ is reachable, so $I(s_0)$
+  because $O$ is \sTIconfluent{}.
+\end{proof}

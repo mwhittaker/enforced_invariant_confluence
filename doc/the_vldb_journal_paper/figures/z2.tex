@@ -3,12 +3,12 @@
 \newcommand{\ymin}{-2}
 \newcommand{\ymax}{2}
 
-\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=2pt]
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=3pt]
 \tikzstyle{inv}=[line width=0.75pt, draw=black]
 \tikzstyle{pointinv}=[point, inv]
 \tikzstyle{invregion}=[rounded corners, fill=flatgreen!50, draw=none]
 \tikzstyle{reachableregion}=[rounded corners, fill=flatblue!50, draw=none]
-\tikzstyle{statelabel}=[anchor=south west, inner sep=1pt]
+\tikzstyle{statelabel}=[anchor=south west, inner sep=3pt]
 
 % Axes.
 \newcommand{\xyaxes}{
@@ -87,7 +87,7 @@
 
   \begin{subfigure}[b]{0.5\columnwidth}
     \centering
-    \begin{tikzpicture}[scale=0.4]
+    \begin{tikzpicture}[scale=0.6]
       \begin{scope}
         \clip (\xmin.5, \ymax.5) rectangle (\xmax.5, \ymin.5);
         \draw[invregion] (\xmin.9, \ymax.9) rectangle (0.5, -0.5);
@@ -109,7 +109,7 @@
   \end{subfigure}%
   \begin{subfigure}[b]{0.5\columnwidth}
     \centering
-    \begin{tikzpicture}[scale=0.4]
+    \begin{tikzpicture}[scale=0.6]
       \begin{scope}
         \clip (-1, 1) rectangle (\xmax.5, \ymin.5);
         \draw[reachableregion, draw=black] (-0.5, 0.5) rectangle (\xmax.9, \ymin.9);
