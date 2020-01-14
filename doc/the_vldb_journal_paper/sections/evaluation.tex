@@ -160,23 +160,25 @@ the value so long as it is not decremented by more than the amount that has
 been escrowed. We show how segmented \invariantconfluence{} can be used to
 implement escrow transactions.
 
-Consider again the PN-Counter $s = (p_1, p_2, p_3), (n_1, n_2, n_3)$ from
-\exampleref{CounreachableExample} replicated on three servers with transactions
-to increment and decrement the PN-Counter. In
+Consider again, from \exampleref{CounreachableExample}, the PN-Counter $s =
+(p_1, p_2, p_3)$, $(n_1, n_2, n_3)$ replicated on three servers with
+transactions to increment and decrement the PN-Counter. In
 \exampleref{CounreachableExample}, we found that concurrent decrements violate
 \invariantconfluence{} which led us to a segmentation which prohibited
 concurrent decrements. We now propose a new segmentation with escrow amount $k$
 that will allow us to perform concurrent decrements that respect the escrowed
-value. The first segment $(\setst{(p_1, p_2, p_3), (n_1, n_2, n_3)}{p_1, p_2,
-p_3 \geq k \land n_1, n_2, n_3 \leq k}, T)$ allows for concurrent increments
-and decrements so long as every $p_i \geq k$ and every $n_i \leq k$.
-Intuitively, this segment represents the situation in which every server has
-escrowed a value of $k$. They can decrement freely, so long as they don't
-exceed their escrow budget of $k$. The second segment is the one presented in
-\exampleref{CounreachableExample} which prohibits concurrent decrements. We ran
-our decision procedure on this example and it concluded that it was segmented
-\invariantconfluent{} in less than a tenth of a second and without any human
-interaction.
+value. The first segment is $(I_k, T)$ where
+\[
+  I_k = \setst{(p_1, p_2, p_3), (n_1, n_2, n_3)}{n_1, n_2, n_3 \leq k \leq p_1, p_2, p_3}
+\]
+This segment allows for concurrent increments and decrements so long as every
+$p_i \geq k$ and every $n_i \leq k$.  Intuitively, this segment represents the
+situation in which every server has escrowed a value of $k$. They can decrement
+freely, so long as they don't exceed their escrow budget of $k$. The second
+segment is the one presented in \exampleref{CounreachableExample} which
+prohibits concurrent decrements. We ran our decision procedure on this example
+and it concluded that it was segmented \invariantconfluent{} in less than a
+tenth of a second and without any human interaction.
 
 \example[TPC-C]\examplelabel{TpccEval}
 TPC-C is a ubiquitous OLTP benchmark with a workload that models a simple
