@@ -7,3 +7,4 @@ Changes
   original definition given by Bailis et al.
 - Added formal proof that invariant closure is sufficient for invariant
   confluence.
+- Expanded interactive decision procedure correctness proof.
