@@ -17,3 +17,5 @@ Changes
   confluence.
 - Added figure summarizing relationship between invariant confluence, invariant
   closure, merge reducibility, and criteria 1-4.
+- Added example of co-reachability.
+- Clarified fault tolerance limitations of segmented invariant confluence.

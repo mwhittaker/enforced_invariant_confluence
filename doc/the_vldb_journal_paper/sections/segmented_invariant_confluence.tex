@@ -9,8 +9,8 @@ In this section, we present a generalization of \invariantconfluence{} called
 invariants of non-\invariantconfluent{} objects, requiring only a small amount
 of coordination. In \secref{Evaluation}, we see that replicating a
 non-\invariantconfluent{} object with segmented \invariantconfluence{} can
-achieve between 10x and 100x more throughput than linearizable replication for
-certain workloads.
+achieve between 10$\times$ and 100$\times$ more throughput than linearizable
+replication for certain workloads.
 
 The main idea behind segmented \invariantconfluence{} is to segment the state
 space into a number of segments and restrict the set of allowable transactions
@@ -46,18 +46,18 @@ following conditions hold:
 \end{itemize}
 
 \begin{example}\examplelabel{SegmentedZ2}
-  Consider again the object $O = (\ints \times \ints, \join)$, transactions $T
-  = \set{t_{x+1}, t_{y-1}}$, and invariant $I = \setst{(x, y)}{xy \leq 0}$ from
-  \exampleref{Z2}, but now let the start state $s_0$ be $(-42, 42)$. $O$ is
-  \emph{not} \sTIconfluent{} because the points $(0, 42)$ and $(42, 0)$ are
-  reachable, and merging these points yields $(42, 42)$ which violates the
-  invariant. However, $O$ is \sTISconfluent{} for $\Sigma = (I_1, T_1)$, $(I_2,
-  T_2)$, $(I_3, T_3)$, $(I_4, T_4)$ where
+  Consider again the object $O = (\ints \times \ints, \join)$, the set of
+  transactions $T = \set{t_{x+1}, t_{y-1}}$, and the invariant $I = \setst{(x,
+  y)}{xy \leq 0}$ from \exampleref{Z2}, but now let the start state $s_0$ be
+  $(-42, 42)$. $O$ is \emph{not} \sTIconfluent{} because the points $(0, 42)$
+  and $(42, 0)$ are reachable, and merging these points yields $(42, 42)$ which
+  violates the invariant. However, $O$ is \sTISconfluent{} for $\Sigma = (I_1,
+  T_1)$, $(I_2, T_2)$, $(I_3, T_3)$, $(I_4, T_4)$ where
   \begin{align*}
-    I_1 &= \setst{(x, y)}{x < 0, y > 0}       &T_1 &= \set{t_{x+1}, t_{y-1}} \\
-    I_2 &= \setst{(x, y)}{x \geq 0, y \leq 0} &T_2 &= \set{t_{x+1}, t_{y-1}} \\
-    I_3 &= \setst{(x, y)}{x = 0}              &T_3 &= \set{t_{y-1}} \\
-    I_4 &= \setst{(x, y)}{y = 0}              &T_4 &= \set{t_{x+1}}
+    \qquad I_1 &= \setst{(x, y)}{x < 0, y > 0}       &T_1 &= \set{t_{x+1}, t_{y-1}} \\
+    \qquad I_2 &= \setst{(x, y)}{x \geq 0, y \leq 0} &T_2 &= \set{t_{x+1}, t_{y-1}} \\
+    \qquad I_3 &= \setst{(x, y)}{x = 0}              &T_3 &= \set{t_{y-1}} \\
+    \qquad I_4 &= \setst{(x, y)}{y = 0}              &T_4 &= \set{t_{x+1}}
   \end{align*}
   $\Sigma$ is illustrated in \figref{SegmentedZ2}. Clearly, $s_0$ satisfies the
   invariant, and $I_1, I_2, I_3, I_4$ cover $I$. Moreover, for every $(I_i,
@@ -68,7 +68,6 @@ following conditions hold:
 
 {\input{figures/segmented_z2}}
 
-
 \subsection{System Model}
 Now, we describe the system model used to replicate a segmented
 \invariantconfluent{} object without any coordination within a segment and with
@@ -77,9 +76,9 @@ before, we replicate an object $O$ across a set $p_1, \ldots, p_n$ of $n$
 servers each of which manages a replica $s_i \in S$ of the object. Every server
 begins with $s_0$, $T$, $I$, and $\Sigma$. Moreover, at any given point in
 time, a server designates one of the segments in $\Sigma$ as its
-\defword{active segment}.  Initially, every server chooses the first segment
-$(I_i, T_i) \in \Sigma$ such that $I_i(s_0)$ to be its active segment. We'll
-see momentarily the significance of the active segment.
+\defword{active segment}.  Initially, every server selects its active segment
+to be the first segment $(I_i, T_i) \in \Sigma$ such that $I_i(s_0)$. We'll see
+momentarily the significance of the active segment.
 
 As before, servers repeatedly perform one of two actions: execute a transaction
 or merge states with another server. Merging states in the segmented
@@ -88,7 +87,7 @@ or merge states with another server. Merging states in the segmented
 another server $p_j$ which \emph{must} merge $s_i$ into its state $s_j$.
 %
 Transaction execution in the new system model, on the other hand, is a bit more
-involved. Consider a server $s_i$ with active segment $(I_i, T_i)$. A client
+involved. Consider a server $p_i$ with active segment $(I_i, T_i)$. A client
 can request that $p_i$ execute a transaction $t \in T$. We consider what
 happens when $t \in T_i$ and $t \notin T_i$ separately.
 
@@ -126,9 +125,12 @@ described in the previous paragraph.  Transaction execution is summarized in
     \If{$t \notin T_i$}
       \State Execute $t$ with global coordination
     \Else{}
-      \If{$I_i(t(s_i))$} Commit $t$
-      \ElsIf{$\lnot I(t(s_i))$} Abort $t$
-      \Else{} Execute $t$ with global coordination
+      \If{$I_i(t(s_i))$}
+        \State Commit $t$
+      \ElsIf{$\lnot I(t(s_i))$}
+        \State Abort $t$
+      \Else{}
+        \State Execute $t$ with global coordination
       \EndIf{}
     \EndIf{}
   \end{algorithmic}
@@ -170,26 +172,40 @@ then generalize \thmref{IclosureEquivalentIconfluence}. Two states $s_1, s_2
 \defword{\TIcoreachable}, if there exists some state $s_0 \in I$ such that
 $s_1$ and $s_2$ are both \sTIreachable{}.
 
+\begin{example}
+  Consider the object $O = (\nats, \max)$ consisting of natural numbers merged
+  by the max function. Let $I = \nats$. Let $T = \set{t_{2\times}, t_{+10}}$
+  where $t_{2\times}(x) = 2x$ and $t_{+10} = x + 10$. The states $3$ and $16$
+  are \TIcoreachable{} because both are \stireachable{s}{T}{I} from $s = 3$
+  ($16 = 2 \times 3 + 10$). The states $3$ and $5$, however, are not
+  \TIcoreachable{}. The only state in which $3$ is reachable is $3$, but from
+  this state, the smallest reachable number larger than $3$ is $6$.
+\end{example}
+
 \begin{theorem}\thmlabel{ExtendedIclosureEquivalentIconfluence}
   Consider an object $O = (S, \join)$, a set of transactions $T$, and an
   invariant $I$. If every pair of states in the invariant are \TIcoreachable{},
   then
   \[
+    \hfill
     \text{$O$ is \Iclosed{}}
     \iff
-    \text{$O$ is \sticonfluent{s}{T}{I} for every $s \in I$}
+    \forall s \in I.\ \text{$O$ is \sticonfluent{s}{T}{I}}
+    \hfill
   \]
 \end{theorem}
 
-The proof of the forward direction is exactly the same as the proof of
-\thmref{IclosureImpliesIconfluence}. Transactions always maintain the
-invariant, so if merge does as well, then every reachable state must satisfy
-the invariant.
-%
-For the reverse direction, consider two arbitrary states $s_1, s_2 \in I$.
-The two points are \TIcoreachable{}, so there exists some state $s_0$ from
-which they can be reached. $O$ is \sTIconfluent{} and $s_1 \join s_2$ is
-\sTIreachable{}, so it satisfies the invariant.
+\begin{proof}
+  The proof of the forward direction is exactly the same as the proof of
+  \thmref{IclosureImpliesIconfluence}. Transactions always maintain the
+  invariant, so if merge does as well, then every reachable state must satisfy
+  the invariant.
+  %
+  For the reverse direction, consider two arbitrary states $s_1, s_2 \in I$.
+  By assumption, the two points are \TIcoreachable{}, so there exists some
+  state $s_0$ from which they can be reached. $O$ is \sTIconfluent{} and $s_1
+  \join s_2$ is \sTIreachable{}, so it satisfies the invariant.
+\end{proof}
 
 Using \thmref{ExtendedIclosureEquivalentIconfluence}, we develop
 \algoref{ArbitraryStartInteractiveDecisionProcedure}: a natural generalization
@@ -308,7 +324,7 @@ withdrawal transactions from our segmentation's set of transactions.
 Fourth, we can integrate a couple of optimizations into our system model to
 further reduce the amount of coordination it requires. To begin, if a server
 with state $s_i$ and active segment $(I_i, T_i)$ receives a transaction $t
-\in I_i$ to execute, and $t(s_i)$ violates the active invariant but not the
+\in T_i$ to execute, and $t(s_i)$ violates the active invariant but not the
 global invariant, instead of initiating a round of global coordination, $p_i$
 can simply buffer $t$ for re-execution at a later time. While this increases
 the latency required to execute $t$, it's possible that after other
@@ -323,3 +339,13 @@ leverage \thmref{LatticeProperty} in addition to
 \algoref{ArbitraryStartInteractiveDecisionProcedure}. If an object $O$ meets
 criteria (1) - (3), then it is \sticonfluent{s}{T}{I} for every state $s \in
 I$.
+
+Sixth, a naive implementation of our segmented invariant confluence system
+model is \emph{not} fault tolerant. A round of global coordination requires
+that \emph{every} server be non-faulty. If even a single server fails, then
+every round of global coordination will fail to complete. Fortunately, we can
+leverage well-established means of ensuring fault tolerance without difficulty.
+For example, we can replicate every server using a state machine replication
+protocol like MultiPaxos~\cite{lamport1998part, lamport2001paxos} or
+Raft~\cite{ongaro2014search}. Doing so will introduce a constant slowdown for
+each (now replicated) server, but servers remain independent and scalable.
