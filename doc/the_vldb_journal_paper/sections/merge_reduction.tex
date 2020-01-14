@@ -20,21 +20,89 @@ e_2$. Intuitively, if $O$ is merge-reducible, we can replace $e_1 \join e_2$
 (which has one merge) with $e_3$ (which has no merges) to obtain an equivalent
 expression with fewer merges.
 
+\begin{example}\examplelabel{MergeReducible}
+  Consider the distributed object $O = (\ints, \max)$ consisting of integers
+  merged by the max function. Our start state state $s_0 = 0$ and our invariant
+  $I = \setst{x \in \ints}{x \geq 0}$. Our set $T$ of transactions is the
+  infinite set $T = \setst{t_y}{y \in \ints}$ where $t_y(x) = x + y$ is a
+  transaction that adds $y$ to the state. For example, $t_2$ is a transaction
+  that adds $2$ to the state, and $t_{-3}$ is a transaction which subtracts $3$
+  from the state.
+  %
+  $O$ is \sTImergereducible{}. Consider two merge-free \sTIreachable{}
+  expressions $e_1$ and $e_2$ that evaluate to states $x_1$ and $x_2$. Without
+  loss of generality, assume $x_1 \geq x_2$. Then, we can replace $e_1 \join
+  e_2$ (which evaluates to $x_1$) with $e_1$. We can also replace it with
+  $t_{x_1}(0)$.
+\end{example}
+
+\begin{example}\examplelabel{NotMergeReducible}
+  Consider the distributed object $O = (\set{X \subseteq \ints}, \join)$ in
+  which each state is a set of integers and where $X_1 \join X_2 = \set{y}$
+  where $y = \sum_{x \in X_1} x + \sum_{x \in X_2} x$. Our start state state
+  $s_0 = \emptyset{}$ and our invariant $I = \setst{X}{\forall x \in X.\ x \
+  \text{is even}}$. Our set $T$ of transactions is the set $T = \set{t_0, t_2,
+  t_4}$ where $t_i(X) = X \cup \set{i}$ is a transaction that adds $i$ to the
+  state. For example, $t_2(\set{0}) = \set{0, 2}$.
+  %
+  $O$ is \emph{not} \sTImergereducible{}. Consider the two merge-free
+  \sTIreachable{} expressions $e_1 = t_2(\emptyset)$ and $e_2 =
+  t_4(\emptyset)$. $e_1 \join e_2$ evaluates to $\set{6}$, but there does not
+  exist a merge-free expression that evaluates to $\set{6}$.
+\end{example}
+
+{\input{figures/merging_diagram.tex}}
+
 \begin{theorem}\thmlabel{ReducibilityImpliesIconfluence}
   Given an object $O = (S, \join)$, a start state $s_0 \in S$, a set of
   transactions $T$, and an invariant $I$, if $I(s_0)$ and if $O$ is
   \sTImergereducible{}, then $O$ is \sTIconfluent{}.
 \end{theorem}
 
-The proof of \thmref{ReducibilityImpliesIconfluence} is a straightforward
-induction. We begin with an \sTIreachable{} expression $e$ and repeatedly
-replace any subexpression that merges two merge-free subexpressions with an
-equivalent merge-free reachable subexpression (which we can do because $O$ is
-merge-reducible). We repeat this process until $e$ has been completely replaced
-with an equivalent merge-free reachable expression $e'$. Because $I(s_0)$ and
-because our system model only executes transactions that preserve the
-invariant, $e'$ (and hence $e$) is guaranteed to satisfy the invariant. Thus,
-all reachable states satisfy the invariant, so $O$ is \invariantconfluent{}.
+\begin{proof}
+  Intuitively, the proof of \thmref{ReducibilityImpliesIconfluence} is a
+  straightforward induction. We begin with an \sTIreachable{} expression $e$
+  and repeatedly replace any subexpression that merges two merge-free
+  subexpressions with an equivalent merge-free reachable subexpression (which
+  we can do because $O$ is merge-reducible). We repeat this process until $e$
+  has been completely replaced with an equivalent merge-free reachable
+  expression $e'$. Because $I(s_0)$ and because our system model only executes
+  transactions that preserve the invariant, $e'$ (and hence $e$) is guaranteed
+  to satisfy the invariant. Thus, all reachable states satisfy the invariant,
+  so $O$ is \invariantconfluent{}. An illustration of this idea is given in
+  \figref{MergingDiagram}.
+
+  More formally, we prove by structural induction on $e$, that for all
+  \sTIreachable{} expressions $e$, there exists a merge-free \sTIreachable{}
+  expression $e'$ such that $eval(e) = eval(e')$.
+  \begin{itemize}
+    \item \textbf{Case 1: $e = s_0$.}
+      Trivially, $e' = s_0$.
+
+    \item \textbf{Case 2: $e = t(e_1)$.}
+      $e_1$ is \sTIreachable{}, so by the inductive hypothesis, there exists a
+      merge-free \sTIreachable{} expression $e_1'$ such that $eval(e_1) =
+      eval(e_1')$. $t(e_1)$ is \sTIreachable{}, so $I(t(e_1))$. Because
+      $eval(e_1) = eval(e_1')$, we know also that $I(t(e_1'))$. Thus, $t(e_1')$
+      is \sTIreachable{} (and join free), so we can let $e' = t(e_1')$.
+
+    \item \textbf{Case 3: $e = e_1 \join e_2$.}
+      $e_1$ and $e_2$ are \sTIreachable{}, so by the inductive hypothesis,
+      there exists equivalent merge-free \sTIreachable{} expressions $e_1'$ and
+      $e_2'$. $O$ is \sTImergereducible{}, so there exists an equivalent
+      merge-free \sTIreachable{} expression $e'$.
+  \end{itemize}
+
+  Consider an arbitrary \sTIreachable{} expression $e$ and it's equivalent
+  merge-free \sTIreachable{} counterpart $e'$. $e'$ is either $s_0$ or
+  $t(e'')$.  In either case, it satisfies the invariant, so $O$ is
+  \sTIconfluent{}.
+\end{proof}
+
+Note that while merge-reducibility is a sufficient condition for
+\invariantconfluence{}, it is not necessary. The object in
+\exampleref{NotMergeReducible} is \invariantconfluent{} but not
+merge-reducible.
 
 Merge-reducibility is a sufficient condition for \invariantconfluence{}, but
 unlike with \invariantclosure{}, it is not straightforward to automatically
@@ -48,7 +116,9 @@ to determine automatically.
   then $O$ is \sTImergereducible{} (and therefore \sTIconfluent{}).
   \begin{enumerate}
     \item
-      $O$ is a join-semilattice.
+      $O$ is a join-semilattice. That is, $\join$ is associative ($(x \join y)
+      \join z = x \join (y \join z)$), commutative ($x \join y = y \join x$),
+      and idempotent ($x \join x = x$).
 
     \item
       For every $t \in T$, there exists some $s_t \in S$ such that for all $s
@@ -65,20 +135,94 @@ to determine automatically.
   \end{enumerate}
 \end{theorem}
 
-To show that $O$ is \sTImergereducible, we consider two merge-free reachable
-expressions
-\[
-  e_1 = t_1(\ldots(t_n(s_0))\ldots)
-  \quad\text{and}\quad
-  e_2 = u_1(\ldots(u_m(s_0))\ldots)
-\]
-Then, we inductively use criterion (3) with criteria (1) and (2) to show that
-\[
-  e_3 = t_1(\ldots(
-  t_n(u_1(\ldots(u_m(s_0))\ldots))
-  )\ldots)
-\]
-is reachable and evaluates to $e_1 \join e_2$.
+\newcommand{\bart}[1]{\overline{t_{#1}}}
+\newcommand{\baru}[1]{\overline{u_{#1}}}
+\newcommand{\bartu}[2]{\bart{#1}(\baru{#2}(s_0))}
+\begin{proof}
+  Let
+  \[
+    \hfill
+    e_1 = t_n(t_{n-1}(\ldots (t_1(s_0))\ldots))
+    \hfill
+  \]
+  and
+  \[
+    \hfill
+    e_2 = u_m(u_{m-1}(\ldots (u_1(s_0))\ldots))
+    \hfill
+  \]
+  be two arbitrary merge-free \sTIreachable{} expressions.
+  For ease of notation, let
+  \[
+    \hfill
+    \bart{i} = t_i(\ldots(t_1(s_0))\ldots)
+    \quad\text{and}\quad
+    \baru{j} = u_j(\ldots(u_1(s_0))\ldots)
+    \hfill
+  \]
+  We want to show that there exists some merge-free \sTIreachable{} expression
+  that is equivalent to $e_1 \join e_2$.
+  %
+  To do so, we prove by strong induction on $k \in \nats$ that if $k = i + j$
+  where $0 \leq i \leq n$ and $0 \leq j \leq m$, $\bartu{i}{j}$ is
+  \sTIreachable{} and $eval(\bartu{i}{j}) = eval(\bart{i}(s_0) \join
+  \baru{j}(s_0))$.
+  \begin{itemize}
+    \item \textbf{Case $k = 0$.}
+      $i = j = 0$, so $\bartu{0}{0} = s_0$ which is trivially \sTIreachable{}
+      and equivalent to $\bart{0}(s_0) \join \baru{0}(s_0) = s_0 \join s_0$
+      which evaluates to $s_0$ (because $\join$ is idempotent).
+
+    \item \textbf{Case $k = 1$.}
+      Without loss of generality, assume $i = 1$ and $j = 0$. Then,
+      $
+        \bartu{1}{0} = t_1(s_0)
+      $ which is \sTIreachable{} because it is a subexpression of $\bart{n}$
+      which is \sTIreachable{}. Moreover, it is equivalent to $\bart{1}(s_0)
+      \join \baru{0}(s_0) = t_1(s_0) \join s_0$ which evaluates to $s_{t_1}
+      \join s_0 \join s_0 = s_{t_1} \join s_0 = t_1(s_0)$ for some $s_{t_1} \in
+      S$.
+
+    \item \textbf{Case $k \geq 2$.}
+      If $i = 0$, then $j = k$ and $\baru{k}(s_0)$ is \sTIreachable{} because
+      it is a subexpression of $\baru{m}(s_0)$. Also, it is equivalent to
+      $\bart{0}(s_0) \join \baru{k}(s_0)$ which evaluates to $\baru{k}(s_0)$.
+      %
+      The symmetric result holds if $j = 0$.
+
+      Otherwise, $i, j > 1$. Let
+      \begin{align*}
+        e_{i-1,j-1} &= \bartu{i-1}{j-1} \\
+        e_{i,j-1} &= \bartu{i}{j-1} \\
+        e_{i-1,j} &= \bartu{i-1}{j}
+      \end{align*}
+      By the inductive hypothesis, $e_{i-1,j-1}$, $e_{i,j-1}$, and $e_{i-1,j}$
+      are all \sTIreachable{}. By condition 3 (with $s = eval(e_{i-1,j-1})$,
+      $t_1$ = $t_i$, and $t_2 = u_j$), $I(e_{i,j-1} \join e_{i-1,j})$.
+      $e_{i,j-1} \join e_{i-1,j} = t_i(e_{i-1,j}) = u_j(e_{i,j-1}) =
+      \bartu{i}{j}$, so $I(\bartu{i}{j})$. Therefore, $\bartu{i}{j}$ is
+      \sTIreachable{}.
+  \end{itemize}
+\end{proof}
+
+{\input{figures/diamond_proof_diagram.tex}}
+
+An illustration of this proof is given in \figref{DiamondProofDiagram}. We
+arrange the expressions $e_1$ and $e_2$ as the left and top edges of a square
+grid. Each point in the grid represents a state (with $s_0$ in the top left
+corner), and each edge represents the application of a transaction. A state is
+circled if we know it satisfies the invariant.
+%
+Condition (1) and (2) tell us that the order in which we apply transactions is
+immaterial. Thus, if we begin at the top left of the square and walk to any
+other point in the square, applying transactions along the way, it does not
+matter which path we take. They are all equivalent. Condition (4) tells us that
+the top-left corner satisfies the invariant. We induct to repeatedly apply
+condition (3) to ``fill in'' the square, one block at a time. In iteration $k$,
+we discover that all points with a Manhattan distance of $k$ from the top left
+corner satisfy the invariant. Ultimately, we conclude that the bottom left
+corner (i.e., $e_1 \join e_2$) satisfies the invariant and is equivalent to
+$\bartu{n}{m}$.
 
 \thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is a
 sufficient condition for \invariantconfluence{}, and \thmref{LatticeProperty}
@@ -111,7 +255,7 @@ some objects that satisfy criteria (1) -- (4) that are not
   non-empty and contains only even integers, so $I(t_1(s) \join t_2(s))$.
 \end{example}
 
-% {\input{figures/merge_reducible}}
+{\input{figures/merge_reducible}}
 
 \Invariantclosure{} is not necessary for \invariantconfluence{} because it
 fails to incorporate any notion of reachability. Criteria (1) -- (4) are also
@@ -129,3 +273,7 @@ a set with both odd and even integers. However, if we begin in an invariant
 satisfying state, we cannot reach both an odd-only and even-only set.
 Criterion (3) is able to recognize this fact and conclude that $O$ is
 \invariantconfluent{} despite it not being \invariantclosed{}.
+
+The relationship between \invariantconfluence{}, \invariantclosure{},
+merge-reducibility, and criteria (1)-(4) is illustrated in
+\figref{IclosureVsReducible}.

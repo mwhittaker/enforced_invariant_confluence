@@ -1,0 +1,81 @@
+\begin{figure*}[ht]
+  \centering
+
+  \tikzstyle{s0color}=[fill=flatred]
+  \tikzstyle{s1color}=[fill=flatgreen]
+  \tikzstyle{s2color}=[fill=flatdenim]
+  \tikzstyle{s3color}=[fill=flatorange]
+  \tikzstyle{s4color}=[fill=flatyellow]
+  \tikzstyle{s5color}=[fill=flatcyan]
+  \tikzstyle{s6color}=[fill=flatpurple]
+  \tikzstyle{s7color}=[fill=flatblue]
+  \tikzstyle{astedge}=[thick]
+  \tikzstyle{phantomstate}=[%
+    shape=circle, inner sep=2pt, draw=white, line width=1pt, fill=white]
+  \tikzstyle{state}=[%
+    shape=circle, inner sep=2pt, draw=black, line width=1pt, text opacity=1,
+    fill opacity=0.6]
+  \newcommand{\internaltext}[1]{$\boldsymbol #1$}
+
+  \begin{tikzpicture}[xscale=1.1]
+    \begin{scope}[]
+                         \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (s7) at (0, 0) {\internaltext{\join}};
+      \draw (s7)++(210:1) node[state, s3color, label={[label distance=-0.1cm] 90:$s_3$}] (s3)           {\internaltext{\join}};
+      \draw (s7)++(-30:1) node[state, s6color, label={[label distance=-0.1cm] 90:$s_6$}] (s6)           {\internaltext{\join}};
+      \draw (s3)++(240:1) node[state, s1color, label={[label distance=-0.2cm] 120:$s_1$}](s1)           {\internaltext{t}};
+      \draw (s3)++(-60:1) node[state, s2color, label={[label distance=-0.2cm] 60:$s_2$}] (s2)           {\internaltext{u}};
+      \draw (s6)++(240:1) node[state, s4color, label={[label distance=-0.2cm] 240:$s_4$}](s4)           {\internaltext{v}};
+      \draw (s6)++(-60:1) node[state, s5color, label={[label distance=-0.2cm] 60:$s_5$}] (s5)           {\internaltext{w}};
+      \draw (s1)++(-90:1) node[state, s0color]                                           (n1)           {\internaltext{s_0}};
+      \draw (s2)++(-90:1) node[state, s0color]                                           (n2)           {\internaltext{s_0}};
+      \draw (s4)++(-90:1) node[state, s0color]                                           (n4)           {\internaltext{s_0}};
+      \draw (s5)++(-90:1) node[state, s0color]                                           (n5)           {\internaltext{s_0}};
+      \draw[astedge] (s7) to (s3) to (s1) to (n1);
+      \draw[astedge] (s7) to (s3) to (s2) to (n2);
+      \draw[astedge] (s7) to (s6) to (s4) to (n4);
+      \draw[astedge] (s7) to (s6) to (s5) to (n5);
+      \coordinate (A) at (s5);
+    \end{scope}
+    \begin{scope}[xshift=125]
+      \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (s7) at (0, 0) {\internaltext{\join}};
+      \draw (s7)++(210:1) node[state, s3color, label={[label distance=-0.1cm] 90:$s_3$}] (s3)           {\internaltext{p}};
+      \draw (s7)++(-30:1) node[state, s6color, label={[label distance=-0.1cm] 90:$s_6$}] (s6)           {\internaltext{\join}};
+      \draw (s6)++(240:1) node[state, s4color, label={[label distance=-0.2cm] 240:$s_4$}](s4)           {\internaltext{v}};
+      \draw (s6)++(-60:1) node[state, s5color, label={[label distance=-0.2cm] 60:$s_5$}] (s5)           {\internaltext{w}};
+      \draw (s3)++(-90:1) node[state, s0color]                                           (n3)           {\internaltext{s_0}};
+      \draw (s4)++(-90:1) node[state, s0color]                                           (n4)           {\internaltext{s_0}};
+      \draw (s5)++(-90:1) node[state, s0color]                                           (n5)           {\internaltext{s_0}};
+      \draw[astedge] (s7) to (s3) to (n3);
+      \draw[astedge] (s7) to (s6) to (s4) to (n4);
+      \draw[astedge] (s7) to (s6) to (s5) to (n5);
+    \end{scope}
+    \begin{scope}[xshift=250]
+      \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (s7) at (0, 0) {\internaltext{\join}};
+      \draw (s7)++(210:1) node[state, s3color, label={[label distance=-0.1cm] 90:$s_3$}] (s3)           {\internaltext{p}};
+      \draw (s7)++(-30:1) node[state, s6color, label={[label distance=-0.1cm] 90:$s_6$}] (s6)           {\internaltext{q}};
+      \draw (s3)++(-90:1) node[state, s0color]                                           (n3)           {\internaltext{s_0}};
+      \draw (s6)++(-90:1) node[state, s0color]                                           (n6)           {\internaltext{s_0}};
+      \draw[astedge] (s7) to (s3) to (n3);
+      \draw[astedge] (s7) to (s6) to (n6);
+    \end{scope}
+    \begin{scope}[xshift=350]
+                         \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (s7) at (0, 0) {\internaltext{r}};
+      \draw (s7)++(-90:1) node[state, s0color]                                           (n7)           {\internaltext{s_0}};
+      \draw[astedge] (s7) to (n7);
+    \end{scope}
+
+    \draw[-latex, line width=3pt] (A) ++ (0.55, 0) to ++(1, 0);
+    \draw[-latex, line width=3pt] (A) ++ (5, 0) to ++(1, 0);
+    \draw[-latex, line width=3pt] (A) ++ (9, 0) to ++(1, 0);
+  \end{tikzpicture}
+
+  \caption{%
+    An illustration of the proof of \thmref{ReducibilityImpliesIconfluence}. We
+    begin with a reachable expression and convert it into a merge-free
+    reachable expression by repeatedly replacing the merge of two merge-free
+    reachable subexpressions with an equivalent merge-free reachable
+    expression. In this example, we first replace $t(s_0) \join u(s_0)$ with
+    $p(s_0)$. We then replace $v(s_0) \join w(s_0)$ with $q(s_0)$. Finally, we
+    replace $p(s_0) \join q(s_0)$ with $r(s_0)$.
+  }\figlabel{MergingDiagram}
+\end{figure*}
