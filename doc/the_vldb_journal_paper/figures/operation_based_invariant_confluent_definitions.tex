@@ -1,0 +1,124 @@
+\begin{figure}[ht]
+  \centering
+
+  \tikzstyle{inv}=[draw=black]
+  \tikzstyle{s0color}=[fill=flatred]
+  \tikzstyle{s1color}=[fill=flatgreen]
+  \tikzstyle{s2color}=[fill=flatdenim]
+  \tikzstyle{s3color}=[fill=flatorange]
+  \tikzstyle{s4color}=[fill=flatyellow]
+  \tikzstyle{s5color}=[fill=flatcyan]
+  \tikzstyle{s6color}=[fill=flatpurple]
+  \tikzstyle{s7color}=[fill=flatblue]
+  \tikzstyle{s8color}=[fill=flatdarkgray]
+  \tikzstyle{txnline}=[black, thick, -latex]
+  \tikzstyle{phantomstate}=[%
+    shape=circle, inner sep=1pt, draw=white, line width=1pt, fill=white]
+  \tikzstyle{state}=[%
+    shape=circle, inner sep=1pt, draw=black, line width=1pt, text opacity=1,
+    fill opacity=0.6]
+
+  \newcommand{\internaltext}[1]{$\boldsymbol #1$}
+
+  \begin{subfigure}[c]{0.4\textwidth}
+    \centering
+
+    \begin{tikzpicture}[xscale=1.5, yscale=1]
+      \node (p3) at (0.5, 3) {$p_3$};
+      \node (p2) at (0.5, 2) {$p_2$};
+      \node (p1) at (0.5, 1) {$p_1$};
+
+      \tikzstyle{pline}=[gray, opacity=0.75, thick, -latex]
+      \draw[pline] (p3) to (4.5, 3);
+      \draw[pline] (p2) to (4.5, 2);
+      \draw[pline] (p1) to (4.5, 1);
+
+      % Top line (phantom).
+      \node[phantomstate] (s03) at (1, 3) {$\phantom{s_0}$};
+      \node[phantomstate] (s13) at (2, 3) {$\phantom{s_1}$};
+      \node[phantomstate] (s23) at (3, 3) {$\phantom{s_3}$};
+      \node[phantomstate] (s33) at (4, 3) {$\phantom{s_6}$};
+
+      % Middle line (phantom).
+      \node[phantomstate] (s02) at (1, 2) {$\phantom{s_0}$};
+      \node[phantomstate] (s12) at (2, 2) {$\phantom{s_2}$};
+      \node[phantomstate] (s22) at (3, 2) {$\phantom{s_4}$};
+      \node[phantomstate] (s32) at (4, 2) {$\phantom{s_7}$};
+
+      % Bottom line (phantom).
+      \node[phantomstate] (s01) at (1, 1) {$\phantom{s_0}$};
+      \node[phantomstate] (s11) at (2, 1) {$\phantom{s_2}$};
+      \node[phantomstate] (s21) at (3, 1) {$\phantom{s_5}$};
+      \node[phantomstate] (s31) at (4, 1) {$\phantom{s_8}$};
+
+      % Send lines.
+      \tikzstyle{txntext}=[sloped, above, -latex]
+      \tikzstyle{sendline}=[opacity=0.5, gray, -latex]
+      \draw[txnline, sendline] (s03) to (s22);
+      \draw[txnline, sendline] (s03) to (s31);
+      \draw[txnline, sendline] (s02) to (s23);
+      \draw[txnline, sendline] (s02) to (s11);
+      \draw[txnline, sendline] (s11) to (s33);
+      \draw[txnline, sendline] (s11) to (s32);
+
+      % Top line.
+      \node[state, s0color] (s03) at (1, 3) {\internaltext{s_0}};
+      \node[state, s1color] (s13) at (2, 3) {\internaltext{s_1}};
+      \node[state, s3color] (s23) at (3, 3) {\internaltext{s_3}};
+      \node[state, s6color] (s33) at (4, 3) {\internaltext{s_6}};
+
+      % Middle line.
+      \node[state, s0color] (s02) at (1, 2) {\internaltext{s_0}};
+      \node[state, s2color] (s12) at (2, 2) {\internaltext{s_2}};
+      \node[state, s4color] (s22) at (3, 2) {\internaltext{s_4}};
+      \node[state, s7color] (s32) at (4, 2) {\internaltext{s_7}};
+
+      % Bottom line.
+      \node[state, s0color] (s01) at (1, 1) {\internaltext{s_0}};
+      \node[state, s2color] (s11) at (2, 1) {\internaltext{s_2}};
+      \node[state, s5color] (s21) at (3, 1) {\internaltext{s_5}};
+      \node[state, s8color] (s31) at (4, 1) {\internaltext{s_8}};
+
+      % Transaction lines.
+      \draw[txnline] (s03) to node[txntext]{$t(s_0)$} (s13);
+      \draw[txnline] (s02) to node[txntext]{$u(s_0)$} (s12);
+      \draw[txnline] (s11) to node[txntext]{$v(s_2)$} (s21);
+      \draw[txnline] (s13) to node[txntext]{$u(s_0)$} (s23);
+      \draw[txnline] (s23) to node[txntext]{$v(s_2)$} (s33);
+      \draw[txnline] (s12) to node[txntext]{$t(s_0)$} (s22);
+      \draw[txnline] (s22) to node[txntext]{$v(s_2)$} (s32);
+      \draw[txnline] (s01) to node[txntext]{$u(s_0)$} (s11);
+      \draw[txnline] (s21) to node[txntext]{$t(s_2)$} (s31);
+    \end{tikzpicture}
+
+    \caption{System Execution}\figlabel{OpSystemExecution}
+  \end{subfigure}
+
+  \begin{subfigure}[c]{0.3\textwidth}
+    \centering
+
+    \begin{tikzpicture}[xscale=0.75]
+                         \node[state, s7color, label={[label distance=-0.1cm] 90:$s_7$}] (s7) at (0, 0) {\internaltext{v}};
+      \draw (s7)++(210:1) node[state, s2color, label={[label distance=-0.1cm] 90:$s_2$}] (s2)           {\internaltext{u}};
+      \draw (s7)++(-30:1) node[state, s4color, label={[label distance=-0.1cm] 90:$s_4$}] (s4)           {\internaltext{t}};
+      \draw (s2)++(210:1) node[state, s0color]                                           (n1)           {\internaltext{s_0}};
+      \draw (s2)++(-90:1) node[state, s0color]                                           (n2)           {\internaltext{s_0}};
+      \draw (s4)++(225:1) node[state, s0color]                                           (n3)           {\internaltext{s_0}};
+      \draw (s4)++(-45:1) node[state, s2color, label={[label distance=-0.1cm] 90:$s_2$}] (s22)          {\internaltext{u}};
+      \draw (s22)++(225:1) node[state, s0color]                                          (n4)           {\internaltext{s_0}};
+      \draw (s22)++(-45:1) node[state, s0color]                                          (n5)           {\internaltext{s_0}};
+
+      \tikzstyle{astedge}=[thick]
+      \draw[astedge] (s7) to (s2) to (n1);
+      \draw[astedge] (s7) to (s2) to (n2);
+      \draw[astedge] (s7) to (s4) to (n3);
+      \draw[astedge] (s7) to (s4) to (s22) to (n4);
+      \draw[astedge] (s7) to (s4) to (s22) to (n5);
+    \end{tikzpicture}
+
+    \caption{Expression}\figlabel{OpExpression}
+  \end{subfigure}
+
+  \caption{An operation-based system execution and corresponding expression}
+  \figlabel{OpDefinitions}
+\end{figure}
