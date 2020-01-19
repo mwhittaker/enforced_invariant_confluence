@@ -220,7 +220,7 @@ matter which path we take. They are all equivalent. Condition (4) tells us that
 the top-left corner satisfies the invariant. We induct to repeatedly apply
 condition (3) to ``fill in'' the square, one block at a time. In iteration $k$,
 we discover that all points with a Manhattan distance of $k$ from the top left
-corner satisfy the invariant. Ultimately, we conclude that the bottom left
+corner satisfy the invariant. Ultimately, we conclude that the bottom right
 corner (i.e., $e_1 \join e_2$) satisfies the invariant and is equivalent to
 $\bartu{n}{m}$.
 
@@ -250,7 +250,7 @@ some objects that satisfy criteria (1) -- (4) that are not
   Here's why criterion (3) is satisfied. If $s$ is an arbitrary state that
   satisfies $I$, then it is non-empty and contains, without loss of generality,
   only even integers. If $t_1$ and $t_2$ are arbitrary transactions such that
-  $I(t_1(s))$ and $I(t_2(s))$, then $t_1(s)$ and $t_1(s)$ are also non-empty
+  $I(t_1(s))$ and $I(t_2(s))$, then $t_1(s)$ and $t_2(s)$ are also non-empty
   and contain only even integers. Thus, $t_1(s) \cup t_2(s)$ is clearly
   non-empty and contains only even integers, so $I(t_1(s) \join t_2(s))$.
 \end{example}

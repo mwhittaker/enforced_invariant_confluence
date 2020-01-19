@@ -175,9 +175,9 @@ $s_1$ and $s_2$ are both \sTIreachable{}.
 \begin{example}
   Consider the object $O = (\nats, \max)$ consisting of natural numbers merged
   by the max function. Let $I = \nats$. Let $T = \set{t_{2\times}, t_{+10}}$
-  where $t_{2\times}(x) = 2x$ and $t_{+10} = x + 10$. The states $3$ and $16$
-  are \TIcoreachable{} because both are \stireachable{s}{T}{I} from $s = 3$
-  ($16 = 2 \times 3 + 10$). The states $3$ and $5$, however, are not
+  where $t_{2\times}(x) = 2x$ and $t_{+10}(x) = x + 10$. The states $3$ and
+  $16$ are \TIcoreachable{} because both are \stireachable{s}{T}{I} from $s =
+  3$ ($16 = 2 \times 3 + 10$). The states $3$ and $5$, however, are not
   \TIcoreachable{}. The only state in which $3$ is reachable is $3$, but from
   this state, the smallest reachable number larger than $3$ is $6$.
 \end{example}
@@ -344,8 +344,8 @@ Sixth, a naive implementation of our segmented invariant confluence system
 model is \emph{not} fault tolerant. A round of global coordination requires
 that \emph{every} server be non-faulty. If even a single server fails, then
 every round of global coordination will fail to complete. Fortunately, we can
-leverage well-established means of ensuring fault tolerance without difficulty.
-For example, we can replicate every server using a state machine replication
-protocol like MultiPaxos~\cite{lamport1998part, lamport2001paxos} or
+leverage well-established means of ensuring fault tolerance. For example, we
+can replicate every server using a state machine replication protocol like
+MultiPaxos~\cite{lamport1998part, lamport2001paxos} or
 Raft~\cite{ongaro2014search}. Doing so will introduce a constant slowdown for
 each (now replicated) server, but servers remain independent and scalable.
