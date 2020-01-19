@@ -1,0 +1,132 @@
+\documentclass[12pt]{article}
+
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{natbib}
+
+\begin{document}
+\begin{center}
+  {\huge Change Log for ``Interactive Checks for Coordination Avoidance''}
+
+  Michael Whittaker, Joseph M. Hellerstein
+\end{center}
+
+Here, we describe the additions that we made to our VLDB 2019 conference
+version of ``Interactive Checks for Coordination Avoidance''.
+
+\begin{itemize}
+  \item
+    In our conference paper, we present a definition of invariant confluence
+    that is slightly different than the original definition from Bailis et
+    al.~\cite{bailis2014coordination}, but we do not comment on the difference.
+    We added a  subsection (Section 2.3) clarifying that the difference in
+    definitions is superficial. We describe Bailis' original definition using
+    our formalism and prove that the two definitions are equivalent.
+
+  \item
+    We expanded the correctness proof of our interactive decision procedure. A
+    key step in understanding the correctness of our interactive invariant
+    confluence decision procedure---namely that $I$-reachable and
+    $(I-NR)$-reachable states were equal---was omitted from our conference
+    paper. We added a formal proof of this fact as well as a few other minor
+    elaborations.
+
+  \item
+    One of the core contributions of our paper is an interactive invariant
+    confluence decision procedure. Here, ``interactive'' means that the
+    decision procedure relies on human input to guide the decision procedure.
+    To err is human. It's possible for a person to provide the decision
+    procedure with incorrect information. We added a section (Section 4.3)
+    describing how to mitigate these errors.
+
+  \item
+    We added a formal proof that criteria 1 through 4 are sufficient for
+    invariant confluence. The idea behind the proof is straightforward but the
+    details are tedious. To help readers see the forest through the trees, we
+    also added an illustration of the key idea of the proof.
+
+  \item
+    Our conference paper presents formal definitions of distributed objects and
+    invariant confluence. The definitions revolve around servers gossiping
+    state to one another and merging the states together using a binary merge
+    operator. This approach is called a ``state-based'' approach. We added a
+    section (Section 7) outlining a dual ``operation-based'' approach in which
+    transactions, rather than states, are gossiped. This duality between
+    state-based and operation-based definitions is well established in the CRDT
+    literature.
+
+  \item
+    We clarified that the merge operator of a distributed object does not have
+    to satisfy any special mathematical properties like associativity,
+    commutativity, or idempotence. Our results are more general and do not rely
+    on any of these assumptions.
+
+  \item
+    We added a formal proof that invariant closure is sufficient for invariant
+    confluence.
+
+  \item
+    We added a formal proof of our key result equating invariant closure and
+    invariant confluence.
+
+  \item
+    In our conference paper, we asserted that checking for invariant closure is
+    undecidable in general. We added a brief example showing \emph{why}
+    invariant closure is undecidable, by reducing it to the Halting Problem.
+
+  \item
+    We added examples of merge-reducible and non-merge-reducible objects to
+    make it easier for the reader to understand the definition of
+    merge-reducibility.
+
+  \item
+    We added a formal proof that merge-reducibility is a sufficient condition
+    for invariant-confluence. Similarly, we added a counterexample showing that
+    merge-reducibility is not a necessary condition for invariant-confluence.
+
+  \item
+    In our conference paper, we provide an example of a distributed object that
+    satisfies criteria 1 through 4 outlined in Theorem 4 but is not invariant
+    closed. In the example, we asserted that criteria 1 through 4 are satisfied
+    but did not elaborate on why. We added a brief explanation making it clear
+    why the criteria are met.
+
+  \item
+    We added a Euler diagram illustrating the relationship between invariant
+    confluence, invariant closure, merge reducibility, and criteria 1 through
+    4.
+
+  \item
+    We added an example of co-reachable and co-unreachable states to help the
+    reader understand the definition of co-reachability.
+
+  \item
+    We added a paragraph explaining the relationship between segmented
+    invariant confluence and a distributed locking approach to maintaining
+    invariants (that can be found in related works).
+
+  \item
+    We added a paragraph explaining a couple of optimizations that can be made
+    to our segmented invariant confluence system model to reduce the frequency
+    of global coordination.
+
+  \item
+    We added a paragraph explaining how a segmented invariant confluence
+    decision procedure can leverage our merge reducibility results in addition
+    to our results on invariant closure.
+
+  \item
+    We clarified the fault tolerance limitations of segmented invariant
+    confluence. A naive implementation of our segmented invariant confluence
+    decision procedure does not guarantee liveness, but there are
+    straightforward techniques we can leverage to introduce liveness. We added
+    an explanation of this to the paper.
+
+  \item
+    We added a ``Program Analysis in Database Systems'' paragraph to our
+    related works section. In it, we describe other efforts to use program
+    analysis to improve the performance of database systems.
+\end{itemize}
+
+\bibliographystyle{abbrv}
+\bibliography{references}
+\end{document}
