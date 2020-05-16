@@ -1,0 +1,67 @@
+\newcommand{\join}{\sqcup}
+
+% Text commands.
+\newcommand{\invariantconfluence}{invariant confluence}
+\newcommand{\invariantconfluent}{invariant confluent}
+\newcommand{\Invariantconfluence}{Invariant confluence}
+\newcommand{\Invariantconfluent}{Invariant confluent}
+
+\newcommand{\invariantclosure}{invariant closure}
+\newcommand{\invariantclosed}{invariant closed}
+\newcommand{\Invariantclosure}{Invariant closure}
+\newcommand{\Invariantclosed}{Invariant closed}
+
+\newcommand{\mergereducible}{merge reducible}
+\newcommand{\mergereduction}{merge reduction}
+\newcommand{\mergereducibility}{merge reducibility}
+\newcommand{\Mergereducible}{Merge reducible}
+\newcommand{\Mergereduction}{Merge reduction}
+\newcommand{\Mergereducibility}{Merge reducibility}
+
+% Math commands.
+\newcommand{\sticonfluence}[3]{$(#1, #2, #3)$-confluence}
+\newcommand{\sticonfluent}[3]{$(#1, #2, #3)$-confluent}
+\newcommand{\sTIconfluence}{\sticonfluence{s_0}{T}{I}}
+\newcommand{\sTIconfluent}{\sticonfluent{s_0}{T}{I}}
+
+\newcommand{\stipconfluence}[4]{$(#1, #2, #3, #4)$-confluence}
+\newcommand{\stipconfluent}[4]{$(#1, #2, #3, #4)$-confluent}
+\newcommand{\sTISconfluence}{\stipconfluence{s_0}{T}{I}{\Sigma}}
+\newcommand{\sTISconfluent}{\stipconfluent{s_0}{T}{I}{\Sigma}}
+
+\newcommand{\stireachable}[3]{$(#1, #2, #3)$-reachable}
+\newcommand{\sTIreachable}{\stireachable{s_0}{T}{I}}
+\newcommand{\stiunreachable}[3]{$(#1, #2, #3)$-unreachable}
+\newcommand{\sTIunreachable}{\stiunreachable{s_0}{T}{I}}
+\newcommand{\ticoreachable}[2]{$(#1, #2)$-coreachable}
+\newcommand{\TIcoreachable}{\ticoreachable{T}{I}}
+\newcommand{\ticounreachable}[2]{$(#1, #2)$-counreachable}
+\newcommand{\TIcounreachable}{\ticounreachable{T}{I}}
+
+\newcommand{\stireachablepredicate}[4]{\text{reachable}_{(#1, #2, #3)}(#4)}
+\newcommand{\sTIreachablepredicate}[1]{\stireachablepredicate{s_0}{T}{I}{#1}}
+\newcommand{\stiunreachablepredicate}[4]{unreachable_{(#1, #2, #3)}(#4)}
+\newcommand{\sTIunreachablepredicate}[1]{\stiunreachablepredicate{s_0}{T}{I}{#1}}
+\newcommand{\ticoreachablepredicate}[3]{coreachable_{(#1, #2)}(#3)}
+\newcommand{\TIcoreachablepredicate}[1]{\ticoreachablepredicate{T}{I}{#1}}
+\newcommand{\ticounreachablepredicate}[3]{\text{counreachable}_{(#1, #2)}(#3)}
+\newcommand{\TIcounreachablepredicate}[1]{\ticounreachablepredicate{T}{I}{#1}}
+
+\newcommand{\iclosed}[1]{$#1$-closed}
+\newcommand{\Iclosed}{\iclosed{I}}
+\newcommand{\iclosure}[1]{$#1$ closure}
+\newcommand{\Iclosure}{\iclosure{I}}
+
+\newcommand{\stimergereducible}[3]{$(#1, #2, #3)$-merge reducible}
+\newcommand{\stimergereduction}[3]{$(#1, #2, #3)$-merge reduction}
+\newcommand{\stimergereducibility}[3]{$(#1, #2, #3)$-merge reducibility}
+\newcommand{\sTImergereducible}{\stimergereducible{s_0}{T}{I}}
+\newcommand{\sTImergereduction}{\stimergereduction{s_0}{T}{I}}
+\newcommand{\sTImergereducibility}{\stimergereducibility{s_0}{T}{I}}
+
+% Note-related commands.
+\newcounter{numnotes}
+\newcommand{\note}[3]{
+  \stepcounter{numnotes}\textcolor{#1}{#2: #3}{}
+}
+\newcommand{\jmh}[1]{\note{red}{jmh}{#1}}

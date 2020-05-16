@@ -1,0 +1,82 @@
+\tikzstyle{point}=[shape=circle, fill=flatgray, inner sep=1.2pt, draw=black]
+\tikzstyle{region}=[draw=none]
+\tikzstyle{region1}=[region, fill=flatred!50]
+\tikzstyle{region2}=[region, fill=flatgreen!50]
+\tikzstyle{region3}=[region, fill=flatblue!50]
+\tikzstyle{region4}=[region, fill=flatpurple!50]
+
+\newcommand{\pointgrid}[4]{{
+  \newcommand{\argxmin}{#1}
+  \newcommand{\argxmax}{#2}
+  \newcommand{\argymin}{#3}
+  \newcommand{\argymax}{#4}
+
+  \draw[] (\argxmin, 0) to (\argxmax, 0);
+  \draw[] (0, \argymin) to (0, \argymax);
+  \foreach \x in {\argxmin, ..., \argxmax} {
+    \foreach \y in {\argymin, ..., \argymax} {
+      \node[point] (\x-\y) at (\x, \y) {};
+    }
+  }
+}}
+
+\begin{figure}[ht]
+  \centering
+
+  \newcommand{\subfigwidth}{0.24\columnwidth}
+  \newcommand{\subfighspace}{0.3cm}
+  \newcommand{\tikzhspace}{0.4cm}
+  \newcommand{\tikzscale}{0.25}
+  \newcommand{\xmin}{-2}
+  \newcommand{\xmax}{2}
+  \newcommand{\ymin}{-2}
+  \newcommand{\ymax}{2}
+
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region1] (\xmin.5, \ymax.5) rectangle (-0.5, 0.5);
+      \draw (-0.5, 0.5) to (\xmin.5, 0.5);
+      \draw (-0.5, 0.5) to (-0.5, \ymax.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{$(I_1, T_1)$.}
+    \figlabel{SegZ21}
+  \end{subfigure}
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region2] (-0.5, 0.5) rectangle (\xmax.5, \ymin.5);
+      \draw (-0.5, 0.5) to (\xmax.5, 0.5);
+      \draw (-0.5, 0.5) to (-0.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{$(I_2, T_2)$.}
+    \figlabel{SegZ22}
+  \end{subfigure}
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region3] (-0.5, \ymax.5) rectangle (0.5, \ymin.5);
+      \draw (-0.5, \ymax.5) to (-0.5, \ymin.5);
+      \draw (0.5, \ymax.5) to (0.5, \ymin.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{$(I_3, T_3)$.}
+    \figlabel{SegZ23}
+  \end{subfigure}
+  \begin{subfigure}[t]{\subfigwidth}
+    \centering
+    \begin{tikzpicture}[scale=\tikzscale]
+      \draw[region4] (\xmin.5, 0.5) rectangle (\xmax.5, -0.5);
+      \draw (\xmax.5, -0.5) to (\xmin.5, -0.5);
+      \draw (\xmax.5, 0.5) to (\xmin.5, 0.5);
+      \pointgrid{\xmin}{\xmax}{\ymin}{\ymax}
+    \end{tikzpicture}
+    \caption{$(I_4, T_4)$.}
+    \figlabel{SegZ24}
+  \end{subfigure}
+
+  \caption{An illustration of \exampleref{SegmentedZ2}}
+  \figlabel{SegmentedZ2}
+\end{figure}

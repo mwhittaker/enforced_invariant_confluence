@@ -1,0 +1,91 @@
+\section{Invariant Closure}\seclabel{InvariantClosure}
+Our ultimate goal is to write a program that can automatically decide whether a
+given distributed object $O$ is \sTIconfluent{}. Such a program has to
+automatically prove or disprove that every reachable state satisfies the
+invariant. However, automatically reasoning about the possibly infinite set of
+reachable states is challenging, especially because transactions and merge
+functions can be complex and can be interleaved arbitrarily in an execution.
+Due to this complexity, existing systems that aim to automatically decide
+\invariantconfluence{} instead focus on deciding a sufficient condition for
+\invariantconfluence{}---dubbed \defword{\invariantclosure{}}---that is simpler
+to reason about~\cite{li2012making, li2014automating}. In this section, we
+define \invariantclosure{} and study why the condition is sufficient but not
+necessary.  Armed with this understanding, we present conditions under which it
+is both sufficient and necessary.
+
+We say an object $O = (S, \join)$ is \defword{\invariantclosed{}} with respect
+to an invariant $I$, abbreviated \defword{\Iclosed{}}, if invariant satisfying
+states are closed under merge. That is, for every state $s_1, s_2 \in S$, if
+$I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
+
+\begin{theorem}\thmlabel{IclosureImpliesIconfluence}
+  Given an object $O = (S, \join)$, a start state $s_0 \in S$, a set of
+  transactions $T$, and an invariant $I$, if $I(s_0)$ and if $O$ is \Iclosed{},
+  then $O$ is \sTIconfluent{}.
+\end{theorem}
+
+\thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is
+sufficient for \invariantconfluence{}. Intuitively, recall that our system model ensures
+that transaction execution preserves the invariant, so if merging states also
+preserves the invariant and if our start state satisfies the invariant, then
+inductively it is impossible for us to reach a state that doesn't satisfy the
+invariant.
+
+This is good news because checking if an object is \invariantclosed{} is more
+straightforward than checking if it is \invariantconfluent{}. Existing systems
+typically use an SMT solver like Z3 to check if an object is
+\invariantclosed{}~\cite{de2008z3, balegas2015putting, gotsman2016cause}. If it
+is, then by \thmref{IclosureImpliesIconfluence}, it is \invariantconfluent{}.
+Unfortunately, \invariantclosure{} is \emph{not} necessary for
+\invariantconfluence{}, so if an object is \emph{not} \invariantclosed{}, these
+systems cannot conclude that the object is \emph{not} \invariantconfluent{}.
+The reason why \invariantclosure{} is not necessary for \invariantconfluence{}
+is best explained through an example.
+
+{\input{figures/z2}}
+
+\begin{example}\examplelabel{Z2}
+  Let $O = (\ints \times \ints, \join)$ consist of pairs $(x, y)$ of integers
+  where $(x_1, y_1) \join (x_2, y_2) = (\max(x_1, x_2), \max(y_1, y_2))$. Our
+  start state $s_0 \in \ints \times \ints$ is the point $(0, 0)$. Our set $T$
+  of transactions consists of two transactions: $t_{x+1}((x, y)) = (x + 1, y)$
+  which increments $x$ and $t_{y-1}((x, y)) = (x, y - 1)$ which decrements $y$.
+  Our invariant $I = \setst{(x, y) \in \ints \times \ints}{xy \leq 0}$ consists
+  of all points $(x, y)$ where the product of $x$ and $y$ is non-positive.
+
+  The invariant and the set of reachable states are illustrated in \figref{Z2}
+  in which we draw each state $(x, y)$ as a point in space. The invariant
+  consists of the second and fourth quadrant, while the reachable states consist only
+  of the fourth quadrant. From this, it is immediate that the reachable states
+  are a subset of the invariant, so $O$ is \invariantconfluent{}. However,
+  letting $s_1 = (-1, 1)$ and $s_2 = (1, -1)$, we see that $O$ is not
+  \invariantclosed{}. $I(s_1)$ and $I(s_2)$, but letting $s_3 = s_1 \join s_2 =
+  (1, 1)$, we see $\lnot I(s_3)$.
+\end{example}
+
+In \exampleref{Z2}, $s_1$ and $s_2$ witness the fact that $O$ is not
+\invariantclosed{}, but $s_1$ is not reachable. This is not particular to
+\exampleref{Z2}. In fact, it is fundamentally the reason why
+\invariantclosure{} is not equivalent to \invariantconfluence{}.
+\Invariantconfluence{} is, at its core, a property of reachable states, but
+\invariantclosure{} is completely ignorant of reachability. As a result,
+invariant-satisfying yet unreachable states like $s_1$ are the key hurdle
+preventing \invariantclosure{} from being equivalent to \invariantconfluence{}.
+This is formalized by \thmref{IclosureEquivalentIconfluence}.
+
+\begin{theorem}\thmlabel{IclosureEquivalentIconfluence}
+  Consider an object $O = (S, \join)$, a start state $s_0 \in S$, a set of
+  transactions $T$, and an invariant $I$. If the invariant is a subset of the
+  reachable states (i.e. $I \subseteq \setst{s \in
+  S}{\sTIreachablepredicate{s}}$), then
+  \[
+    (\text{$I(s_0)$ and $O$ is \Iclosed{}}) \iff \text{$O$ is \sTIconfluent{}}
+  \]
+\end{theorem}
+
+The forward direction of \thmref{IclosureEquivalentIconfluence} follows
+immediately from \thmref{IclosureImpliesIconfluence}. The backward direction
+holds because any two invariant satisfying states $s_1$ and $s_2$ must be
+reachable (by assumption), so their join $s_1 \join s_2$ is also reachable.
+And because $O$ is \sTIconfluent{}, all reachable points, including $s_1
+\join s_2$, satisfy the invariant.
