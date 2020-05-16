@@ -47,7 +47,7 @@
 %%%
 %
 %%% Copyright Space:
-%%% This style automatically reserves 1" blank space at the bottom of page 1/column 1.  
+%%% This style automatically reserves 1" blank space at the bottom of page 1/column 1.
 %%%
 %%% WARNING:
 %%% Some dvi-ps converters heuristically allow chars to drift from their
@@ -254,7 +254,7 @@
 \newfont{\secfnt}{ptmb8t at 12pt}
 \newfont{\secit}{ptmbi8t at 12pt}    %13 Jan 00 gkmt
 \newfont{\subsecfnt}{ptmri8t at 11pt}
-\newfont{\subsecit}{ptmbi8t at 11pt}  % 
+\newfont{\subsecit}{ptmbi8t at 11pt}  %
 \newfont{\ttlfnt}{phvb8t at 18pt}
 \newfont{\ttlit}{phvbo8t at 18pt}    % GM 2/4/2000
 \newfont{\subttlfnt}{phvr8t at 14pt}
@@ -443,7 +443,7 @@
   \hrule width .5\columnwidth   % (was .4) updated Gerry March 20 2007
   \kern 2.6\p@}                 % The \hrule has default height of .4pt % (was .4) updated Gerry March 20 2007
 % ------
-\long\def\@makefntext#1{\noindent 
+\long\def\@makefntext#1{\noindent
 %\hbox to .5em{\hss$^{\@thefnmark}$}#1}   % original
 \hbox to .5em{\hss\textsuperscript{\@thefnmark}}#1}  % C. Clifton / GM Oct. 2nd. 2002
 % -------
@@ -731,7 +731,7 @@
 
 % -- Classification needs to be a bit smart due to optionals - Gerry/Georgia November 2nd. 1999
 %\newcount\catcount           % Gerry March 2008 - not needed in RH/CACM
-%\global\catcount=1   
+%\global\catcount=1
 
 %\def\category#1#2#3{%        % Gerry March 2008 - not needed in RH/CACM
 %\ifnum\catcount=1
@@ -767,7 +767,9 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-\begin{picture}(20,3) %Space for copyright notice  % was 20,6 % Gerry March 2008
+% Original.
+% \begin{picture}(20,3) %Space for copyright notice  % was 20,6 % Gerry March 2008
+\begin{picture}(20,5) %Space for copyright notice  % was 20,6 % Gerry March 2008
 \put(0,-0.95){\crnotice{\@toappear}}
 \end{picture}
 \end{center}
@@ -1203,11 +1205,11 @@
 \newdimen\bibindent
 \setcounter{enumi}{1}
 \bibindent=0em
-\def\thebibliography#1{% 
+\def\thebibliography#1{%
 %\ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi   % Gerry March 2008 - unrestricted authors for RH/CACM
      \section[References]{%    <=== OPTIONAL ARGUMENT ADDED HERE
         {References} % was uppercased but this affects pdf bookmarks (SP/GM October 2004)
-          {\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing) 
+          {\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing)
          \@mkboth{{\refname}}{{\refname}}%
      }%
      \list{[\arabic{enumi}]}{%
@@ -1346,7 +1348,9 @@
 \newtoks\copyrightetc
 \global\copyrightetc{Copyright \the\copyrtyr\ ACM \the\acmcopyr\ ...\$5.00}
 \toappear{\the\boilerplate\par
-{\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
+% Original:
+% {\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
+{\confname{\the\conf}} \the\confinfo\par \textcopyright VLDB Endowment 2018. This is a minor revision of the paper entitled ``Interactive Checks for Coordination Avoidance'', published in PVLDB, Vol. 12, No. 1, ISSN 2150-8097. DOI: https://doi.org/10.14778/3275536.3275538}
 %
 %
 % The following section (i.e. 3 .sty inclusions) was added in January 2008 so as to fix the problems that many
@@ -1354,11 +1358,11 @@
 % font. Conversely the letter-character font would be correct but, e.g. a 'bar' would appear superimposed on the
 % character instead of, say, an unlaut/diaresis. Sometimes the letter-character would NOT appear at all.
 % Using [T1]{fontenc} outright was not an option as this caused 99% of the authors to 'produce' a Type-3 (bitmapped)
-% PDF file - useless for production. 
+% PDF file - useless for production.
 %
-% For proper (font) accenting we NEED these packages to be part of the .cls file i.e. 'ae', 'aecompl' and 'aeguil' 
+% For proper (font) accenting we NEED these packages to be part of the .cls file i.e. 'ae', 'aecompl' and 'aeguil'
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%% This is file `ae.sty' 
+%% This is file `ae.sty'
 \def\fileversion{1.3}
 \def\filedate{2001/02/12}
 \NeedsTeXFormat{LaTeX2e}
@@ -1379,7 +1383,7 @@
     \renewcommand{\ttdefault}{aett}
 \fi
 \endinput
-%% 
+%%
 %% End of file `ae.sty'.
 %
 %
@@ -1388,7 +1392,7 @@
 \NeedsTeXFormat{LaTeX2e}
 %\ProvidesPackage{aecompl}[\filedate\space\fileversion\space   % GM
 %T1 Complements for AE fonts (D. Roegel)]                      % GM -- keeping the log file clean(er)
- 
+
 \def\@ae@compl#1{{\fontencoding{T1}\fontfamily{cmr}\selectfont\symbol{#1}}}
 \def\guillemotleft{\@ae@compl{19}}
 \def\guillemotright{\@ae@compl{20}}
@@ -1408,18 +1412,18 @@
 \endinput
 %
 %
-%% This is file `aeguill.sty' 
+%% This is file `aeguill.sty'
 % This file gives french guillemets (and not guillemots!)
-% built with the Polish CMR fonts (default), WNCYR fonts, the LASY fonts 
-% or with the EC fonts. 
+% built with the Polish CMR fonts (default), WNCYR fonts, the LASY fonts
+% or with the EC fonts.
 % This is useful in conjunction with the ae package
 % (this package loads the ae package in case it has not been loaded)
 %  and with or without the french(le) package.
 %
 % In order to get the guillemets, it is necessary to either type
 % \guillemotleft and \guillemotright, or to use an 8 bit encoding
-% (such as ISO-Latin1) which selects these two commands, 
-% or, if you use the french package (but not the frenchle package), 
+% (such as ISO-Latin1) which selects these two commands,
+% or, if you use the french package (but not the frenchle package),
 % to type << or >>.
 %
 % By default, you get the Polish CMR guillemets; if this package is loaded
@@ -1433,7 +1437,7 @@
 % and these guillemets are very close in shape to the EC guillemets.
 % There are no free Type 1 versions of the EC fonts.
 %
-% Support for Polish CMR guillemets was kindly provided by 
+% Support for Polish CMR guillemets was kindly provided by
 % Rolf Niepraschk <niepraschk@ptb.de> in version 0.99 (2000/05/22).
 % Bernd Raichle provided extensive simplifications to the code
 % for version 1.00.
@@ -1490,12 +1494,12 @@
   \def\selectguillfont{\fontencoding{T1}\fontfamily{#1}\selectfont}%
   \def\@oguills{{\selectguillfont\symbol{19}}}%
   \def\@fguills{{\selectguillfont\symbol{20}}}%
-  } 
+  }
 
 \newcommand{\aeguills}{%
   \ae@guills
   % We redefine \guillemotleft and \guillemotright
-  % in order to catch them when they are used 
+  % in order to catch them when they are used
   % with \DeclareInputText (in latin1.def for instance)
   % We use \auxWARNINGi as a safe indicator that french.sty is used.
   \gdef\guillemotleft{\ifx\auxWARNINGi\undefined
