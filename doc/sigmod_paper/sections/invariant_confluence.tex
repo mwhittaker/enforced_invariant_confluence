@@ -32,12 +32,12 @@ and $\lnot I(s)$ to denote that $s$ does not satisfy the invariant (i.e. $s
   non-negative.
 \end{example}
 
-Note that by modelling a transaction $t$ as a function $S \to S$, we focus
-exclusively on the effects that a transaction has on the object (i.e.\
-``writes'' to the object). Transactions are also free to read the value of the
-object, but these reads are not captured by our model because, as we'll see,
-they do not affect \invariantconfluence{}. For example, we could model any
-read-only transaction as a function $t$ where $t(s) = s$ for every $s \in S$.
+% Note that by modelling a transaction $t$ as a function $S \to S$, we focus
+% exclusively on the effects that a transaction has on the object (i.e.\
+% ``writes'' to the object). Transactions are also free to read the value of the
+% object, but these reads are not captured by our model because, as we'll see,
+% they do not affect \invariantconfluence{}. For example, we could model any
+% read-only transaction as a function $t$ where $t(s) = s$ for every $s \in S$.
 
 In our system model, a distributed object $O$ is replicated across a set $p_1,
 \ldots, p_n$ of $n$ servers. Each server $p_i$ manages a replica $s_i \in S$ of
@@ -54,11 +54,12 @@ Otherwise, $p_i$ aborts the transaction and reverts to state $s_i$.
 Second, a server $p_i$ can send its state $s_i$ to another server $p_j$ with
 state $s_j$ causing $p_j$ to transition from state $s_j$  to state $s_i \join
 s_j$. Servers periodically merge states with one another in order to keep their
-states loosely synchronized\footnote{%
-  Notably, if $O$ is a CRDT---i.e. $O$ is a semilattice and every transaction
-  $t \in T$ is inflationary---then this periodic merging ensures that $O$ is
-  strongly eventually consistent~\cite{shapiro2011conflict}.
-}.
+states loosely synchronized.
+% \footnote{%
+%   Notably, if $O$ is a CRDT---i.e. $O$ is a semilattice and every transaction
+%   $t \in T$ is inflationary---then this periodic merging ensures that $O$ is
+%   strongly eventually consistent~\cite{shapiro2011conflict}.
+% }.
 Note that unlike with transactions, servers \emph{cannot} abort a merge; server
 $p_j$ must transition from $s_j$ to $s_i \join s_j$ whether or not $s_i \join
 s_j$ satisfies the invariant.

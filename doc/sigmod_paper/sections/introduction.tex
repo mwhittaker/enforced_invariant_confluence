@@ -76,10 +76,7 @@ allowing us to reduce the problem of determining \invariantconfluence{} to that
 of determining \invariantclosure{}.
 %
 Then, we use these conditions to design a general-purpose interactive
-\invariantconfluence{} decision procedure and a new sufficient condition for
-\invariantconfluence{}, dubbed \emph{\mergereducibility}. \Mergereducibility{}
-covers some cases that are not covered by \invariantclosure{}, and it can be
-checked automatically.
+\invariantconfluence{} decision procedure.
 
 % Then, we use these conditions to design a general-purpose interactive
 % \invariantconfluence{} decision procedure. Users iteratively interact with the
@@ -109,34 +106,33 @@ require more coordination, and vice-versa.
 
 Finally, we present Lucy: an implementation of our decision procedures and a
 system for replicating \invariantconfluent{} and segmented
-\invariantconfluent{} objects. Using Lucy, we find that our decision
-procedures can efficiently handle a wide range of common workloads. For
-example, in \secref{Evaluation}, we apply Lucy to foreign key constraints,
-escrow transactions, an auction application, and the TPC-C benchmark. Lucy
-processes these workloads in less than half a second, and no workload requires
-more than 66 lines of code to specify. Moreover, we find that segmented
-\invariantconfluent{} replication can achieve 10x to 100x more throughput than
-linearizable replication for low-coordination workloads.
+\invariantconfluent{} objects. Using Lucy, we find that our decision procedures
+can efficiently handle a wide range of common workloads.  For example, in
+\secref{Evaluation}, we apply Lucy to foreign key constraints and escrow
+transactions. Lucy processes these workloads in less than half a second, and
+neither workload requires more than 66 lines of code to specify. Moreover, we
+find that segmented \invariantconfluent{} replication can achieve 10x to 100x
+more throughput than linearizable replication for low-coordination workloads.
 
-In closing, here is an outline of the paper and of our contributions:
-%
-We propose a novel expression-oriented definition of \invariantconfluence{}
-that is both formal and simple (\secref{InvariantConfluence}).
-%
-We develop an understanding of why \invariantclosure{} is not necessary for
-\invariantconfluence{} and use this understanding to develop conditions under
-which it is both necessary and sufficient (\secref{InvariantClosure}).
-%
-We exploit these conditions to design a general-purpose interactive decision
-procedure for \invariantconfluence{} (\secref{InteractiveDecisionProcedure}).
-%
-We again exploit these conditions to design a novel non-trivial sufficient
-condition for \invariantconfluence{}, called \mergereducibility.
-%
-We present segmented \invariantconfluence{}: a generalization of
-\invariantconfluence{} that uses a small amount of coordination to maintain
-invariants for replicated objects that are otherwise not \invariantconfluent{}
-(\secref{SegmentedInvariantConfluence}).
-%
-We evaluate our methods using a prototype implementation called Lucy
-(\secref{Evaluation}).
+% In closing, here is an outline of the paper and of our contributions:
+% %
+% We propose a novel expression-oriented definition of \invariantconfluence{}
+% that is both formal and simple (\secref{InvariantConfluence}).
+% %
+% We develop an understanding of why \invariantclosure{} is not necessary for
+% \invariantconfluence{} and use this understanding to develop conditions under
+% which it is both necessary and sufficient (\secref{InvariantClosure}).
+% %
+% We exploit these conditions to design a general-purpose interactive decision
+% procedure for \invariantconfluence{} (\secref{InteractiveDecisionProcedure}).
+% %
+% We again exploit these conditions to design a novel non-trivial sufficient
+% condition for \invariantconfluence{}, called \mergereducibility.
+% %
+% We present segmented \invariantconfluence{}: a generalization of
+% \invariantconfluence{} that uses a small amount of coordination to maintain
+% invariants for replicated objects that are otherwise not \invariantconfluent{}
+% (\secref{SegmentedInvariantConfluence}).
+% %
+% We evaluate our methods using a prototype implementation called Lucy
+% (\secref{Evaluation}).
