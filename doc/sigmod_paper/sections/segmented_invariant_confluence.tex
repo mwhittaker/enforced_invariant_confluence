@@ -7,10 +7,10 @@ object's invariant. But what if the object is \emph{not} \invariantconfluent{}?
 In this section, we present a generalization of \invariantconfluence{} called
 \defword{segmented \invariantconfluence{}} that can be used to maintain the
 invariants of non-\invariantconfluent{} objects, requiring only a small amount
-of coordination. In \secref{Evaluation}, we see that replicating a
-non-\invariantconfluent{} object with segmented \invariantconfluence{} can
-achieve between 10x and 100x more throughput than linearizable replication for
-certain workloads.
+of coordination.
+% In \secref{Evaluation}, we see that replicating a non-\invariantconfluent{}
+% object with segmented \invariantconfluence{} can achieve between 10x and 100x
+% more throughput than linearizable replication for certain workloads.
 
 The main idea behind segmented \invariantconfluence{} is to segment the state
 space into a number of segments and restrict the set of allowable transactions
@@ -181,15 +181,15 @@ $s_1$ and $s_2$ are both \sTIreachable{}.
   \]
 \end{theorem}
 
-% The proof of the forward direction is exactly the same as the proof of
-% \thmref{IclosureImpliesIconfluence}. Transactions always maintain the
-% invariant, so if merge does as well, then every reachable state must satisfy
-% the invariant.
-% %
-% For the reverse direction, consider two arbitrary states $s_1, s_2 \in I$.
-% The two points are \TIcoreachable{}, so there exists some state $s_0$ from
-% which they can be reached. $O$ is \sTIconfluent{} and $s_1 \join s_2$ is
-% \sTIreachable{}, so it satisfies the invariant.
+The proof of the forward direction is exactly the same as the proof of
+\thmref{IclosureImpliesIconfluence}. Transactions always maintain the
+invariant, so if merge does as well, then every reachable state must satisfy
+the invariant.
+%
+For the reverse direction, consider two arbitrary states $s_1, s_2 \in I$.
+The two points are \TIcoreachable{}, so there exists some state $s_0$ from
+which they can be reached. $O$ is \sTIconfluent{} and $s_1 \join s_2$ is
+\sTIreachable{}, so it satisfies the invariant.
 
 Using \thmref{ExtendedIclosureEquivalentIconfluence}, we develop
 \algoref{ArbitraryStartInteractiveDecisionProcedure}: a natural generalization
@@ -243,33 +243,35 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
   \end{algorithmic}
 \end{algorithm}
 
-% \begin{example}\examplelabel{CounreachableExample}
-%   Let $O = (\ints^3 \times \ints^3, \join)$ be an object that separately keeps positive and negative integer counts (dubbed a
-%   PN-Counter~\cite{shapiro2011comprehensive}), replicated on three machines.
-%   Every state $s = $ $(p_1, p_2, p_3),$ $(n_1, n_2, n_3)$ represents the
-%   integer $(p_1 + p_2 + p_3) - (n_1 + n_2 + n_3)$. To increment or decrement
-%   the counter, the $i$th server increments $p_i$ or $n_i$ respectively, and
-%   $\join$ computes an element-wise maximum. Our start state $s_0 = (0, 0, 0),
-%   (0, 0, 0)$; our set $T$ of transactions consists of increment and decrement;
-%   and our invariant $I$ is that the value of $s$ is non-negative.
-%
-%   Applying \algoref{InteractiveDecisionProcedure}, \IsIclosed{} returns false
-%   with the states $s_1 = (1, 0, 0), (0, 1, 0)$ and $s_2 = (1, 0, 0), (0, 0,
-%   1)$. Both are reachable, so $O$ is not \sTIconfluent{} and
-%   \algoref{InteractiveDecisionProcedure} returns false.  The culprit is
-%   concurrent decrements, which we can forbid in a simple one-segment
-%   segmentation $\Sigma = (I, T^+)$ where $T^+$ consists only of increment
-%   transactions. Applying, \algoref{ArbitraryStartInteractiveDecisionProcedure},
-%   \IsIclosed{} again returns false with the same states $s_1$ and $s_2$. This time,
-%   however, the user recognizes that the two states are not
-%   \ticoreachable{T^+}{I} (all modifications of $(n_1, n_2, n_3)$ require global
-%   coordination, so it is impossible for $s_1$ and $s_2$ to differ on these
-%   values).
-%   The user refines $NR$ with the observation that two
-%   states are coreachable if and only if they have the same values of $n_1, n_2,
-%   n_3$. After this, \IsIclosed{} and
-%   \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.
-% \end{example}
+\begin{example}\examplelabel{CounreachableExample}
+  Let $O = (\ints^3 \times \ints^3, \join)$ be an object that separately keeps
+  positive and negative integer counts (dubbed a
+  PN-Counter~\cite{shapiro2011comprehensive}), replicated on three machines.
+  Every state $s = $ $(p_1, p_2, p_3),$ $(n_1, n_2, n_3)$ represents the
+  integer $(p_1 + p_2 + p_3) - (n_1 + n_2 + n_3)$. To increment or decrement
+  the counter, the $i$th server increments $p_i$ or $n_i$ respectively, and
+  $\join$ computes an element-wise maximum. Our start state $s_0 = (0, 0, 0),
+  (0, 0, 0)$; our set $T$ of transactions consists of increment and decrement;
+  and our invariant $I$ is that the value of $s$ is non-negative.
+
+  Applying \algoref{InteractiveDecisionProcedure}, \IsIclosed{} returns false
+  with the states $s_1 = (1, 0, 0), (0, 1, 0)$ and $s_2 = (1, 0, 0), (0, 0,
+  1)$. Both are reachable, so $O$ is not \sTIconfluent{} and
+  \algoref{InteractiveDecisionProcedure} returns false.  The culprit is
+  concurrent decrements, which we can forbid in a simple one-segment
+  segmentation $\Sigma = (I, T^+)$ where $T^+$ consists only of increment
+  transactions. Applying, \algoref{ArbitraryStartInteractiveDecisionProcedure},
+  \IsIclosed{} again returns false with the same states $s_1$ and $s_2$. This time,
+  however, the user recognizes that the two states are not
+  \ticoreachable{T^+}{I}.
+  % (all modifications of $(n_1, n_2, n_3)$ require global
+  % coordination, so it is impossible for $s_1$ and $s_2$ to differ on these
+  % values).
+  The user refines $NR$ with the observation that two
+  states are coreachable if and only if they have the same values of $n_1, n_2,
+  n_3$. After this, \IsIclosed{} and
+  \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.
+\end{example}
 
 % \subsection{Discussion and Limitations}
 % There are a few things worth noting about segmented \invariantconfluence{}, its

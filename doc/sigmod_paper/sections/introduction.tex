@@ -98,7 +98,7 @@ property called \emph{segmented \invariantconfluence{}}. While
 replicate non-\invariantconfluent{} objects with only \emph{occasional}
 coordination. The main idea is to divide the set of invariant-satisfying states
 into \emph{segments}, with a restricted set of transactions allowed in each
-segment.  Within a segment servers act without any coordination; they
+segment. Within a segment, servers act without any coordination; they
 synchronize only to transition across segment boundaries. This design
 highlights the trade-off between application complexity and
 coordination-freedom; more complex applications require more segments which
@@ -110,9 +110,10 @@ system for replicating \invariantconfluent{} and segmented
 can efficiently handle a wide range of common workloads.  For example, in
 \secref{Evaluation}, we apply Lucy to foreign key constraints and escrow
 transactions. Lucy processes these workloads in less than half a second, and
-neither workload requires more than 66 lines of code to specify. Moreover, we
-find that segmented \invariantconfluent{} replication can achieve 10x to 100x
-more throughput than linearizable replication for low-coordination workloads.
+no workload requires more than 66 lines of code to specify.
+% Moreover, we find that segmented \invariantconfluent{} replication can achieve
+% 10x to 100x more throughput than linearizable replication for low-coordination
+% workloads.
 
 % In closing, here is an outline of the paper and of our contributions:
 % %

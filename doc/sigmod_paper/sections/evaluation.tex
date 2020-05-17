@@ -1,6 +1,7 @@
 \section{Evaluation}\seclabel{Evaluation}
 In this section, we describe and evaluate Lucy: a prototype implementation of
-our decision procedures and system models.
+our decision procedures and system models. A more complete evaluation can be
+found in \cite{whittaker2018interactive}.
 
 % \subsection{Implementation}
 Lucy includes an implementation of the interactive decision procedures
@@ -15,17 +16,20 @@ are implemented in roughly 2,500 lines of Python.
 % check the \invariantconfluence{} of their distributed object. The decision
 % procedures do not have to be run online when transactions are being processed.
 %
-We use Z3~\cite{de2008z3} to implement our \invariantclosure{} decision procedure,
-compiling an object and invariant into a formula that is satisfiable if and
-only if the object is \emph{not} \invariantclosed{}. If the object is
-\invariantclosed{}, then Z3 concludes that the formula is unsatisfiable.
-Otherwise, if the object is not \invariantclosed{}, then Z3 produces a
-counterexample witnessing the satisfiability of the formula.
-
+We use Z3~\cite{de2008z3} to implement our \invariantclosure{} decision procedure.
+% ,
+% compiling an object and invariant into a formula that is satisfiable if and
+% only if the object is \emph{not} \invariantclosed{}. If the object is
+% \invariantclosed{}, then Z3 concludes that the formula is unsatisfiable.
+% Otherwise, if the object is not \invariantclosed{}, then Z3 produces a
+% counterexample witnessing the satisfiability of the formula.
+%
 Lucy also includes an implementation of the \invariantconfluence{} and
 segmented \invariantconfluence{} system models in roughly 3,500 lines of C++.
 Users specify objects, transactions, invariants, and segmentations in C++. Lucy
 then replicates the objects using segmented \invariantconfluence{}.
+We now evaluate the practicality and efficiency of our decision procedure
+prototypes.
 % Clients
 % send every transaction request to a randomly selected server. When a server
 % receives a transaction request, it executes \algoref{TxnExecution} to attempt
@@ -40,8 +44,8 @@ then replicates the objects using segmented \invariantconfluence{}.
 % new active segment, and resumes normal processing. After every 100 transactions
 % processed, a server sends a merge request to a randomly selected server.
 
-Lucy can also replicate an object with eventual consistency and with
-linearizability. ~\cite{whittaker2018interactive} TODO
+% Lucy can also replicate an object with eventual consistency and with
+% linearizability. ~\cite{whittaker2018interactive} TODO
 % With eventual consistency, clients send every transaction
 % request to a randomly selected server. The server executes the transaction
 % locally and returns immediately to the client, sending merge requests after
@@ -58,8 +62,6 @@ linearizability. ~\cite{whittaker2018interactive} TODO
 % discussions or evaluation, so we leave it for future work.
 
 % \subsection{Decision Procedures}
-We now evaluate the practicality and efficiency of our decision procedure
-prototypes.
 
 % We begin by demonstrating the decision procedure on a handful of
 % simple, yet practical examples. We then discuss how our tool can be used to
