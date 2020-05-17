@@ -2,7 +2,7 @@
 In this section, we describe and evaluate Lucy: a prototype implementation of
 our decision procedures and system models.
 
-\subsection{Implementation}
+% \subsection{Implementation}
 Lucy includes an implementation of the interactive decision procedures
 described in \algoref{InteractiveDecisionProcedure} and
 \algoref{ArbitraryStartInteractiveDecisionProcedure}. The decision procedures
@@ -41,7 +41,7 @@ then replicates the objects using segmented \invariantconfluence{}.
 % processed, a server sends a merge request to a randomly selected server.
 
 Lucy can also replicate an object with eventual consistency and with
-linearizability.
+linearizability. ~\cite{whittaker2018interactive} TODO
 % With eventual consistency, clients send every transaction
 % request to a randomly selected server. The server executes the transaction
 % locally and returns immediately to the client, sending merge requests after
@@ -57,7 +57,7 @@ linearizability.
 % be straightforward to add fault-tolerance to Lucy, but it would not affect our
 % discussions or evaluation, so we leave it for future work.
 
-\subsection{Decision Procedures}
+% \subsection{Decision Procedures}
 We now evaluate the practicality and efficiency of our decision procedure
 prototypes.
 
@@ -69,34 +69,34 @@ prototypes.
 
 % {\input{figures/eval_table.tex}}
 
-\example[$\ints^2$]\examplelabel{TwoIntsEval}
-We begin with a minimal working example. Consider again our recurring example
-of $\ints^2$ from \exampleref{Z2}. The Python code used to describe the object,
-transactions, and invariant is given in \figref{Z2Code}. When we call
-\python{checker.check()}, the interactive decision procedure produces a
-counterexample $s_1 = (0, 1), s_2 = (1, 0)$ in less than a tenth of a second
-and automatically recognizes that $s_2$ is reachable. After we label $s_1$ as
-unreachable and refine the invariant with $y \leq 0$, the interactive decision
-procedure determines that the object is \invariantconfluent{}, again, in less
-than a tenth of a second. Note that the object is \invariantconfluent{} but
-\emph{not} \invariantclosed{}, so prior work~\cite{li2012making,
-li2014automating, balegas2015towards, gotsman2016cause} that relies on
-\invariantclosure{}---or another equivalent sufficient condition---to determine
-\invariantconfluence{} would not be able to identify this example as
-\invariantconfluent{}.
-
-\begin{figure}[ht]
-  \begin{Python}[gobble=4]
-    checker = InteractiveInvariantConfluenceChecker()
-    x = checker.int_max('x', 0) # An int, x, merged by max.
-    y = checker.int_max('y', 0) # An int, y, merged by max.
-    checker.add_transaction('increment_x', [x.assign(x + 1)])
-    checker.add_transaction('decrement_y', [y.assign(y - 1)])
-    checker.add_invariant(x * y <= 0)
-    checker.check()
-  \end{Python}
-  \caption{\exampleref{TwoIntsEval} specification}\figlabel{Z2Code}
-\end{figure}
+% \example[$\ints^2$]\examplelabel{TwoIntsEval}
+% We begin with a minimal working example. Consider again our recurring example
+% of $\ints^2$ from \exampleref{Z2}. The Python code used to describe the object,
+% transactions, and invariant is given in \figref{Z2Code}. When we call
+% \python{checker.check()}, the interactive decision procedure produces a
+% counterexample $s_1 = (0, 1), s_2 = (1, 0)$ in less than a tenth of a second
+% and automatically recognizes that $s_2$ is reachable. After we label $s_1$ as
+% unreachable and refine the invariant with $y \leq 0$, the interactive decision
+% procedure determines that the object is \invariantconfluent{}, again, in less
+% than a tenth of a second. Note that the object is \invariantconfluent{} but
+% \emph{not} \invariantclosed{}, so prior work~\cite{li2012making,
+% li2014automating, balegas2015towards, gotsman2016cause} that relies on
+% \invariantclosure{}---or another equivalent sufficient condition---to determine
+% \invariantconfluence{} would not be able to identify this example as
+% \invariantconfluent{}.
+%
+% \begin{figure}[ht]
+%   \begin{Python}[gobble=4]
+%     checker = InteractiveInvariantConfluenceChecker()
+%     x = checker.int_max('x', 0) # An int, x, merged by max.
+%     y = checker.int_max('y', 0) # An int, y, merged by max.
+%     checker.add_transaction('increment_x', [x.assign(x + 1)])
+%     checker.add_transaction('decrement_y', [y.assign(y - 1)])
+%     checker.add_invariant(x * y <= 0)
+%     checker.check()
+%   \end{Python}
+%   \caption{\exampleref{TwoIntsEval} specification}\figlabel{Z2Code}
+% \end{figure}
 
 \example[Foreign Keys]\examplelabel{ForeignKeysEval}
 A 2P-Set $X = (A_X, R_X)$ is a set CRDT composed of a set of additions $A_X$
@@ -238,11 +238,11 @@ interaction.
 %     if we drop the requirement that IDs are assigned sequentially.
 % % \end{enumerate}
 
-\subsection{Segmented Invariant Confluence}%
-\seclabel{SegmentedInvariantConfluenceEval}
-Now, we evaluate the performance of replicating an object with segmented
-\invariantconfluence{} as compared to the performance of replicating it with
-eventual consistency or linearizability.
+% \subsection{Segmented Invariant Confluence}%
+% \seclabel{SegmentedInvariantConfluenceEval}
+% Now, we evaluate the performance of replicating an object with segmented
+% \invariantconfluence{} as compared to the performance of replicating it with
+% eventual consistency or linearizability.
 
 % %
 % There are two hypotheses about the performance of segmented
@@ -367,55 +367,55 @@ eventual consistency or linearizability.
 %   significantly.
 % \end{benchmark}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/throughput_vs_num_nodes_multi.pdf}
-  \caption{%
-    Throughput of eventually consistent, segmented \invariantconfluent{}, and
-    linearizable replication measured against the number of nodes for workloads
-    with varying fractions of decrement transactions. For example, the
-    ``segmented (0.2)'' line measures the performance of segmented
-    \invariantconfluent{} replication with 20\% decrement transactions.
-    Eventually consistent replication and linearizable replication are not
-    affected by workload.
-  }\figlabel{VaryNodes}
-\end{figure}
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=\columnwidth]{figures/throughput_vs_num_nodes_multi.pdf}
+%   \caption{%
+%     Throughput of eventually consistent, segmented \invariantconfluent{}, and
+%     linearizable replication measured against the number of nodes for workloads
+%     with varying fractions of decrement transactions. For example, the
+%     ``segmented (0.2)'' line measures the performance of segmented
+%     \invariantconfluent{} replication with 20\% decrement transactions.
+%     Eventually consistent replication and linearizable replication are not
+%     affected by workload.
+%   }\figlabel{VaryNodes}
+% \end{figure}
 
-% \begin{benchmark}
-  Consider again the PN-Counter from \exampleref{CounreachableExample} and the
-  corresponding transactions, invariants, and single-segment segmentation that
-  forbids concurrent decrements.
-  %
-  We replicate this object on 16 servers deployed on 16 m5.xlarge EC2 instances
-  within the same availability zone.  Each server has three colocated clients
-  that issue increment and decrement transactions.
-  %
-  We replicate the object with eventual consistency, segmented
-  \invariantconfluence{}, and linearizability and measure the system's total
-  throughput as we vary the number of nodes and the fraction of client requests
-  that are decrements.  The results are shown in \figref{VaryNodes}.
-
-  % In this benchmark, we measure the scale-out of segmented
-  % \invariantconfluent{} replication. We repeat \benchref{VaryWithdraws} while
-  % we vary the number of servers that we use to replicate our object. When we
-  % replicate with $n$ servers, we use $3n$ clients (the $3$ colocated clients on
-  % each server) as part of the workload. The results are shown in
-  % \figref{VaryNodes}.
-
-  Eventually consistent replication scales perfectly with the number of nodes,
-  confirming the results in~\cite{bailis2014coordination}. Linearizable
-  replication, on the other hand, scales up to about 3 servers before
-  performance begins to decrease. Segmented \invariantconfluent{} replication
-  scales well for low-coordination workloads and poorly for high-coordination
-  workloads. For 1\%, 5\%, 20\%, and 50\% decrement transactions, segmented
-  \invariantconfluent{} replication scales up to 24, 12, 4, and 1 server
-  respectively.
-
-  For low-coordination workloads, segmented \invariantconfluent{} replication
-  can offer almost an order of magnitude better scalability compared to
-  linearizable replication, but coordination decreases scalability
-  superlinearly. Even infrequent coordination can drastically reduce the
-  scalability of segmented \invariantconfluent{} replication with segmented
-  \invariantconfluent{} replication ultimately scaling worse than linearizable
-  replication for high-coordination workloads.
-% \end{benchmark}
+% % \begin{benchmark}
+%   Consider again the PN-Counter from \exampleref{CounreachableExample} and the
+%   corresponding transactions, invariants, and single-segment segmentation that
+%   forbids concurrent decrements.
+%   %
+%   We replicate this object on 16 servers deployed on 16 m5.xlarge EC2 instances
+%   within the same availability zone.  Each server has three colocated clients
+%   that issue increment and decrement transactions.
+%   %
+%   We replicate the object with eventual consistency, segmented
+%   \invariantconfluence{}, and linearizability and measure the system's total
+%   throughput as we vary the number of nodes and the fraction of client requests
+%   that are decrements.  The results are shown in \figref{VaryNodes}.
+%
+%   % In this benchmark, we measure the scale-out of segmented
+%   % \invariantconfluent{} replication. We repeat \benchref{VaryWithdraws} while
+%   % we vary the number of servers that we use to replicate our object. When we
+%   % replicate with $n$ servers, we use $3n$ clients (the $3$ colocated clients on
+%   % each server) as part of the workload. The results are shown in
+%   % \figref{VaryNodes}.
+%
+%   Eventually consistent replication scales perfectly with the number of nodes,
+%   confirming the results in~\cite{bailis2014coordination}. Linearizable
+%   replication, on the other hand, scales up to about 3 servers before
+%   performance begins to decrease. Segmented \invariantconfluent{} replication
+%   scales well for low-coordination workloads and poorly for high-coordination
+%   workloads. For 1\%, 5\%, 20\%, and 50\% decrement transactions, segmented
+%   \invariantconfluent{} replication scales up to 24, 12, 4, and 1 server
+%   respectively.
+%
+%   For low-coordination workloads, segmented \invariantconfluent{} replication
+%   can offer almost an order of magnitude better scalability compared to
+%   linearizable replication, but coordination decreases scalability
+%   superlinearly. Even infrequent coordination can drastically reduce the
+%   scalability of segmented \invariantconfluent{} replication with segmented
+%   \invariantconfluent{} replication ultimately scaling worse than linearizable
+%   replication for high-coordination workloads.
+% % \end{benchmark}

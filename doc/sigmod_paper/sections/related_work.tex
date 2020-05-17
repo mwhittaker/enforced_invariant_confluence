@@ -105,24 +105,26 @@ which cannot be emulated with the token based approach.
 % that require a modest amount of coordination.
 
 % \textbf{Branch and Merge.}
-Bayou~\cite{terry1995managing}, Dynamo~\cite{decandia2007dynamo}, and
-TARDiS~\cite{crooks2016tardis} all take a branch and merge approach to
-maintaining distributed invariants without coordination. With this approach,
-servers execute transactions without any coordination but keep track of the
-causal dependencies between transactions. Periodically, two servers merge
-states and invoke a user defined merge function to reconcile the divergent
-states. This approach does \emph{not} provide any formal guarantees that
-invariants are maintained.
+% Bayou~\cite{terry1995managing}, Dynamo~\cite{decandia2007dynamo}, and
+% TARDiS~\cite{crooks2016tardis} all take a branch and merge approach to
+% maintaining distributed invariants without coordination.
+% With this approach,
+% servers execute transactions without any coordination but keep track of the
+% causal dependencies between transactions. Periodically, two servers merge
+% states and invoke a user defined merge function to reconcile the divergent
+% states.
+% This approach does \emph{not} provide any formal guarantees that
+% invariants are maintained.
 % Its correctness depends on the correctness of the
 % potentially complex user defined merge functions.
 
 % \textbf{CRDTs.}
-CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
-semilattices with inflationary update methods. Due to their algebraic
-properties, CRDTs can be replicated with strong eventual consistency without
-the need for any coordination. Our definition of distributed objects and our
-\invariantconfluence{} system model are inspired directly by the corresponding
-definitions and system models in~\cite{shapiro2011conflict}.
+% CRDTs~\cite{shapiro2011conflict, shapiro2011comprehensive} are distributed
+% semilattices with inflationary update methods. Due to their algebraic
+% properties, CRDTs can be replicated with strong eventual consistency without
+% the need for any coordination. Our definition of distributed objects and our
+% \invariantconfluence{} system model are inspired directly by the corresponding
+% definitions and system models in~\cite{shapiro2011conflict}.
 
 %
 % CRDTs are eventually consistent but may not preserve invariants. Conversely,
@@ -150,15 +152,3 @@ definitions and system models in~\cite{shapiro2011conflict}.
 % are general-purpose programming languages that can be used to implement a
 % variety of distributed systems that are outside of the scope of
 % \invariantconfluence{}.
-
-\begin{techreport}
-
-  \textbf{Program Analysis in Database Systems.} Using program analysis to
-  improve the performance of database systems is not new. For example, it has
-  been used to improve the performance of database-backed web
-  applications~\cite{cheung2014using, wu2016transaction,
-  ramachandra2012program} and used to improve the performance of optimistic
-  concurrency control on multi-core machines~\cite{wu2016transaction}. Our work
-  on \invariantconfluence{} continues the theme of using program analysis to
-  reap the performance benefits gained from understanding program semantics.
-\end{techreport}
