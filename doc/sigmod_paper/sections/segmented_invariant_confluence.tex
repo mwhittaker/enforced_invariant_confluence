@@ -8,9 +8,6 @@ In this section, we present a generalization of \invariantconfluence{} called
 \defword{segmented \invariantconfluence{}} that can be used to maintain the
 invariants of non-\invariantconfluent{} objects, requiring only a small amount
 of coordination.
-% In \secref{Evaluation}, we see that replicating a non-\invariantconfluent{}
-% object with segmented \invariantconfluence{} can achieve between 10x and 100x
-% more throughput than linearizable replication for certain workloads.
 
 The main idea behind segmented \invariantconfluence{} is to segment the state
 space into a number of segments and restrict the set of allowable transactions
@@ -68,7 +65,6 @@ with respect to $s_0$, $T$, $I$, and $\Sigma$, abbreviated
 \end{example}
 
 {\input{figures/segmented_z2}}
-
 
 \subsection{System Model}
 Now, we describe the system model used to replicate a segmented
@@ -200,19 +196,9 @@ of \algoref{InteractiveDecisionProcedure}.
 \emph{reachable} states whereas
 \algoref{ArbitraryStartInteractiveDecisionProcedure} iteratively refines the
 set of \emph{coreachable} states, but otherwise, the core of the two algorithms
-is the same.
-% \footnote{%
-%   Another small difference is that \IsIclosed{} behaves differently in
-%   \algoref{InteractiveDecisionProcedure} and
-%   \algoref{ArbitraryStartInteractiveDecisionProcedure}. In
-%   \algoref{ArbitraryStartInteractiveDecisionProcedure}, \IsIclosed{} returns a
-%   triple (closed, $s_1$, $s_2$). If closed is false, then $s_1, s_2 \in I$
-%   are two states not in $NR$ such that $I(s_1)$ and $I(s_2)$ but $\lnot I(s_1
-%   \join s_2)$. If no such states exist, then closed is true, and $s_1$ and
-%   $s_2$ are null.
-% }
-Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
-\algoref{ArbitraryStartInteractiveDecisionProcedure} once on each segment.
+is the same. Now, a segmented \invariantconfluence{} decision procedure, can
+simply invoke \algoref{ArbitraryStartInteractiveDecisionProcedure} once on each
+segment.
 
 \newcommand{\algocomment}[1]{\State \textcolor{flatdenim}{\texttt{//} #1}}
 \begin{algorithm}[t]
@@ -265,35 +251,8 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
   transactions. Applying \algoref{ArbitraryStartInteractiveDecisionProcedure},
   \IsIclosed{} again returns false with the same states $s_1$ and $s_2$. This time,
   however, the user recognizes that the two states are not
-  \ticoreachable{T^+}{I}.
-  % (all modifications of $(n_1, n_2, n_3)$ require global
-  % coordination, so it is impossible for $s_1$ and $s_2$ to differ on these
-  % values).
-  The user refines $NR$ with the observation that two
+  \ticoreachable{T^+}{I}. The user refines $NR$ with the observation that two
   states are coreachable if and only if they have the same values of $n_1, n_2,
   n_3$. After this, \IsIclosed{} and
   \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.
 \end{example}
-
-% \subsection{Discussion and Limitations}
-% There are a few things worth noting about segmented \invariantconfluence{}, its
-% system model, and its decision procedure.
-% %
-% First, \invariantconfluence{} is a very coarse-grained property. If an object
-% is \invariantconfluent{}, then we can replicate it with no coordination. If it
-% is not \invariantconfluent{}, then we have no guarantees. There's no
-% in-between.  Segmented \invariantconfluence{}, on the other hand, is a much
-% more fine-grained property that can be applied to applications with varying
-% degrees of complexity. Segmented \invariantconfluence{} provides guarantees to
-% complex applications that require a large number of segments and to simple
-% applications with a smaller number of segments, whereas \invariantconfluence{}
-% only provides guarantees to applications that can be segmented into a single
-% segment.
-%
-% Second, while our segmented \invariantconfluence{} decision procedure can help
-% decide whether or not an object is segmented \invariantconfluent{}, it cannot
-% currently help construct a segmentation. It is the responsibility of the
-% programmer to think of a segmentation that is amenable to segmented
-% \invariantconfluence{}. This can be an onerous process. In the future, we
-% plan to explore ways by which we can automatically suggest segmentations to the
-% application designer to ease this process.

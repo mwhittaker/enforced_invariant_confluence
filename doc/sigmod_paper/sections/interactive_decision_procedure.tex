@@ -126,31 +126,3 @@ invariant. See \figref{DecisionProcedureExample}, for example. Once $NR$ has
 been sufficiently augmented to the point that $I - NR$ is a subset of the
 reachable states, \thmref{IclosureEquivalentIconfluence} guarantees that the
 algorithm will terminate after one more call to \IsIclosed.
-
-% \subsection{Limitations}
-% Our interactive \invariantconfluence{} decision procedure has two
-% limitations. First, \algoref{InteractiveDecisionProcedure} requires an
-% \invariantclosure{} decision procedure, but determining \invariantclosure{} is
-% undecidable in general.
-% %
-% In practice, we can implement an \invariantclosure{} decision procedure using
-% an SMT solver like Z3 that works well on simple objects, invariants, and merge
-% operators (e.g., integers, tuples, infinite sets, bit vectors, linear
-% constraints, basic arithmetic, tuple projection, basic set operations, bit
-% arithmetic). But, SMT solvers are mostly unable to analyze more complex
-% constructs (e.g., finite lists~\cite{kroning2009proposal}, graphs, recursive
-% algebraic data types, nonlinear constraints, merge operators that contain loops
-% or recursion).
-%
-% Second, \algoref{InteractiveDecisionProcedure} relies on a user to identify
-% unreachable states. As we saw in \figref{DecisionProcedureExample}, the set of
-% unreachable states can sometimes be clear, especially if there's a noticeable
-% pattern in the set of reachable states. However, if the set of transactions is
-% large or complex or if the merge operator is complex, then reasoning about
-% unreachable states can be difficult.  Unlike with reachable states---where
-% verifying that a state is reachable only requires thinking of a single way to
-% reach the state---verifying that a state is unreachable requires a programmer
-% to reason about a large number of system executions and conclude that
-% \emph{none} of them can lead to the state. In the future, we plan on exploring
-% ways to help a user reason about unreachable states and ways to discover sets of
-% unreachable states automatically.
