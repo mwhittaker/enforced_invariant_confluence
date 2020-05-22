@@ -119,9 +119,9 @@ After less than a tenth of a second, the decision procedure produced a
 reachable counterexample witnessing the fact that the object is not
 \invariantconfluent{}. A concurrent insertion into $X$ and deletion from $Y$
 can lead to a state that violates the invariant. This object is not
-\invariantconfluent{} and therefore not \invariantclosed{}. Thus, previous
-tools depending on \invariantclosure{} as a sufficient condition would be
-unable to conclude definitively that the object is \emph{not}
+\invariantconfluent{} and therefore not \invariantclosed{}.
+Thus, existing systems that depend on \invariantclosure{} as a sufficient
+condition are unable to conclude definitively that the object is \emph{not}
 \invariantconfluent{}.
 
 We also reran the decision procedure, but this time with insertions into $X$
@@ -177,7 +177,7 @@ value. The first segment $(\setst{(p_1, p_2, p_3), (n_1, n_2, n_3)}{p_1, p_2,
 p_3 \geq k \land n_1, n_2, n_3 \leq k}, T)$ allows for concurrent increments
 and decrements so long as every $p_i \geq k$ and every $n_i \leq k$.
 Intuitively, this segment represents the situation in which every server has
-escrowed a value of $k$. They can decrement freely, so long as they don't
+escrowed a value of $k$. Each server can decrement freely, so long as they don't
 exceed their escrow budget of $k$. The second segment is the one presented in
 \exampleref{CounreachableExample} which prohibits concurrent decrements. We ran
 our decision procedure on this example and it concluded that it was segmented

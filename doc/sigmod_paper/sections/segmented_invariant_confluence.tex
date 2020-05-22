@@ -25,11 +25,12 @@ introduce a segmented \invariantconfluence{} decision procedure.
 \subsection{Formalism}
 Consider a distributed object $O = (S, \join)$, a start state $s_0 \in S$, a
 set of transitions $T$, and an invariant $I$. A segmentation $\Sigma = (I_1,
-T_1), \ldots, (I_n, T_n)$ is a sequence (not a set) of $n$ segments $(I_i,
-T_i)$ where every $T_i$ is a subset of $T$ and every $I_i \subseteq S$ is an
-invariant. $O$ is \defword{segmented \invariantconfluent{}} with respect to
-$s_0$, $T$, $I$, and $\Sigma$, abbreviated \defword{\sTISconfluent}, if the
-following conditions hold:
+T_1), \ldots, (I_n, T_n)$ is a sequence of $n$ segments $(I_i, T_i)$ where
+every $T_i$ is a subset of $T$ and every $I_i \subseteq S$ is an invariant.
+Note that $\Sigma$ is a sequence, not a set. The reason for this will become
+clear in the next subsection. $O$ is \defword{segmented \invariantconfluent{}}
+with respect to $s_0$, $T$, $I$, and $\Sigma$, abbreviated
+\defword{\sTISconfluent}, if the following conditions hold:
 \begin{itemize}
   \item
     The start state satisfies the invariant (i.e. $I(s_0)$).
@@ -103,9 +104,10 @@ $I(t(s))$), then every server commits $t$ and remains in state $t(s)$. Every
 server then chooses the first segment $(I_i, T_i) \in \Sigma$ such that
 $I_i(t(s))$ to be the new active segment.  Note that such a segment is
 guaranteed to exist because the segment invariants cover $I$. Moreover,
-$\Sigma$ is ordered, so every server will deterministically pick the same
-active segment. In fact, an invariant of the system model is that at any given
-point of normal processing, every server has the same active segment.
+$\Sigma$ is ordered, as described in the previous subsection, so every server
+will deterministically pick the same active segment. In fact, an invariant of
+the system model is that at any given point of normal processing, every server
+has the same active segment.
 
 Otherwise, if $t \in T_i$, then $p_i$ executes $t$ immediately and without
 coordination.  If $t(s_i)$ satisfies the \emph{active} invariant (i.e.
@@ -260,7 +262,7 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
   \algoref{InteractiveDecisionProcedure} returns false.  The culprit is
   concurrent decrements, which we can forbid in a simple one-segment
   segmentation $\Sigma = (I, T^+)$ where $T^+$ consists only of increment
-  transactions. Applying, \algoref{ArbitraryStartInteractiveDecisionProcedure},
+  transactions. Applying \algoref{ArbitraryStartInteractiveDecisionProcedure},
   \IsIclosed{} again returns false with the same states $s_1$ and $s_2$. This time,
   however, the user recognizes that the two states are not
   \ticoreachable{T^+}{I}.

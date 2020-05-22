@@ -83,8 +83,10 @@ causal consistency, sequential consistency, and RedBlue consistency.
 % invariant is never broken.
 The token based approach allows users to
 specify certain conflicts that are not possible with segmented
-\invariantconfluence{} because a segmentation only allows transactions within a
-segment to acquire a single self-conflicting lock. However, segmented
+\invariantconfluence{}.
+% because a segmentation only allows transactions within a
+% segment to acquire a single self-conflicting lock.
+However, segmented
 \invariantconfluence{} also introduces the notion of invariant segmentation,
 which cannot be emulated with the token based approach.
 % For example, it is
