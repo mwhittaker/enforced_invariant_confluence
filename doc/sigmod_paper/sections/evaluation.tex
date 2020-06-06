@@ -2,17 +2,18 @@
 In this section, we describe and evaluate Lucy: a prototype implementation of
 our decision procedures and system models. A more complete evaluation can be
 found in \cite{whittaker2018interactive}.
-
-Lucy includes an implementation of the interactive decision procedures
+%
+Lucy includes a Python implementation of the interactive decision procedures
 described in \algoref{InteractiveDecisionProcedure} and
-\algoref{ArbitraryStartInteractiveDecisionProcedure}. The decision procedures
-are implemented in roughly 2,500 lines of Python. We use Z3~\cite{de2008z3} to
-implement our \invariantclosure{} decision procedure. Lucy also includes an
-implementation of the \invariantconfluence{} and segmented
-\invariantconfluence{} system models in roughly 3,500 lines of C++. Users
-specify objects, transactions, invariants, and segmentations in C++. Lucy then
-replicates the objects using segmented \invariantconfluence{}. We now evaluate
-the practicality and efficiency of our decision procedure prototypes.
+\algoref{ArbitraryStartInteractiveDecisionProcedure}. Users
+specify objects, transactions, invariants, and segmentations in Python.
+%
+Lucy also includes a C++ implementation of the \invariantconfluence{} and
+segmented \invariantconfluence{} system models.
+
+We now evaluate the practicality and efficiency of our decision procedure
+prototypes. Specifically, we show that the user burden of specifying objects
+and interactively checking them for invariant confluence is not too onerous.
 
 \example[Foreign Keys]\examplelabel{ForeignKeysEval}
 A 2P-Set $X = (A_X, R_X)$ is a set CRDT composed of a set of additions $A_X$
@@ -72,3 +73,27 @@ exceed their escrow budget of $k$. The second segment is the one presented in
 our decision procedure on this example and it concluded that it was segmented
 \invariantconfluent{} in less than a tenth of a second and without any human
 interaction.
+
+\vspace{4pt}
+\textbf{Further Evaluation.}
+In~\cite{whittaker2018interactive}, we also specify workloads involving
+\exampleref{Ints}, an auction application, and TPC-C. Lucy processes all of
+these workloads, as well as the workloads described above, in less than half a
+second, and no workload requires more than 66 lines of Python code to specify.
+This shows that the user burden of specification is not too high and that our
+decision procedures are efficient enough for interactive use.
+
+In~\cite{whittaker2018interactive}, we also evaluate the performance of our
+segmented \invariantconfluence{} system model.
+%
+Namely, we show that segmented \invariantconfluent{} replication can achieve an
+order of magnitude higher throughput compared to linearizable replication, but
+the throughput improvements decrease as we increase the fraction of
+transactions that require coordination. For example, with 5\% coordinating
+transactions, segmented \invariantconfluent{} replication performs over an
+order of magnitude better than linearizable replication; with 50\%, it performs
+as well; and with 100\%, it performs two times worse.
+%
+% We also measure the scalability of segmented \invariantconfluent{} replication.
+% Expectedly, low coordination workloads scale well, but increasing coordination
+% decreases scalability.
