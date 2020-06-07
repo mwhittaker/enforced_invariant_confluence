@@ -113,24 +113,25 @@ I(t(s_i))$), then $p_i$ aborts $t$, reverts to state $s_i$, and replies to the
 client. If $t(s_i)$ satisfies the global invariant but violates the active
 invariant (i.e.  $I(t(s_i))$ but $\lnot I_i(t(s_i))$), then $p_i$ reverts to
 state $s_i$ and initiates a round of global coordination to execute $t$, as
-described in the previous paragraph.  Transaction execution is summarized in
-\algoref{TxnExecution}.
+described in the previous paragraph.
+%
+% Transaction execution is summarized in \algoref{TxnExecution}.
 
-\begin{algorithm}[t]
-  \caption{%
-    Transaction execution in the segmented \invariantconfluence{} system model}%
-  \algolabel{TxnExecution}
-  \begin{algorithmic}
-    \If{$t \notin T_i$}
-      \State Execute $t$ with global coordination
-    \Else{}
-      \If{$I_i(t(s_i))$} Commit $t$
-      \ElsIf{$\lnot I(t(s_i))$} Abort $t$
-      \Else{} Execute $t$ with global coordination
-      \EndIf{}
-    \EndIf{}
-  \end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}[t]
+%   \caption{%
+%     Transaction execution in the segmented \invariantconfluence{} system model}%
+%   \algolabel{TxnExecution}
+%   \begin{algorithmic}
+%     \If{$t \notin T_i$}
+%       \State Execute $t$ with global coordination
+%     \Else{}
+%       \If{$I_i(t(s_i))$} Commit $t$
+%       \ElsIf{$\lnot I(t(s_i))$} Abort $t$
+%       \Else{} Execute $t$ with global coordination
+%       \EndIf{}
+%     \EndIf{}
+%   \end{algorithmic}
+% \end{algorithm}
 
 This system model guarantees that all replicas of a segmented
 \invariantconfluent{} object always satisfy the invariant. All servers begin in

@@ -2,9 +2,8 @@
 When an application designer decides to replicate a piece of data, they have to
 make a fundamental choice between weak and strong consistency. Replicating the
 data with strong consistency using a technique like distributed
-transactions~\cite{bernstein1981concurrency,mohan1986transaction} or state
-machine replication~\cite{schneider1990implementing, lamport1998part,
-liskov2012viewstamped, ongaro2014search} makes the application designer's life
+transactions~\cite{bernstein1981concurrency} or state
+machine replication~\cite{lamport1998part} makes the application designer's life
 very easy. To the developer, a strongly consistent system behaves exactly like
 a single-threaded system running on a single node, so reasoning about the
 behavior of the system is simple~\cite{herlihy1990linearizability}.
@@ -20,7 +19,7 @@ application designer to reason about the complex interleavings of operations
 that are allowed by these weak consistency models. In particular, weak
 consistency models strip an application developer of one of the earliest and
 most effective tools that is used to reason about the execution of programs:
-application invariants~\cite{hoare1969axiomatic, balegas2015towards} such as
+application invariants~\cite{balegas2015towards} such as
 database integrity constraints~\cite{grefen1993integrity, gupta1993local}. Even
 if every transaction executing in a weakly consistent system individually
 maintains an application invariant, the system as a whole can produce
