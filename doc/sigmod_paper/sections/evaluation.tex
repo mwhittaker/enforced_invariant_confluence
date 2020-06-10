@@ -12,8 +12,9 @@ Lucy also includes a C++ implementation of the \invariantconfluence{} and
 segmented \invariantconfluence{} system models.
 
 We now evaluate the practicality and efficiency of our decision procedure
-prototypes. Specifically, we show that the user burden of specifying objects
-and interactively checking them for invariant confluence is not too onerous.
+prototypes. Specifically, we show that specifying objects is not too onerous
+and that our decision procedures' latencies are small enough to be used
+comfortably in an interactive way~\cite{liu2014effects}.
 
 \example[Foreign Keys]\examplelabel{ForeignKeysEval}
 A 2P-Set $X = (A_X, R_X)$ is a set CRDT composed of a set of additions $A_X$
@@ -75,7 +76,7 @@ our decision procedure on this example and it concluded that it was segmented
 interaction.
 
 \vspace{4pt}
-\textbf{Further Evaluation.}
+\textbf{Further Decision Procedure Evaluation.}
 In~\cite{whittaker2018interactive}, we also specify workloads involving
 \exampleref{Ints}, an auction application, and TPC-C. Lucy processes all of
 these workloads, as well as the workloads described above, in less than half a
@@ -83,8 +84,11 @@ second, and no workload requires more than 66 lines of Python code to specify.
 This shows that the user burden of specification is not too high and that our
 decision procedures are efficient enough for interactive use.
 
-In~\cite{whittaker2018interactive}, we also evaluate the performance of our
-segmented \invariantconfluence{} system model.
+\vspace{4pt}
+\textbf{System Model Evaluation.}
+In addition to our decision procedures, we also evaluate the performance of
+distributed objects deployed with segmented
+\invariantconfluence{}~\cite{whittaker2018interactive}.
 %
 Namely, we show that segmented \invariantconfluent{} replication can achieve an
 order of magnitude higher throughput compared to linearizable replication, but

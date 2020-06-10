@@ -10,7 +10,7 @@ behavior of the system is simple~\cite{herlihy1990linearizability}.
 Unfortunately, strong consistency is at odds with performance. The CAP theorem
 and PACELC theorem tell us that strongly consistent systems suffer from higher
 latency at best and unavailability at worst~\cite{gilbert2002brewer,
-brewer2012cap, abadi2012consistency}. On the other hand, weak consistency
+abadi2012consistency}. On the other hand, weak consistency
 models like eventual consistency~\cite{vogels2009eventually}, PRAM
 consistency~\cite{lipton1988pram}, causal consistency~\cite{ahamad1995causal},
 and others~\cite{lloyd2011don, mehdi2017can} allow data to be replicated with
@@ -20,7 +20,7 @@ that are allowed by these weak consistency models. In particular, weak
 consistency models strip an application developer of one of the earliest and
 most effective tools that is used to reason about the execution of programs:
 application invariants~\cite{balegas2015towards} such as
-database integrity constraints~\cite{grefen1993integrity, gupta1993local}. Even
+database integrity constraints~\cite{grefen1993integrity}. Even
 if every transaction executing in a weakly consistent system individually
 maintains an application invariant, the system as a whole can produce
 invariant-violating states.
