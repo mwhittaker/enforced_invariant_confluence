@@ -84,10 +84,10 @@ or merge states with another server. Merging states in the segmented
 \invariantconfluence{} system model. A server $p_i$ sends its state $s_i$ to
 another server $p_j$ which \emph{must} merge $s_i$ into its state $s_j$.
 %
-Transaction execution in the new system model, on the other hand, is a bit more
+Transaction execution in the new system model, on the other hand, is more
 involved. Consider a server $s_i$ with active segment $(I_i, T_i)$. A client
-can request that $p_i$ execute a transaction $t \in T$. We consider what
-happens when $t \in T_i$ and $t \notin T_i$ separately.
+can request that $p_i$ execute a transaction $t$. We consider what happens when
+$t \in T_i$ and when $t \notin T_i$.
 
 If $t \notin T_i$, then $p_i$ initiates a round of global coordination to
 execute $t$. During global coordination, every server temporarily stops
@@ -165,9 +165,9 @@ Instead, we develop a new decision procedure that can be used to determine if
 an object is \sticonfluent{s}{T}{I} for every state $s \in I$. To do so, we
 need to extend the notion of reachability to a notion of coreachability and
 then generalize \thmref{IclosureEquivalentIconfluence}. Two states $s_1, s_2
-\in I$ are \defword{coreachable} with respect to $T$ and $I$, abbreviated
-\defword{\TIcoreachable}, if there exists some state $s_0 \in I$ such that
-$s_1$ and $s_2$ are both \sTIreachable{}.
+\in I$ are \defword{coreachable} with respect to a set of transactions $T$ and
+an invariant $I$, abbreviated \defword{\TIcoreachable}, if there exists some
+state $s_0 \in I$ such that $s_1$ and $s_2$ are both \sTIreachable{}.
 
 \begin{theorem}\thmlabel{ExtendedIclosureEquivalentIconfluence}
   Consider an object $O = (S, \join)$, a set of transactions $T$, and an
@@ -254,6 +254,6 @@ segment.
   however, the user recognizes that the two states are not
   \ticoreachable{T^+}{I}. The user refines $NR$ with the observation that two
   states are coreachable if and only if they have the same values of $n_1, n_2,
-  n_3$. After this, \IsIclosed{} and
-  \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.
+  n_3$. After this, \IsIclosed{} (and thus \textsc{Helper}) returns true, and
+  \algoref{ArbitraryStartInteractiveDecisionProcedure} terminates.
 \end{example}

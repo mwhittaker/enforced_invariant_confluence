@@ -6,14 +6,14 @@ modified or merged together~\cite{bailis2014coordination}. In this section, we
 make this informal notion of \invariantconfluence{} precise.
 
 We begin by introducing our system model of replicated objects in which a
-distributed object and accompanying invariant is replicated across a set of
-servers. Clients send transactions to servers, and a server executes a
-transaction so long as it maintains the invariant. Servers execute
+distributed object and an invariant are replicated across a set of
+servers. Clients send transactions to servers, and servers execute
+transactions so long as they maintain the invariant. Servers execute
 transactions without coordination, but to avoid state divergence, servers
 periodically gossip with one another and merge their replicas.
 %
-After we introduce the system model, we present a formal definition of
-\invariantconfluence{}.
+% After we introduce the system model, we present a formal definition of
+% \invariantconfluence{}.
 
 \subsection{System Model}
 
@@ -25,6 +25,8 @@ we write $I(s)$ to denote that $s$ satisfies the invariant (i.e. $s \in I$)
 and $\lnot I(s)$ to denote that $s$ does not satisfy the invariant (i.e. $s
 \notin I$).
 
+\vfill\null
+
 \begin{example}\examplelabel{Ints}
   $O = (\ints, \max)$ is a distributed object consisting of integers merged by the
   $\max$ function; $t(x) = x + 1$ is a transaction that adds one to a state; and
@@ -34,7 +36,7 @@ and $\lnot I(s)$ to denote that $s$ does not satisfy the invariant (i.e. $s
 
 In our system model, a distributed object $O$ is replicated across a set $p_1,
 \ldots, p_n$ of $n$ servers. Each server $p_i$ manages a replica $s_i \in S$ of
-the replicated object. Every server begins with a start state $s_0 \in S$, a
+the object. Every server begins with a start state $s_0 \in S$, a
 fixed set $T$ of transactions, and an invariant $I$. Servers repeatedly perform
 one of two actions.
 
@@ -78,6 +80,7 @@ We say an expression $e$ is \defword{\sTIreachable{}} if it corresponds to a
 valid execution of our system model. Formally, we define
 $\sTIreachablepredicate{e}$ to be the predicate that satisfies the
 following conditions:
+\pagebreak
 \begin{itemize}
   \item
     $\sTIreachablepredicate{s_0}$.
@@ -86,10 +89,11 @@ following conditions:
     transactions, if $\sTIreachablepredicate{e}$ and $I(t(e))$, then
     $\sTIreachablepredicate{t(e)}$.
   \item
-    For all expressions $e_1$ and $e_2$, if $\sTIreachablepredicate{e_1}$ and
+    For expressions $e_1$ and $e_2$, if $\sTIreachablepredicate{e_1}$ and
     $\sTIreachablepredicate{e_2}$, then $\sTIreachablepredicate{e_1 \join
     e_2}$.
 \end{itemize}
+
 Similarly, we say a state $s \in S$ is \sTIreachable{} if there exists an
 \sTIreachable{} expression $e$ that evaluates to $s$. Returning to
 \exampleref{Ints} with start state $s_0 = 42$, we see that all integers greater

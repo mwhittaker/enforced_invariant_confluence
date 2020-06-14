@@ -25,7 +25,7 @@ $I(s_1)$ and $I(s_2)$, then $I(s_1 \join s_2)$.
 \end{theorem}
 
 \thmref{IclosureImpliesIconfluence} states that \invariantclosure{} is
-sufficient for \invariantconfluence{}. Intuitively, recall that our system model ensures
+sufficient for \invariantconfluence{}. Intuitively, our system model ensures
 that transaction execution preserves the invariant, so if merging states also
 preserves the invariant and if our start state satisfies the invariant, then
 inductively it is impossible for us to reach a state that doesn't satisfy the
@@ -47,8 +47,8 @@ is best explained through an example.
 \begin{example}\examplelabel{Z2}
   Let $O = (\ints \times \ints, \join)$ consist of pairs $(x, y)$ of integers
   where $(x_1, y_1) \join (x_2, y_2) = (\max(x_1, x_2), \max(y_1, y_2))$. Our
-  start state $s_0 \in \ints \times \ints$ is the point $(0, 0)$. Our set $T$
-  of transactions consists of two transactions: $t_{x+1}((x, y)) = (x + 1, y)$
+  start state $s_0 \in \ints \times \ints$ is $(0, 0)$. Our set $T$ of
+  transactions consists of two transactions: $t_{x+1}((x, y)) = (x + 1, y)$
   which increments $x$ and $t_{y-1}((x, y)) = (x, y - 1)$ which decrements $y$.
   Our invariant $I = \setst{(x, y) \in \ints \times \ints}{xy \leq 0}$ consists
   of all points $(x, y)$ where the product of $x$ and $y$ is non-positive.

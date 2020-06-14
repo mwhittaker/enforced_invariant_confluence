@@ -62,12 +62,11 @@ in \figref{DecisionProcedureExample}.
 \IsInvConfluent{} assumes access to an \invariantclosure{} decision procedure
 \IsIclosed$(O, I)$. \IsIclosed$(O, I)$ returns a triple (closed, $s_1$, $s_2$).
 closed is a boolean indicating whether $O$ is \Iclosed{}. If closed is true,
-then $s_1$ and $s_2$ are null. If closed is false, then $s_1$ and $s_2$ are a
-counterexample witnessing the fact that $O$ is not \Iclosed{}. That is,
-$I(s_1)$ and $I(s_2)$, but $\lnot I(s_1 \join s_2)$ (e.g., $s_1$ and $s_2$ from
-\exampleref{Z2}).  As we mentioned earlier, we can (and do) implement the
-\invariantclosure{} decision procedure using an SMT solver like
-Z3~\cite{de2008z3}.
+then $s_1$ and $s_2$ are null. Otherwise, $s_1$ and $s_2$ are a counterexample
+witnessing the fact that $O$ is not \Iclosed{}. That is, $I(s_1)$ and $I(s_2)$,
+but $\lnot I(s_1 \join s_2)$ (e.g., $s_1$ and $s_2$ from \exampleref{Z2}).  As
+we mentioned earlier, we can (and do) implement the \invariantclosure{}
+decision procedure using an SMT solver like Z3~\cite{de2008z3}.
 
 \IsInvConfluent{} first checks that $s_0$ satisfies the invariant. $s_0$ is
 reachable, so if it does not satisfy the invariant, then $O$ is not
@@ -99,14 +98,14 @@ have a counterexample $s_1, s_2$. We want to determine whether $s_1$ and $s_2$
 are reachable or unreachable. We can do so in two ways.
 %
 First, we can randomly generate a set of reachable states and add them to $R$.
-If $s_1$ or $s_2$ is in $R$, then we know they are reachable.
+If $s_1$ or $s_2$ is in $R$, then they are reachable.
 %
-Second, we can prompt the user to tell us directly whether or not the states
+Second, we can prompt the user to tell us directly whether the states
 are reachable or unreachable.
 
 In addition to labelling $s_1$ and $s_2$ as reachable or unreachable, the user
 can also refine $I$ by augmenting $R$ and $NR$ arbitrarily (see
-\figref{DecisionProcedureExample} for an example). In this step, we also make
+\figref{DecisionProcedureExample} for example). In this step, we also make
 sure that $s_0 \notin NR$ since we know that $s_0$ is reachable.
 
 After $s_1$ and $s_2$ have been labelled as \sTIreachable{} or not, we

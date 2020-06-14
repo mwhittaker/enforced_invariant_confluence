@@ -19,7 +19,7 @@ application designer to reason about the complex interleavings of operations
 that are allowed by these weak consistency models. In particular, weak
 consistency models strip an application developer of one of the earliest and
 most effective tools that is used to reason about the execution of programs:
-application invariants~\cite{balegas2015towards} such as
+application invariants~\cite{hoare1969axiomatic, balegas2015towards} such as
 database integrity constraints~\cite{grefen1993integrity}. Even
 if every transaction executing in a weakly consistent system individually
 maintains an application invariant, the system as a whole can produce
@@ -80,7 +80,7 @@ segment. Within a segment, servers act without any coordination; they
 synchronize only to transition across segment boundaries. This design
 highlights the trade-off between application complexity and
 coordination-freedom; more complex applications require more segments which
-require more coordination, and vice-versa.
+require more coordination.
 
 Finally, we present Lucy: an implementation of our decision procedures and a
 system for replicating \invariantconfluent{} and segmented
