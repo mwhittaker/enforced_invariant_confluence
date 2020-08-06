@@ -177,3 +177,32 @@
 % Misc.
 \newcommand{\defword}[1]{\textbf{#1}}
 \newcommand{\todo}[1]{\textbf{\textcolor{flatred}{TODO: #1}}}
+
+% We white out the revisions for arxiv.
+\definecolor{revisioncolor}{HTML}{FF007F}
+
+\NewEnviron{techreportrevisions}{%
+  \iftoggle{techreportenabled}{%
+    \begin{tcolorbox}[%
+      parbox=false,
+      enhanced,
+      borderline west={2pt}{-6pt}{flatred},
+      breakable,
+      colback=white,
+      colframe=white,
+      coltext=revisioncolor,
+      boxsep=0pt,
+      boxrule=0pt,
+      leftrule=0pt,
+      rightrule=0pt,
+      toprule=0pt,
+      bottomrule=0pt,
+      left=0pt,
+      right=0pt,
+      top=0pt,
+      bottom=0pt]\BODY\end{tcolorbox}%
+  }{}%
+}
+
+\newcommand{\markrevisions}[1]{\textcolor{revisioncolor}{#1}}
+\NewEnviron{revisions}{{\color{revisioncolor}\BODY}}

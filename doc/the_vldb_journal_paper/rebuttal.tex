@@ -1,0 +1,340 @@
+\documentclass[9pt]{article}
+
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{pervasives}
+\usepackage{vldblite}
+
+% Reviewer quotes.
+\definecolor{ReviewerDarkGray}{HTML}{37474F}
+\newenvironment{reviewerquote}
+{\list{}{\leftmargin=\parindent\rightmargin=0in}\item[] \itshape \color{ReviewerDarkGray}}%
+{\endlist}
+
+\newtoggle{showfeedback}
+\toggletrue{showfeedback}
+% \togglefalse{showfeedback}
+\NewEnviron{feedback}{
+  \iftoggle{showfeedback}{
+    \begin{itemize}[leftmargin=*]
+      \item[] \itshape \textcolor{ReviewerDarkGray}{\BODY}
+    \end{itemize}
+  }{}
+}
+
+% Turn on the full reviewer comments if the turnonshowfeedback flag was passed
+% in from the command line. This was taken from [1].
+%
+% [1]: https://stackoverflow.com/a/1466610/3187068
+% \ifdefined\turnonshowfeedback
+%   \toggletrue{showfeedback}
+% \else
+%   \togglefalse{showfeedback}
+% \fi
+
+\begin{document}
+\begin{center}
+  \ttlfnt Response to Reviewer Comments
+\end{center}
+
+\begin{multicols*}{2}
+Below, you'll find our response to reviewer comments and our revisions. All
+changes made to the paper are shown in \markrevisions{pink}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Reviewer 1}
+\paragraph{Reviewer 1: W1}
+\begin{feedback}
+  More details about the DSL to specify the invariants with more complex
+  examples would add a lot of value to the paper
+\end{feedback}
+\paragraph{Reviewer 1: W2}
+\begin{feedback}
+  More experiments with some realistic workloads (like TPCC) to show the
+  benefit of the proposed concepts in action are needed
+\end{feedback}
+\paragraph{Reviewer 1: W3}
+\begin{feedback}
+  Even though the automatic segmentation is left for future work, an example
+  with a manual mapping of segments in a realistic workload (like TPCC) would
+  show-case its potential
+\end{feedback}
+\paragraph{Reviewer 1: W4}
+\begin{feedback}
+  The main weak point of this specific submission is whether it has enough new
+  material to to qualify for being an extended version
+\end{feedback}
+\paragraph{Reviewer 1: D1}
+\begin{feedback}
+  W4 touches upon the "new material" for this extended version of the paper,
+  and the above weak points W1, W2 and W3 can all serve as additional material.
+\end{feedback}
+\paragraph{Reviewer 1: D2}
+\begin{feedback}
+  W1 will essentially help the reader to quickly see the value of the proposed
+  definitions and theorems with some specification examples that will be able
+  to capture more interesting use-cases.
+\end{feedback}
+\paragraph{Reviewer 1: D3}
+\begin{feedback}
+  W2 would help to quantify the benefits that come from being able to have some
+  invariant confluent objects in an otherwise strongly consistent setting.
+\end{feedback}
+\paragraph{Reviewer 1: D4}
+\begin{feedback}
+  W3 would really help to showcase the value of segmentation in practice.
+  Ideally, we want to see that in a specific application there is a logical
+  mapping between segments and data, and then use this work as an example for
+  potential future work that will be fully automated as the authors suggest.
+\end{feedback}
+\paragraph{Reviewer 1: D5}
+\begin{feedback}
+  In fact, this automation would definitely strength the paper dramatically if
+  it were added (but it is not required for this extended version to be enough)
+\end{feedback}
+\paragraph{Reviewer 1: D6}
+\begin{feedback}
+  It is clear that the authors added more material to the journal paper,
+  however, it does not substantially augment the messages of the paper --
+  addressing W1-W3 will help in that direction (for example section 7 ends
+  without any enough discussion of the practical connections of the proposed
+  idea)
+\end{feedback}
+\paragraph{Reviewer 1: D7}
+\begin{feedback}
+  In the intro we read about "the trade-off between application complexity and
+  coordination-freedom", it would be great to see some practical examples later
+  in the paper
+\end{feedback}
+\paragraph{Reviewer 1: D8}
+\begin{feedback}
+  In section 4.2, more details about what can be done with respect to help a
+  user reason about unreachable states would be great
+\end{feedback}
+\paragraph{Reviewer 1: D9}
+\begin{feedback}
+  Figure 5 should be moved before figure 6
+\end{feedback}
+\paragraph{Reviewer 1: D10}
+\begin{feedback}
+  in page 3 we read "The culprit is concurrent decrements, which we can forbid
+  in a simple one-segment segmentation ...", this sentence does not parse well
+\end{feedback}
+\paragraph{Reviewer 1: D11}
+\begin{feedback}
+  In 6.4 we read "This example is exactly the same as Example 8 which we
+  handled by simply removing withdrawal transactions from our segmentation's
+  set of transactions." How can one identify transactions to remove, and is the
+  removal practically done?
+\end{feedback}
+\paragraph{Reviewer 1: D12}
+\begin{feedback}
+  In 8.1 we read "When a server receives a coordination request from the
+  leader, it stops processing transactions and sends the leader its state."
+  what happens to the in-flight transactions? Are the cancelled or allowed to
+  finish? Is the system simply not admitting new transactions?
+\end{feedback}
+
+\paragraph{Reviewer 1: D13}
+\begin{feedback}
+  In 8.1 again, at the end, more discussion about the tradeoff of
+  fault-tolerance would be interesting.
+\end{feedback}
+
+\paragraph{Reviewer 1: Typos}
+\begin{feedback}
+  end of first column of page 3 "that it execute a transaction" --> "that it
+  executes a transaction"
+
+  section 5, in example 3, "Our start state state" --> two times state
+
+  section 8.2 in example 12: "and a optional" --> "and an optional"
+\end{feedback}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Reviewer 3}
+\paragraph{Reviewer 3: Overview}
+\begin{feedback}
+  This manuscript is an extension of the VLDB 2019 conference version of
+  "Interactive Checks for Coordination Avoidance". The original PVLDB paper is
+  a solid piece of work that is well written and easy to follow.  It was
+  published in September 2018. In this manuscript, the authors elaborated more
+  by adding more examples, proofs, and figures to make it easier for the reader
+  to understand specific concepts and definitions. Some readers may find that
+  the original paper is clear and enough without these additions. Moreover, the
+  authors added two new sections, namely Section 4.3 and 7, which do not show a
+  significant improvement to the original contribution. In almost two years, it
+  was expected that the authors will address some of the future work mentioned
+  in the original paper, such as "In the future, we plan on exploring ways to
+  help a user reason about unreachable states and ways to discover sets of
+  unreachable states automatically." Overall, the authors did not manage to
+  show that the additions were significant enough to warrant publication.
+\end{feedback}
+
+
+\paragraph{Reviewer 3: Section 2.1}
+\begin{feedback}
+  The authors revised a small part of this section to clarify that the merge
+  operator of a distributed object does not have to satisfy any special
+  mathematical properties like associativity and commutativity.
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 2.3}
+\begin{feedback}
+  The authors added this section to prove that their definition of invariant
+  confluence and the original definition from Bailis et al.  [1] are
+  equivalent. The authors did not clarify why it is important to prove that
+  both definitions are equivalent.
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 3}
+\begin{feedback}
+  The authors revised a small part of the original section to be in the form of
+  a proof. For example in the PVLDB paper, the authors said: "The forward
+  direction of Theorem 2 follows immediately from Theorem 1. The backward
+  direction holds because any two invariant satisfying states s1 and s2 must be
+  reachable (by assumption), so their join s1 t s2 is also reachable. And
+  because O is (s0, T, I)-confluent, all reachable points, including s1 t s2,
+  satisfy the invariant." And in the VLDBJ submission, the authors said:
+  "Proof. The forward direction of Theorem 3 follows immediately from Theorem
+  2. The backward direction holds because any two invariant satisfying states
+  s1 and s2 must be reachable (by assumption), so their join s1 ⊔ s2 is also
+  reachable. And because O is (s0, T, I)- confluent, all reachable points,
+  including s1 ⊔s2, satisfy the invariant. Moreover s0 is reachable, so I(s0)
+  because O is (s0,T,I)-confluent. "
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 4.1}
+\begin{feedback}
+  the authors expanded their correctness proof of the interactive decision
+  procedure and added a few other minor elaborations. The original proof in the
+  PVLDB paper was clear enough to the reader.
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 4.2}
+\begin{feedback}
+  In Section 4.2, the authors added a very brief example showing why invariant
+  closure is undecidable. The reader can find original section 4.2 is clear
+  enough. Instead in both versions of section 4.2, i.e., PVLDB and VLDBJ, the
+  authors said: "In the future, we plan on exploring ways to help a user reason
+  about unreachable states and ways to discover sets of unreachable states
+  automatically." After almost two years of publishing the PVLDB version of
+  this submission, this manuscript would be much stronger, if the authors
+  explored these ways.
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 4.3}
+\begin{feedback}
+  Section 4.3 is newly added to clarify that the decision procedure relies on
+  human input to guide the decision procedure and explain how to mitigate these
+  errors.
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 5}
+\begin{feedback}
+  In section 5, the authors added more examples, proof, and Figure 4 to provide
+  a better understanding of merge-reducible, non-merge- reducible objects.
+  Still, the reader can easily understand these concepts from the original
+  paper.
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 6}
+\begin{feedback}
+  In Section 6, the authors elaborated more to clarify the concepts and
+  definitions in this section. Some readers may find the original paper was
+  enough to understand these concepts and definitions.
+\end{feedback}
+
+\paragraph{Reviewer 3: Section 7}
+\begin{feedback}
+  The authors added Section 7 to highlight a dual "operation-based" approach.
+  This is not a significant improvement to the original contribution.
+\end{feedback}
+
+\paragraph{Reviewer 3: Reviewer 3: Other Comments}
+\begin{feedback}
+  Figure 5 should appear before Figure 6.
+\end{feedback}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Reviewer 4}
+\paragraph{Reviewer 4: Overview}
+\begin{feedback}
+  The paper is very well written, and it makes substantial improvement over the
+  VLDB 2019 conference version.
+\end{feedback}
+
+\paragraph{Reviewer 4: 1}
+\begin{feedback}
+  In the introduction the concept of "invariant" is missing some context. Where
+  does this invariant come from? It looks like this invariant is a given
+  invariant for the program executing on the replicated object, and it is not
+  necessarily a tight invariant.  Clarifying this in advance would be useful,
+  as I realized this only in the beginning of Section 2, I read this:
+  "Informally, a replicated object is invariant confluent *with respect to an
+  invariant* if every replica of the object is guaranteed to satisfy the
+  invariant despite the possibility of different replicas being concurrently
+  modified or merged together." Mentioning the system model explicitly in the
+  introduction also would help: "a distributed object and accompanying
+  invariant is replicated across a set of servers."
+\end{feedback}
+
+\paragraph{Reviewer 4: 2}
+\begin{feedback}
+  Invariant confluence is about safety, however, could there be a liveness part
+  of the problem worth investigating/discussing for replicated object
+  management? Would it be possible that forgoing coordination across replicas
+  could jeopardize/violate some liveness properties?
+\end{feedback}
+
+\paragraph{Reviewer 4: 3}
+\begin{feedback}
+  Mergeable Replicated Data Types paper (OOPSLA'19) is relevant work. The paper
+  does not cite MRDT understandably because it is very recent work, however
+  including a discussion of this in the related work would be helpful.
+\end{feedback}
+
+\paragraph{Reviewer 4: 4}
+\begin{feedback}
+  Section 4 is about invariant tightening, which has a broader applicability in
+  distributed systems/programs. Unfortunately the techniques used here are not
+  new. Involving the user for identifying unreachable states in not practical,
+  and the discussion on tolerating user errors is weak as it does not offer a
+  remedy. Would using some heuristics and abstracting state provide any help
+  here?
+\end{feedback}
+
+\paragraph{Reviewer 4: 5}
+\begin{feedback}
+  Section 6 on segmented invariant confluence is nice. It would be nice if
+  Section 6.4 could be improved. I liked the fourth point in Section 6.4, would
+  it be possible to elaborate on this. The sixth point however is bad, as
+  replicating every server with state-machine-replication is overkill. Would it
+  be possible to use use a membership service approach (as in Vertical Paxos
+  and Chain Replication configuration) to prevent a single crash to flunk
+  global coordination?
+\end{feedback}
+
+\paragraph{Reviewer 4: 6}
+\begin{feedback}
+  Is there plans to make Lucy implementation open source?
+\end{feedback}
+
+\paragraph{Reviewer 4: 7}
+\begin{feedback}
+  In the throughput evaluation of segmented invariant confluence systems, what
+  would be the effects/overhead of faulttolerance? (Related to item 5 above.)
+\end{feedback}
+
+\paragraph{Reviewer 4: 8}
+\begin{feedback}
+  Would it be possible to elaborate more on escrow transaction implementation.
+  It was not clear to me from Example 13.
+\end{feedback}
+
+\bibliographystyle{abbrv}
+\bibliography{references}
+\end{multicols*}
+\end{document}
