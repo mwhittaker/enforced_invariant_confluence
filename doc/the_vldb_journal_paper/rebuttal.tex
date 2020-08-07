@@ -3,6 +3,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{enumitem}
 \usepackage{float}
+\usepackage{invariantconfluence}
 \usepackage{multicol}
 \usepackage{pervasives}
 \usepackage{vldblite}
@@ -50,38 +51,52 @@ changes made to the paper are shown in \markrevisions{pink}.
   More details about the DSL to specify the invariants with more complex
   examples would add a lot of value to the paper
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: W2}
 \begin{feedback}
   More experiments with some realistic workloads (like TPCC) to show the
   benefit of the proposed concepts in action are needed
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: W3}
 \begin{feedback}
   Even though the automatic segmentation is left for future work, an example
   with a manual mapping of segments in a realistic workload (like TPCC) would
   show-case its potential
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: W4}
 \begin{feedback}
   The main weak point of this specific submission is whether it has enough new
   material to to qualify for being an extended version
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D1}
 \begin{feedback}
   W4 touches upon the "new material" for this extended version of the paper,
   and the above weak points W1, W2 and W3 can all serve as additional material.
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D2}
 \begin{feedback}
   W1 will essentially help the reader to quickly see the value of the proposed
   definitions and theorems with some specification examples that will be able
   to capture more interesting use-cases.
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D3}
 \begin{feedback}
   W2 would help to quantify the benefits that come from being able to have some
   invariant confluent objects in an otherwise strongly consistent setting.
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D4}
 \begin{feedback}
   W3 would really help to showcase the value of segmentation in practice.
@@ -89,11 +104,15 @@ changes made to the paper are shown in \markrevisions{pink}.
   mapping between segments and data, and then use this work as an example for
   potential future work that will be fully automated as the authors suggest.
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D5}
 \begin{feedback}
   In fact, this automation would definitely strength the paper dramatically if
   it were added (but it is not required for this extended version to be enough)
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D6}
 \begin{feedback}
   It is clear that the authors added more material to the journal paper,
@@ -102,26 +121,36 @@ changes made to the paper are shown in \markrevisions{pink}.
   without any enough discussion of the practical connections of the proposed
   idea)
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D7}
 \begin{feedback}
   In the intro we read about "the trade-off between application complexity and
   coordination-freedom", it would be great to see some practical examples later
   in the paper
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D8}
 \begin{feedback}
   In section 4.2, more details about what can be done with respect to help a
   user reason about unreachable states would be great
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D9}
 \begin{feedback}
   Figure 5 should be moved before figure 6
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D10}
 \begin{feedback}
   in page 3 we read "The culprit is concurrent decrements, which we can forbid
   in a simple one-segment segmentation ...", this sentence does not parse well
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D11}
 \begin{feedback}
   In 6.4 we read "This example is exactly the same as Example 8 which we
@@ -129,6 +158,8 @@ changes made to the paper are shown in \markrevisions{pink}.
   set of transactions." How can one identify transactions to remove, and is the
   removal practically done?
 \end{feedback}
+\textcolor{red}{TODO.}
+
 \paragraph{Reviewer 1: D12}
 \begin{feedback}
   In 8.1 we read "When a server receives a coordination request from the
@@ -136,12 +167,14 @@ changes made to the paper are shown in \markrevisions{pink}.
   what happens to the in-flight transactions? Are the cancelled or allowed to
   finish? Is the system simply not admitting new transactions?
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \paragraph{Reviewer 1: D13}
 \begin{feedback}
   In 8.1 again, at the end, more discussion about the tradeoff of
   fault-tolerance would be interesting.
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \paragraph{Reviewer 1: Typos}
 \begin{feedback}
@@ -152,14 +185,15 @@ changes made to the paper are shown in \markrevisions{pink}.
 
   section 8.2 in example 12: "and a optional" --> "and an optional"
 \end{feedback}
+\textcolor{red}{TODO.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Reviewer 3}
 \paragraph{Reviewer 3: Overview}
 \begin{feedback}
   This manuscript is an extension of the VLDB 2019 conference version of
-  "Interactive Checks for Coordination Avoidance". The original PVLDB paper is
-  a solid piece of work that is well written and easy to follow.  It was
+  ``Interactive Checks for Coordination Avoidance''. The original PVLDB paper
+  is a solid piece of work that is well written and easy to follow. It was
   published in September 2018. In this manuscript, the authors elaborated more
   by adding more examples, proofs, and figures to make it easier for the reader
   to understand specific concepts and definitions. Some readers may find that
@@ -167,12 +201,13 @@ changes made to the paper are shown in \markrevisions{pink}.
   authors added two new sections, namely Section 4.3 and 7, which do not show a
   significant improvement to the original contribution. In almost two years, it
   was expected that the authors will address some of the future work mentioned
-  in the original paper, such as "In the future, we plan on exploring ways to
+  in the original paper, such as ``In the future, we plan on exploring ways to
   help a user reason about unreachable states and ways to discover sets of
-  unreachable states automatically." Overall, the authors did not manage to
+  unreachable states automatically.'' Overall, the authors did not manage to
   show that the additions were significant enough to warrant publication.
 \end{feedback}
-
+We address this feedback in detail below. We also disagree that the time
+between publication and now should have any bearing on the revisions.
 
 \paragraph{Reviewer 3: Section 2.1}
 \begin{feedback}
@@ -180,31 +215,44 @@ changes made to the paper are shown in \markrevisions{pink}.
   operator of a distributed object does not have to satisfy any special
   mathematical properties like associativity and commutativity.
 \end{feedback}
+Yup. This was requested by many readers who assumed early on that the merge
+operator did require some special properties. In Bailis et al.'s original
+paper, for example, they assume the merge operator is associative, commutative,
+and idempotent~\cite{bailis2014coordination}.
 
 \paragraph{Reviewer 3: Section 2.3}
 \begin{feedback}
   The authors added this section to prove that their definition of invariant
-  confluence and the original definition from Bailis et al.  [1] are
-  equivalent. The authors did not clarify why it is important to prove that
-  both definitions are equivalent.
+  confluence and the original definition from Bailis et al.\ are equivalent.
+  The authors did not clarify why it is important to prove that both
+  definitions are equivalent.
 \end{feedback}
+Without a proof of the two definitions being equivalent, it's possible that our
+notion of \invariantconfluence{} and Bailis et al.'s original notion differ.
+If so, none of our theorems or decision procedures could be applied to Bailis et
+al.'s findings. We'd be talking about two completely different concepts.
+Proving they are equivalent unifies the work. It's similar to proving that
+relational algebra, SQL, and relational calculus are all equally expressive.
+Without this knowledge, proofs using the different definitions would be
+mutually incompatible.
 
 \paragraph{Reviewer 3: Section 3}
 \begin{feedback}
   The authors revised a small part of the original section to be in the form of
-  a proof. For example in the PVLDB paper, the authors said: "The forward
+  a proof. For example in the PVLDB paper, the authors said: ``The forward
   direction of Theorem 2 follows immediately from Theorem 1. The backward
   direction holds because any two invariant satisfying states s1 and s2 must be
   reachable (by assumption), so their join s1 t s2 is also reachable. And
   because O is (s0, T, I)-confluent, all reachable points, including s1 t s2,
-  satisfy the invariant." And in the VLDBJ submission, the authors said:
-  "Proof. The forward direction of Theorem 3 follows immediately from Theorem
+  satisfy the invariant.'' And in the VLDBJ submission, the authors said:
+  ``Proof. The forward direction of Theorem 3 follows immediately from Theorem
   2. The backward direction holds because any two invariant satisfying states
   s1 and s2 must be reachable (by assumption), so their join s1 ⊔ s2 is also
   reachable. And because O is (s0, T, I)- confluent, all reachable points,
   including s1 ⊔s2, satisfy the invariant. Moreover s0 is reachable, so I(s0)
-  because O is (s0,T,I)-confluent. "
+  because O is (s0,T,I)-confluent.''
 \end{feedback}
+Yup, a minor but helpful improvement.
 
 \paragraph{Reviewer 3: Section 4.1}
 \begin{feedback}
@@ -212,18 +260,29 @@ changes made to the paper are shown in \markrevisions{pink}.
   procedure and added a few other minor elaborations. The original proof in the
   PVLDB paper was clear enough to the reader.
 \end{feedback}
+We're happy that the original proof was clear to the reviewer, but we felt it
+was not clear to most people, including us.
 
 \paragraph{Reviewer 3: Section 4.2}
 \begin{feedback}
   In Section 4.2, the authors added a very brief example showing why invariant
   closure is undecidable. The reader can find original section 4.2 is clear
   enough. Instead in both versions of section 4.2, i.e., PVLDB and VLDBJ, the
-  authors said: "In the future, we plan on exploring ways to help a user reason
-  about unreachable states and ways to discover sets of unreachable states
-  automatically." After almost two years of publishing the PVLDB version of
-  this submission, this manuscript would be much stronger, if the authors
-  explored these ways.
+  authors said: ``In the future, we plan on exploring ways to help a user
+  reason about unreachable states and ways to discover sets of unreachable
+  states automatically.'' After almost two years of publishing the PVLDB
+  version of this submission, this manuscript would be much stronger, if the
+  authors explored these ways.
 \end{feedback}
+Automatically discovering unreachable states is hard, really hard. As we
+describe in the paper, it is easy to verify that a state is reachable, simply
+give an expression that evaluates to it. Verifying that a state is unreachable
+is significantly harder, as we have to create a proof showing that there does
+not exist any execution in which the state is reached. Things like the Collatz
+conjecture show that reasoning about the reachability or unreachability of even
+simple programs can be tremendously difficult. If we developed any substantial
+techniques to identify unreachable states in a general way, we feel that would
+constitute a strong publication on its own.
 
 \paragraph{Reviewer 3: Section 4.3}
 \begin{feedback}
@@ -231,6 +290,16 @@ changes made to the paper are shown in \markrevisions{pink}.
   human input to guide the decision procedure and explain how to mitigate these
   errors.
 \end{feedback}
+Yes, and we feel this is one of the core additions to the paper. The two
+biggest drawbacks of interactivity are (1) the time and labor required of a
+user and (2) the possibility of introducing errors. We break down the two types
+of user errors (i.e.\ labelling an unreachable state as reachable and labelling
+a reachable state as unreachable) and provide solutions for both, eliminating
+the possibility of an erroneously verified \invariantconfluent{} object from
+violating an invariant in deployment. This addition is very important for
+anyone deploying \invariantconfluent{} objects in the wild. It's also
+surprising and non-obvious. We originally did not think that our decision
+procedures could be made tolerant to user errors.
 
 \paragraph{Reviewer 3: Section 5}
 \begin{feedback}
@@ -239,6 +308,12 @@ changes made to the paper are shown in \markrevisions{pink}.
   Still, the reader can easily understand these concepts from the original
   paper.
 \end{feedback}
+We strongly disagree. We believe that Section 5 was the most difficult section
+to understand in our original publication, mostly because we did not have
+enough space to fully explain all of our definitions, theorems, and proofs. The
+statement and proof of Theorem 4 (in our original publication) is particularly
+nuanced. We think that our added proofs greatly clarify this section, and our
+figures illustrating the intuition behind the proofs are especially helpful.
 
 \paragraph{Reviewer 3: Section 6}
 \begin{feedback}
@@ -246,17 +321,40 @@ changes made to the paper are shown in \markrevisions{pink}.
   definitions in this section. Some readers may find the original paper was
   enough to understand these concepts and definitions.
 \end{feedback}
+We added an example to the paper to better explain co-reachable and
+co-unreachable states.  We agree that this was a minor bit of clarification,
+and that the section was already relatively clear. However, we also made a
+number of other additions to Section 6. We explained the difference between
+segmented \invariantconfluence{} and a distributed locking approach to
+maintaining invariants~\cite{balegas2015putting, gotsman2016cause}. We
+discussed two performance optimizations to our segmented \invariantconfluence{}
+system model.  We discussed how segmented \invariantconfluence{} can leverage
+our results on \mergereducibility{}. We elaborated on the fault-tolerance of
+our model. We believe that, taken together, these additions are significant.
 
 \paragraph{Reviewer 3: Section 7}
 \begin{feedback}
-  The authors added Section 7 to highlight a dual "operation-based" approach.
+  The authors added Section 7 to highlight a dual ``operation-based'' approach.
   This is not a significant improvement to the original contribution.
 \end{feedback}
+We disagree. The dual operation-based definitions of \invariantconfluence{} are
+both theoretically interesting and practically important. Theoretically, as
+with work on CRDTs, having dual models of the same concept can be helpful in
+writing proofs and building intuition. Some properties are more naturally
+expressed in the state-based model, while others are more natural in the
+operation-based model. The operation-based model also has practical importance.
+Many CRDTs are easier to understand as state-based objects, but are more
+efficiently implemented as operation-based objects. By introducing
+operation-based definitions of \invariantconfluence{}, we allow system
+designers to choose whichever form of CRDT is more efficient. As we describe in
+the paper, for example, the operation-based definitions let us replace a
+PN-counter with a more efficient integer.
 
 \paragraph{Reviewer 3: Reviewer 3: Other Comments}
 \begin{feedback}
   Figure 5 should appear before Figure 6.
 \end{feedback}
+\textcolor{red}{TODO.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Reviewer 4}
@@ -265,6 +363,7 @@ changes made to the paper are shown in \markrevisions{pink}.
   The paper is very well written, and it makes substantial improvement over the
   VLDB 2019 conference version.
 \end{feedback}
+Thanks! We appreciate it!
 
 \paragraph{Reviewer 4: 1}
 \begin{feedback}
@@ -288,6 +387,13 @@ changes made to the paper are shown in \markrevisions{pink}.
   management? Would it be possible that forgoing coordination across replicas
   could jeopardize/violate some liveness properties?
 \end{feedback}
+Forgoing coordination across replicas actually \emph{increases} liveness,
+rather than jeopardizing or violating it. Any alive replica of an
+\invariantconfluent{} object can service client requests and execute
+transactions. This is the strongest form of liveness we can hope to achieve. In
+fact, if we aim for strongly consistent replication, then the CAP theorem tells
+us that total availability (the kind that \invariantconfluence{} achieves) is
+impossible~\cite{brewer2012cap, gilbert2002brewer}.
 
 \paragraph{Reviewer 4: 3}
 \begin{feedback}
@@ -295,6 +401,7 @@ changes made to the paper are shown in \markrevisions{pink}.
   does not cite MRDT understandably because it is very recent work, however
   including a discussion of this in the related work would be helpful.
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \paragraph{Reviewer 4: 4}
 \begin{feedback}
@@ -305,6 +412,7 @@ changes made to the paper are shown in \markrevisions{pink}.
   remedy. Would using some heuristics and abstracting state provide any help
   here?
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \paragraph{Reviewer 4: 5}
 \begin{feedback}
@@ -316,23 +424,31 @@ changes made to the paper are shown in \markrevisions{pink}.
   and Chain Replication configuration) to prevent a single crash to flunk
   global coordination?
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \paragraph{Reviewer 4: 6}
 \begin{feedback}
   Is there plans to make Lucy implementation open source?
 \end{feedback}
+{
+  Yes. Lucy is available online at \urlstyle{rm}
+  \url{https://github.com/mwhittaker/enforced_invariant_confluence}. We also
+  added this link to Section 8 of the paper.
+}
 
 \paragraph{Reviewer 4: 7}
 \begin{feedback}
   In the throughput evaluation of segmented invariant confluence systems, what
   would be the effects/overhead of faulttolerance? (Related to item 5 above.)
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \paragraph{Reviewer 4: 8}
 \begin{feedback}
   Would it be possible to elaborate more on escrow transaction implementation.
   It was not clear to me from Example 13.
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \bibliographystyle{abbrv}
 \bibliography{references}
