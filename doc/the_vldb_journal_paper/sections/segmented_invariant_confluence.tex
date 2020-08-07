@@ -289,7 +289,7 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
   \algoref{ArbitraryStartInteractiveDecisionProcedure} return true.
 \end{example}
 
-\subsection{Discussion and Limitations}
+\subsection{Discussion and Limitations}~\seclabel{SegmentedDiscussion}
 There are a few things worth noting about segmented \invariantconfluence{}, its
 system model, and its decision procedure.
 %
@@ -333,9 +333,13 @@ can simply buffer $t$ for re-execution at a later time. While this increases
 the latency required to execute $t$, it's possible that after other
 transactions are executed, re-executing $t$ may lead to a state that either
 satisfies the active invariant or violates the global invariant. In either
-case, a round of global coordination is avoided. Similarly, servers can
-buffer transactions that require global coordination, executing an entire
-batch of these transactions during a single round of global coordination.
+case, a round of global coordination is avoided. \markrevisions{Later, in
+\exampleref{EscrowTransactionsEval}, we'll see a concrete example of this
+optimization.}
+%
+Similarly, servers can buffer transactions that require global coordination,
+executing an entire batch of these transactions during a single round of global
+coordination.
 
 Fifth, a segmented \invariantconfluence{} decision procedure can also
 leverage \thmref{LatticeProperty} in addition to
