@@ -22,7 +22,7 @@ expression with fewer merges.
 
 \begin{example}\examplelabel{MergeReducible}
   Consider the distributed object $O = (\ints, \max)$ consisting of integers
-  merged by the max function. Our start state state $s_0 = 0$ and our invariant
+  merged by the max function. Our start state $s_0 = 0$ and our invariant
   $I = \setst{x \in \ints}{x \geq 0}$. Our set $T$ of transactions is the
   infinite set $T = \setst{t_y}{y \in \ints}$ where $t_y(x) = x + y$ is a
   transaction that adds $y$ to the state. For example, $t_2$ is a transaction

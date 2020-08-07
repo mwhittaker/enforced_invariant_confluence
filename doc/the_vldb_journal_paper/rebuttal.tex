@@ -146,28 +146,50 @@ changes made to the paper are shown in \markrevisions{pink}.
 
 \paragraph{Reviewer 1: D10}
 \begin{feedback}
-  in page 3 we read "The culprit is concurrent decrements, which we can forbid
-  in a simple one-segment segmentation ...", this sentence does not parse well
+  in page 3 we read ``The culprit is concurrent decrements, which we can forbid
+  in a simple one-segment segmentation ...'', this sentence does not parse well
 \end{feedback}
-\textcolor{red}{TODO.}
+We reworded the sentence to be easier to read.
 
 \paragraph{Reviewer 1: D11}
 \begin{feedback}
-  In 6.4 we read "This example is exactly the same as Example 8 which we
+  In 6.4 we read ``This example is exactly the same as Example 8 which we
   handled by simply removing withdrawal transactions from our segmentation's
-  set of transactions." How can one identify transactions to remove, and is the
-  removal practically done?
+  set of transactions.'' How can one identify transactions to remove, and is
+  the removal practically done?
 \end{feedback}
-\textcolor{red}{TODO.}
+Users must manually identify transactions to remove. More generally,
+identifying a transaction to remove from a segmentation is a special case of
+forming a segmentation, and we do not provide any automated assistance on how
+to form a segmentation. Is the removal practically done? That depends on the
+workload. For some workloads, identifying invariant-violating transactions can
+be easy. The bank withdrawal example (Example 8). Other, more complex
+workloads, can be difficult to reason about. Forming segmentations for these
+workloads is not easy. We think that automatically forming segmentations is an
+interesting avenue for future research.
 
 \paragraph{Reviewer 1: D12}
 \begin{feedback}
-  In 8.1 we read "When a server receives a coordination request from the
-  leader, it stops processing transactions and sends the leader its state."
+  In 8.1 we read ``When a server receives a coordination request from the
+  leader, it stops processing transactions and sends the leader its state.''
   what happens to the in-flight transactions? Are the cancelled or allowed to
   finish? Is the system simply not admitting new transactions?
 \end{feedback}
-\textcolor{red}{TODO.}
+In-flight transactions are deferred until after the round of coordination is
+done. They aren't cancelled, and they are allowed to finish, but only after the
+coordination is done. The entire system stops processing transactions
+temporarily.  Technically, the system can still \emph{admit} new transactions
+during coordination, but it cannot execute them.
+
+We describe this in Section 6.2, for example, when we say that if ``$t \notin
+T_i$, then $p_i$ initiates a round of global coordination to execute $t$.
+During global coordination, every server temporarily stops processing
+transactions.''
+
+Your question also reinforces the conclusion of Figure 10. If coordination is
+frequent, then segmented \invariantconfluence{} becomes slow, even slower than
+linearizable replication. Segmented \invariantconfluent{} works well only when
+coordination is infrequent.
 
 \paragraph{Reviewer 1: D13}
 \begin{feedback}
@@ -185,7 +207,7 @@ changes made to the paper are shown in \markrevisions{pink}.
 
   section 8.2 in example 12: "and a optional" --> "and an optional"
 \end{feedback}
-\textcolor{red}{TODO.}
+Fixed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Reviewer 3}

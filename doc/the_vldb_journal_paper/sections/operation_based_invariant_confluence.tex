@@ -33,13 +33,13 @@ replica $s_i \in O$ of the replicated object. Every server begins with a start
 state $s_0 \in S$, a fixed set $T$ of transactions, and an invariant $I$.
 Servers repeatedly perform one of two actions.
 
-First, a client can contact a server $p_i$ and request that it execute a
-transaction $t \in T$. $p_i$ speculatively executes $t(s_i)$, transitioning
-from state $s_i$ to state $t(s_i)(s_i)$. If $t(s_i)(s_i)$ does not satisfy the
-invariant, then $p_i$ aborts the transaction and reverts to state $s_i$.
-Otherwise, $p_i$ commits the transaction and remains in state $t(s_i)(s_i)$. It
-also broadcasts the shadow transaction $t(s_i)$ in an exactly-once manner to
-the rest of the servers.
+First, a client can contact a server $p_i$ and request that it
+\markrevisions{executes} a transaction $t \in T$. $p_i$ speculatively executes
+$t(s_i)$, transitioning from state $s_i$ to state $t(s_i)(s_i)$. If
+$t(s_i)(s_i)$ does not satisfy the invariant, then $p_i$ aborts the transaction
+and reverts to state $s_i$.  Otherwise, $p_i$ commits the transaction and
+remains in state $t(s_i)(s_i)$. It also broadcasts the shadow transaction
+$t(s_i)$ in an exactly-once manner to the rest of the servers.
 
 Second, $p_j$ can receive a shadow transaction $t(s_i)$ from some other server
 $p_i$. When $p_j$ receives $t(s_i)$, it transitions from its state $s_j$ to
