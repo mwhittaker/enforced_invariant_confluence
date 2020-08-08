@@ -51,14 +51,23 @@ changes made to the paper are shown in \markrevisions{pink}.
   More details about the DSL to specify the invariants with more complex
   examples would add a lot of value to the paper
 \end{feedback}
-\textcolor{red}{TODO.}
+We added a link to our DSL implementation on GitHub to the beginning of Section
+8. The GitHub repository also contains a couple of examples that didn't make it
+into the paper. We also added a bit more explanation of the DSL to Section 8.1.
+We agree the paper would benefit from more examples, but given that the paper
+already has over 10 examples of invariant confluence with varying degrees of
+complexity from simple (e.g., Example 10) to complex (e.g, Example 14), we feel
+the added benefit of yet another example does not justify the effort.
 
 \paragraph{Reviewer 1: W2}
 \begin{feedback}
   More experiments with some realistic workloads (like TPCC) to show the
   benefit of the proposed concepts in action are needed
 \end{feedback}
-\textcolor{red}{TODO.}
+See above. We agree that having a number of realistic workloads in the paper
+would be beneficial, but specifying, verifying, and explaining every workload
+requires a significant amount of work for a marginal increase in the clarity of
+the paper.
 
 \paragraph{Reviewer 1: W3}
 \begin{feedback}
@@ -66,21 +75,21 @@ changes made to the paper are shown in \markrevisions{pink}.
   with a manual mapping of segments in a realistic workload (like TPCC) would
   show-case its potential
 \end{feedback}
-\textcolor{red}{TODO.}
+See above.
 
 \paragraph{Reviewer 1: W4}
 \begin{feedback}
   The main weak point of this specific submission is whether it has enough new
   material to to qualify for being an extended version
 \end{feedback}
-\textcolor{red}{TODO.}
+See D6.
 
 \paragraph{Reviewer 1: D1}
 \begin{feedback}
-  W4 touches upon the "new material" for this extended version of the paper,
+  W4 touches upon the ``new material'' for this extended version of the paper,
   and the above weak points W1, W2 and W3 can all serve as additional material.
 \end{feedback}
-\textcolor{red}{TODO.}
+See W1, W2, W3, and D6.
 
 \paragraph{Reviewer 1: D2}
 \begin{feedback}
@@ -88,14 +97,14 @@ changes made to the paper are shown in \markrevisions{pink}.
   definitions and theorems with some specification examples that will be able
   to capture more interesting use-cases.
 \end{feedback}
-\textcolor{red}{TODO.}
+See W1.
 
 \paragraph{Reviewer 1: D3}
 \begin{feedback}
   W2 would help to quantify the benefits that come from being able to have some
   invariant confluent objects in an otherwise strongly consistent setting.
 \end{feedback}
-\textcolor{red}{TODO.}
+See W2.
 
 \paragraph{Reviewer 1: D4}
 \begin{feedback}
@@ -104,14 +113,15 @@ changes made to the paper are shown in \markrevisions{pink}.
   mapping between segments and data, and then use this work as an example for
   potential future work that will be fully automated as the authors suggest.
 \end{feedback}
-\textcolor{red}{TODO.}
+See W3.
 
 \paragraph{Reviewer 1: D5}
 \begin{feedback}
   In fact, this automation would definitely strength the paper dramatically if
   it were added (but it is not required for this extended version to be enough)
 \end{feedback}
-\textcolor{red}{TODO.}
+We think that automated segmentation would be such a significant contribution
+that it would warrant a publication on its own.
 
 \paragraph{Reviewer 1: D6}
 \begin{feedback}
@@ -121,12 +131,123 @@ changes made to the paper are shown in \markrevisions{pink}.
   without any enough discussion of the practical connections of the proposed
   idea)
 \end{feedback}
-\textcolor{red}{TODO.}
+We disagree. Our paper is largely theoretical. We provide new, and arguably
+improved, definitions of \invariantconfluence{}. We characterize the
+relationship between \invariantclosure{} and \invariantconfluence{}. We exploit
+the relationship to develop an \invariantclosure{} decision procedure. We
+invent the notion of \mergereducibility{} and characterize its relationship
+with \invariantclosure{}. We invent the notion of segmented
+\invariantconfluence{}, and develop another decision procedure.
+
+Addressing W1-W3 would certainly strengthen the paper. We don't argue that.
+But, these three points focus exclusively on the empirical evaluation of our
+techniques, rather than the theoretical underpinnings, which we feel is the
+core message of the paper. This is why we focused our revisions on the
+theoretical aspects of the paper. We believe that these additions are
+substantial. Repeating from our change log:
+\begin{itemize}
+  \item (Section 2.3)
+    In our conference paper, we present a definition of invariant confluence
+    that is slightly different than the original definition from Bailis et
+    al.~\cite{bailis2014coordination}, but we do not comment on the difference.
+    We added a subsection (Section 2.3) clarifying that the difference in
+    definitions is superficial. We describe Bailis' original definition using
+    our formalism and prove that the two definitions are equivalent.
+
+  \item (Section 3, Theorem 2)
+    We added a formal proof that invariant closure is sufficient for invariant
+    confluence.
+
+  \item (Section 3, Theorem 3)
+    We added a formal proof of our key result equating invariant closure and
+    invariant confluence.
+
+  \item (Section 4.1)
+    We expanded the correctness proof of our interactive decision procedure. A
+    key step in understanding the correctness of our interactive invariant
+    confluence decision procedure---namely that $I$-reachable and
+    $(I-NR)$-reachable states are equal---was omitted from our conference
+    paper. We added a formal proof of this fact as well as a few other minor
+    elaborations.
+
+  \item (Section 4.2)
+    In our conference paper, we asserted that checking for invariant closure is
+    undecidable in general. We added a brief example showing \emph{why}
+    invariant closure is undecidable, by reducing it to the Halting Problem.
+
+  \item (Section 4.3)
+    One of the core contributions of our paper is an interactive invariant
+    confluence decision procedure. Here, ``interactive'' means that the
+    decision procedure relies on human input to guide the decision procedure.
+    It's possible for a person to provide the decision procedure with incorrect
+    information. We added a subsection (Section 4.3) describing how to mitigate
+    these errors.
+
+  \item (Section 5, Examples 3 and 4)
+    We added examples of merge-reducible and non-merge-reducible objects to
+    make it easier for the reader to understand the definition of
+    merge-reducibility.
+
+  \item (Section 5, Theorem 4 and Figure 4)
+    We added a formal proof that merge-reducibility is a sufficient condition
+    for invariant-confluence. We also added a diagram illustrating the key idea
+    behind the proof. Similarly, we added a counterexample showing that
+    merge-reducibility is not a necessary condition for invariant-confluence.
+
+  \item (Section 5, Theorem 5 and Figure 5)
+    We added a formal proof that criteria 1 through 4 are sufficient for
+    invariant confluence. The idea behind the proof is straightforward but the
+    details are tedious. To help readers see the forest through the trees, we
+    also added an illustration of the key idea of the proof.
+
+  \item (Section 5, Example 5)
+    In our conference paper, we provide an example of a distributed object that
+    satisfies criteria 1 through 4 outlined in Theorem 4 but is not invariant
+    closed. In the example, we asserted that criteria 1 through 4 are satisfied
+    but did not elaborate on why. We added a brief explanation making it clear
+    why the criteria are met.
+
+  \item (Section 6.3, Example 7)
+    We added an example of co-reachable and co-unreachable states to help the
+    reader understand the definition of co-reachability.
+
+  \item (Section 6.4)
+    We added a paragraph explaining the relationship between segmented
+    invariant confluence and a distributed locking approach to maintaining
+    invariants (that can be found in related works).
+
+  \item (Section 6.4)
+    We added a paragraph explaining a couple of optimizations that can be made
+    to our segmented invariant confluence system model to reduce the frequency
+    of global coordination.
+
+  \item (Section 6.4)
+    We added a paragraph explaining how a segmented invariant confluence
+    decision procedure can leverage our merge reducibility results in addition
+    to our results on invariant closure.
+
+  \item (Section 6.4)
+    We clarified the fault tolerance limitations of segmented invariant
+    confluence. A naive implementation of our segmented invariant confluence
+    decision procedure does not guarantee liveness, but there are
+    straightforward techniques we can leverage to introduce liveness. We added
+    an explanation of this to the paper.
+
+  \item (Section 7)
+    Our conference paper presents formal definitions of distributed objects and
+    invariant confluence. The definitions revolve around servers gossiping
+    state to one another and merging the states together using a binary merge
+    operator. This approach is called a ``state-based'' approach. We added a
+    section (Section 7) outlining a dual ``operation-based'' approach in which
+    transactions, rather than states, are gossiped. This duality between
+    state-based and operation-based definitions is well established in the CRDT
+    literature.
+\end{itemize}
 
 \paragraph{Reviewer 1: D7}
 \begin{feedback}
-  In the intro we read about "the trade-off between application complexity and
-  coordination-freedom", it would be great to see some practical examples later
+  In the intro we read about ``the trade-off between application complexity and
+  coordination-freedom'', it would be great to see some practical examples later
   in the paper
 \end{feedback}
 \textcolor{red}{TODO.}
@@ -196,7 +317,7 @@ coordination is infrequent.
   In 8.1 again, at the end, more discussion about the tradeoff of
   fault-tolerance would be interesting.
 \end{feedback}
-\textcolor{red}{TODO.}
+See Reviewer 4: 5, 7.
 
 \paragraph{Reviewer 1: Typos}
 \begin{feedback}

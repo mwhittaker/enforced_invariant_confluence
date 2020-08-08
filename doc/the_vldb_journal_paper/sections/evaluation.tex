@@ -2,9 +2,10 @@
 In this section, we describe and evaluate Lucy: a prototype implementation of
 our decision procedures and system models.
 \begin{revisions}
-  All code is available online:
+  All code and all the specifications described below are available online:
   \urlstyle{rm}
-  \url{https://github.com/mwhittaker/enforced_invariant_confluence}.
+  \url{https://github.com/mwhittaker/enforced_invariant_confluence}. The
+  repository also contains a couple more example specifications.
 \end{revisions}
 
 \subsection{Implementation}
@@ -15,14 +16,21 @@ implementation of the decision procedure described in
 \algoref{ArbitraryStartInteractiveDecisionProcedure}. The decision procedures
 are implemented in roughly 2,500 lines of Python. Programmers specify objects,
 transactions, and invariants in a small Python DSL and interact with the
-interactive decision procedures using an interactive Python console. Note that
-a programmer only has to run the decision procedures offline a single time to
-check the \invariantconfluence{} of their distributed object. The decision
-procedures do not have to be run online when transactions are being processed.
+interactive decision procedures using an interactive Python console.
+\begin{revisions}
+  The Python DSL includes a library of CRDTs including integers, booleans,
+  tuples, sets, option types, and maps. It supports invariants involving
+  equalities, inequalities, arithmetic, boolean logic, and basic set operations
+  (e.g, union, intersection).
+\end{revisions}\
+Note that a programmer only has to run the decision procedures offline a single
+time to check the \invariantconfluence{} of their distributed object. The
+decision procedures do not have to be run online when transactions are being
+processed.
 
-We use Z3~\cite{de2008z3} to implement our \invariantclosure{} decision procedure,
-compiling an object and invariant into a formula that is satisfiable if and
-only if the object is \emph{not} \invariantclosed{}. If the object is
+We use Z3~\cite{de2008z3} to implement our \invariantclosure{} decision
+procedure, compiling an object and invariant into a formula that is satisfiable
+if and only if the object is \emph{not} \invariantclosed{}. If the object is
 \invariantclosed{}, then Z3 concludes that the formula is unsatisfiable.
 Otherwise, if the object is not \invariantclosed{}, then Z3 produces a
 counterexample witnessing the satisfiability of the formula.
@@ -219,13 +227,13 @@ any human interaction.
   coordination.
 
   Escrow transactions are a good example where this optimization works
-  particularly well. Assume that $k = 3$ and that the three states are $s_1 =
-  s_2 = s_3 = (p_1, p_2, p_3), (n_1, n_2, n_3) = (3, 3, 3), (3, 3, 3)$. Here,
-  no server can process a decrement transaction locally. If a server receives a
-  decrement transaction, it must execute it with global coordination. However,
-  if the server instead defers the execution of the decrement transaction and
-  happens to receive a number of increment transactions, then it can execute
-  the decrement locally, without the need for global coordination.
+  particularly well. Assume that $k = 3$ and that the three states are $(3, 3,
+  3), (3, 3, 3)$. Here, no server can process a decrement transaction locally.
+  If a server receives a decrement transaction, it must execute it with global
+  coordination. However, if the server instead defers the execution of the
+  decrement transaction and happens to receive a number of increment
+  transactions, then it can execute the decrement locally, without the need for
+  global coordination.
 \end{revisions}
 
 \example[TPC-C]\examplelabel{TpccEval}
