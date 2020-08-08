@@ -142,7 +142,7 @@ changes made to the paper are shown in \markrevisions{pink}.
 \begin{feedback}
   Figure 5 should be moved before figure 6
 \end{feedback}
-\textcolor{red}{TODO.}
+Fixed!
 
 \paragraph{Reviewer 1: D10}
 \begin{feedback}
@@ -376,7 +376,7 @@ PN-counter with a more efficient integer.
 \begin{feedback}
   Figure 5 should appear before Figure 6.
 \end{feedback}
-\textcolor{red}{TODO.}
+Fixed!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Reviewer 4}
@@ -401,6 +401,7 @@ Thanks! We appreciate it!
   introduction also would help: "a distributed object and accompanying
   invariant is replicated across a set of servers."
 \end{feedback}
+\textcolor{red}{TODO.}
 
 \paragraph{Reviewer 4: 2}
 \begin{feedback}
@@ -440,7 +441,16 @@ live. We discuss this more in Reviewer 4: 5 below.
   remedy. Would using some heuristics and abstracting state provide any help
   here?
 \end{feedback}
-\textcolor{red}{TODO.}
+We agree that involving the user for identifying unreachable states is not
+ideal, and in many cases not practical. We think our discussion of tolerating
+user errors is also not ideal, but not weak. By requiring users to provide
+proofs of reachability and by deploying the invariant $I - NR$ instead of $I$,
+invariant violations are impossible.
+%
+Heuristics and abstracting state and other techniques from invariant tightening
+would probably help, but they are out of scope of the paper. As you mention,
+the techniques are not new. We view it as an orthogonal but complementary line
+of research.
 
 \paragraph{Reviewer 4: 5}
 \begin{feedback}
