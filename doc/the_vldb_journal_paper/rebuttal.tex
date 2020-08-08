@@ -321,12 +321,12 @@ See Reviewer 4: 5, 7.
 
 \paragraph{Reviewer 1: Typos}
 \begin{feedback}
-  end of first column of page 3 "that it execute a transaction" --> "that it
-  executes a transaction"
+  end of first column of page 3 ``that it execute a transaction'' --> ``that it
+  executes a transaction''
 
-  section 5, in example 3, "Our start state state" --> two times state
+  section 5, in example 3, ``Our start state state'' --> two times state
 
-  section 8.2 in example 12: "and a optional" --> "and an optional"
+  section 8.2 in example 12: ``and a optional'' --> ``and an optional''
 \end{feedback}
 Fixed.
 
@@ -510,19 +510,20 @@ Thanks! We appreciate it!
 
 \paragraph{Reviewer 4: 1}
 \begin{feedback}
-  In the introduction the concept of "invariant" is missing some context. Where
+  In the introduction the concept of ``invariant'' is missing some context. Where
   does this invariant come from? It looks like this invariant is a given
   invariant for the program executing on the replicated object, and it is not
   necessarily a tight invariant.  Clarifying this in advance would be useful,
   as I realized this only in the beginning of Section 2, I read this:
-  "Informally, a replicated object is invariant confluent *with respect to an
+  ``Informally, a replicated object is invariant confluent *with respect to an
   invariant* if every replica of the object is guaranteed to satisfy the
   invariant despite the possibility of different replicas being concurrently
-  modified or merged together." Mentioning the system model explicitly in the
-  introduction also would help: "a distributed object and accompanying
-  invariant is replicated across a set of servers."
+  modified or merged together.'' Mentioning the system model explicitly in the
+  introduction also would help: ``a distributed object and accompanying
+  invariant is replicated across a set of servers.''
 \end{feedback}
-\textcolor{red}{TODO.}
+We re-worded the introduction with your suggestion and also added a short
+example of \invariantconfluence{} to the introduction.
 
 \paragraph{Reviewer 4: 2}
 \begin{feedback}
@@ -551,7 +552,9 @@ live. We discuss this more in Reviewer 4: 5 below.
   does not cite MRDT understandably because it is very recent work, however
   including a discussion of this in the related work would be helpful.
 \end{feedback}
-\textcolor{red}{TODO.}
+Thanks for pointing out this paper. We hadn't heard of it before, and it is
+definitely relevant to our work on \invariantconfluence{}. We added a
+discussion of MRDTs to our related works section.
 
 \paragraph{Reviewer 4: 4}
 \begin{feedback}

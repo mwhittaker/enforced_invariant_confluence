@@ -32,9 +32,15 @@ still ensure that its invariants are maintained? Yes...\ sometimes. Bailis et
 al.\ introduced the notion of \emph{\invariantconfluence{}} as a necessary and
 sufficient condition for when invariants can be maintained over replicated data
 without the need for any coordination~\cite{bailis2014coordination}. If an
-object is \invariantconfluent{} with respect to an invariant, we can replicate
-it with the performance benefits of weak consistency and (some of) the
-correctness benefits of strong consistency.
+object is \invariantconfluent{} with respect to an \markrevisions{accompanying}
+invariant, we can replicate the \markrevisions{object and invariant} with the
+performance benefits of weak consistency and (some of) the correctness benefits
+of strong consistency.
+\begin{revisions}
+  For example, a replicated bank account balance (represented as an integer) is
+  \invariantconfluent{} with respect the invariant of a non-negative balance,
+  so long as we only allow deposits.
+\end{revisions}
 
 Unfortunately, to date, the task of identifying whether or not an object
 actually is \invariantconfluent{} has remained an exercise in human proof
@@ -43,7 +49,7 @@ transactions, and invariants (e.g.\ foreign key constraints on relations,
 linear constraints on integers) as \invariantconfluent{} or not. Hand-written
 proofs of this sort are unreasonable to expect from programmers. Ideally we
 would have a general-purpose program that can automatically determine
-\invariantconfluence{} for us.  \textbf{The first main thrust of this paper is
+\invariantconfluence{} for us. \textbf{The first main thrust of this paper is
 to make \invariantconfluence{} checkable:} to design a general-purpose
 \invariantconfluence{} decision procedure, and implement it in an interactive
 system.

@@ -128,6 +128,24 @@ combination of strong eventual consistency and invariant preservation. Any CRDT
 Finally, our criteria in \thmref{LatticeProperty} also borrow ideas from CRDTs,
 exploiting the algebraic properties of semilattices.
 
+\begin{revisions}
+  \textbf{Mergeable Replicated Data Types.}
+  Mergeable Replicated Data Types (MRDTs)~\cite{kaki2019mergeable}, like CRDTs,
+  are eventually consistent replicated objects. CRDTs get their eventual
+  consistency by merging two CRDT replicas using a commutative, associative,
+  and idempotent merge function. MRDTs instead merge two divergent replicas
+  along with their least common ancestor. MRDTs rely on an abstraction function
+  $\alpha$ and concretization function $\gamma$ to map abstract data types to
+  the domain of relations. Given these two functions, one can derive an
+  appropriate merge function.
+
+  Like CRDTs, MRDTs are eventually consistent but may not preserve invariants,
+  while \invariantconfluent{} objects preserve invariants but may not be
+  eventually consistent. An interesting direction for future work would be to
+  generalize \invariantconfluence{}'s use of binary merge operators to use the
+  ternary merge operators used by MRDTs.
+\end{revisions}
+
 \textbf{CALM Theorem.}
 Bloom~\cite{alvaro2010boom, alvaro2011consistency, conway2012logic} and its
 formalism, Dedalus~\cite{alvaro2011dedalus, alvaro2013declarative}, are
