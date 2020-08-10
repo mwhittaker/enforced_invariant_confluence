@@ -196,19 +196,19 @@ prohibits concurrent decrements.
 
 \begin{revisions}
   For example, assume that $k = 3$ and that the three states are $s_1 = s_2 =
-  s_3 = (p_1, p_2, p_3), (n_1, n_2, n_3) = (3, 4, 5), (3, 3, 3)$. Here, the
-  value of the PN-counter is $(3 + 4 + 5) - (3 + 3 + 3) = 3$, which is
+  s_3 = (p_1, p_2, p_3), (n_1, n_2, n_3) = (3, 3, 3), (3, 2, 1)$. Here, the
+  value of the PN-counter is $(3 + 3 + 3) - (3 + 2 + 1) = 3$, which is
   non-negative as expected. If server 1 receives a decrement request, it
   \emph{cannot} execute the decrement without global coordination because doing
   so would cause $n_1$ to exceed the escrow threshold $k = 3$. Naively, it
-  seems safe. Server 1 would transition to state $(3, 3, 5), (3, 3, 3)$ which
+  seems safe. Server 1 would transition to state $(3, 3, 3), (4, 2, 1)$ which
   has non-negative value $2$. However, if servers 2 and 3 concurrently perform
   decrements of their own, the three servers' states would merge to a negative
   value. Thus, the decrement requires global coordination to rule out the
   possibility of concurrent decrements.
 
   On the other hand, if server 2 receives a decrement request, it can safely
-  execute it locally and transition to state $(3, 3, 5), (3, 3, 3)$. This is
+  execute it locally and transition to state $(3, 3, 3), (3, 3, 1)$. This is
   safe because server 2 knows that every server $i$ maintains $p_i \geq n_i$.
   Thus, after merging, the value of the PN-counter is $\sum_i p_i - \sum_i n_i
   = \sum_i (p_i - n_i)$ which is the sum of non-negative terms. Intuitively, if
@@ -229,13 +229,20 @@ any human interaction.
   coordination.
 
   Escrow transactions are a good example where this optimization works
-  particularly well. Assume that $k = 3$ and that the three states are $(3, 3,
-  3), (3, 3, 3)$. Here, no server can process a decrement transaction locally.
-  If a server receives a decrement transaction, it must execute it with global
-  coordination. However, if the server instead defers the execution of the
-  decrement transaction and happens to receive a number of increment
-  transactions, then it can execute the decrement locally, without the need for
-  global coordination.
+  particularly well. Assume that instead of using PN-counters, we implement a
+  replicated bank account balance as a tuple of timestamped integers $(x_1,
+  x_2, \ldots, x_n)$, with the value of the bank account being the sum of the
+  integers, with merging done element-wise, and with higher timestamps
+  overriding lower timestamps~\cite{wu2019anna}. Every time a sever $s_i$
+  increments or decrements its integer $x_i$, it increases the integer's
+  timestamp. We consider the segmentation in which decrements do not require
+  global coordination so long as every individual integer remains non-negative.
+
+  If a server's integer is zero, it cannot process a decrement transaction
+  locally, it must execute it with global coordination. However, if the server
+  instead defers the execution of the decrement transaction and happens to
+  receive a number of increment transactions, then it can execute the decrement
+  locally, without the need for global coordination.
 \end{revisions}
 
 \example[TPC-C]\examplelabel{TpccEval}

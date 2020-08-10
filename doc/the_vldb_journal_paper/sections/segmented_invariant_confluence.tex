@@ -276,8 +276,8 @@ Now, a segmented \invariantconfluence{} decision procedure, can simply invoke
     $O$ is not \sTIconfluent{} because of concurrent decrements. We can forbid
     concurrent decrements using a simple one-segment segmentation $\Sigma = (I,
     T^+)$ where $T^+$ consists only of increment transactions.
-  \end{revisions}
-  Applying, \algoref{ArbitraryStartInteractiveDecisionProcedure},
+  \end{revisions}\
+  Applying \algoref{ArbitraryStartInteractiveDecisionProcedure},
   \IsIclosed{} again returns false with the same states $s_1$ and $s_2$. This time,
   however, the user recognizes that the two states are not
   \ticoreachable{T^+}{I} (all modifications of $(n_1, n_2, n_3)$ require global

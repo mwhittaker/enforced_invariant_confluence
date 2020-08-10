@@ -50,16 +50,17 @@ Our original publication on \invariantconfluence{} is largely theoretical. We
 provide new, and arguably improved, definitions of \invariantconfluence{}. We
 characterize the relationship between \invariantclosure{} and
 \invariantconfluence{}. We exploit the relationship to develop an
-\invariantclosure{} decision procedure. We invent the notion of
+\invariantconfluence{} decision procedure. We invent the notion of
 \mergereducibility{} and characterize its relationship with
-\invariantclosure{}. We invent the notion of segmented \invariantconfluence{},
-and develop another decision procedure.
+\invariantclosure{} and \invariantconfluence{}. We invent the notion of
+segmented \invariantconfluence{} and develop a segmented \invariantconfluence{}
+decision procedure.
 
 When our paper was invited to this journal, we took the opportunity to improve
-the rigor and clarity of the core contributions of the paper. We added numerous
-proofs to verify the theorems in the paper, and we added many examples and
-illustrations providing valuable intuition behind the key results. We also
-added a significant amount of new material:
+the rigor and clarity of the core contributions of the paper: its theoretical
+foundations. We added numerous proofs to verify the theorems in the paper, and
+we added many examples and illustrations providing valuable intuition behind
+the key results. We also added a significant amount of new material:
 \begin{itemize}
   \item (Section 2.3)
     In our conference paper, we present a definition of invariant confluence
@@ -174,7 +175,7 @@ See our Overview section above.
   W4 touches upon the ``new material'' for this extended version of the paper,
   and the above weak points W1, W2 and W3 can all serve as additional material.
 \end{feedback}
-See W1, W2, W3, and D6.
+See W1, W2, W3, and our Overview section above.
 
 \paragraph{Reviewer 1: D2}
 \begin{feedback}
@@ -325,8 +326,7 @@ Fixed.
   unreachable states automatically.'' Overall, the authors did not manage to
   show that the additions were significant enough to warrant publication.
 \end{feedback}
-We address this feedback in detail below. We also disagree that the time
-between publication and now should have any bearing on the revisions.
+We address this feedback in detail below.
 
 \paragraph{Reviewer 3: Section 2.1}
 \begin{feedback}
@@ -347,7 +347,7 @@ and idempotent~\cite{bailis2014coordination}.
   definitions are equivalent.
 \end{feedback}
 We believe that proving equivalent definitions are, in fact, equivalent is a
-fundamental tenant of theoretical research. Without a proof of the two
+fundamental tenet of theoretical research. Without a proof of the two
 definitions being equivalent, it's possible that our notion of
 \invariantconfluence{} and Bailis et al.'s original notion differ.  If so, none
 of our theorems or decision procedures could be applied to Bailis et al.'s
@@ -380,7 +380,7 @@ Yup, a minor but (we hope) useful improvement.
   PVLDB paper was clear enough to the reader.
 \end{feedback}
 We're happy that the original proof was clear to the reviewer, but we felt it
-was not clear to most people, including us.
+was not clear to most people.
 
 \paragraph{Reviewer 3: Section 4.2}
 \begin{feedback}
@@ -413,7 +413,7 @@ publication on its own.
 Yes, and we feel this is one of the core additions to the paper. The two
 biggest drawbacks of interactivity are (1) the time and labor required of a
 user and (2) the possibility of introducing errors. We break down the two types
-of user errors (i.e.\ labelling an unreachable state as reachable and labelling
+of user errors (i.e.\ labeling an unreachable state as reachable and labeling
 a reachable state as unreachable) and provide solutions for both, eliminating
 the possibility of an erroneously verified \invariantconfluent{} object from
 violating an invariant in deployment. This addition is very important for
@@ -518,10 +518,10 @@ then the CAP theorem tells us that total availability (the kind that
 \invariantconfluence{} achieves) is impossible~\cite{brewer2012cap,
 gilbert2002brewer}.
 
-Note, however, that a segmented \invariantconfluent{} object does suffer from
-liveness problems, as we discuss in Section 6.4. Specifically, transactions
-that require global coordination are live only as long as every replica is
-live. We discuss this more in Reviewer 4: 5 below.
+Note, however, that a \emph{segmented} \invariantconfluent{} object does suffer
+from liveness problems, as we discuss in Section 6.4. Specifically,
+transactions that require global coordination are live only as long as every
+replica is live. We discuss this more in Reviewer 4: 5 below.
 
 \paragraph{Reviewer 4: 3}
 \begin{feedback}
@@ -573,9 +573,9 @@ researching membership changes in state machine replication protocols---which
 you can find here:
 \url{https://mwhittaker.github.io/publications/matchmaker_paxos.html}---so we
 can answer your question with quite a bit of confidence. Assume a client sends
-a transaction to a server $p$. The transaction happens to not need global
-coordination, so $p$ executes the transaction locally and sends back the result
-to the client. This scenario makes membership changes difficult for the
+a transaction to a server $p$. The transaction happens to \emph{not} need
+global coordination, so $p$ executes the transaction locally and sends back the
+result to the client. This scenario makes membership changes difficult for the
 following reason. Consider a different execution in which $p$ is partitioned
 from the rest of the servers. The system erroneously thinks that $p$ has failed
 and reconfigures to some other set of servers. However, $p$ and the client are
@@ -592,6 +592,7 @@ that this is a very interesting direction of future work, but unfortunately (as
 with all membership change protocols) is very nuanced and very easy to get
 wrong. It is out of the scope of our paper.
 
+\paragraph{Reviewer 4: 6}
 \begin{feedback}
   Is there plans to make Lucy implementation open source?
 \end{feedback}
