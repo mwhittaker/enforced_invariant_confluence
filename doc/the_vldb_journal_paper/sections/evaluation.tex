@@ -46,11 +46,13 @@ coordination, then the server forwards the transaction request to a
 predetermined leader. When the leader receives a transaction request, it
 broadcasts a coordination request to the other servers. When a server receives
 a coordination request from the leader, it stops processing transactions and
-sends the leader its state. When the leader receives the states of all other
-servers, it executes the transaction, and then sends its state to the other
-servers. When a server receives a new state, it adopts the state, computes its
-new active segment, and resumes normal processing. After every 100 transactions
-processed, a server sends a merge request to a randomly selected server.
+sends the leader its state. \markrevisions{All in-flight transactions are
+deferred until the global communication is complete.} When the leader receives
+the states of all other servers, it executes the transaction, and then sends
+its state to the other servers. When a server receives a new state, it adopts
+the state, computes its new active segment, and resumes normal processing.
+After every 100 transactions processed, a server sends a merge request to a
+randomly selected server.
 
 Lucy can also replicate an object with eventual consistency and with
 linearizability. With eventual consistency, clients send every transaction

@@ -45,6 +45,93 @@ Below, you'll find our response to reviewer comments and our revisions. All
 changes made to the paper are shown in \markrevisions{pink}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Overview}
+Our original publication on \invariantconfluence{} is largely theoretical. We
+provide new, and arguably improved, definitions of \invariantconfluence{}. We
+characterize the relationship between \invariantclosure{} and
+\invariantconfluence{}. We exploit the relationship to develop an
+\invariantclosure{} decision procedure. We invent the notion of
+\mergereducibility{} and characterize its relationship with
+\invariantclosure{}. We invent the notion of segmented \invariantconfluence{},
+and develop another decision procedure.
+
+When our paper was invited to this journal, we took the opportunity to improve
+the rigor and clarity of the core contributions of the paper. We added numerous
+proofs to verify the theorems in the paper, and we added many examples and
+illustrations providing valuable intuition behind the key results. We also
+added a significant amount of new material:
+\begin{itemize}
+  \item (Section 2.3)
+    In our conference paper, we present a definition of invariant confluence
+    that is slightly different than the original definition from Bailis et
+    al.~\cite{bailis2014coordination}, but we do not comment on the difference.
+    We added a subsection (Section 2.3) clarifying that the difference in
+    definitions is superficial. We describe Bailis' original definition using
+    our formalism and prove that the two definitions are equivalent.
+
+  \item (Section 4.3)
+    One of the core contributions of our paper is an interactive invariant
+    confluence decision procedure. Here, ``interactive'' means that the
+    decision procedure relies on human input to guide the decision procedure.
+    It's possible for a person to provide the decision procedure with incorrect
+    information. We added a subsection (Section 4.3) describing how to mitigate
+    these errors.
+
+  \item (Section 6.4)
+    We added a paragraph explaining the relationship between segmented
+    invariant confluence and a distributed locking approach to maintaining
+    invariants (that can be found in related works).
+
+  \item (Section 6.4)
+    We added a paragraph explaining a couple of optimizations that can be made
+    to our segmented invariant confluence system model to reduce the frequency
+    of global coordination.
+
+  \item (Section 6.4)
+    We added a paragraph explaining how a segmented invariant confluence
+    decision procedure can leverage our merge reducibility results in addition
+    to our results on invariant closure.
+
+  \item (Section 6.4)
+    We clarified the fault tolerance limitations of segmented invariant
+    confluence. A naive implementation of our segmented invariant confluence
+    decision procedure does not guarantee liveness, but there are
+    straightforward techniques we can leverage to introduce liveness. We added
+    an explanation of this to the paper.
+
+  \item (Section 7)
+    Our conference paper presents formal definitions of distributed objects and
+    invariant confluence. The definitions revolve around servers gossiping
+    state to one another and merging the states together using a binary merge
+    operator. This approach is called a ``state-based'' approach. We added a
+    section (Section 7) outlining a dual ``operation-based'' approach in which
+    transactions, rather than states, are gossiped. This duality between
+    state-based and operation-based definitions is well established in the CRDT
+    literature.
+\end{itemize}
+
+The requested revisions, however, fall mainly into two categories. First, we
+have requests to expand our empirical evaluation. Unfortunately, an expanded
+evaluation requires a significant amount of work for very little additional
+technical contribution. The applications of our theoretical results are
+important (which is why we included them in the paper originally), but it is
+not the focus of the paper. We believe that future work focused more on the
+application of \invariantconfluence{} would leverage the key insights of our
+paper and would benefit from the increased clarity and rigor of our journal
+submission.
+
+Second, we have requests to complete some of our suggested future work, with
+arguments that the two years since our original publication should be enough
+time to do so. We disagree that the time since our original publication should
+have any bearing on our journal submission. Since our publication, we have been
+working in new research areas. We have not spent the last two years working on
+\invariantconfluence{}. Moreover, the suggested future work involves a
+significant research undertaking that would involve solving many fundamental
+research problems with implications well beyond \invariantconfluence{}. We
+believe that any such results would more than warrant a publication on their
+own.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Reviewer 1}
 \paragraph{Reviewer 1: W1}
 \begin{feedback}
@@ -52,22 +139,20 @@ changes made to the paper are shown in \markrevisions{pink}.
   examples would add a lot of value to the paper
 \end{feedback}
 We added a link to our DSL implementation on GitHub to the beginning of Section
-8. The GitHub repository also contains a couple of examples that didn't make it
-into the paper. We also added a bit more explanation of the DSL to Section 8.1.
-We agree the paper would benefit from more examples, but given that the paper
+8. We also added a bit more explanation of the DSL to Section 8.1.  The paper
 already has over 10 examples of invariant confluence with varying degrees of
-complexity from simple (e.g., Example 10) to complex (e.g, Example 14), we feel
-the added benefit of yet another example does not justify the effort.
+complexity from simple (e.g., Example 10) to complex (e.g., Example 14), and we
+feel that additional examples will offer little additional technical insight.
 
 \paragraph{Reviewer 1: W2}
 \begin{feedback}
   More experiments with some realistic workloads (like TPCC) to show the
   benefit of the proposed concepts in action are needed
 \end{feedback}
-See above. We agree that having a number of realistic workloads in the paper
-would be beneficial, but specifying, verifying, and explaining every workload
-requires a significant amount of work for a marginal increase in the clarity of
-the paper.
+We agree that having a number of realistic workloads in the paper would be
+beneficial, but specifying, verifying, and explaining every workload requires a
+significant amount of work for a marginal increase in the clarity of the paper.
+The focus of the paper is the foundations, not the applications of these ideas.
 
 \paragraph{Reviewer 1: W3}
 \begin{feedback}
@@ -82,7 +167,7 @@ See above.
   The main weak point of this specific submission is whether it has enough new
   material to to qualify for being an extended version
 \end{feedback}
-See D6.
+See our Overview section above.
 
 \paragraph{Reviewer 1: D1}
 \begin{feedback}
@@ -131,118 +216,7 @@ that it would warrant a publication on its own.
   without any enough discussion of the practical connections of the proposed
   idea)
 \end{feedback}
-We disagree. Our paper is largely theoretical. We provide new, and arguably
-improved, definitions of \invariantconfluence{}. We characterize the
-relationship between \invariantclosure{} and \invariantconfluence{}. We exploit
-the relationship to develop an \invariantclosure{} decision procedure. We
-invent the notion of \mergereducibility{} and characterize its relationship
-with \invariantclosure{}. We invent the notion of segmented
-\invariantconfluence{}, and develop another decision procedure.
-
-Addressing W1-W3 would certainly strengthen the paper. We don't argue that.
-But, these three points focus exclusively on the empirical evaluation of our
-techniques, rather than the theoretical underpinnings, which we feel is the
-core message of the paper. This is why we focused our revisions on the
-theoretical aspects of the paper. We believe that these additions are
-substantial. Repeating from our change log:
-\begin{itemize}
-  \item (Section 2.3)
-    In our conference paper, we present a definition of invariant confluence
-    that is slightly different than the original definition from Bailis et
-    al.~\cite{bailis2014coordination}, but we do not comment on the difference.
-    We added a subsection (Section 2.3) clarifying that the difference in
-    definitions is superficial. We describe Bailis' original definition using
-    our formalism and prove that the two definitions are equivalent.
-
-  \item (Section 3, Theorem 2)
-    We added a formal proof that invariant closure is sufficient for invariant
-    confluence.
-
-  \item (Section 3, Theorem 3)
-    We added a formal proof of our key result equating invariant closure and
-    invariant confluence.
-
-  \item (Section 4.1)
-    We expanded the correctness proof of our interactive decision procedure. A
-    key step in understanding the correctness of our interactive invariant
-    confluence decision procedure---namely that $I$-reachable and
-    $(I-NR)$-reachable states are equal---was omitted from our conference
-    paper. We added a formal proof of this fact as well as a few other minor
-    elaborations.
-
-  \item (Section 4.2)
-    In our conference paper, we asserted that checking for invariant closure is
-    undecidable in general. We added a brief example showing \emph{why}
-    invariant closure is undecidable, by reducing it to the Halting Problem.
-
-  \item (Section 4.3)
-    One of the core contributions of our paper is an interactive invariant
-    confluence decision procedure. Here, ``interactive'' means that the
-    decision procedure relies on human input to guide the decision procedure.
-    It's possible for a person to provide the decision procedure with incorrect
-    information. We added a subsection (Section 4.3) describing how to mitigate
-    these errors.
-
-  \item (Section 5, Examples 3 and 4)
-    We added examples of merge-reducible and non-merge-reducible objects to
-    make it easier for the reader to understand the definition of
-    merge-reducibility.
-
-  \item (Section 5, Theorem 4 and Figure 4)
-    We added a formal proof that merge-reducibility is a sufficient condition
-    for invariant-confluence. We also added a diagram illustrating the key idea
-    behind the proof. Similarly, we added a counterexample showing that
-    merge-reducibility is not a necessary condition for invariant-confluence.
-
-  \item (Section 5, Theorem 5 and Figure 5)
-    We added a formal proof that criteria 1 through 4 are sufficient for
-    invariant confluence. The idea behind the proof is straightforward but the
-    details are tedious. To help readers see the forest through the trees, we
-    also added an illustration of the key idea of the proof.
-
-  \item (Section 5, Example 5)
-    In our conference paper, we provide an example of a distributed object that
-    satisfies criteria 1 through 4 outlined in Theorem 4 but is not invariant
-    closed. In the example, we asserted that criteria 1 through 4 are satisfied
-    but did not elaborate on why. We added a brief explanation making it clear
-    why the criteria are met.
-
-  \item (Section 6.3, Example 7)
-    We added an example of co-reachable and co-unreachable states to help the
-    reader understand the definition of co-reachability.
-
-  \item (Section 6.4)
-    We added a paragraph explaining the relationship between segmented
-    invariant confluence and a distributed locking approach to maintaining
-    invariants (that can be found in related works).
-
-  \item (Section 6.4)
-    We added a paragraph explaining a couple of optimizations that can be made
-    to our segmented invariant confluence system model to reduce the frequency
-    of global coordination.
-
-  \item (Section 6.4)
-    We added a paragraph explaining how a segmented invariant confluence
-    decision procedure can leverage our merge reducibility results in addition
-    to our results on invariant closure.
-
-  \item (Section 6.4)
-    We clarified the fault tolerance limitations of segmented invariant
-    confluence. A naive implementation of our segmented invariant confluence
-    decision procedure does not guarantee liveness, but there are
-    straightforward techniques we can leverage to introduce liveness. We added
-    an explanation of this to the paper.
-
-  \item (Section 7)
-    Our conference paper presents formal definitions of distributed objects and
-    invariant confluence. The definitions revolve around servers gossiping
-    state to one another and merging the states together using a binary merge
-    operator. This approach is called a ``state-based'' approach. We added a
-    section (Section 7) outlining a dual ``operation-based'' approach in which
-    transactions, rather than states, are gossiped. This duality between
-    state-based and operation-based definitions is well established in the CRDT
-    literature.
-\end{itemize}
+See our Overview section above.
 
 \paragraph{Reviewer 1: D7}
 \begin{feedback}
@@ -254,11 +228,9 @@ The trade-off between application complexity and coordination-freedom is shown
 in Examples 2, 6, 12, and 13. Very simple examples (Example 2) don't require
 any segmentation. More complex initial states (Example 6), more complex
 transactions (Example 12), and more complex optimizations (Example 13) require
-segmentation. We agree though that these examples don't demonstrate the
-trade-off in an airtight way. The trade-off we describe in the introduction is
-written to give some intuition to the reader, but ultimately the notion of
-complexity is subjective, and the number of segments of an application is up to
-the user.
+segmentation. The trade-off we describe in the introduction is written to give
+some intuition to the reader, but ultimately the notion of complexity is
+subjective, and the number of segments of an application is up to the user.
 
 \paragraph{Reviewer 1: D8}
 \begin{feedback}
@@ -287,12 +259,12 @@ We reworded the sentence to be easier to read.
   set of transactions.'' How can one identify transactions to remove, and is
   the removal practically done?
 \end{feedback}
-Users must manually identify transactions to remove. More generally,
-identifying a transaction to remove from a segmentation is a special case of
-forming a segmentation, and we do not provide any automated assistance on how
-to form a segmentation. Is the removal practically done? That depends on the
-workload. For some workloads, identifying invariant-violating transactions can
-be easy. The bank withdrawal example (Example 8). Other, more complex
+In the current work, users must manually identify transactions to remove. More
+generally, identifying a transaction to remove from a segmentation is a special
+case of forming a segmentation, and we do not provide any automated assistance
+on how to form a segmentation. Is the removal practically done? That depends on
+the workload. For some workloads, identifying invariant-violating transactions
+can be easy, like the bank withdrawal example (Example 8). Other, more complex
 workloads, can be difficult to reason about. Forming segmentations for these
 workloads is not easy. We think that automatically forming segmentations is an
 interesting avenue for future research.
@@ -304,16 +276,12 @@ interesting avenue for future research.
   what happens to the in-flight transactions? Are the cancelled or allowed to
   finish? Is the system simply not admitting new transactions?
 \end{feedback}
-In-flight transactions are deferred until after the round of coordination is
-done. They aren't cancelled, and they are allowed to finish, but only after the
-coordination is done. The entire system stops processing transactions
-temporarily.  Technically, the system can still \emph{admit} new transactions
-during coordination, but it cannot execute them.
-
-We describe this in Section 6.2, for example, when we say that if ``$t \notin
-T_i$, then $p_i$ initiates a round of global coordination to execute $t$.
-During global coordination, every server temporarily stops processing
-transactions.''
+Thanks for catching this. We added some clarification to Section 8.1.  In
+short, in-flight transactions are deferred until after the round of
+coordination is done. They aren't cancelled, and they are allowed to finish,
+but only after the coordination is done. The entire system stops processing
+transactions temporarily. Technically, the system can still \emph{admit} new
+transactions during coordination, but it cannot execute them.
 
 Your question also reinforces the conclusion of Figure 10. If coordination is
 frequent, then segmented \invariantconfluence{} becomes slow, even slower than
@@ -329,12 +297,12 @@ See Reviewer 4: 5, 7.
 
 \paragraph{Reviewer 1: Typos}
 \begin{feedback}
-  end of first column of page 3 ``that it execute a transaction'' --> ``that it
-  executes a transaction''
+  end of first column of page 3 ``that it execute a transaction'' $\to$ ``that
+  it executes a transaction''
 
-  section 5, in example 3, ``Our start state state'' --> two times state
+  section 5, in example 3, ``Our start state state'' $\to$ two times state
 
-  section 8.2 in example 12: ``and a optional'' --> ``and an optional''
+  section 8.2 in example 12: ``and a optional'' $\to$ ``and an optional''
 \end{feedback}
 Fixed.
 
@@ -378,14 +346,14 @@ and idempotent~\cite{bailis2014coordination}.
   The authors did not clarify why it is important to prove that both
   definitions are equivalent.
 \end{feedback}
-Without a proof of the two definitions being equivalent, it's possible that our
-notion of \invariantconfluence{} and Bailis et al.'s original notion differ.
-If so, none of our theorems or decision procedures could be applied to Bailis et
-al.'s findings. We'd be talking about two completely different concepts.
-Proving they are equivalent unifies the work. It's similar to proving that
-relational algebra, SQL, and relational calculus are all equally expressive.
-Without this knowledge, proofs using the different definitions would be
-mutually incompatible.
+We believe that proving equivalent definitions are, in fact, equivalent is a
+fundamental tenant of theoretical research. Without a proof of the two
+definitions being equivalent, it's possible that our notion of
+\invariantconfluence{} and Bailis et al.'s original notion differ.  If so, none
+of our theorems or decision procedures could be applied to Bailis et al.'s
+findings. We'd be talking about two completely different concepts.  Proving
+they are equivalent unifies the work. Without this knowledge, proofs using the
+different definitions would be mutually incompatible.
 
 \paragraph{Reviewer 3: Section 3}
 \begin{feedback}
@@ -403,7 +371,7 @@ mutually incompatible.
   including s1 ⊔s2, satisfy the invariant. Moreover s0 is reachable, so I(s0)
   because O is (s0,T,I)-confluent.''
 \end{feedback}
-Yup, a minor but helpful improvement.
+Yup, a minor but (we hope) useful improvement.
 
 \paragraph{Reviewer 3: Section 4.1}
 \begin{feedback}
@@ -429,11 +397,12 @@ Automatically discovering unreachable states is hard, really hard. As we
 describe in the paper, it is easy to verify that a state is reachable, simply
 give an expression that evaluates to it. Verifying that a state is unreachable
 is significantly harder, as we have to create a proof showing that there does
-not exist any execution in which the state is reached. Things like the Collatz
-conjecture show that reasoning about the reachability or unreachability of even
-simple programs can be tremendously difficult. If we developed any substantial
-techniques to identify unreachable states in a general way, we feel that would
-constitute a strong publication on its own.
+not exist any execution in which the state is reached. Open mathematical
+problems like the Collatz conjecture~\cite{mottaanalysis} show that reasoning
+about the reachability or unreachability of even simple programs can be
+tremendously difficult. If we developed any substantial techniques to identify
+unreachable states in a general way, we feel that would constitute a strong
+publication on its own.
 
 \paragraph{Reviewer 3: Section 4.3}
 \begin{feedback}
@@ -603,8 +572,8 @@ before. Coincidentally, since our initial publication, we spent some time
 researching membership changes in state machine replication protocols---which
 you can find here:
 \url{https://mwhittaker.github.io/publications/matchmaker_paxos.html}---so we
-can answer your question with a bit of confidence. Assume a client sends a
-transactions to a server $p$. The transaction happens to not need global
+can answer your question with quite a bit of confidence. Assume a client sends
+a transaction to a server $p$. The transaction happens to not need global
 coordination, so $p$ executes the transaction locally and sends back the result
 to the client. This scenario makes membership changes difficult for the
 following reason. Consider a different execution in which $p$ is partitioned
