@@ -99,7 +99,7 @@ ply==3.10
 prompt-toolkit==1.0.14
 psutil==5.4.3
 ptyprocess==0.5.1
-py==1.4.33
+py==1.10.0
 pycosat==0.6.2
 pycparser==2.17
 pycrypto==2.6.1
