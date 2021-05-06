@@ -36,7 +36,7 @@ entrypoints==0.2.2
 et-xmlfile==1.0.1
 fastcache==1.0.2
 Flask==0.12.2
-Flask-Cors==3.0.2
+Flask-Cors==3.0.9
 gevent==1.2.1
 greenlet==0.4.12
 h5py==2.7.0
